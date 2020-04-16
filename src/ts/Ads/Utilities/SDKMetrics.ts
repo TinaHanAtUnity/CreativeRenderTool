@@ -117,14 +117,14 @@ export enum MraidMetric {
 }
 
 export enum AUIMetric {
-    CampaignAlreadyActive = 'campaign_already_active',
+    CampaignCategoryAlreadyActive = 'campaign_category_already_active',
+    CampaignCategoryInactive = 'campaign_category_inactive',
     CampaignInitializationError = 'automated_experiment_manager_initialization_error',
     FailedToCollectStaticFeatures = 'FailedToCollectStaticFeatures',
     FailedToCollectDeviceFeatures = 'failed_to_collect_device_features',
     FailedToFetchAutomatedExperiements = 'failed_to_fetch_automated_experiments',
     FailedToParseExperimentResponse = 'failed_to_parse_automated_experiments_response',
     FailedToPublishOutcome = 'failed_to_publish_experiment_outcome',
-    IgnoringNonPerformanceCampaign = 'ignoring_non_performance_campaign',
     InvalidEndscreenAnimation = 'invalid_endscreen_animation',
     OptimizationResponseApplied = 'campaign_optimization_response_applied',
     AutomatedExperimentManagerInitializationError = 'automated_experiment_manager_initialization_error',
@@ -135,7 +135,8 @@ export enum AUIMetric {
     EndscreenColorTintThemingFailed = 'endscreen_color_tint_theming_failed',
     OptimizationResponseIgnored = 'campaign_optimization_response_ignored',
     RequestingCampaignOptimization = 'requesting_campaign_optimization',
-    UnknownExperimentName = 'unknown_experiement_name'
+    UnknownExperimentName = 'unknown_experiment_name',
+    UnknownCategoryProvided = 'unknown_automated_experiment_category_provided'
 }
 
 export enum GeneralTimingMetric {

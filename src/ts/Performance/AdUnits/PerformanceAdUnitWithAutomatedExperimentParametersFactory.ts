@@ -5,9 +5,9 @@ import { IEndScreenParameters } from 'Ads/Views/EndScreen';
 import { ICore } from 'Core/ICore';
 import { AnimatedDownloadButtonEndScreen } from 'Performance/Views/AnimatedDownloadButtonEndScreen';
 import { AutomatedExperimentManager } from 'Ads/Managers/AutomatedExperimentManager';
-import { AutomatedExperimentsList, ButtonAnimationsExperiment } from 'Ads/Models/AutomatedExperimentsList';
-import { AUIMetric, SDKMetrics } from 'Ads/Utilities/SDKMetrics';
+import { AutomatedExperimentsCategories } from 'Ads/Models/AutomatedExperimentsList';
 import { PerformanceAdUnitParametersFactory } from 'Performance/AdUnits/PerformanceAdUnitParametersFactory';
+import { IExperimentActionChoice } from 'Ads/Models/AutomatedExperiment';
 
 export class PerformanceAdUnitWithAutomatedExperimentParametersFactory extends PerformanceAdUnitParametersFactory {
 
@@ -16,7 +16,7 @@ export class PerformanceAdUnitWithAutomatedExperimentParametersFactory extends P
     constructor(core: ICore, aem: AutomatedExperimentManager) {
         super(core, core.Ads);
         this._automatedExperimentManager = aem;
-        this._automatedExperimentManager.registerExperiments(AutomatedExperimentsList);
+        this._automatedExperimentManager.registerExperimentCategory(AutomatedExperimentsCategories.PERFORMANCE_ENDCARD, 'PerformanceCampaign');
     }
 
     protected createParameters(baseParams: IAdUnitParameters<PerformanceCampaign>) {
@@ -33,8 +33,13 @@ export class PerformanceAdUnitWithAutomatedExperimentParametersFactory extends P
 
         const video = this.getVideo(baseParams.campaign, baseParams.forceOrientation);
 
-        const endScreenCombination = this._automatedExperimentManager.activateExperiment(baseParams.campaign, ButtonAnimationsExperiment);
+        const experimentID = this._automatedExperimentManager.getSelectedExperimentName(baseParams.campaign, AutomatedExperimentsCategories.PERFORMANCE_ENDCARD);
 
+        let endScreenCombination: IExperimentActionChoice | undefined;
+
+        if (AnimatedDownloadButtonEndScreen.experimentSupported(experimentID)) {
+            endScreenCombination = this._automatedExperimentManager.activateSelectedExperiment(baseParams.campaign, AutomatedExperimentsCategories.PERFORMANCE_ENDCARD);
+        }
         const endScreen = new AnimatedDownloadButtonEndScreen(endScreenCombination, endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
 
         return {

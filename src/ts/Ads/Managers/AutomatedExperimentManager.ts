@@ -1,5 +1,5 @@
 import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
-import { AutomatedExperiment, IExperimentActionChoice, IExperimentActionsPossibleValues, IExperimentDeclaration } from 'Ads/Models/AutomatedExperiment';
+import { IExperimentActionChoice, AutomatedExperiment } from 'Ads/Models/AutomatedExperiment';
 import { Campaign, ICampaignTrackingUrls } from 'Ads/Models/Campaign';
 import { CampaignAssetInfo } from 'Ads/Utilities/CampaignAssetInfo';
 import { GameSessionCounters } from 'Ads/Utilities/GameSessionCounters';
@@ -20,59 +20,94 @@ import { Observable3 } from 'Core/Utilities/Observable';
 import { SDKMetrics, AUIMetric } from 'Ads/Utilities/SDKMetrics';
 import { MabDisabledABTest } from 'Core/Models/ABGroup';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
+import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
+import { ARUtil } from 'AR/Utilities/ARUtil';
 
 interface IAutomatedExperimentResponse {
-    experiments: { [key: string]: IExperimentActionChoice };
-    metadata: { [key: string]: string };
+    categories: { [expCat: string]: IAggregateExperiment };
 }
 
-interface IParsedExperiment {
-    name: string;
+// For a given category, AUI/Optmz service can return multiple experiments that answer the request.
+// These experiments always share the same "outcomes" and are internal to the AutomatedManager.
+// What gets exposed is the aggregated `actions` of these experiments.
+interface IAggregateExperiment {
+    experiment_name: string;
+    parts: IAggregateExperimentPart[];
+}
+
+interface IAggregateExperimentPart {
+    id: string;
     actions: IExperimentActionChoice;
     metadata: string;
 }
 
 export type ContextualFeature = string | number | boolean | null | undefined | BatteryStatus | RingerMode | Platform | string[] | { [key: string]: string } | { [key: string]: number } | number[] | string[];
 
-class OptimizedAutomatedExperiment {
-    constructor(experiment: AutomatedExperiment) {
-        this._experiment = experiment;
-        this.Actions = experiment.getDefaultActions();
-        this.Active = false;
-        this.Outcome = 0;
-    }
-
-    private _experiment: AutomatedExperiment;
-    public Actions: IExperimentActionChoice;
-    public Active: boolean;
-    public Outcome: number;
-    public MetaData: string;
-
-    public getExperiment(): AutomatedExperiment {
-        return this._experiment;
-    }
-}
-
 enum AutomatedExperimentStage {
     AWAITING_OPTIMIZATION,
+    OPTIMIZED,
     RUNNING,
     OUTCOME_PUBLISHED,
     ENDED
 }
 
+// A categorized experiment is an experiment that is associated to an 'Experiment Category'
+// An experiment category can, on the AUI/Optmz service side, be composed of many 'categorized experiments'
+// When the AUI/Optmz is queried for an categorized experiment, it will choose a random experiment
+// for the available experiments of that category.
+// This allows the AUI/Optmz service to select optimized experiments per category.
+class CategorizedExperiment {
+    constructor() {
+        this.Outcome = 0;
+        this.Stage = AutomatedExperimentStage.AWAITING_OPTIMIZATION;
+    }
+
+    public Stage: AutomatedExperimentStage;
+    public Experiment: IAggregateExperiment;
+    public Outcome: number;
+
+    public aggregatedActions(): IExperimentActionChoice {
+
+        const actions: IExperimentActionChoice = {};
+
+        for (const part of this.Experiment.parts) {
+
+            Object.keys(part.actions).forEach((act) => {
+                actions[act] = part.actions[act];
+            });
+        }
+
+        return actions;
+    }
+}
+
 class OptimizedCampaign {
     constructor() {
-        this.Stage = AutomatedExperimentStage.AWAITING_OPTIMIZATION;
-        this.Experiments = {};
+        this.CategorizedExperiments = {};
         this.Id = '';
     }
 
     public Id: string;
-    public Stage: AutomatedExperimentStage;
-    public Experiments: { [experimentId: string]: OptimizedAutomatedExperiment };
+    public CategorizedExperiments: { [Category: string]: CategorizedExperiment };
 }
 
+class ExperimentCategory {
+    public Category: string;
+    public CampaignType: string;
+}
+
+// How to usage, call in order:
+//  1. initialize()                             // Done by Ads
+//  2. registerExperimentCategory()             // for each category of interest
+//  3. (optional) getSelectedExperimentName()       // gets the name of the experiment choosen by AUi/Optmz
+//  4. activeSelectedExperiment()               // Signals that experiment is underway -> awaiting an outcome
+//  5. (Optional) rewardSelectedExperiment()    // when experiment result is found to be positive (this sends positive outcome back to AUI/Optmz)
+//  6. endSelectedExperiment()                  // Once the experiment is over (success or not) (this sends negative outcome back to AUI/Optmz if no reward was sent)
+
 export class AutomatedExperimentManager {
+
+    private static _forcedARMRAID: boolean;
+
     private _requestManager: RequestManager;
     private _deviceInfo: DeviceInfo;
     private _privacySdk: PrivacySDK;
@@ -81,23 +116,31 @@ export class AutomatedExperimentManager {
     private _nativeBridge: NativeBridge;
     private _onCampaignListener: (placementID: string, campaign: Campaign, trackingURL: ICampaignTrackingUrls | undefined) => void;
 
-    private static readonly _baseUrl = 'https://auiopt.unityads.unity3d.com/v2/';
-    private static readonly _createEndPoint = 'experiment';
-    private static readonly _rewardEndPoint = 'reward';
+    public static readonly BaseUrlProduction = 'https://auiopt.unityads.unity3d.com';
+    public static readonly BaseUrlStaging = 'https://auiopt.staging.unityads.unity3d.com';
+    public static readonly BaseUrlLocal = 'http://127.0.0.1:3001';
+
+    public static readonly BaseUrl = AutomatedExperimentManager.BaseUrlProduction;
+    public static readonly CreateEndPoint = '/v1/category/experiment';
+    public static readonly RewardEndPoint = '/v1/category/reward';
 
     private _abGroup: number;
     private _gameSessionID: number;
-    private _declaredExperiments: AutomatedExperiment[];
+    private _experimentCategories: ExperimentCategory[];
     private _campaign: OptimizedCampaign;
     private _staticFeaturesPromise: Promise<{ [key: string]: ContextualFeature }>;
     private _campaignSource: Observable3<string, Campaign, ICampaignTrackingUrls | undefined>;
+
+    public static setForcedARMRAID(value: boolean) {
+        this._forcedARMRAID = value;
+    }
 
     public static isAutomationAvailable(adsConfig: AdsConfiguration, config: CoreConfiguration) {
         return !MabDisabledABTest.isValid(config.getAbGroup()) || adsConfig.getHasArPlacement();
     }
 
     constructor() {
-        this._declaredExperiments = [];
+        this._experimentCategories = [];
     }
 
     public initialize(core: ICore, campaignSource: Observable3<string, Campaign, ICampaignTrackingUrls | undefined>): void {
@@ -115,147 +158,131 @@ export class AutomatedExperimentManager {
         this._staticFeaturesPromise = this.collectStaticContextualFeatures();
     }
 
-    public registerExperiments(experiments: AutomatedExperiment[]) {
-        this._declaredExperiments = this._declaredExperiments.concat(experiments);
+    public registerExperimentCategory(category: string, campaignType: string) {
+
+        const newCatExp = new ExperimentCategory();
+        newCatExp.CampaignType = campaignType;
+        newCatExp.Category = category;
+
+        this._experimentCategories = this._experimentCategories.concat(newCatExp);
     }
 
-    public isCampaignTargetForExperiment(campaign: Campaign) {
-        return this._campaign !== undefined && this._campaign.Id === campaign.getId();
-    }
+    public getSelectedExperimentName(campaign: Campaign, category: string): string {
 
-    public startCampaign(campaign: Campaign) {
-        if (this.isCampaignTargetForExperiment(campaign)) {
-
-            if (this._campaign.Stage === AutomatedExperimentStage.RUNNING) {
-                SDKMetrics.reportMetricEvent(AUIMetric.CampaignAlreadyActive);
-                return;
-            }
-
-            for (const experimentName in this._campaign.Experiments.keys) {
-                if (this._campaign.Experiments.hasOwnProperty(experimentName)) {
-                    this._campaign.Experiments[experimentName].Active = false;
-                    this._campaign.Experiments[experimentName].Outcome = 0;
-                }
-            }
-
-            this._campaign.Stage = AutomatedExperimentStage.RUNNING;
-        }
-    }
-
-    public activateExperiment(campaign: Campaign, experiment: AutomatedExperiment): IExperimentActionChoice {
-
-        if (this.isCampaignTargetForExperiment(campaign)) {
-
-            if (this._campaign.Experiments.hasOwnProperty(experiment.getName())) {
-                this._campaign.Experiments[experiment.getName()].Active = true;
-                return this._campaign.Experiments[experiment.getName()].Actions;
-            }
-
-            SDKMetrics.reportMetricEvent(AUIMetric.UnknownExperimentName);
+        if (!this.isOptimizationTarget(campaign, category)) {
+            return '';
         }
 
-        return experiment.getDefaultActions();
+        const categorizedExp = this._campaign.CategorizedExperiments[category];
+
+        if (categorizedExp.Stage === AutomatedExperimentStage.AWAITING_OPTIMIZATION ||
+            categorizedExp.Stage === AutomatedExperimentStage.ENDED) {
+            return '';
+        }
+
+        return categorizedExp.Experiment.experiment_name;
     }
 
-    public endCampaign(campaign: Campaign): Promise<void> {
+    public activateSelectedExperiment(campaign: Campaign, category: string): IExperimentActionChoice | undefined {
 
-        if (this.isCampaignTargetForExperiment(campaign)) {
+        if (!this.isOptimizationTarget(campaign, category)) {
+            return undefined;
+        }
 
-            if (this._campaign.Stage === AutomatedExperimentStage.AWAITING_OPTIMIZATION) {
+        const categorizedExp = this._campaign.CategorizedExperiments[category];
 
-                this._campaign.Stage = AutomatedExperimentStage.ENDED;
+        if (categorizedExp.Stage === AutomatedExperimentStage.RUNNING) {
+            SDKMetrics.reportMetricEvent(AUIMetric.CampaignCategoryAlreadyActive);
+            return undefined;
+        } else if (categorizedExp.Stage !== AutomatedExperimentStage.OPTIMIZED) {
+            return undefined;
+        }
 
+        categorizedExp.Stage = AutomatedExperimentStage.RUNNING;
+        categorizedExp.Outcome = 0;
+
+        return categorizedExp.aggregatedActions();
+    }
+
+    public endSelectedExperiment(campaign: Campaign, category: string): Promise<void> {
+
+        if (!this.isOptimizationTarget(campaign, category)) {
+            return Promise.resolve();
+        }
+
+        try {
+            const categorizedExp = this._campaign.CategorizedExperiments[category];
+
+            if (categorizedExp.Stage !== AutomatedExperimentStage.RUNNING) {
                 return Promise.resolve();
-
-            } else if (this._campaign.Stage !== AutomatedExperimentStage.RUNNING) {
-                return Promise.reject('Experiment session not started.');
             }
 
-            return this.publishCampaignOutcomes(campaign, AutomatedExperimentStage.ENDED);
+            return this.publishCampaignOutcomes(campaign, categorizedExp, AutomatedExperimentStage.ENDED);
+        }
+        finally {
+            this._campaign = new OptimizedCampaign();
         }
 
-        return Promise.resolve();
-    }
+     }
 
-    private publishCampaignOutcomes(campaign: Campaign, nextStage: AutomatedExperimentStage): Promise<void> {
+     public rewardSelectedExperiment(campaign: Campaign, category: string): Promise<void> {
 
-        this._campaign.Stage = nextStage;
-
-        const promises: Promise<INativeResponse>[] = [];
-        for (const experimentName in this._campaign.Experiments) {
-
-            if (this._campaign.Experiments.hasOwnProperty(experimentName)) {
-
-                const optmzdExperiment = this._campaign.Experiments[experimentName];
-                if (optmzdExperiment.Active) {
-                    optmzdExperiment.Active = false;
-                    promises.push(this.postExperimentOutcome(campaign, optmzdExperiment, AutomatedExperimentManager._rewardEndPoint));
-                }
-            }
+        if (!this.isOptimizationTarget(campaign, category)) {
+            return Promise.resolve();
         }
 
-        return Promise.all(promises)
-            .catch((e) => {
-                SDKMetrics.reportMetricEvent(AUIMetric.FailedToPublishOutcome);
-                return Promise.reject(e);
-            })
-            .finally(() => { this._campaign = new OptimizedCampaign(); })
-            .then((res) => { return Promise.resolve(); });
-    }
+        const categorizedExp = this._campaign.CategorizedExperiments[category];
 
-    public rewardExperiments(campaign: Campaign) {
-
-        if (this.isCampaignTargetForExperiment(campaign)) {
-
-            if (this._campaign.Stage !== AutomatedExperimentStage.RUNNING) {
-                return;
-            }
-
-            for (const experimentName in this._campaign.Experiments) {
-                if (this._campaign.Experiments.hasOwnProperty(experimentName)) {
-
-                    if (this._campaign.Experiments[experimentName].Active) {
-                        this._campaign.Experiments[experimentName].Outcome = 1;
-                    }
-                }
-            }
-
-            this.publishCampaignOutcomes(campaign, AutomatedExperimentStage.AWAITING_OPTIMIZATION);
+        if (categorizedExp.Stage !== AutomatedExperimentStage.RUNNING) {
+            return Promise.resolve();
         }
+
+        categorizedExp.Outcome = 1;
+
+        return this.publishCampaignOutcomes(campaign, categorizedExp, AutomatedExperimentStage.OUTCOME_PUBLISHED);
     }
 
-    private postExperimentOutcome(campaign: Campaign, optmzExperiment: OptimizedAutomatedExperiment, apiEndPoint: string): Promise<INativeResponse> {
+    private publishCampaignOutcomes(campaign: Campaign, categorizedExp: CategorizedExperiment, nextStage: AutomatedExperimentStage): Promise<void> {
+
+        categorizedExp.Stage = nextStage;
+
+        const experiments = [];
+        for (const part of categorizedExp.Experiment.parts) {
+            experiments.push({
+                experiment: part.id,
+                actions: part.actions,
+                metadata: part.metadata
+            });
+        }
+
         const outcome = {
             user_info: {
                 ab_group: this._abGroup,
                 auction_id: campaign.getSession().getId(),
                 game_session_id: this._gameSessionID
             },
-            experiment: optmzExperiment.getExperiment().getName(),
-            actions: optmzExperiment.Actions,
-            reward: optmzExperiment.Outcome,
-            metadata: optmzExperiment.MetaData
+            reward: categorizedExp.Outcome,
+            experiments: experiments
         };
 
-        const url = AutomatedExperimentManager._baseUrl + apiEndPoint;
+        const url = AutomatedExperimentManager.BaseUrl + AutomatedExperimentManager.RewardEndPoint;
         const body = JSON.stringify(outcome);
-        return this._requestManager.post(url, body);
+
+        return this._requestManager.post(url, body)
+            .catch((e) => {
+                SDKMetrics.reportMetricEvent(AUIMetric.FailedToPublishOutcome);
+                return Promise.reject(e);
+            })
+            .then((res) => Promise.resolve());
     }
 
-    private parseExperimentsResponse(response: INativeResponse): IParsedExperiment[] {
+    private parseExperimentsResponse(response: INativeResponse): IAutomatedExperimentResponse {
         if (response && response.responseCode === 200) {
-            let json: IAutomatedExperimentResponse;
             try {
-                json = JsonParser.parse<IAutomatedExperimentResponse>(response.response);
-
-                return Object.keys(json.experiments).map(experiment => ({
-                    name: experiment,
-                    actions: json.experiments[experiment],
-                    metadata: (json.metadata === null || json.metadata === undefined ? '' : json.metadata[experiment])
-                }));
+                return JsonParser.parse<IAutomatedExperimentResponse>(response.response);
             } catch (e) {
                 SDKMetrics.reportMetricEvent(AUIMetric.FailedToParseExperimentResponse);
-                return [];
+                throw new Error(AUIMetric.FailedToParseExperimentResponse);
             }
         } else {
             throw new Error('Failed to fetch response from aui service');
@@ -428,55 +455,51 @@ export class AutomatedExperimentManager {
         return features;
     }
 
-    private createRequestBody(campaign: Campaign, experiments: AutomatedExperiment[], contextualFeatures: { [key: string]: ContextualFeature }): string {
+    private createRequestBody(campaign: Campaign, categories: string[], contextualFeatures: { [key: string]: ContextualFeature }): string {
         return JSON.stringify({
             user_info: {
                 ab_group: this._abGroup,
                 game_session_id: this._gameSessionID,
                 auction_id: campaign.getSession().getId()
             },
-            experiments: experiments.map(e => {
-                return {
-                    name: e.getName(),
-                    actions: this.getExperimentSpace(e.getActions())
-                };
-            }),
+            categories: categories,
             contextual_features: contextualFeatures
         });
-    }
-
-    private getExperimentSpace(experimentComponentsDictionary: IExperimentDeclaration): IExperimentActionsPossibleValues {
-        const experimentSpace: { [actionName: string]: string[] } = {};
-        for (const [actionName, variants] of Object.entries(experimentComponentsDictionary)) {
-            experimentSpace[actionName] = Object.values(variants);
-        }
-
-        return experimentSpace;
     }
 
     // Only public so that testing can access it. :/
     public onNewCampaign(campaign: Campaign): Promise<void> {
 
-        if (this._declaredExperiments.length === 0) {
+        if (Object.keys(this._experimentCategories).length === 0) {
             return Promise.resolve();
         }
 
-        if (!(campaign instanceof PerformanceCampaign)) {
-            SDKMetrics.reportMetricEvent(AUIMetric.IgnoringNonPerformanceCampaign);
+        // Gather relevant categories from campaign type
+        const categories: string[] = [];
+        this._experimentCategories.forEach((exp) => {
+            // This sucks but couldn't find a way dynamicaly do it. JS limitation as far as I could tell.
+            if ((exp.CampaignType === 'PerformanceCampaign' && campaign instanceof PerformanceCampaign) ||
+                (exp.CampaignType === 'MRAIDCampaign_AR' && campaign instanceof MRAIDCampaign && ARUtil.isARCreative(campaign)) ||
+                AutomatedExperimentManager._forcedARMRAID) {
+                categories.push(exp.Category);
+            }
+        });
+
+        if (categories.length === 0) {
             return Promise.resolve();
         }
 
         // This is to limit to 1 optmization call per Game Session.
+        // First come, first served
         if (this._campaignSource !== undefined) {
             this._campaignSource.unsubscribe(this._onCampaignListener);
         }
 
         this._campaign = new OptimizedCampaign();
         this._campaign.Id = campaign.getId();
-
-        this._declaredExperiments.forEach(experiment => {
-            this._campaign.Experiments[experiment.getName()] = new OptimizedAutomatedExperiment(experiment);
-        });
+        for (const cat of categories) {
+            this._campaign.CategorizedExperiments[cat] = new CategorizedExperiment();
+        }
 
         SDKMetrics.reportMetricEvent(AUIMetric.RequestingCampaignOptimization);
 
@@ -495,12 +518,12 @@ export class AutomatedExperimentManager {
                 }
                 return features;
             }).then((features) => {
-                const body = this.createRequestBody(campaign, this._declaredExperiments, features);
-                const url = AutomatedExperimentManager._baseUrl + AutomatedExperimentManager._createEndPoint;
+                const body = this.createRequestBody(campaign, categories, features);
+                const url = AutomatedExperimentManager.BaseUrl + AutomatedExperimentManager.CreateEndPoint;
 
                 return this._requestManager.post(url, body)
                     .then((response) => this.parseExperimentsResponse(response))
-                    .then((parsedExperiments) => this.loadCampaignExperiments(campaign, parsedExperiments))
+                    .then((parsedResponse) => this.loadCampaignExperiments(campaign, parsedResponse))
                     .then(() => Promise.resolve())
                     .catch((err) => {
                         SDKMetrics.reportMetricEvent(AUIMetric.FailedToFetchAutomatedExperiements);
@@ -510,21 +533,22 @@ export class AutomatedExperimentManager {
             });
     }
 
-    private loadCampaignExperiments(campaign: Campaign, experiments: IParsedExperiment[]): Promise<void> {
+    private loadCampaignExperiments(campaign: Campaign, response: IAutomatedExperimentResponse): Promise<void> {
 
         if (this._campaign.Id === campaign.getId()) {
 
-            if (this._campaign.Stage !== AutomatedExperimentStage.AWAITING_OPTIMIZATION) {
-                SDKMetrics.reportMetricEvent(AUIMetric.OptimizationResponseIgnored);
-                return Promise.resolve();
-            }
+            Object.keys(response.categories).forEach(category => {
 
-            experiments.forEach(experiment => {
-                const optmzdExperiment = this._campaign.Experiments[experiment.name];
-                if (optmzdExperiment) {
-                    optmzdExperiment.Actions = experiment.actions;
-                    optmzdExperiment.MetaData = experiment.metadata;
+                const categorizedExp = this._campaign.CategorizedExperiments[category];
+
+                if (categorizedExp.Stage !== AutomatedExperimentStage.AWAITING_OPTIMIZATION) {
+                    SDKMetrics.reportMetricEvent(AUIMetric.OptimizationResponseIgnored);
+                    this._campaign = new OptimizedCampaign();
+                    return;
                 }
+
+                categorizedExp.Experiment = response.categories[category];
+                categorizedExp.Stage = AutomatedExperimentStage.OPTIMIZED;
             });
 
             SDKMetrics.reportMetricEvent(AUIMetric.OptimizationResponseApplied);
@@ -534,5 +558,18 @@ export class AutomatedExperimentManager {
         } else {
             return Promise.reject('unknown_campaign_cant_load_experiments');
         }
+    }
+
+    private isOptimizationTarget(campaign: Campaign, category: string): boolean {
+        if (this._campaign === undefined || this._campaign.Id !== campaign.getId()) {
+            return false;
+        }
+
+        if (!this._campaign.CategorizedExperiments.hasOwnProperty(category)) {
+            SDKMetrics.reportMetricEvent(AUIMetric.UnknownCategoryProvided);
+            return false;
+        }
+
+        return true;
     }
 }

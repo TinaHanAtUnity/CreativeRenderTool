@@ -4,7 +4,7 @@ import { PerformanceEndScreen, SQUARE_END_SCREEN } from 'Performance/Views/Perfo
 import EndScreenAnimatedDownloadButton from 'html/EndScreenAnimatedDownloadButton.html';
 import SquareEndScreenAnimatedDownloadButtonTemplate from 'html/SquareEndScreenAnimatedDownloadButton.html';
 import { IExperimentActionChoice } from 'Ads/Models/AutomatedExperiment';
-import { ButtonAnimationsExperiment, ButtonExperimentDeclaration } from 'Ads/Models/AutomatedExperimentsList';
+import { ButtonExperimentDeclaration, ButtonAnimationsExperiment } from 'Ads/Models/AutomatedExperimentsList';
 import { AUIMetric, SDKMetrics } from 'Ads/Utilities/SDKMetrics';
 import { Color } from 'Core/Utilities/Color';
 import { ImageAnalysis } from 'Performance/Utilities/ImageAnalysis';
@@ -16,12 +16,10 @@ export class AnimatedDownloadButtonEndScreen extends PerformanceEndScreen {
     private _darkMode: boolean;
     private _tintColor: boolean;
 
-    constructor(combination: IExperimentActionChoice, parameters: IEndScreenParameters, campaign: PerformanceCampaign, country?: string) {
+    constructor(combination: IExperimentActionChoice | undefined, parameters: IEndScreenParameters, campaign: PerformanceCampaign, country?: string) {
         super(parameters, campaign, country);
-        if (!ButtonAnimationsExperiment.isValid(combination)) {
-            combination = ButtonAnimationsExperiment.getDefaultActions();
-            SDKMetrics.reportMetricEvent(AUIMetric.InvalidEndscreenAnimation);
-        }
+
+        combination = this.fixupExperimentChoices(combination);
 
         switch (combination.scheme) {
             case ButtonExperimentDeclaration.scheme.LIGHT:
@@ -43,6 +41,24 @@ export class AnimatedDownloadButtonEndScreen extends PerformanceEndScreen {
             ...this._templateData,
             'hasShadow': this._animation === ButtonExperimentDeclaration.animation.BOUNCING
         };
+    }
+
+    private fixupExperimentChoices(actions: IExperimentActionChoice | undefined): IExperimentActionChoice {
+        if (actions === undefined) {
+            return ButtonAnimationsExperiment.getDefaultActions();
+        }
+
+        if (!ButtonAnimationsExperiment.isValid(actions)) {
+            SDKMetrics.reportMetricEvent(AUIMetric.InvalidEndscreenAnimation);
+            return ButtonAnimationsExperiment.getDefaultActions();
+        }
+
+        return actions;
+    }
+
+    public static experimentSupported(experimentID: string): boolean {
+        // This is a temp implementation. simple implementation works for now as there is only on experiment supported.
+        return experimentID === ButtonAnimationsExperiment.getName();
     }
 
     public render(): void {
