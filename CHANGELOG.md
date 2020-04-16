@@ -1,4 +1,4 @@
-# Pending
+# Thu Apr 16 23:14:56 UTC 2020
 
 * [AUI] Refactor Service for Categorized Experiments [#14319](https://github.com/Applifier/unity-ads-webview/pull/14319)
 
