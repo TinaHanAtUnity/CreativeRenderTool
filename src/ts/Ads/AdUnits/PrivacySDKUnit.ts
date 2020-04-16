@@ -239,8 +239,8 @@ export class PrivacySDKUnit implements IAdUnit, IPrivacySDKViewHandler {
         this._unityPrivacyView.openUrlCallback(url);
     }
 
-    public onPrivacyMetric(data: string): void {
-        this._requestManager.post(this._privacyMetricsUrl, data)
+    public onPrivacyMetric(metric: { [key: string]: unknown }): void {
+        this._requestManager.post(this._privacyMetricsUrl, JSON.stringify(metric))
           .catch(error => {
               this._core.Sdk.logError(`PRIVACY: sending metrics failed: ${error.message}`);
           });
@@ -249,7 +249,7 @@ export class PrivacySDKUnit implements IAdUnit, IPrivacySDKViewHandler {
     public onPrivacyFetchUrl(data: IPrivacyFetchUrlParams): void {
         const { url, property } = data;
         this._requestManager.get(url).then((response) => {
-            this._unityPrivacyView.fetchUrlCallback(response.response, property);
+            this._unityPrivacyView.fetchUrlCallback(JSON.parse(response.response), property);
         });
     }
 

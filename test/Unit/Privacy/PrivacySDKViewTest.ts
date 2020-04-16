@@ -80,7 +80,7 @@ describe('PrivacySDKViewTest', () => {
                 onPrivacyOpenUrl: (url: string): void => {
                     // TODO: Empty
                 },
-                onPrivacyMetric: (data: string): void => {
+                onPrivacyMetric: (data: { [key: string]: unknown }): void => {
                     // TODO: Empty
                 },
                 onPrivacyFetchUrl: (data: IPrivacyFetchUrlParams): void => {

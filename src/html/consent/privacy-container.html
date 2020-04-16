@@ -71,7 +71,7 @@
                 this.onPrivacyCompleted = function(userSettings) {
                     window.parent.postMessage({
                         type: 'onPrivacyCompleted',
-                        data: JSON.parse(userSettings)
+                        data: userSettings
                     }, '*');
                 };
 
@@ -92,7 +92,7 @@
                 this.onPrivacyFetchUrl = function(data) {
                     window.parent.postMessage({
                         type: 'onPrivacyFetchUrl',
-                        data: JSON.parse(data)
+                        data: data
                     }, '*');
                 };
 

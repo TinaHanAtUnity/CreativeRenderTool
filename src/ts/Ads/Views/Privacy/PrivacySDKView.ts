@@ -130,7 +130,7 @@ export class PrivacySDKView extends View<IPrivacySDKViewHandler> {
         this._frameEventAdapter.postMessage('openUrlCallback', url);
     }
 
-    public onPrivacyMetric(data: string): void {
+    public onPrivacyMetric(data: { [key: string]: unknown }): void {
         this._handlers.forEach(handler => handler.onPrivacyMetric(data));
     }
 
@@ -142,7 +142,7 @@ export class PrivacySDKView extends View<IPrivacySDKViewHandler> {
         this._handlers.forEach(handler => handler.onPrivacyFetchUrl(data));
     }
 
-    public fetchUrlCallback(response: string, property: string): void {
+    public fetchUrlCallback(response: { [key: string]: unknown }, property: string): void {
         this._frameEventAdapter.postMessage('fetchUrlCallback', { response, property });
     }
 

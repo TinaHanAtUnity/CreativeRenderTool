@@ -40,7 +40,7 @@ export class PrivacyAdapterContainer implements IPrivacyFrameHandler {
         this._handler.onPrivacyOpenUrl(url);
     }
 
-    public onPrivacyMetric(data: string): void {
+    public onPrivacyMetric(data: { [key: string]: unknown }): void {
         this._handler.onPrivacyMetric(data);
     }
 
