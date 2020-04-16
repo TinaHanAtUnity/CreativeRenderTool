@@ -1,4 +1,4 @@
-# Pending
+# Thu Apr 16 19:27:56 UTC 2020
 
 * [Load V5] Attempt to stream Ad if caching failed [#14625](https://github.com/Applifier/unity-ads-webview/pull/14625)
 * [Load V5] Expand load v5 to chimera game [#14657](https://github.com/Applifier/unity-ads-webview/pull/14657)
