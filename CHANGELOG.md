@@ -1,5 +1,6 @@
 # Pending
 
+* Cleanup campaign level session counters [#14685](https://github.com/Applifier/unity-ads-webview/pull/14685)
 * [Deployment Scripts] Script to merge pr before staging [#14656](https://github.com/Applifier/unity-ads-webview/pull/14656)
 
 # Thu Apr 16 01:24:36 UTC 2020
