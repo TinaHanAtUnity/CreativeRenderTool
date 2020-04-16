@@ -34,8 +34,9 @@ export class AuctionResponseParser {
                 ...eventTracking.params,
                 ...globalParams
             };
-            const params: { [x: string]: string } =  {};
-            Object.keys(tempParams).forEach(key =>  {
+
+            const params: { [x: string]: string } = {};
+            Object.keys(tempParams).forEach(key => {
                 const templateKey = `{{${key}}}`;
                 params[templateKey] = tempParams[key];
             });
@@ -62,42 +63,35 @@ export class AuctionResponseParser {
 
         Object.keys(placements).forEach((placementId) => {
             const placement = placements[placementId];
-            if (!placement.isBannerPlacement()) {
-                let mediaId: string | undefined;
-                let tracking: IPlacementTrackingV6 | undefined;
+            if (placement.isBannerPlacement()) {
+                return;
+            }
 
-                const placementResponse = responseJson.placements[placementId];
-                if (placementResponse) {
-                    if (placementResponse.mediaId) {
-                        mediaId = responseJson.placements[placementId].mediaId;
-                    } else {
-                        SDKMetrics.reportMetricEvent(AuctionV6.MediaIdMissing);
-                    }
+            let mediaId: string | undefined;
+            let tracking: IPlacementTrackingV6 | undefined;
 
-                    if (placementResponse.tracking) {
-                        tracking = responseJson.placements[placementId].tracking;
-                    } else {
-                        SDKMetrics.reportMetricEvent(AuctionV6.TrackingMissing);
-                    }
+            const placementResponse = responseJson.placements[placementId];
+            if (placementResponse) {
+                if (placementResponse.mediaId) {
+                    mediaId = responseJson.placements[placementId].mediaId;
+                }
+                if (placementResponse.tracking) {
+                    tracking = responseJson.placements[placementId].tracking;
+                }
+            }
+
+            if (mediaId && tracking) {
+                const trackingUrls = this.constructTrackingUrls(responseJson.trackingTemplates, tracking);
+                const auctionPlacement: AuctionPlacement = new AuctionPlacement(placementId, mediaId, trackingUrls);
+
+                if (campaigns[mediaId] === undefined) {
+                    campaigns[mediaId] = [];
                 }
 
-                if (mediaId && tracking) {
-
-                    const trackingUrls = this.constructTrackingUrls(responseJson.trackingTemplates, tracking);
-
-                    const auctionPlacement: AuctionPlacement = new AuctionPlacement(placementId, mediaId, trackingUrls);
-
-                    if (campaigns[mediaId] === undefined) {
-                        campaigns[mediaId] = [];
-                    }
-
-                    campaigns[mediaId].push(auctionPlacement);
-                } else {
-                    unfilledPlacementIds.push(placementId);
-                    refreshDelay = 3600; // Moved const from RefreshManager
-                }
+                campaigns[mediaId].push(auctionPlacement);
             } else {
-                SDKMetrics.reportMetricEvent(AuctionV6.BannerPlacementNotRemoved);
+                unfilledPlacementIds.push(placementId);
+                refreshDelay = 3600; // Moved const from RefreshManager
             }
         });
 
