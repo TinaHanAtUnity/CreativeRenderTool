@@ -1,3 +1,7 @@
+# Pending
+
+* [AUI] Refactor Service for Categorized Experiments [#14319](https://github.com/Applifier/unity-ads-webview/pull/14319)
+
 # Thu Apr 16 19:27:56 UTC 2020
 
 * [Load V5] Attempt to stream Ad if caching failed [#14625](https://github.com/Applifier/unity-ads-webview/pull/14625)
