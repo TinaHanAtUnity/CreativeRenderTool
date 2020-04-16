@@ -484,7 +484,8 @@ export class AdRequestManager extends CampaignManager {
                 }
             }).then(campaign => {
                 return this._assetManager.setup(campaign).catch((err) => {
-                    throw new AdRequestManagerError('Failed to setup campaign', 'campaign_setup');
+                    // If caching failed, we still can stream an ad.
+                    return campaign;
                 });
             }).then((campaign) => {
                 return {
