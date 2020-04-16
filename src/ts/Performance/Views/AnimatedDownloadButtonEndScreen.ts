@@ -63,6 +63,7 @@ export class AnimatedDownloadButtonEndScreen extends PerformanceEndScreen {
 
     public render(): void {
         super.render();
+        document.body.classList.remove('dark-mode');
         this._container.classList.add(`${this._animation}-download-button-end-screen`);
         if (this.getEndscreenAlt() === SQUARE_END_SCREEN) {
             this._container.classList.add(`${this._animation}-download-button-end-screen-square`);
