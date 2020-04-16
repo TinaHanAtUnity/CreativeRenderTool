@@ -77,7 +77,7 @@ export const ArAutomatedExperimentsList: AutomatedExperiment[] = [ArAvailableBut
 // Video Overlay Download
 
 export const VideoOverlayDownloadExperimentDeclaration: IExperimentDeclaration = {
-    method: {
+    mode: {
         SWIPEUP: 'swipeup',
         CLICK: 'click'
     }
@@ -87,7 +87,7 @@ export const VideoOverlayDownloadExperiment = new AutomatedExperiment({
     name: 'wbvw-overlay-v1',
     actions: VideoOverlayDownloadExperimentDeclaration,
     defaultActions: {
-        scheme: VideoOverlayDownloadExperimentDeclaration.method.CLICK
+        mode: VideoOverlayDownloadExperimentDeclaration.mode.CLICK
     },
     cacheDisabled: true
 });

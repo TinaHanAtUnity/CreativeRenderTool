@@ -1,20 +1,21 @@
-import { IAdsApi } from 'Ads/IAds';
-import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
-import { AbstractPrivacy, IPrivacyHandlerView } from 'Ads/Views/AbstractPrivacy';
-import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
 import { Platform } from 'Core/Constants/Platform';
-import { Localization } from 'Core/Utilities/Localization';
-import { Template } from 'Core/Utilities/Template';
-
-import VideoOverlayTemplate from 'html/VideoOverlay.html';
-import { Campaign } from 'Ads/Models/Campaign';
-import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
+import { IAdsApi } from 'Ads/IAds';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { Placement } from 'Ads/Models/Placement';
+
+import { AbstractPrivacy, IPrivacyHandlerView } from 'Ads/Views/AbstractPrivacy';
+import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
+import { Localization } from 'Core/Utilities/Localization';
+import { Template } from 'Core/Utilities/Template';
+import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
+import VideoOverlayTemplate from 'html/VideoOverlay.html';
+import { Campaign } from 'Ads/Models/Campaign';
+import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 import { IExperimentActionChoice } from 'Ads/Models/AutomatedExperiment';
+
 
 export interface IVideoOverlayParameters<T extends Campaign> {
     platform: Platform;
@@ -36,7 +37,7 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
 
     private _spinnerEnabled: boolean = false;
 
-    private _skipEnabled: boolean;
+    protected _skipEnabled: boolean;
 
     private _videoDurationEnabled: boolean = false;
     protected _videoProgress: number;
@@ -48,12 +49,13 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
     protected _callButtonVisible: boolean = false;
     private _callButtonEnabled: boolean = true;
 
-    private _skipButtonElement: HTMLElement;
+    protected _skipButtonElement: HTMLElement;
     private _spinnerElement: HTMLElement;
     private _muteButtonElement: HTMLElement;
     private _debugMessageElement: HTMLElement;
     protected _callButtonElement: HTMLElement;
     protected _swipeUpButtonElement: HTMLElement;
+    protected _swipeUpZoneContainerElement: HTMLElement;
     private _timerElement: HTMLElement;
     private _chinaAdvertisementElement: HTMLElement;
 
@@ -126,11 +128,6 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
                 event: 'click',
                 listener: (event: Event) => this.onPrivacyEvent(event),
                 selector: '.gdpr-button'
-            },
-            {
-                event: 'swipeup',
-                listener: (event: Event) => this.onSwipeUpEvent(event),
-                selector: '.swipe-up-zone'
             }
         ];
 
@@ -196,7 +193,7 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
         }
     }
 
-    public setVideoProgress(value: number): void {
+    private handleVideoProgress (value: number) {
         if (VideoOverlay.AutoSkip) {
             this._handlers.forEach(handler => handler.onOverlaySkip(value));
         }
@@ -222,13 +219,19 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
             this._chinaAdvertisementElement.classList.add('with-skip-button');
         }
 
+    }
+
+    protected handleVideoProgressButton() {
         const isPerformanceCampaign = this._campaign instanceof PerformanceCampaign || this._campaign instanceof XPromoCampaign;
         if (isPerformanceCampaign && !this._skipEnabled && this._videoProgress > 5000) {
-            //this is for traditional install button sliding in from the right
-            // this.showCallButton();
-            this.showSwipeUpButton(); //this is for swipe up 'button'
+            this.showCallButton();
             return;
         }
+    }
+
+    public setVideoProgress(value: number): void {
+        this.handleVideoProgress(value);
+        this.handleVideoProgressButton();
     }
 
     public setMuteEnabled(value: boolean) {
@@ -334,7 +337,7 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
         this.triggerOnOverlayDownload();
     }
 
-    private onSwipeUpEvent (event: Event): void {
+    protected onSwipeUpEvent (event: Event): void {
         event.preventDefault();
         event.stopPropagation();
         this.resetFadeTimer();
@@ -376,7 +379,8 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
             return;
         }
 
-        if(event.type !== 'swipeup') {
+        //fix a bug on iOS where the mute button and timer would be invisible after the first swipe
+        if (event.type !== 'swipeup') {
             this.resetFadeTimer();
 
             if (this._areControlsVisible) {
@@ -398,12 +402,11 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
         this._chinaAdvertisementElement = <HTMLLIElement> this._container.querySelector('.china-advertisement');
     }
 
-    private showSkipButton() {
+    protected showSkipButton() {
         if (this._skipEnabled) {
             this._skipButtonElement.classList.add('show-skip-button');
             if (this._campaign instanceof PerformanceCampaign || this._campaign instanceof XPromoCampaign) {
-                // this.showCallButton();  //this is for traditional install button sliding from the right
-                this.showSwipeUpButton(); //this is for swipe up 'button'
+                this.showCallButton();  //this is for traditional install button sliding from the right
             }
         }
     }
@@ -424,7 +427,11 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
         this._swipeUpButtonElement.classList.add('show-swipe-up-button');
     }
 
-    private fadeIn() {
+    protected showSwipeUpZoneContainer() {
+        this._swipeUpZoneContainerElement.classList.add('show-swipe-up-zone-container')
+    }
+
+    protected handleFadeIn () {
         if (!this._container) {
             return;
         }
@@ -434,15 +441,17 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
         if (this._campaign instanceof PerformanceCampaign || this._campaign instanceof XPromoCampaign) {
             return;
         }
-        //this is for traditional install button sliding from the right
-        // setTimeout(() => {
-        //     this.showCallButton();
-        // }, 500);
+    }
 
-        //this is for swipe up 'button'
+    protected handleFadeInButton() {
         setTimeout(() => {
-            this.showSwipeUpButton();
+            this.showCallButton();
         }, 500);
+    }
+
+    private fadeIn() {
+        this.handleFadeIn();
+        this.handleVideoProgressButton();
     }
 
     private fadeOut() {
