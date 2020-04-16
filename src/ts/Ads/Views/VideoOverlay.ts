@@ -14,6 +14,7 @@ import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { Placement } from 'Ads/Models/Placement';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
+import { IExperimentActionChoice } from 'Ads/Models/AutomatedExperiment';
 
 export interface IVideoOverlayParameters<T extends Campaign> {
     platform: Platform;
@@ -375,12 +376,14 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
             return;
         }
 
-        this.resetFadeTimer();
+        if(event.type !== 'swipeup') {
+            this.resetFadeTimer();
 
-        if (this._areControlsVisible) {
-            this.fadeOut();
-        } else {
-            this.fadeIn();
+            if (this._areControlsVisible) {
+                this.fadeOut();
+            } else {
+                this.fadeIn();
+            }
         }
     }
 
