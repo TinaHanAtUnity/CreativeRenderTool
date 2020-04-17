@@ -45,7 +45,6 @@ export class SwipeUpVideoOverlay extends VideoOverlay {
             switch (combination.mode) {
                 case VideoOverlayDownloadExperimentDeclaration.mode.SWIPEUP:
                     this._ctaMode = 'swipeup';
-                    // this.showSwipeUpZoneContainer();
                     break;
                 case VideoOverlayDownloadExperimentDeclaration.mode.CLICK:
                     this._ctaMode = 'click';
