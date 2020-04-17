@@ -1,5 +1,6 @@
 # Pending
 
+* [Latency] Ramp Mediated CacheMode Allowed Experiment to Groups 11 and 13 [#14770](https://github.com/Applifier/unity-ads-webview/pull/14770)
 * [Auction V6] Cleanup Metrics and Implementation [#14715](https://github.com/Applifier/unity-ads-webview/pull/14715)
 * [Metrics Refactoring] Buffered metric instance [#14409](https://github.com/Applifier/unity-ads-webview/pull/14409)
 * [Load V5] Reload invalidates only placements with comet campaigns [#14533](https://github.com/Applifier/unity-ads-webview/pull/14533)
