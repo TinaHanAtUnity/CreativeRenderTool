@@ -21,8 +21,17 @@ do
     if [ "$?" -eq "1" ]; then
         git status | grep 'deleted by us' | sed 's/^.*deleted by us: //g' | xargs git rm
         git status | grep 'added by them' | sed 's/^.*added by them: //g' | xargs git rm
-        echo -e "\n${RED}Resolve merge conflicts then proceed by pressing any key.${RESET}"
-        read answer < /dev/tty
+
+        echo -e "\nCurrent Git Status:"
+        git status -s
+
+        echo -e "\n${RED}Resolve merge conflicts then:\n\tPress 'C' to automatically commit changes\n\tPress Enter when changes were commited manually.${RESET}"
+        read -p 'Choice:' -n 1 answer < /dev/tty
+        echo -e "\n"
+
+        if [ "$answer" == "c" ]; then
+            git add -A . && git commit -m "Merged master from script after resolving issues"
+        fi
     else
         echo -e "\n${GREEN}Nothing to resolve. Continue if there is nothing to edit.${RESET}"
         read answer < /dev/tty
