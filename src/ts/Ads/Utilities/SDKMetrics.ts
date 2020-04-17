@@ -186,10 +186,7 @@ export enum AuctionV6 {
     FailedToParse = 'v6_failed_to_parse',
     AuctionIdMissing = 'v6_auction_id_missing',
     PlacementsMissing = 'v6_placements_missing',
-    MediaIdMissing = 'v6_media_id_missing',
-    TrackingMissing = 'v6_tracking_missing',
     TrackingIndicesOutOfBounds = 'v6_tracking_indices_out_of_bounds',
-    BannerPlacementNotRemoved = 'v6_banner_placement_not_removed',
     FailedCreatingAuctionResponse = 'v6_failed_creating_auction_response'
 }
 
