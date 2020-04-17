@@ -1,12 +1,12 @@
 import { ICoreApi } from 'Core/ICore';
-import { IPrivacySettings } from 'Privacy/IPrivacySettings';
+import { IPrivacyFetchUrlParams, IPrivacySettings } from 'Privacy/IPrivacySettings';
 
 export enum IFrameEvents {
     PRIVACY_READY = 'onPrivacyReady',
     PRIVACY_COMPLETED = 'onPrivacyCompleted',
     PRIVACY_OPENURL = 'onPrivacyOpenUrl',
     PRIVACY_METRIC = 'onPrivacyMetric',
-    PRIVACY_FETCH = 'onPrivacyFetch'
+    PRIVACY_FETCHURL = 'onPrivacyFetchUrl'
 }
 
 export interface IPrivacyFrameEventAdapter {
@@ -18,8 +18,8 @@ export interface IPrivacyFrameHandler {
     onPrivacyCompleted(privacySettings: IPrivacySettings): void;
     onPrivacyReady(): void;
     onPrivacyOpenUrl(url: string): void;
-    onPrivacyMetric(data: string): void;
-    onPrivacyFetch(url: string, data: { [key: string]: unknown }): void;
+    onPrivacyMetric(data: { [key: string]: unknown }): void;
+    onPrivacyFetchUrl(data: IPrivacyFetchUrlParams): void;
 }
 
 export class PrivacyFrameEventAdapter implements IPrivacyFrameEventAdapter {
@@ -40,8 +40,8 @@ export class PrivacyFrameEventAdapter implements IPrivacyFrameEventAdapter {
         this._iFrameHandlers[IFrameEvents.PRIVACY_COMPLETED] = (msg) => this.onPrivacyCompleted(<IPrivacySettings>msg.data);
         this._iFrameHandlers[IFrameEvents.PRIVACY_READY] = (msg) => this.onPrivacyReady();
         this._iFrameHandlers[IFrameEvents.PRIVACY_OPENURL] = (msg) => this.onPrivacyOpenUrl(<string>msg.data);
-        this._iFrameHandlers[IFrameEvents.PRIVACY_METRIC] = (msg) => this.onPrivacyMetric(<string>msg.data);
-        this._iFrameHandlers[IFrameEvents.PRIVACY_FETCH] = (msg) => this.onPrivacyFetch(<string>msg.url, <{ [key: string]: unknown }>msg.data);
+        this._iFrameHandlers[IFrameEvents.PRIVACY_METRIC] = (msg) => this.onPrivacyMetric(<{ [key: string]: unknown }>msg.data);
+        this._iFrameHandlers[IFrameEvents.PRIVACY_FETCHURL] = (msg) => this.onPrivacyFetchUrl(<IPrivacyFetchUrlParams>msg.data);
     }
 
     public connect() {
@@ -81,11 +81,11 @@ export class PrivacyFrameEventAdapter implements IPrivacyFrameEventAdapter {
         this._handler.onPrivacyOpenUrl(url);
     }
 
-    private onPrivacyMetric(data: string): void {
+    private onPrivacyMetric(data: { [key: string]: unknown }): void {
         this._handler.onPrivacyMetric(data);
     }
 
-    private onPrivacyFetch(url: string, data: { [key: string]: unknown }): void {
-        this._handler.onPrivacyFetch(url, data);
+    private onPrivacyFetchUrl(data: IPrivacyFetchUrlParams): void {
+        this._handler.onPrivacyFetchUrl(data);
     }
 }

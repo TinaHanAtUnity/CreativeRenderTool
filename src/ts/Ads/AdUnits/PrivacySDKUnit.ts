@@ -18,7 +18,7 @@ import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { IPrivacySDKViewParameters, PrivacySDKView } from 'Ads/Views/Privacy/PrivacySDKView';
 import { PrivacyConfig } from 'Privacy/PrivacyConfig';
-import { IPrivacySettings } from 'Privacy/IPrivacySettings';
+import { IPrivacyFetchUrlParams, IPrivacySettings } from 'Privacy/IPrivacySettings';
 
 export interface IPrivacyUnitParameters {
     abGroup: ABGroup;
@@ -230,16 +230,17 @@ export class PrivacySDKUnit implements IAdUnit, IPrivacySDKViewHandler {
         this._unityPrivacyView.openUrlCallback(url);
     }
 
-    public onPrivacyMetric(data: string): void {
-        this._requestManager.post(this._privacyMetricsUrl, data)
+    public onPrivacyMetric(metric: { [key: string]: unknown }): void {
+        this._requestManager.post(this._privacyMetricsUrl, JSON.stringify(metric))
           .catch(error => {
               this._core.Sdk.logError(`PRIVACY: sending metrics failed: ${error.message}`);
           });
     }
 
-    public onPrivacyFetch(url: string, data: { [key: string]: unknown }): void {
+    public onPrivacyFetchUrl(data: IPrivacyFetchUrlParams): void {
+        const { url, property } = data;
         this._requestManager.get(url).then((response) => {
-            this._unityPrivacyView.fetchCallback(response.response);
+            this._unityPrivacyView.fetchUrlCallback(JSON.parse(response.response), property);
         });
     }
 

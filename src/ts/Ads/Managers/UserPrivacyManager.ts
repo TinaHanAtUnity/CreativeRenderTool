@@ -152,8 +152,12 @@ export class UserPrivacyManager {
     public getPrivacyConfig(): PrivacyConfig {
         const ageGateChoice = this.getAgeGateChoice();
 
-        const userSummary = CachedUserSummary.get();
         const { ads, external, gameExp } = this._userPrivacy.getPermissions();
+        const userSummaryUrl = 'https://ads-privacy-api.prd.mz.internal.unity3d.com/api/v1/summary?' +
+          `gameId=${this._clientInfo.getGameId()}&` +
+          `projectId=${this._coreConfig.getUnityProjectId()}&` +
+          `adid=${this._deviceInfo.getAdvertisingIdentifier()}&` +
+          `storeId=${this._deviceInfo.getStores()}`;
 
         return new PrivacyConfig(PrivacySDKFlow,
             {
@@ -165,6 +169,7 @@ export class UserPrivacyManager {
             },
             {
                 buildOsVersion: this._deviceInfo.getOsVersion(),
+                deviceModel: this._deviceInfo.getModel(),
                 platform: Platform[this._platform],
                 userLocale: this._deviceInfo.getLanguage() ? this.resolveLanguageForPrivacyConfig(this._deviceInfo.getLanguage()) : undefined,
                 country: this._coreConfig.getCountry(),
@@ -175,14 +180,8 @@ export class UserPrivacyManager {
                 legalFramework: this._privacy.getLegalFramework(),
                 isCoppa: this._coreConfig.isCoppaCompliant(),
                 apiLevel: this._platform === Platform.ANDROID ? (<AndroidDeviceInfo> this._deviceInfo).getApiLevel() : undefined,
-                userSummary: {
-                    deviceModel: userSummary ? userSummary.deviceModel : '-',
-                    country: userSummary ? userSummary.country : '-',
-                    gamePlaysThisWeek: userSummary ? userSummary.gamePlaysThisWeek.toString() : '-',
-                    adsSeenInGameThisWeek: userSummary ? userSummary.adsSeenInGameThisWeek.toString() : '-',
-                    installsFromAds: userSummary ? userSummary.installsFromAds.toString() : '-'
-                },
-                developerAgeGate: this.isDeveloperAgeGateActive()
+                developerAgeGate: this.isDeveloperAgeGateActive(),
+                userSummaryUrl
             },
             PrivacyWebUI);
     }

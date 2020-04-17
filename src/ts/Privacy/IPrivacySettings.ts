@@ -12,3 +12,8 @@ export interface IUserPrivacySettings {
     ageGateChoice: AgeGateChoice;
     agreementMethod: string;
 }
+
+export interface IPrivacyFetchUrlParams {
+    url: string;
+    property: string;
+}
