@@ -143,7 +143,7 @@ export class PrivacySDKView extends View<IPrivacySDKViewHandler> {
     }
 
     public fetchUrlCallback(response: { [key: string]: unknown }, property: string): void {
-        this._frameEventAdapter.postMessage('fetchUrlCallback', { response, property });
+        this._frameEventAdapter.postMessage('fetchUrlCallback', { value: response, property });
     }
 
     public postMessage(event: string, data?: unknown) {

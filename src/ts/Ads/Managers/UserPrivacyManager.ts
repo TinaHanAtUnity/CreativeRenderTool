@@ -145,7 +145,7 @@ export class UserPrivacyManager {
         this._core.Storage.onSet.subscribe((eventType, data) => this.onStorageSet(eventType, <IUserPrivacyStorageData><unknown>data));
 
         if (PrivacyTestEnvironment.get('privacySDKMetricsUrl')) {
-            this._privacySDKMetricsUrl = TestEnvironment.get('privacySDKMetricsUrl');
+            this._privacySDKMetricsUrl = PrivacyTestEnvironment.get('privacySDKMetricsUrl');
         }
     }
 
