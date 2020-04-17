@@ -30,6 +30,34 @@ And check that it's correctly set with:
 
 ### Staging
 
+## Description
+
+#### Staging/00.merge_pr.sh
+
+This script is going to do:
+1. Check PR state
+2. Check CI status
+3. Merges changes to master locally
+4. Updates `CHANGELOG.md`
+5. Commits changes to `CHANGELOG.md`
+6. Pushes changes
+7. Deletes remote branch
+
+This script should be ran if:
+- You intend to merge PR into master branch and stage afterwards
+
+Usage:
+
+```
+./tools/release-scripts/Staging/000.merge_pr.sh <pr-number>
+```
+
+For example:
+
+```
+./tools/release-scripts/Staging/000.merge_pr.sh 14533
+```
+
 #### Staging/00.delete_local_branches.sh
 
 Removes references to local branches if they exist.

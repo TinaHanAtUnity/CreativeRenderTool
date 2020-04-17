@@ -14,6 +14,13 @@ import { AutomatedExperiment, IExperimentDeclaration, IExperimentActionChoice } 
 //     cacheDisabled: true
 // });
 
+export enum AutomatedExperimentsCategories {
+    PERFORMANCE_ENDCARD = 'webview-perf-ad-endcard',
+    MRAID_AR = 'webview-ar-mraid',
+    VIDEO_OVERLAY = 'webview-video-overlay'
+    
+}
+
 export const ButtonExperimentDeclaration: IExperimentDeclaration = {
   scheme: {
       DARK: 'dark',
@@ -44,8 +51,6 @@ export const ButtonAnimationsExperiment = new AutomatedExperiment({
     },
     cacheDisabled: true
 });
-
-export const AutomatedExperimentsList: AutomatedExperiment[] = [ButtonAnimationsExperiment];
 
 // AR Ads
 

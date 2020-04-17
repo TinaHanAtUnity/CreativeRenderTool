@@ -7,7 +7,6 @@ const INITIAL_AD_REQUEST_WAIT_TIME_IN_MS = 250;
 
 export enum MediationExperimentType {
     CacheModeAllowed = 'cma2',
-    AuctionV6 = 'av6',
     AuctionXHR = 'xhr',
     LoadV5 = 'lv5',
     None = 'none'
@@ -47,59 +46,39 @@ export class MediationLoadTrackingManager {
         this._initialAdRequest = false;
         this._initCompleteTime = this.getTime();
 
-        SDKMetrics.reportTimingEventWithTags(MediationMetric.InitializationComplete, this._initCompleteTime, {
-            'med': this._mediationName,
-            'wel': `${this._webviewEnabledLoad}`,
-            'exp': this._experimentType
-        });
+        SDKMetrics.reportTimingEventWithTags(MediationMetric.InitializationComplete, this._initCompleteTime, this.getBaseTrackingTags());
     }
 
     public reportPlacementCount(placementCount: number) {
-        SDKMetrics.reportTimingEventWithTags(MediationMetric.PlacementCount, placementCount, {
-            'med': this._mediationName,
-            'wel': `${this._webviewEnabledLoad}`,
-            'exp': this._experimentType
-        });
+        SDKMetrics.reportTimingEventWithTags(MediationMetric.PlacementCount, placementCount, this.getBaseTrackingTags());
     }
 
     public reportMediaCount(mediaCount: number) {
-        SDKMetrics.reportTimingEventWithTags(MediationMetric.MediaCount, mediaCount, {
-            'med': this._mediationName,
-            'wel': `${this._webviewEnabledLoad}`,
-            'iar': `${GameSessionCounters.getCurrentCounters().adRequests === 1}`,
-            'exp': this._experimentType
-        });
+        SDKMetrics.reportTimingEventWithTags(MediationMetric.MediaCount, mediaCount, this.getBaseTrackingTags({
+            'iar': `${GameSessionCounters.getCurrentCounters().adRequests === 1}`
+        }));
     }
 
     public reportAuctionRequestStarted() {
-        SDKMetrics.reportMetricEventWithTags(MediationMetric.AuctionRequestStarted, {
-            'med': this._mediationName,
-            'wel': `${this._webviewEnabledLoad}`,
-            'iar': `${GameSessionCounters.getCurrentCounters().adRequests === 1}`,
-            'exp': this._experimentType
-        });
+        SDKMetrics.reportMetricEventWithTags(MediationMetric.AuctionRequestStarted, this.getBaseTrackingTags({
+            'iar': `${GameSessionCounters.getCurrentCounters().adRequests === 1}`
+        }));
         SDKMetrics.sendBatchedEvents();
     }
 
-    public reportAdShown(adPlayedFromStream: boolean) {
-        SDKMetrics.reportMetricEventWithTags(MediationMetric.AdShow, {
-            'med': this._mediationName,
-            'wel': `${this._webviewEnabledLoad}`,
+    public reportAdShown(adCached: boolean) {
+        SDKMetrics.reportMetricEventWithTags(MediationMetric.AdShow, this.getBaseTrackingTags({
             'iar': `${GameSessionCounters.getCurrentCounters().adRequests === 1}`,
-            'exp': this._experimentType,
-            'str': `${adPlayedFromStream}`
-        });
+            'str': `${!adCached}`
+        }));
         SDKMetrics.sendBatchedEvents();
     }
 
     public reportAuctionRequest(latency: number, requestSuccessful: boolean, reason?: string) {
-        let tags: { [key: string]: string } = {
-            'med': this._mediationName,
-            'wel': `${this._webviewEnabledLoad}`,
+        let tags: { [key: string]: string } = this.getBaseTrackingTags({
             'iar': `${GameSessionCounters.getCurrentCounters().adRequests === 1}`,
-            'res': `${requestSuccessful}`,
-            'exp': this._experimentType
-        };
+            'res': `${requestSuccessful}`
+        });
 
         if (reason) {
             tags = {
@@ -113,13 +92,10 @@ export class MediationLoadTrackingManager {
     }
 
     public reportingAdCaching(latency: number, adCachedSuccessfully: boolean) {
-        SDKMetrics.reportTimingEventWithTags(MediationMetric.AdCaching, latency, {
-            'med': this._mediationName,
-            'wel': `${this._webviewEnabledLoad}`,
+        SDKMetrics.reportTimingEventWithTags(MediationMetric.AdCaching, latency, this.getBaseTrackingTags({
             'acs': `${adCachedSuccessfully}`,
-            'iar': `${GameSessionCounters.getCurrentCounters().adRequests === 1}`,
-            'exp': this._experimentType
-        });
+            'iar': `${GameSessionCounters.getCurrentCounters().adRequests === 1}`
+        }));
     }
 
     private onLoad(placements: { [key: string]: number }): void {
@@ -131,19 +107,12 @@ export class MediationLoadTrackingManager {
                     initialAdRequest: this._initialAdRequest || (this.getTime() - this._initCompleteTime <= INITIAL_AD_REQUEST_WAIT_TIME_IN_MS),
                     nativeTimeoutSent: false
                 };
-                SDKMetrics.reportMetricEventWithTags(MediationMetric.LoadRequest, {
-                    'med': this._mediationName,
-                    'wel': `${this._webviewEnabledLoad}`,
-                    'iar': `${this._activeLoads[placementId].initialAdRequest}`,
-                    'exp': this._experimentType
-                });
+                SDKMetrics.reportMetricEventWithTags(MediationMetric.LoadRequest, this.getBaseTrackingTags({
+                    'iar': `${this._activeLoads[placementId].initialAdRequest}`
+                }));
 
                 if (this._nativeInitTime && this._activeLoads[placementId].initialAdRequest) {
-                    SDKMetrics.reportMetricEventWithTags(MediationMetric.LoadRequestNativeMeasured, {
-                        'med': this._mediationName,
-                        'wel': `${this._webviewEnabledLoad}`,
-                        'exp': this._experimentType
-                    });
+                    SDKMetrics.reportMetricEventWithTags(MediationMetric.LoadRequestNativeMeasured, this.getBaseTrackingTags());
                 }
             }
         });
@@ -162,21 +131,15 @@ export class MediationLoadTrackingManager {
         this.checkForTimedOutPlacements();
 
         if (newState === 'READY') {
-            SDKMetrics.reportTimingEventWithTags(MediationMetric.LoadRequestFill, timeValue, {
-                'med': this._mediationName,
-                'wel': `${this._webviewEnabledLoad}`,
-                'iar': `${this._activeLoads[placementId].initialAdRequest}`,
-                'exp': this._experimentType
-            });
+            SDKMetrics.reportTimingEventWithTags(MediationMetric.LoadRequestFill, timeValue, this.getBaseTrackingTags({
+                'iar': `${this._activeLoads[placementId].initialAdRequest}`
+            }));
             delete this._activeLoads[placementId];
             SDKMetrics.sendBatchedEvents();
         } else if (newState === 'NO_FILL') {
-            SDKMetrics.reportTimingEventWithTags(MediationMetric.LoadRequestNofill, timeValue, {
-                'med': this._mediationName,
-                'wel': `${this._webviewEnabledLoad}`,
-                'iar': `${this._activeLoads[placementId].initialAdRequest}`,
-                'exp': this._experimentType
-            });
+            SDKMetrics.reportTimingEventWithTags(MediationMetric.LoadRequestNofill, timeValue, this.getBaseTrackingTags({
+                'iar': `${this._activeLoads[placementId].initialAdRequest}`
+            }));
             delete this._activeLoads[placementId];
             SDKMetrics.sendBatchedEvents();
         }
@@ -190,12 +153,9 @@ export class MediationLoadTrackingManager {
         this.tryToSendNativeTimeout(placementId);
 
         if (timeValue >= 30000) {
-            SDKMetrics.reportMetricEventWithTags(MediationMetric.LoadRequestTimeout, {
-                'med': this._mediationName,
-                'wel': `${this._webviewEnabledLoad}`,
-                'iar': `${this._activeLoads[placementId].initialAdRequest}`,
-                'exp': this._experimentType
-            });
+            SDKMetrics.reportMetricEventWithTags(MediationMetric.LoadRequestTimeout, this.getBaseTrackingTags({
+                'iar': `${this._activeLoads[placementId].initialAdRequest}`
+            }));
 
             delete this._activeLoads[placementId];
             SDKMetrics.sendBatchedEvents();
@@ -218,12 +178,7 @@ export class MediationLoadTrackingManager {
         }
 
         if (this.getTime() + this._nativeInitTime >= 30000) {
-            SDKMetrics.reportMetricEventWithTags(MediationMetric.LoadRequestTimeoutNativeMeasured, {
-                'med': this._mediationName,
-                'wel': `${this._webviewEnabledLoad}`,
-                'exp': this._experimentType
-            });
-
+            SDKMetrics.reportMetricEventWithTags(MediationMetric.LoadRequestTimeoutNativeMeasured, this.getBaseTrackingTags());
             this._activeLoads[placementId].nativeTimeoutSent = true;
         }
     }
@@ -233,5 +188,14 @@ export class MediationLoadTrackingManager {
             const timeValue = this.getTime() - this._activeLoads[placementId].time;
             this.hasPlacementTimedOut(placementId, timeValue);
         });
+    }
+
+    private getBaseTrackingTags(additionalTags: { [key: string]: string } = {}): { [key: string]: string } {
+        return {
+            ...additionalTags,
+            'med': this._mediationName,
+            'wel': `${this._webviewEnabledLoad}`,
+            'exp': this._experimentType
+        };
     }
 }

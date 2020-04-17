@@ -25,31 +25,43 @@ export interface IVideoOverlayParameters<T extends Campaign> {
 
 export class SwipeUpVideoOverlay extends VideoOverlay {
     private _ctaMode: string;
+    protected _swipeUpZoneContainerElement: HTMLElement;
+    protected _swipeUpButtonElement: HTMLElement;
 
     constructor(
         parameters: IVideoOverlayParameters<Campaign>,
         privacy: AbstractPrivacy,
         showGDPRBanner: boolean,
         showPrivacyDuringVideo: boolean,
-        combination: IExperimentActionChoice
+        combination: IExperimentActionChoice | undefined
     ) {
         super(parameters, privacy, showGDPRBanner, showPrivacyDuringVideo);
 
-        if (!VideoOverlayDownloadExperiment.isValid(combination)) {
+        console.log('COMBINATIONNNNNNNNN$$$$$$$$$',combination)
+
+        if (combination) {
+            if (!VideoOverlayDownloadExperiment.isValid(combination)) {
+                combination = VideoOverlayDownloadExperiment.getDefaultActions();
+                SDKMetrics.reportMetricEvent(AUIMetric.InvalidVideoOverlayMode);
+            }
+
+            switch (combination.mode) {
+                case VideoOverlayDownloadExperimentDeclaration.mode.SWIPEUP:
+                    this._ctaMode = 'swipeup';
+                    // this.showSwipeUpZoneContainer();
+                    break;
+                case VideoOverlayDownloadExperimentDeclaration.mode.CLICK:
+                    this._ctaMode = 'click';
+                    break;
+                default:
+            }
+        } else {
             combination = VideoOverlayDownloadExperiment.getDefaultActions();
             SDKMetrics.reportMetricEvent(AUIMetric.InvalidVideoOverlayMode);
+            this._ctaMode = 'click'
         }
 
-        switch (combination.mode) {
-            case VideoOverlayDownloadExperimentDeclaration.mode.SWIPEUP:
-                this._ctaMode = 'swipeup';
-                this.showSwipeUpZoneContainer();
-                break;
-            case VideoOverlayDownloadExperimentDeclaration.mode.CLICK:
-                this._ctaMode = 'click';
-                break;
-            default:
-        }
+        console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>',this._ctaMode)
 
         this._bindings.push({
             event: 'swipeup',
@@ -100,9 +112,9 @@ export class SwipeUpVideoOverlay extends VideoOverlay {
         this._swipeUpButtonElement.classList.add('show-swipe-up-button');
     }
 
-    protected showSwipeUpZoneContainer() {
-        this._swipeUpZoneContainerElement.classList.add('show-swipe-up-zone-container');
-    }
+    // protected showSwipeUpZoneContainer() {
+    //     this._swipeUpZoneContainerElement.classList.add('show-swipe-up-zone-container');
+    // }
 
     protected onClick(event: Event) {
         if (this._disableFadeOutOnClick) {
@@ -119,5 +131,11 @@ export class SwipeUpVideoOverlay extends VideoOverlay {
                 this.fadeIn();
             }
         }
+    }
+
+    protected setupElementReferences(): void {
+        this.getBaseElements();
+        this._swipeUpButtonElement = <HTMLElement> this._container.querySelector('.swipe-up-button');
+        this._swipeUpZoneContainerElement = <HTMLElement> this._container.querySelector('.swipe-up-zone-container');
     }
 }

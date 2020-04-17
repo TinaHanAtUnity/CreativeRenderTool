@@ -55,6 +55,8 @@ import { Campaign } from 'Ads/Models/Campaign';
                 }
             });
 
+            Object.defineProperty(iframe, 'id', { value: 'iframeId' });
+
             handler =  {
                 onEventProcessed: sinon.spy()
             };
@@ -111,13 +113,13 @@ import { Campaign } from 'Ads/Models/Campaign';
             });
 
             it('should not send events if no event has been stored in history', () => {
-                omidEventBridge.onEventRegistered('omidVideo', 'test', '1');
+                omidEventBridge.onEventRegistered('omidVideo', 'test', '1', 'iframeId');
                 sinon.assert.notCalled(pmStub);
             });
 
             it('should send omidGeometry change event when it has been stored in history', () => {
                 omidEventBridge.triggerAdEvent('omidGeometryChange');
-                omidEventBridge.onEventRegistered('omidGeometryChange', 'test', '1');
+                omidEventBridge.onEventRegistered('omidGeometryChange', 'test', '1', 'iframeId');
                 sinon.assert.calledWith(pmStub, {
                     adSessionId: undefined,
                     payload: undefined,
@@ -130,8 +132,15 @@ import { Campaign } from 'Ads/Models/Campaign';
             it('should send omidGeometryChange event twice when it has been stored in history twice', () => {
                 omidEventBridge.triggerAdEvent('omidGeometryChange');
                 omidEventBridge.triggerAdEvent('omidGeometryChange');
-                omidEventBridge.onEventRegistered('omidGeometryChange', 'test', '1');
+                omidEventBridge.onEventRegistered('omidGeometryChange', 'test', '1', 'iframeId');
                 sinon.assert.calledTwice(pmStub);
+            });
+
+            it('shoud not send events if iframe id is not right', () => {
+                omidEventBridge.triggerAdEvent('omidGeometryChange');
+                omidEventBridge.triggerAdEvent('omidGeometryChange');
+                omidEventBridge.onEventRegistered('omidGeometryChange', 'test', '1', 'wrongIframeId');
+                sinon.assert.notCalled(pmStub);
             });
 
             it('should send omidGeometryChange event n timez', () => {
@@ -140,12 +149,12 @@ import { Campaign } from 'Ads/Models/Campaign';
 
                 assert.equal((pmStub).getCalls().length, 0);
 
-                omidEventBridge.onEventRegistered('omidGeometryChange', 'test', '1');
+                omidEventBridge.onEventRegistered('omidGeometryChange', 'test', '1', 'iframeId');
                 omidEventBridge.triggerAdEvent('omidGeometryChange');
 
                 assert.equal((pmStub).getCalls().length, 3);
 
-                omidEventBridge.onEventRegistered('omidGeometryChange', 'test', '2');
+                omidEventBridge.onEventRegistered('omidGeometryChange', 'test', '2', 'iframeId');
                 assert.equal((pmStub).getCalls().length, 6);
 
                 omidEventBridge.triggerAdEvent('omidGeometryChange');
@@ -158,8 +167,8 @@ import { Campaign } from 'Ads/Models/Campaign';
 
                 assert.equal((pmStub).getCalls().length, 0);
 
-                omidEventBridge.onEventRegistered('omidVideo', 'testvendor', '1');
-                omidEventBridge.onEventRegistered('omidGeometryChange', 'testvendor', '2');
+                omidEventBridge.onEventRegistered('omidVideo', 'testvendor', '1', 'iframeId');
+                omidEventBridge.onEventRegistered('omidGeometryChange', 'testvendor', '2', 'iframeId');
 
                 assert.equal((pmStub).getCalls().length, 2);
 
@@ -171,7 +180,7 @@ import { Campaign } from 'Ads/Models/Campaign';
             });
 
             it('should send omidVideo UUID event n timez after registration', () => {
-                omidEventBridge.onEventRegistered('omidVideo', 'test', '1');
+                omidEventBridge.onEventRegistered('omidVideo', 'test', '1', 'iframeId');
 
                 assert.equal((pmStub).getCalls().length, 0);
 
@@ -182,8 +191,8 @@ import { Campaign } from 'Ads/Models/Campaign';
             });
 
             it('should send start event for both video and regular start events based on UUID of registration', () => {
-                omidEventBridge.onEventRegistered('omidVideo', 'test', '23');
-                omidEventBridge.onEventRegistered('omidStart', 'test', '33');
+                omidEventBridge.onEventRegistered('omidVideo', 'test', '23', 'iframeId');
+                omidEventBridge.onEventRegistered('omidStart', 'test', '33', 'iframeId');
                 sandbox.stub(omidEventBridge, 'postMessage');
 
                 omidEventBridge.triggerVideoEvent('omidStart');

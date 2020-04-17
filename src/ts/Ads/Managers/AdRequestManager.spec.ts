@@ -145,11 +145,8 @@ class SatisfiesMatcher {
                     adRequests: 1,
                     starts: 0,
                     views: 0,
-                    startsPerCampaign: { },
                     startsPerTarget: { },
-                    viewsPerCampaign: { },
                     viewsPerTarget: { },
-                    latestCampaignsStarts: { },
                     latestTargetStarts: { }
                 });
             });
@@ -194,11 +191,8 @@ class SatisfiesMatcher {
                     adRequests: 1,
                     starts: 0,
                     views: 0,
-                    startsPerCampaign: { },
                     startsPerTarget: { },
-                    viewsPerCampaign: { },
                     viewsPerTarget: { },
-                    latestCampaignsStarts: { },
                     latestTargetStarts: { }
                 });
             });
@@ -266,11 +260,8 @@ class SatisfiesMatcher {
                     adRequests: 1,
                     starts: 0,
                     views: 0,
-                    startsPerCampaign: { },
                     startsPerTarget: { },
-                    viewsPerCampaign: { },
                     viewsPerTarget: { },
-                    latestCampaignsStarts: { },
                     latestTargetStarts: { }
                 });
             });
@@ -359,6 +350,37 @@ class SatisfiesMatcher {
                     retryDelay: 10000,
                     retryWithConnectionEvents: false
                 });
+            });
+        });
+
+        describe('successful load request and caching fails', () => {
+            let loadedCampaign: ILoadedCampaign | undefined;
+
+            beforeEach(async () => {
+                request.post.mockResolvedValueOnce({
+                    url: '',
+                    response: JSON.stringify(LoadV5PreloadResponse),
+                    responseCode: 200,
+                    headers: {}
+                }).mockResolvedValueOnce({
+                    url: '',
+                    response: JSON.stringify(LoadV5LoadResponse),
+                    responseCode: 200,
+                    headers: {}
+                });
+
+                assetManager.setup.mockRejectedValue(new Error());
+
+                adsConfig.getPlacement.mockReturnValue(Placement());
+
+                contentTypeHandlerManager.getParser.mockReturnValue(new CometCampaignParser(core));
+
+                await adRequestManager.requestPreload();
+                loadedCampaign = await adRequestManager.requestLoad('video');
+            });
+
+            it('should have a fill', () => {
+                expect(loadedCampaign).toBeDefined();
             });
         });
 
@@ -516,7 +538,6 @@ class SatisfiesMatcher {
                 });
             });
         });
-
 
         describe('load request when no preload data', () => {
             let loadedCampaign: ILoadedCampaign | undefined;
@@ -937,11 +958,8 @@ class SatisfiesMatcher {
                     adRequests: 2,
                     starts: 0,
                     views: 0,
-                    startsPerCampaign: { },
                     startsPerTarget: { },
-                    viewsPerCampaign: { },
                     viewsPerTarget: { },
-                    latestCampaignsStarts: { },
                     latestTargetStarts: { }
                 });
             });

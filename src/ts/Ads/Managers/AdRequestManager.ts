@@ -456,6 +456,9 @@ export class AdRequestManager extends CampaignManager {
             let auctionResponse: AuctionResponse;
             let parser: CampaignParser;
 
+            // We do this copy so that linter would not complain about incompatible types.
+            const selectedTrackingUrls = trackingUrls;
+
             try {
                 auctionPlacement = new AuctionPlacement(placementId, mediaId, trackingUrls);
                 auctionResponse = new AuctionResponse([auctionPlacement], response.media[mediaId], mediaId, response.correlationId, auctionStatusCode);
@@ -481,17 +484,14 @@ export class AdRequestManager extends CampaignManager {
                 }
             }).then(campaign => {
                 return this._assetManager.setup(campaign).catch((err) => {
-                    throw new AdRequestManagerError('Failed to setup campaign', 'campaign_setup');
+                    // If caching failed, we still can stream an ad.
+                    return campaign;
                 });
             }).then((campaign) => {
-                if (trackingUrls) {
-                    return {
-                        campaign: campaign,
-                        trackingUrls: trackingUrls
-                    };
-                } else {
-                    throw new AdRequestManagerError('No tracking URLs', 'tracking');
-                }
+                return {
+                    campaign: campaign,
+                    trackingUrls: selectedTrackingUrls
+                };
             });
         } else {
             return Promise.reject(new AdRequestManagerError('No media or tracking url', 'media_or_url'));

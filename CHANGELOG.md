@@ -1,3 +1,36 @@
+# Pending
+
+* [Metrics Refactoring] Buffered metric instance [#14409](https://github.com/Applifier/unity-ads-webview/pull/14409)
+* [Load V5] Reload invalidates only placements with comet campaigns [#14533](https://github.com/Applifier/unity-ads-webview/pull/14533)
+* Fix dark mode always On in AnimatedDownloadButtonEndScreen [#14739](https://github.com/Applifier/unity-ads-webview/pull/14739)
+* [Latency] Improvements and Bug Fixes [#14712](https://github.com/Applifier/unity-ads-webview/pull/14712)
+* [Deployment Scripts] Add capabilities to merge commits without second terminal [#14684](https://github.com/Applifier/unity-ads-webview/pull/14684)
+
+# Thu Apr 16 23:14:56 UTC 2020
+
+* [AUI] Refactor Service for Categorized Experiments [#14319](https://github.com/Applifier/unity-ads-webview/pull/14319)
+
+# Thu Apr 16 19:27:56 UTC 2020
+
+* [Load V5] Attempt to stream Ad if caching failed [#14625](https://github.com/Applifier/unity-ads-webview/pull/14625)
+* [Load V5] Expand load v5 to chimera game [#14657](https://github.com/Applifier/unity-ads-webview/pull/14657)
+* Add missing initError method to SDK Backend mock [#14686](https://github.com/Applifier/unity-ads-webview/pull/14686)
+* Cleanup campaign level session counters [#14685](https://github.com/Applifier/unity-ads-webview/pull/14685)
+* [Deployment Scripts] Script to merge pr before staging [#14656](https://github.com/Applifier/unity-ads-webview/pull/14656)
+* [Deployment Scripts] Fix color codes [#14683](https://github.com/Applifier/unity-ads-webview/pull/14683)
+
+# Thu Apr 16 01:24:36 UTC 2020
+
+* China auction endpoint switch for 1% of traffic [#14567](https://github.com/Applifier/unity-ads-webview/pull/14567)
+
+# Wed Apr 15 23:25:45 UTC 2020
+
+* [Load V5] Cleanup unused condition block for tracking URLs [#14626](https://github.com/Applifier/unity-ads-webview/pull/14626)
+* [Auction V6] Remove Mediation Experiment Type [#14599](https://github.com/Applifier/unity-ads-webview/pull/14599)
+* [Tech Debt] Disable SessionDiagnostics from Firing to Kafka [#14313](https://github.com/Applifier/unity-ads-webview/pull/14313)
+* [Tech Debt] Disable Diagnostics from Firing to Kafka [#14287](https://github.com/Applifier/unity-ads-webview/pull/14287)
+* OM: Fix duplicate postMessage events happens when several OM instances exist [#14474](https://github.com/Applifier/unity-ads-webview/pull/14474)
+
 # Wed Apr 15 02:32:42 UTC 2020
 
 * Expand Temporary Cachemode Allowed Test to Group 14 and 15 [#14598](https://github.com/Applifier/unity-ads-webview/pull/14598)

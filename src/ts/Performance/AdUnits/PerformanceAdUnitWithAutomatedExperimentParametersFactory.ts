@@ -9,9 +9,10 @@ import { VideoOverlay } from 'Ads/Views/VideoOverlay';
 import { SwipeUpVideoOverlay } from 'Ads/Views/SwipeUpVideoOverlay';
 import { AnimatedDownloadButtonEndScreen } from 'Performance/Views/AnimatedDownloadButtonEndScreen';
 import { AutomatedExperimentManager } from 'Ads/Managers/AutomatedExperimentManager';
-import { AutomatedExperimentsList, ButtonAnimationsExperiment, VideoOverlayDownloadExperiment } from 'Ads/Models/AutomatedExperimentsList';
+import { VideoOverlayDownloadExperiment, AutomatedExperimentsCategories } from 'Ads/Models/AutomatedExperimentsList';
 import { AUIMetric, SDKMetrics } from 'Ads/Utilities/SDKMetrics';
 import { PerformanceAdUnitParametersFactory } from 'Performance/AdUnits/PerformanceAdUnitParametersFactory';
+import { IExperimentActionChoice } from 'Ads/Models/AutomatedExperiment';
 
 export class PerformanceAdUnitWithAutomatedExperimentParametersFactory extends PerformanceAdUnitParametersFactory {
 
@@ -20,7 +21,8 @@ export class PerformanceAdUnitWithAutomatedExperimentParametersFactory extends P
     constructor(core: ICore, aem: AutomatedExperimentManager) {
         super(core, core.Ads);
         this._automatedExperimentManager = aem;
-        this._automatedExperimentManager.registerExperiments(AutomatedExperimentsList);
+        this._automatedExperimentManager.registerExperimentCategory(AutomatedExperimentsCategories.PERFORMANCE_ENDCARD, 'PerformanceCampaign');
+        this._automatedExperimentManager.registerExperimentCategory(AutomatedExperimentsCategories.VIDEO_OVERLAY, 'PerformanceCampaign');
     }
 
     protected createParameters(baseParams: IAdUnitParameters<PerformanceCampaign>) {
@@ -37,8 +39,13 @@ export class PerformanceAdUnitWithAutomatedExperimentParametersFactory extends P
 
         const video = this.getVideo(baseParams.campaign, baseParams.forceOrientation);
 
-        const endScreenCombination = this._automatedExperimentManager.activateExperiment(baseParams.campaign, ButtonAnimationsExperiment);
+        const experimentID = this._automatedExperimentManager.getSelectedExperimentName(baseParams.campaign, AutomatedExperimentsCategories.PERFORMANCE_ENDCARD);
 
+        let endScreenCombination: IExperimentActionChoice | undefined;
+
+        if (AnimatedDownloadButtonEndScreen.experimentSupported(experimentID)) {
+            endScreenCombination = this._automatedExperimentManager.activateSelectedExperiment(baseParams.campaign, AutomatedExperimentsCategories.PERFORMANCE_ENDCARD);
+        }
         const endScreen = new AnimatedDownloadButtonEndScreen(endScreenCombination, endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
 
         return {
@@ -52,7 +59,7 @@ export class PerformanceAdUnitWithAutomatedExperimentParametersFactory extends P
     }
 
     protected getOverlayType(baseParams: IAdUnitParameters<Campaign>, privacy: AbstractPrivacy, showGDPRBanner: boolean, showPrivacyDuringVideo: boolean): VideoOverlay {
-        const videoCombination = this._automatedExperimentManager.activateExperiment(baseParams.campaign, VideoOverlayDownloadExperiment);
+        const videoCombination = this._automatedExperimentManager.activateSelectedExperiment(baseParams.campaign, AutomatedExperimentsCategories.VIDEO_OVERLAY);
 
         return new SwipeUpVideoOverlay(baseParams, privacy, showGDPRBanner, showPrivacyDuringVideo, videoCombination);
     }

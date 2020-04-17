@@ -117,14 +117,14 @@ export enum MraidMetric {
 }
 
 export enum AUIMetric {
-    CampaignAlreadyActive = 'campaign_already_active',
+    CampaignCategoryAlreadyActive = 'campaign_category_already_active',
+    CampaignCategoryInactive = 'campaign_category_inactive',
     CampaignInitializationError = 'automated_experiment_manager_initialization_error',
     FailedToCollectStaticFeatures = 'FailedToCollectStaticFeatures',
     FailedToCollectDeviceFeatures = 'failed_to_collect_device_features',
     FailedToFetchAutomatedExperiements = 'failed_to_fetch_automated_experiments',
     FailedToParseExperimentResponse = 'failed_to_parse_automated_experiments_response',
     FailedToPublishOutcome = 'failed_to_publish_experiment_outcome',
-    IgnoringNonPerformanceCampaign = 'ignoring_non_performance_campaign',
     InvalidEndscreenAnimation = 'invalid_endscreen_animation',
     OptimizationResponseApplied = 'campaign_optimization_response_applied',
     AutomatedExperimentManagerInitializationError = 'automated_experiment_manager_initialization_error',
@@ -136,7 +136,8 @@ export enum AUIMetric {
     OptimizationResponseIgnored = 'campaign_optimization_response_ignored',
     RequestingCampaignOptimization = 'requesting_campaign_optimization',
     UnknownExperimentName = 'unknown_experiement_name',
-    InvalidVideoOverlayMode = 'invalid-video-overlay-mode'
+    InvalidVideoOverlayMode = 'invalid-video-overlay-mode',
+    UnknownCategoryProvided = 'unknown_automated_experiment_category_provided'
 }
 
 export enum GeneralTimingMetric {
@@ -193,9 +194,14 @@ export enum AuctionV6 {
     FailedCreatingAuctionResponse = 'v6_failed_creating_auction_response'
 }
 
+export enum ChinaAucionEndpoint {
+    AuctionRequest = 'china_user_auction_request',
+    AuctionResponse = 'china_user_auction_response'
+}
+
 export type TimingEvent = InitializationMetric | MediationMetric | GeneralTimingMetric;
 
-export type PTSEvent = TimingEvent | AuctionV6 | AdmobMetric | BannerMetric | CachingMetric | ChinaMetric | VastMetric | MraidMetric | MiscellaneousMetric | LoadMetric | ErrorMetric | OMMetric | AUIMetric | LoadV5;
+export type PTSEvent = TimingEvent | AuctionV6 | AdmobMetric | BannerMetric | CachingMetric | ChinaMetric | VastMetric | MraidMetric | MiscellaneousMetric | LoadMetric | ErrorMetric | OMMetric | AUIMetric | LoadV5 | ChinaAucionEndpoint;
 
 export class SDKMetrics {
 
