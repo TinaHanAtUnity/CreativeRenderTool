@@ -20,6 +20,9 @@ interface IPlacementMedia {
     campaigns: { [mediaId: string]: AuctionPlacement[] };
 }
 
+// TODO: Refactor out of this - Replicates default refresh delay in RefreshManager
+const DEFAULT_REFRESH_DELAY = 3600;
+
 export class AuctionResponseParser {
 
     private static constructTrackingUrls(trackingTemplates: string[], tracking: IPlacementTrackingV6): ICampaignTrackingUrls {
@@ -91,7 +94,7 @@ export class AuctionResponseParser {
                 campaigns[mediaId].push(auctionPlacement);
             } else {
                 unfilledPlacementIds.push(placementId);
-                refreshDelay = 3600; // Moved const from RefreshManager
+                refreshDelay = DEFAULT_REFRESH_DELAY;
             }
         });
 
