@@ -1,5 +1,6 @@
 # Pending
 
+* [Load V5] Reload invalidates only placements with comet campaigns [#14533](https://github.com/Applifier/unity-ads-webview/pull/14533)
 * Fix dark mode always On in AnimatedDownloadButtonEndScreen [#14739](https://github.com/Applifier/unity-ads-webview/pull/14739)
 * [Latency] Improvements and Bug Fixes [#14712](https://github.com/Applifier/unity-ads-webview/pull/14712)
 * [Deployment Scripts] Add capabilities to merge commits without second terminal [#14684](https://github.com/Applifier/unity-ads-webview/pull/14684)
