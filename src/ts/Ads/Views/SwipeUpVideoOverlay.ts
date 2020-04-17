@@ -55,7 +55,7 @@ export class SwipeUpVideoOverlay extends VideoOverlay {
         } else {
             combination = VideoOverlayDownloadExperiment.getDefaultActions();
             SDKMetrics.reportMetricEvent(AUIMetric.InvalidVideoOverlayMode);
-            this._ctaMode = 'click'
+            this._ctaMode = 'click';
         }
 
         if (this._ctaMode === 'swipeup') {

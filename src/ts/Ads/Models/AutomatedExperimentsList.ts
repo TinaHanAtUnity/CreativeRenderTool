@@ -18,7 +18,6 @@ export enum AutomatedExperimentsCategories {
     PERFORMANCE_ENDCARD = 'webview-perf-ad-endcard',
     MRAID_AR = 'webview-ar-mraid',
     VIDEO_OVERLAY = 'webview-video-overlay'
-    
 }
 
 export const ButtonExperimentDeclaration: IExperimentDeclaration = {
