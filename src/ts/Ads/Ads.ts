@@ -394,7 +394,7 @@ export class Ads implements IAds {
                     }
 
                     this._mediationName = mediation.getName()!;
-                    this.MediationLoadTrackingManager = new MediationLoadTrackingManager(this.Api.LoadApi, this.Api.Listener, mediation.getName()!, this._webViewEnabledLoad, experimentType, nativeInitTime);
+                    this.MediationLoadTrackingManager = new MediationLoadTrackingManager(this.Api.LoadApi, this.Api.Listener, mediation.getName()!, this._webViewEnabledLoad, experimentType, nativeInitTime, this.Config.getPlacementCount());
                     this.MediationLoadTrackingManager.reportPlacementCount(this.Config.getPlacementCount());
                 }
             }).catch();
