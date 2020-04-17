@@ -1,4 +1,10 @@
-import { GDPREventAction, GDPREventSource, LegalFramework, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
+import {
+    AgeGateChoice,
+    GDPREventAction,
+    GDPREventSource,
+    LegalFramework,
+    UserPrivacyManager
+} from 'Ads/Managers/UserPrivacyManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { GamePrivacy, IPrivacyPermissions, PrivacyMethod, UserPrivacy } from 'Privacy/Privacy';
 import { Backend } from 'Backend/Backend';
@@ -77,7 +83,7 @@ describe('UserPrivacyManagerTest', () => {
            ads: false,
            gameExp: false,
            external: false,
-           agreedOverAgeLimit: false,
+           ageGateChoice: AgeGateChoice.MISSING,
            agreementMethod: ''
         });
         privacySDK.getUserPrivacy.returns(userPrivacy);
@@ -928,7 +934,7 @@ describe('UserPrivacyManagerTest', () => {
                    ads: false,
                    external: false,
                    gameExp: false,
-                   agreedOverAgeLimit: false,
+                   ageGateChoice: AgeGateChoice.MISSING,
                    agreementMethod: ''
                });
             });

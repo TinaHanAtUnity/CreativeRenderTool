@@ -3,12 +3,11 @@ import * as sinon from 'sinon';
 import { IPrivacySDKViewParameters, PrivacySDKView } from 'Ads/Views/Privacy/PrivacySDKView';
 import { ConsentPage } from 'Ads/Views/Privacy/Privacy';
 import { Platform } from 'Core/Constants/Platform';
-import { LegalFramework, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
+import { AgeGateChoice, LegalFramework, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { Core } from 'Core/Core';
 import { PrivacyConfig } from 'Privacy/PrivacyConfig';
 import { PrivacyMethod } from 'Privacy/Privacy';
-import { IPrivacyCompletedParams } from 'Privacy/IPrivacySettings';
-
+import { IPrivacyCompletedParams, IPrivacyFetchUrlParams } from 'Privacy/IPrivacySettings';
 import PrivacySDKFlow from 'json/privacy/PrivacySDKFlow.json';
 import PrivacyWebUI from 'html/PrivacyWebUI.html';
 
@@ -20,7 +19,7 @@ describe('PrivacySDKViewTest', () => {
             ads: false,
             external: false,
             gameExp: false,
-            agreedOverAgeLimit: false,
+            ageGateChoice: AgeGateChoice.NO,
             agreementMethod: ''
         },
         {
@@ -81,10 +80,10 @@ describe('PrivacySDKViewTest', () => {
                 onPrivacyOpenUrl: (url: string): void => {
                     // TODO: Empty
                 },
-                onPrivacyMetric: (data: string): void => {
+                onPrivacyMetric: (data: { [key: string]: unknown }): void => {
                     // TODO: Empty
                 },
-                onPrivacyFetch: (url: string, data: { [key: string]: unknown }): void => {
+                onPrivacyFetchUrl: (data: IPrivacyFetchUrlParams): void => {
                     // TODO: Empty
                 },
                 onPrivacyViewError: (event: string | Event) => {

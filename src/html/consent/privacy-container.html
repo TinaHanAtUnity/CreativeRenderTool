@@ -42,10 +42,11 @@
                                 window.privacyAdapter.openUrlCallback(event.data.data);
                             }
                             break;
-                        case 'fetchCallback':
-                            if (window.privacyAdapter.fetchCallback) {
-                                window.privacyAdapter.fetchCallback(event.data.data);
+                        case 'fetchUrlCallback':
+                            if (window.privacyAdapter.fetchUrlCallback) {
+                                window.privacyAdapter.fetchUrlCallback(event.data.data);
                             }
+                            break;
                         default:
                             console.log('Unhandled message: ' + event.data.type);
                             break;
@@ -70,7 +71,7 @@
                 this.onPrivacyCompleted = function(data) {
                     window.parent.postMessage({
                         type: 'onPrivacyCompleted',
-                        data: JSON.parse(data)
+                        data: data
                     }, '*');
                 };
 
@@ -88,12 +89,15 @@
                     }, '*');
                 };
 
-                this.onPrivacyFetch = function(url, data) {
+                this.onPrivacyFetchUrl = function(data) {
                     window.parent.postMessage({
-                        type: 'onPrivacyFetch',
-                        url: url,
-                        data: JSON.parse(data)
+                        type: 'onPrivacyFetchUrl',
+                        data: data
                     }, '*');
+                };
+
+                this.setFetchUrlCallback = function(fetchUrlCallback) {
+                    this.fetchUrlCallback = fetchUrlCallback;
                 };
             };
 
