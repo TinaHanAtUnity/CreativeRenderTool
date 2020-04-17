@@ -65,7 +65,11 @@ export class VastHTMLEndScreen extends VastEndScreen implements IPrivacyHandlerV
         if (this._htmlContentTemplateData) {
             super.show();
             this.setUpWebPlayers().then(() => {
-                this._webPlayerContainer.setData(this._htmlContentTemplate.render(this._htmlContentTemplateData), 'text/html', 'UTF-8');
+                this._webPlayerContainer.setData(this._htmlContentTemplate.render(this._htmlContentTemplateData), 'text/html', 'UTF-8').catch(() => {
+                    this.onCloseEvent(new Event('click'));
+                });
+            }).catch(() => {
+                this.onCloseEvent(new Event('click'));
             });
         } else {
             this.onCloseEvent(new Event('click'));
@@ -85,10 +89,11 @@ export class VastHTMLEndScreen extends VastEndScreen implements IPrivacyHandlerV
     }
 
     public onPrivacyClose(): void {
-        this._adUnitContainer.setViewFrame('webview', 0, this._screenHeight - this._controlBarHeight, this._screenWidth, this._controlBarHeight).then(() => {
-            if (this._privacy) {
-                this._privacy.hide();
-            }
+        if (this._privacy) {
+            this._privacy.hide();
+        }
+        this._adUnitContainer.setViewFrame('webview', 0, this._screenHeight - this._controlBarHeight, this._screenWidth, this._controlBarHeight).catch(() => {
+            this.onCloseEvent(new Event('click'));
         });
     }
 

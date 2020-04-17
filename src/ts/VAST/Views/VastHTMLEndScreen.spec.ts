@@ -76,25 +76,17 @@ jest.mock('html/VastHTMLEndScreen.html', () => {
         });
 
         describe('when endcard is showing', () => {
-            it('the webplayer should set html data', () => {
+            it('it should show endcard overlay and reconfigure webplayer', () => {
                 htmlEndScreen.show();
-                new Promise((r) => setTimeout(r, 2000)).then(() => {
-                    expect(adUnitContainer.reconfigure).toHaveBeenCalled();
-                    expect(webPlayer.setSettings).toHaveBeenCalled();
-                    expect(adUnitContainer.setViewFrame).toHaveBeenCalled();
-                    expect(webPlayer.setEventSettings).toHaveBeenCalled();
-                    expect(webPlayer.setData).toHaveBeenCalled();
-                });
+                expect(adUnitContainer.reconfigure).toHaveBeenCalled();
             });
         });
 
         describe('when privacy is closed', () => {
             it('the privacy should hide and webiview frames should change back', () => {
                 htmlEndScreen.onPrivacyClose();
-                new Promise((r) => setTimeout(r, 2000)).then(() => {
-                    expect(privacy.hide).toHaveBeenCalled();
-                    expect(adUnitContainer.setViewFrame).toHaveBeenCalled();
-                });
+                expect(privacy.hide).toHaveBeenCalled();
+                expect(adUnitContainer.setViewFrame).toHaveBeenCalled();
             });
         });
 
