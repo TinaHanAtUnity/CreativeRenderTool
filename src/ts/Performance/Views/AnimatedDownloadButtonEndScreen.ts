@@ -73,9 +73,6 @@ export class AnimatedDownloadButtonEndScreen extends PerformanceEndScreen {
                 ctaButton.style.backgroundColor = this._downloadButtonColor;
             }
         }
-        if (this._darkMode) {
-            this.applyDarkMode();
-        }
         if (this._tintColor) {
             this.renderColorTheme();
         }
@@ -159,12 +156,17 @@ export class AnimatedDownloadButtonEndScreen extends PerformanceEndScreen {
     public show(): void {
         super.show();
         window.addEventListener('resize', this.handleResize, false);
+        if (this._darkMode) {
+            this.applyDarkMode();
+        }
     }
 
     public hide(): void {
         super.hide();
         window.removeEventListener('resize', this.handleResize);
-        document.body.classList.remove('dark-mode');
+        if (this._darkMode) {
+            document.body.classList.remove('dark-mode');
+        }
     }
 
     protected getTemplate() {
