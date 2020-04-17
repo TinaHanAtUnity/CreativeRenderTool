@@ -160,7 +160,9 @@ export enum MediationMetric {
     MediaCount = 'media_count',
     AuctionRequest = 'auction_request_time',
     AdCaching = 'ad_caching_time',
-    AuctionRequestStarted = 'auction_request_start'
+    AuctionRequestStarted = 'auction_request_start',
+    FillLatencyByPlacements = 'fill_latency_by_placements',
+    NofillLatencyByPlacements = 'nofill_latency_by_placements'
 }
 
 export enum LoadV5 {
