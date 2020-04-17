@@ -3,7 +3,7 @@ import * as sinon from 'sinon';
 import { IPrivacySDKViewParameters, PrivacySDKView } from 'Ads/Views/Privacy/PrivacySDKView';
 import { ConsentPage } from 'Ads/Views/Privacy/Privacy';
 import { Platform } from 'Core/Constants/Platform';
-import { LegalFramework, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
+import { AgeGateChoice, LegalFramework, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { Core } from 'Core/Core';
 import { PrivacyConfig } from 'Privacy/PrivacyConfig';
 import { PrivacyMethod } from 'Privacy/Privacy';
@@ -20,7 +20,7 @@ describe('PrivacySDKViewTest', () => {
             ads: false,
             external: false,
             gameExp: false,
-            agreedOverAgeLimit: false,
+            ageGateChoice: AgeGateChoice.NO,
             agreementMethod: ''
         },
         {

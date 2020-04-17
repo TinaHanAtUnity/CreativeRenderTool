@@ -150,18 +150,7 @@ export class UserPrivacyManager {
     }
 
     public getPrivacyConfig(): PrivacyConfig {
-        let agreedOverAgeLimit = false;
-        switch (this.getAgeGateChoice()) {
-            case AgeGateChoice.YES:
-                agreedOverAgeLimit = true;
-                break;
-            case AgeGateChoice.NO:
-            case AgeGateChoice.MISSING:
-                agreedOverAgeLimit = false;
-                break;
-            default:
-                agreedOverAgeLimit = false;
-        }
+        const ageGateChoice = this.getAgeGateChoice();
 
         const userSummary = CachedUserSummary.get();
         const { ads, external, gameExp } = this._userPrivacy.getPermissions();
@@ -171,7 +160,7 @@ export class UserPrivacyManager {
                 ads,
                 external,
                 gameExp,
-                agreedOverAgeLimit,
+                ageGateChoice,
                 agreementMethod: ''
             },
             {

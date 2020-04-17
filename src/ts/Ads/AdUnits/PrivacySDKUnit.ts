@@ -194,26 +194,17 @@ export class PrivacySDKUnit implements IAdUnit, IPrivacySDKViewHandler {
                 action = GDPREventAction.CONSENT_SAVE_CHOICES;
         }
 
-        const { ads, external, gameExp, agreedOverAgeLimit } = privacySettings.user;
+        const { ads, external, gameExp, ageGateChoice } = privacySettings.user;
         const permissions: IPrivacyPermissions = { ads, external, gameExp };
 
-        this.setConsent(permissions, action, GDPREventSource.USER);
-
         if (this._privacySDK.isAgeGateEnabled()) {
-            let ageGateChoice = AgeGateChoice.MISSING;
-
-            if (agreedOverAgeLimit !== undefined) {
-                ageGateChoice = AgeGateChoice.YES;
-
-                if (agreedOverAgeLimit === false) {
-                    ageGateChoice = AgeGateChoice.NO;
-                    action = GDPREventAction.AGE_GATE_DISAGREE;
-                }
+            if (ageGateChoice === AgeGateChoice.NO) {
+                action = GDPREventAction.AGE_GATE_DISAGREE;
             }
 
             this._privacyManager.setUsersAgeGateChoice(ageGateChoice, AgeGateSource.USER);
 
-            if (ageGateChoice === AgeGateChoice.NO || (privacySettings.env.privacyMethod && privacySettings.env.privacyMethod === PrivacyMethod.UNITY_CONSENT)) {
+            if (ageGateChoice === AgeGateChoice.NO || (this._privacySDK.getGamePrivacy().getMethod() === PrivacyMethod.UNITY_CONSENT)) {
                 this.setConsent(permissions, action, GDPREventSource.USER);
             }
         } else {
