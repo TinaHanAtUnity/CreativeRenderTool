@@ -53,7 +53,7 @@ export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParameters
         }
 
         const showGDPRBanner = this.showGDPRBanner(parameters) && showPrivacyDuringVideo;
-        const overlay = this.getOverlayType(parameters, privacy, showGDPRBanner, showPrivacyDuringVideo)
+        const overlay = this.getOverlayType(parameters, privacy, showGDPRBanner, showPrivacyDuringVideo);
 
         if (parameters.placement.disableVideoControlsFade()) {
             overlay.setFadeEnabled(false);

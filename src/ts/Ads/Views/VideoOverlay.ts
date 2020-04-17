@@ -16,7 +16,6 @@ import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 import { IExperimentActionChoice } from 'Ads/Models/AutomatedExperiment';
 
-
 export interface IVideoOverlayParameters<T extends Campaign> {
     platform: Platform;
     ads: IAdsApi;
@@ -60,14 +59,14 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
     private _chinaAdvertisementElement: HTMLElement;
 
     private _fadeTimer?: number;
-    private _areControlsVisible: boolean = false;
+    protected _areControlsVisible: boolean = false;
     private _gameId: string;
 
     private _country: string | undefined;
     protected _campaign: Campaign;
 
     private _useCloseIconInsteadOfSkipIcon: boolean | undefined = false;
-    private _disableFadeOutOnClick: boolean | undefined = false;
+    protected _disableFadeOutOnClick: boolean | undefined = false;
 
     constructor(parameters: IVideoOverlayParameters<Campaign>, privacy: AbstractPrivacy, showGDPRBanner: boolean, showPrivacyDuringVideo: boolean) {
         super(parameters.platform, 'video-overlay', parameters.placement.muteVideo());
@@ -374,20 +373,16 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
         this._handlers.forEach(handler => handler.onOverlayPauseForTesting(true));
     }
 
-    private onClick(event: Event) {
+    protected onClick(event: Event) {
         if (this._disableFadeOutOnClick) {
             return;
         }
 
-        //fix a bug on iOS where the mute button and timer would be invisible after the first swipe
-        if (event.type !== 'swipeup') {
-            this.resetFadeTimer();
-
-            if (this._areControlsVisible) {
-                this.fadeOut();
-            } else {
-                this.fadeIn();
-            }
+        this.resetFadeTimer();
+        if (this._areControlsVisible) {
+            this.fadeOut();
+        } else {
+            this.fadeIn();
         }
     }
 
@@ -398,6 +393,7 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
         this._debugMessageElement = <HTMLElement> this._container.querySelector('.debug-message-text');
         this._callButtonElement = <HTMLElement> this._container.querySelector('.call-button');
         this._swipeUpButtonElement = <HTMLElement> this._container.querySelector('.swipe-up-button');
+        this._swipeUpZoneContainerElement = <HTMLElement> this._container.querySelector('.swipe-up-zone-container');
         this._timerElement = <HTMLElement> this._container.querySelector('.timer');
         this._chinaAdvertisementElement = <HTMLLIElement> this._container.querySelector('.china-advertisement');
     }
@@ -411,7 +407,7 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
         }
     }
 
-    private resetFadeTimer() {
+    protected resetFadeTimer() {
         if (this._fadeTimer) {
             clearTimeout(this._fadeTimer);
             this._fadeTimer = undefined;
@@ -421,14 +417,6 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
     protected showCallButton() {
         this._callButtonElement.classList.add('show-call-button');
         this._callButtonElement.classList.add('show-go-text');
-    }
-
-    protected showSwipeUpButton() {
-        this._swipeUpButtonElement.classList.add('show-swipe-up-button');
-    }
-
-    protected showSwipeUpZoneContainer() {
-        this._swipeUpZoneContainerElement.classList.add('show-swipe-up-zone-container')
     }
 
     protected handleFadeIn () {
@@ -449,12 +437,12 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
         }, 500);
     }
 
-    private fadeIn() {
+    protected fadeIn() {
         this.handleFadeIn();
         this.handleVideoProgressButton();
     }
 
-    private fadeOut() {
+    protected fadeOut() {
         this._container.classList.remove('fade-in');
         this._areControlsVisible = false;
     }

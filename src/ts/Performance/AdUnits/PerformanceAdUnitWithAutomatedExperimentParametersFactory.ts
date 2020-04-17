@@ -56,5 +56,4 @@ export class PerformanceAdUnitWithAutomatedExperimentParametersFactory extends P
 
         return new SwipeUpVideoOverlay(baseParams, privacy, showGDPRBanner, showPrivacyDuringVideo, videoCombination);
     }
-    
 }
