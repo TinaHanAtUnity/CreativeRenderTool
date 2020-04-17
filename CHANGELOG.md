@@ -1,3 +1,7 @@
+# Pending
+
+* [Deployment Scripts] Add capabilities to merge commits without second terminal [#14684](https://github.com/Applifier/unity-ads-webview/pull/14684)
+
 # Thu Apr 16 23:14:56 UTC 2020
 
 * [AUI] Refactor Service for Categorized Experiments [#14319](https://github.com/Applifier/unity-ads-webview/pull/14319)
