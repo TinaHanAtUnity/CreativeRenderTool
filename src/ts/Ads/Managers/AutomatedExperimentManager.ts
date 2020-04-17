@@ -81,7 +81,7 @@ export class AutomatedExperimentManager {
     private _nativeBridge: NativeBridge;
     private _onCampaignListener: (placementID: string, campaign: Campaign, trackingURL: ICampaignTrackingUrls | undefined) => void;
 
-    private static readonly _baseUrl = 'https://auiopt.unityads.unity3d.com/v2/';
+    private static readonly _baseUrl = 'https://auiopt.staging.unityads.unity3d.com/v2/';
     private static readonly _createEndPoint = 'experiment';
     private static readonly _rewardEndPoint = 'reward';
 
