@@ -71,7 +71,8 @@ import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 
                 it('should populate the omid-iframe with omid3p container code', () => {
                     om.render();
-                    assert.equal((<HTMLIFrameElement>om.container().querySelector('#omid-iframe' + om.getOMAdSessionId())).srcdoc, MacroUtil.replaceMacro(OMID3p, {'{{ DEFAULT_KEY_ }}': 'default_key'}));
+                    const iframe = <HTMLIFrameElement>om.container().querySelector('#omid-iframe' + om.getOMAdSessionId());
+                    assert.equal(iframe.srcdoc, OMID3p.replace('{{ DEFAULT_KEY_ }}', 'default_key').replace('{{ IFRAME_ID_ }}', iframe.id));
                 });
 
                 it('should not call the remove child function if om does not exist in dom', () => {

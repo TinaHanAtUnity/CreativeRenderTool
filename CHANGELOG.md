@@ -1,3 +1,42 @@
+# Thu Apr 16 23:14:56 UTC 2020
+
+* [AUI] Refactor Service for Categorized Experiments [#14319](https://github.com/Applifier/unity-ads-webview/pull/14319)
+
+# Thu Apr 16 19:27:56 UTC 2020
+
+* [Load V5] Attempt to stream Ad if caching failed [#14625](https://github.com/Applifier/unity-ads-webview/pull/14625)
+* [Load V5] Expand load v5 to chimera game [#14657](https://github.com/Applifier/unity-ads-webview/pull/14657)
+* Add missing initError method to SDK Backend mock [#14686](https://github.com/Applifier/unity-ads-webview/pull/14686)
+* Cleanup campaign level session counters [#14685](https://github.com/Applifier/unity-ads-webview/pull/14685)
+* [Deployment Scripts] Script to merge pr before staging [#14656](https://github.com/Applifier/unity-ads-webview/pull/14656)
+* [Deployment Scripts] Fix color codes [#14683](https://github.com/Applifier/unity-ads-webview/pull/14683)
+
+# Thu Apr 16 01:24:36 UTC 2020
+
+* China auction endpoint switch for 1% of traffic [#14567](https://github.com/Applifier/unity-ads-webview/pull/14567)
+
+# Wed Apr 15 23:25:45 UTC 2020
+
+* [Load V5] Cleanup unused condition block for tracking URLs [#14626](https://github.com/Applifier/unity-ads-webview/pull/14626)
+* [Auction V6] Remove Mediation Experiment Type [#14599](https://github.com/Applifier/unity-ads-webview/pull/14599)
+* [Tech Debt] Disable SessionDiagnostics from Firing to Kafka [#14313](https://github.com/Applifier/unity-ads-webview/pull/14313)
+* [Tech Debt] Disable Diagnostics from Firing to Kafka [#14287](https://github.com/Applifier/unity-ads-webview/pull/14287)
+* OM: Fix duplicate postMessage events happens when several OM instances exist [#14474](https://github.com/Applifier/unity-ads-webview/pull/14474)
+
+# Wed Apr 15 02:32:42 UTC 2020
+
+* Expand Temporary Cachemode Allowed Test to Group 14 and 15 [#14598](https://github.com/Applifier/unity-ads-webview/pull/14598)
+
+# Wed Apr 15 01:24:42 UTC 2020
+
+* [Load V5] Send metric when preload failed while rescheduling load request [#14564](https://github.com/Applifier/unity-ads-webview/pull/14564)
+* [Load V5] Rename error message and error tag to correct one [#14563](https://github.com/Applifier/unity-ads-webview/pull/14563)
+* [Load V5] Expand Load V5 to new AB group [#14535](https://github.com/Applifier/unity-ads-webview/pull/14535)
+* Conclude Original Load and Load V4 Experiment [#14562](https://github.com/Applifier/unity-ads-webview/pull/14562)
+* Add Deploy Label to Deployment PRs [#14566](https://github.com/Applifier/unity-ads-webview/pull/14566)
+* [Auction V6] Increase Traffic to Group 13 [#14594](https://github.com/Applifier/unity-ads-webview/pull/14594)
+* [Auction V6] Change Group 13 to Group 10 [#14597](https://github.com/Applifier/unity-ads-webview/pull/14597)
+
 # Tue Apr 14 00:36:19 UTC 2020
 
 * [Load V5] Remove duplicate and unused metrics [#14532](https://github.com/Applifier/unity-ads-webview/pull/14532)

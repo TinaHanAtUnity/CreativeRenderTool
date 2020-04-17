@@ -371,35 +371,18 @@ export class AutomatedExperimentManager {
         features.day_of_week = ts.getDay();
         features.local_day_time = ts.getHours() + ts.getMinutes() / 60;
 
-        // Extract game session counters: Campaign centric
+        // Extract game session counters: targetted game centric
         let ids: string[] = [];
         let starts: number[] = [];
         let views: number[] = [];
         let startsTS: string[] = [];
-        for (const campaignID in gameSessionCounters.startsPerCampaign) {
-            if (gameSessionCounters.startsPerCampaign.hasOwnProperty(campaignID)) {
-                ids = ids.concat(campaignID);
-                starts = starts.concat(gameSessionCounters.startsPerCampaign[campaignID]);
-                views = views.concat(gameSessionCounters.viewsPerCampaign[campaignID] !== undefined ? gameSessionCounters.viewsPerCampaign[campaignID] : 0);
-                startsTS = startsTS.concat(gameSessionCounters.latestCampaignsStarts[campaignID] !== undefined ? gameSessionCounters.latestCampaignsStarts[campaignID] : '');
-            }
-        }
-        if (ids.length > 0) {
-            features.gsc_campaigns = ids;
-            features.gsc_campaign_starts = starts;
-            features.gsc_campaign_views = views;
-            features.gsc_campaign_last_start_ts = startsTS;
-        }
 
-        // Extract game session counters: targetted game centric
-        ids = [];
-        starts = [];
-        views = [];
         for (const targetId in gameSessionCounters.startsPerTarget) {
             if (gameSessionCounters.startsPerTarget.hasOwnProperty(targetId)) {
                 ids = ids.concat(targetId);
                 starts = starts.concat(gameSessionCounters.startsPerTarget[targetId]);
                 views = views.concat(gameSessionCounters.viewsPerTarget[targetId] !== undefined ? gameSessionCounters.viewsPerTarget[targetId] : 0);
+                startsTS = startsTS.concat(gameSessionCounters.latestTargetStarts[targetId] !== undefined ? gameSessionCounters.latestTargetStarts[targetId] : '');
             }
         }
 

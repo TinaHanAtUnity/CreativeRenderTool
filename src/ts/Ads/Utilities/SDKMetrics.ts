@@ -193,9 +193,14 @@ export enum AuctionV6 {
     FailedCreatingAuctionResponse = 'v6_failed_creating_auction_response'
 }
 
+export enum ChinaAucionEndpoint {
+    AuctionRequest = 'china_user_auction_request',
+    AuctionResponse = 'china_user_auction_response'
+}
+
 export type TimingEvent = InitializationMetric | MediationMetric | GeneralTimingMetric;
 
-export type PTSEvent = TimingEvent | AuctionV6 | AdmobMetric | BannerMetric | CachingMetric | ChinaMetric | VastMetric | MraidMetric | MiscellaneousMetric | LoadMetric | ErrorMetric | OMMetric | AUIMetric | LoadV5;
+export type PTSEvent = TimingEvent | AuctionV6 | AdmobMetric | BannerMetric | CachingMetric | ChinaMetric | VastMetric | MraidMetric | MiscellaneousMetric | LoadMetric | ErrorMetric | OMMetric | AUIMetric | LoadV5 | ChinaAucionEndpoint;
 
 export class SDKMetrics {
 
