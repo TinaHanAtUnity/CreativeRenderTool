@@ -25,7 +25,6 @@ export interface IVideoOverlayParameters<T extends Campaign> {
 
 export class SwipeUpVideoOverlay extends VideoOverlay {
     private _ctaMode: string;
-    protected _swipeUpZoneContainerElement: HTMLElement;
     protected _swipeUpButtonElement: HTMLElement;
 
     constructor(
@@ -36,8 +35,6 @@ export class SwipeUpVideoOverlay extends VideoOverlay {
         combination: IExperimentActionChoice | undefined
     ) {
         super(parameters, privacy, showGDPRBanner, showPrivacyDuringVideo);
-
-        console.log('COMBINATIONNNNNNNNN$$$$$$$$$',combination)
 
         if (combination) {
             if (!VideoOverlayDownloadExperiment.isValid(combination)) {
@@ -61,13 +58,13 @@ export class SwipeUpVideoOverlay extends VideoOverlay {
             this._ctaMode = 'click'
         }
 
-        console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>',this._ctaMode)
-
-        this._bindings.push({
-            event: 'swipeup',
-            listener: (event: Event) => this.onSwipeUpEvent(event),
-            selector: '.swipe-up-zone'
-        });
+        if (this._ctaMode === 'swipeup') {
+            this._bindings.push({
+                event: 'swipeup',
+                listener: (event: Event) => this.onSwipeUpEvent(event),
+                selector: '.swipe-up-zone'
+            });
+        }
     }
 
     protected handleVideoProgressButton() {
@@ -112,10 +109,6 @@ export class SwipeUpVideoOverlay extends VideoOverlay {
         this._swipeUpButtonElement.classList.add('show-swipe-up-button');
     }
 
-    // protected showSwipeUpZoneContainer() {
-    //     this._swipeUpZoneContainerElement.classList.add('show-swipe-up-zone-container');
-    // }
-
     protected onClick(event: Event) {
         if (this._disableFadeOutOnClick) {
             return;
@@ -136,6 +129,5 @@ export class SwipeUpVideoOverlay extends VideoOverlay {
     protected setupElementReferences(): void {
         this.getBaseElements();
         this._swipeUpButtonElement = <HTMLElement> this._container.querySelector('.swipe-up-button');
-        this._swipeUpZoneContainerElement = <HTMLElement> this._container.querySelector('.swipe-up-zone-container');
     }
 }
