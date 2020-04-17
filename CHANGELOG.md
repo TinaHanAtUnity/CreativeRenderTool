@@ -1,5 +1,6 @@
 # Pending
 
+* [Metrics Refactoring] Buffered metric instance [#14409](https://github.com/Applifier/unity-ads-webview/pull/14409)
 * [Load V5] Reload invalidates only placements with comet campaigns [#14533](https://github.com/Applifier/unity-ads-webview/pull/14533)
 * Fix dark mode always On in AnimatedDownloadButtonEndScreen [#14739](https://github.com/Applifier/unity-ads-webview/pull/14739)
 * [Latency] Improvements and Bug Fixes [#14712](https://github.com/Applifier/unity-ads-webview/pull/14712)
