@@ -1,5 +1,6 @@
 # Pending
 
+* [Latency] Improvements and Bug Fixes [#14712](https://github.com/Applifier/unity-ads-webview/pull/14712)
 * [Deployment Scripts] Add capabilities to merge commits without second terminal [#14684](https://github.com/Applifier/unity-ads-webview/pull/14684)
 
 # Thu Apr 16 23:14:56 UTC 2020
