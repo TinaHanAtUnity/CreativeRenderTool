@@ -822,6 +822,12 @@
           "condition": true
         }
       ],
+      "fetchUrls": [
+        {
+          "url": "env.userSummaryUrl",
+          "property": "env.userSummary"
+        }
+      ],
       "allowGoBack": true
     }
   }
