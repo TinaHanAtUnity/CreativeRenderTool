@@ -76,8 +76,6 @@ export const ArAvailableButtonExperiment = new AutomatedExperiment({
     cacheDisabled: true
 });
 
-export const ArAutomatedExperimentsList: AutomatedExperiment[] = [ArAvailableButtonExperiment];
-
 // Video Overlay Download
 
 export const VideoOverlayDownloadExperimentDeclaration: IExperimentDeclaration = {
@@ -95,5 +93,3 @@ export const VideoOverlayDownloadExperiment = new AutomatedExperiment({
     },
     cacheDisabled: true
 });
-
-export const VideoOverlayDownloadExperimentsList: AutomatedExperiment[] = [VideoOverlayDownloadExperiment];
