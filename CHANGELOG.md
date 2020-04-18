@@ -1,4 +1,4 @@
-# Pending
+# Sat Apr 18 00:31:20 UTC 2020
 
 * [Latency] Add Fill/Nofill Latency by Placement Bucket [#14771](https://github.com/Applifier/unity-ads-webview/pull/14771)
 * [Latency] Ramp Mediated CacheMode Allowed Experiment to Groups 11 and 13 [#14770](https://github.com/Applifier/unity-ads-webview/pull/14770)
