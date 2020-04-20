@@ -284,8 +284,13 @@ describe('MediationLoadTrackingManager', () => {
         });
 
         it('should report metric event with tags', () => {
-            expect(SDKMetrics.reportTimingEventWithTags).toBeCalledTimes(1);
+            expect(SDKMetrics.reportTimingEventWithTags).toBeCalledTimes(2);
         });
+
+        it('should report metric event with tags', () => {
+            expect(SDKMetrics.reportTimingEventWithTags).toBeCalledWith(MediationMetric.InitCompleteByPlacements, expect.anything(), expect.objectContaining({ 'iar': 'true' }));
+        });
+
     });
 
     describe('should report reason when it is set', () => {
