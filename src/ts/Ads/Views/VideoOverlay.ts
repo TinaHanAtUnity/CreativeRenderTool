@@ -402,7 +402,7 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
         }
     }
 
-    protected resetFadeTimer() {
+    private resetFadeTimer() {
         if (this._fadeTimer) {
             clearTimeout(this._fadeTimer);
             this._fadeTimer = undefined;
