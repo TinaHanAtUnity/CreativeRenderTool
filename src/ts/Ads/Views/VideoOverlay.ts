@@ -14,7 +14,6 @@ import VideoOverlayTemplate from 'html/VideoOverlay.html';
 import { Campaign } from 'Ads/Models/Campaign';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
-import { IExperimentActionChoice } from 'Ads/Models/AutomatedExperiment';
 
 export interface IVideoOverlayParameters<T extends Campaign> {
     platform: Platform;
