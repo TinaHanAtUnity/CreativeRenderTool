@@ -384,7 +384,7 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
         }
     }
 
-    protected getBaseElements () {
+    protected setupElementReferences(): void {
         this._skipButtonElement = <HTMLElement> this._container.querySelector('.skip-button');
         this._spinnerElement = <HTMLElement> this._container.querySelector('.buffering-spinner');
         this._muteButtonElement = <HTMLElement> this._container.querySelector('.mute-button');
@@ -392,10 +392,6 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
         this._callButtonElement = <HTMLElement> this._container.querySelector('.call-button');
         this._timerElement = <HTMLElement> this._container.querySelector('.timer');
         this._chinaAdvertisementElement = <HTMLLIElement> this._container.querySelector('.china-advertisement');
-    }
-
-    protected setupElementReferences(): void {
-      this.getBaseElements();
     }
 
     protected showSkipButton() {
