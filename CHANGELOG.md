@@ -1,3 +1,7 @@
+# Pending
+
+* [Latency] Add Placement Bucket Tracking for Init Complete [#14772](https://github.com/Applifier/unity-ads-webview/pull/14772)
+
 # Sat Apr 18 00:31:20 UTC 2020
 
 * [Latency] Add Fill/Nofill Latency by Placement Bucket [#14771](https://github.com/Applifier/unity-ads-webview/pull/14771)
