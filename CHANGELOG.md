@@ -1,5 +1,6 @@
 # Pending
 
+* [Latency] Ramp Mediation CMA Test to 95% [#14773](https://github.com/Applifier/unity-ads-webview/pull/14773)
 * [Latency] Add Placement Bucket Tracking for Init Complete [#14772](https://github.com/Applifier/unity-ads-webview/pull/14772)
 
 # Sat Apr 18 00:31:20 UTC 2020
