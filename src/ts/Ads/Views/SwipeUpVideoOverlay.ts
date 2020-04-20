@@ -107,19 +107,8 @@ export class SwipeUpVideoOverlay extends VideoOverlay {
     }
 
     protected onClick(event: Event) {
-        if (this._disableFadeOutOnClick) {
-            return;
-        }
-
-        //fix a bug on iOS where the mute button and timer would be invisible after the first swipe
         if (event.type !== 'swipeup') {
-            this.resetFadeTimer();
-
-            if (this._areControlsVisible) {
-                this.fadeOut();
-            } else {
-                this.fadeIn();
-            }
+             super.onClick(event);
         }
     }
 
