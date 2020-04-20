@@ -49,6 +49,7 @@ export class MediationLoadTrackingManager {
         this._initCompleteTime = this.getTime();
 
         SDKMetrics.reportTimingEventWithTags(MediationMetric.InitializationComplete, this._initCompleteTime, this.getBaseTrackingTags());
+        this.reportPlacementBucket(MediationMetric.InitCompleteByPlacements, true, this._initCompleteTime);
     }
 
     public reportPlacementCount(placementCount: number) {
@@ -136,7 +137,7 @@ export class MediationLoadTrackingManager {
             SDKMetrics.reportTimingEventWithTags(MediationMetric.LoadRequestFill, timeValue, this.getBaseTrackingTags({
                 'iar': `${this._activeLoads[placementId].initialAdRequest}`
             }));
-            this.reportPlacementBucket(MediationMetric.FillLatencyByPlacements, placementId, timeValue);
+            this.reportPlacementBucket(MediationMetric.FillLatencyByPlacements, this._activeLoads[placementId].initialAdRequest, timeValue);
 
             delete this._activeLoads[placementId];
             SDKMetrics.sendBatchedEvents();
@@ -144,7 +145,7 @@ export class MediationLoadTrackingManager {
             SDKMetrics.reportTimingEventWithTags(MediationMetric.LoadRequestNofill, timeValue, this.getBaseTrackingTags({
                 'iar': `${this._activeLoads[placementId].initialAdRequest}`
             }));
-            this.reportPlacementBucket(MediationMetric.NofillLatencyByPlacements, placementId, timeValue);
+            this.reportPlacementBucket(MediationMetric.NofillLatencyByPlacements, this._activeLoads[placementId].initialAdRequest, timeValue);
 
             delete this._activeLoads[placementId];
             SDKMetrics.sendBatchedEvents();
@@ -205,9 +206,9 @@ export class MediationLoadTrackingManager {
         };
     }
 
-    private reportPlacementBucket(metric: MediationMetric, placementId: string, latency: number): void {
+    private reportPlacementBucket(metric: MediationMetric, initialAdRequest: boolean, latency: number): void {
         SDKMetrics.reportTimingEventWithTags(metric, latency, {
-            'iar': `${this._activeLoads[placementId].initialAdRequest}`,
+            'iar': `${initialAdRequest}`,
             'plb': this.getPlacementBucket()
         });
     }
