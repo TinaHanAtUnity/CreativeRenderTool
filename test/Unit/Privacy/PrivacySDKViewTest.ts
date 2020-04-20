@@ -7,7 +7,7 @@ import { AgeGateChoice, LegalFramework, UserPrivacyManager } from 'Ads/Managers/
 import { Core } from 'Core/Core';
 import { PrivacyConfig } from 'Privacy/PrivacyConfig';
 import { PrivacyMethod } from 'Privacy/Privacy';
-import { IPrivacyFetchUrlParams, IPrivacySettings } from 'Privacy/IPrivacySettings';
+import { IPrivacyCompletedParams, IPrivacyFetchUrlParams } from 'Privacy/IPrivacySettings';
 import PrivacySDKFlow from 'json/privacy/PrivacySDKFlow.json';
 import PrivacyWebUI from 'html/PrivacyWebUI.html';
 
@@ -74,7 +74,7 @@ describe('PrivacySDKViewTest', () => {
                     document.body.removeChild(privacyView.container());
                     done();
                 },
-                onPrivacyCompleted: (privacySettings: IPrivacySettings): void => {
+                onPrivacyCompleted: (privacyParams: IPrivacyCompletedParams): void => {
                     // TODO: Empty
                 },
                 onPrivacyOpenUrl: (url: string): void => {

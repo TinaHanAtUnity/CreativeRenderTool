@@ -18,7 +18,7 @@ import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { IPrivacySDKViewParameters, PrivacySDKView } from 'Ads/Views/Privacy/PrivacySDKView';
 import { PrivacyConfig } from 'Privacy/PrivacyConfig';
-import { IPrivacyFetchUrlParams, IPrivacySettings } from 'Privacy/IPrivacySettings';
+import { IPrivacyCompletedParams, IPrivacyFetchUrlParams } from 'Privacy/IPrivacySettings';
 
 export interface IPrivacyUnitParameters {
     abGroup: ABGroup;
@@ -169,11 +169,19 @@ export class PrivacySDKUnit implements IAdUnit, IPrivacySDKViewHandler {
         }
     }
 
-    public onPrivacyCompleted(privacySettings: IPrivacySettings): void {
-        this._core.Sdk.logDebug('PRIVACY: Got permissions: ' + JSON.stringify(privacySettings));
+    public onPrivacyCompleted(params: IPrivacyCompletedParams): void {
+        const { user, error } = params;
+
+        if (error) {
+            this._core.Sdk.logError(`Privacy error: ${error}`);
+            this.closePrivacy();
+            return;
+        }
+
+        this._core.Sdk.logDebug('PRIVACY: Got permissions: ' + JSON.stringify(user));
 
         let action: GDPREventAction;
-        switch (privacySettings.user.agreementMethod) {
+        switch (user.agreementMethod) {
             case 'all':
                 action = GDPREventAction.CONSENT_AGREE_ALL;
                 break;
@@ -194,7 +202,7 @@ export class PrivacySDKUnit implements IAdUnit, IPrivacySDKViewHandler {
                 action = GDPREventAction.CONSENT_SAVE_CHOICES;
         }
 
-        const { ads, external, gameExp, ageGateChoice } = privacySettings.user;
+        const { ads, external, gameExp, ageGateChoice } = user;
         const permissions: IPrivacyPermissions = { ads, external, gameExp };
 
         if (this._privacySDK.isAgeGateEnabled()) {

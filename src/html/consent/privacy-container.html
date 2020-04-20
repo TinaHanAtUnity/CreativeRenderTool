@@ -68,10 +68,10 @@
                     }, '*');
                 };
 
-                this.onPrivacyCompleted = function(userSettings) {
+                this.onPrivacyCompleted = function(data) {
                     window.parent.postMessage({
                         type: 'onPrivacyCompleted',
-                        data: userSettings
+                        data: data
                     }, '*');
                 };
 
