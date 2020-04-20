@@ -354,11 +354,11 @@ $iphone-x-styles() {
     }
 
     .btn-close-region-bottom {
+      right: constant(safe-area-inset-right);
       bottom: constant(safe-area-inset-bottom);
-      right: constant(safe-area-inset-right); //@stylint ignore;
 
+      right: env(safe-area-inset-right);
       bottom: env(safe-area-inset-bottom);
-      right: env(safe-area-inset-right); //@stylint ignore;
     }
   }
 
