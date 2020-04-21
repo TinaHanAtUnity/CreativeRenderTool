@@ -135,7 +135,10 @@ export class CustomFeatures {
     }
 
     public static isLoadV5Game(gameId: string): boolean {
-        const gameIds = ['1783252', '1781853', '1781854'];
+        const gameIds = [
+            '1783252', '1781853', '1781854', // Initial Games
+            '1428861', '1428862' // Chimera Game
+        ];
 
         return this.existsInList(gameIds, gameId);
     }
@@ -197,9 +200,6 @@ export class CustomFeatures {
     }
 
     public static shouldVideoOverlayRemainVisible(gameId: string): boolean {
-        return gameId === '1046481' ||
-               gameId === '1050871' ||
-               gameId === '1048767' ||
-               gameId === '1060862';
+        return this.existsInList(MobilityWareGamesJson, gameId);
     }
 }

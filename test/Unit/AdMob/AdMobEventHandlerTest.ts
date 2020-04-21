@@ -27,6 +27,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
 
 import { unity_proto } from 'unity_proto';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
+import { SDKMetrics, AdmobMetric } from 'Ads/Utilities/SDKMetrics';
 
 const resolveAfter = (timeout: number): Promise<void> => {
     return new Promise((resolve, reject) => setTimeout(resolve, timeout));
@@ -74,6 +75,7 @@ const resolveAfter = (timeout: number): Promise<void> => {
 
             clientInfo = sinon.createStubInstance(ClientInfo);
             privacySDK = sinon.createStubInstance(PrivacySDK);
+            sinon.stub(SDKMetrics, 'reportMetricEvent');
 
             AdMobEventHandler.setLoadTimeout(testTimeout);
             admobEventHandler = new AdMobEventHandler({
@@ -214,6 +216,24 @@ const resolveAfter = (timeout: number): Promise<void> => {
             it('should forward the event to the ad unit', () => {
                 admobEventHandler.onTrackingEvent(TrackingEvent.MIDPOINT);
                 (<sinon.SinonStub>adUnit.sendTrackingEvent).calledWith(TrackingEvent.MIDPOINT);
+            });
+
+            describe('on error event with missing video error', () => {
+                beforeEach(() => {
+                    admobEventHandler.onTrackingEvent(TrackingEvent.ERROR, 'Missing Video Error: No video element contained in document');
+                });
+
+                it('should call the tracking event', () => {
+                    sinon.assert.calledWith((<sinon.SinonStub>adUnit.sendTrackingEvent), TrackingEvent.ERROR);
+                });
+
+                it('should alert SDKMetrics', () => {
+                    sinon.assert.calledWith((<sinon.SinonStub>SDKMetrics.reportMetricEvent), AdmobMetric.AdmobVideoElementMissing);
+                });
+
+                it('should close the ad unit', () => {
+                    sinon.assert.called((<sinon.SinonStub>adUnit.hide));
+                });
             });
         });
     });

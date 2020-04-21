@@ -12,32 +12,6 @@ export interface IKafkaObject {
 
 export class SessionDiagnostics {
     public static trigger(type: string, error: unknown, session: Session): Promise<INativeResponse> {
-
-        // ElasticSearch schema generation can result in dropping errors if root values are not the same type across errors
-        if (!error || typeof error !== 'object' || Array.isArray(error)) {
-            error = {
-                value: error
-            };
-        }
-
-        const adPlan = session.getAdPlan();
-        // Don't send kafka messages greater than 1MB
-        const slightlyLessThanOneMegaByte = 1038576;
-        if (adPlan && adPlan.length > slightlyLessThanOneMegaByte) {
-            const errorWithOldDiagnosticType = {
-                error,
-                type
-            };
-            return Diagnostics.trigger('adplan_too_large', errorWithOldDiagnosticType);
-        }
-
-        const kafkaObject: IKafkaObject = {
-            type,
-            timestamp: Date.now(),
-            adPlan: adPlan
-        };
-        kafkaObject[type] = error;
-
-        return HttpKafka.sendEvent('ads.sdk2.diagnostics', KafkaCommonObjectType.ANONYMOUS, kafkaObject);
+        return Promise.resolve(<INativeResponse>{});
     }
 }

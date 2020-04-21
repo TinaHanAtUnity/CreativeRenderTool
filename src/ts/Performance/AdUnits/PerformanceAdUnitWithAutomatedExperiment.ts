@@ -1,5 +1,5 @@
 import { AutomatedExperimentManager } from 'Ads/Managers/AutomatedExperimentManager';
-import { ButtonAnimationsExperiment } from 'Ads/Models/AutomatedExperimentsList';
+import { AutomatedExperimentsCategories } from 'Ads/Models/AutomatedExperimentsList';
 import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'Performance/AdUnits/PerformanceAdUnit';
 
 export interface IPerformanceAdUnitWithAutomatedExperimentParameters extends IPerformanceAdUnitParameters {
@@ -14,13 +14,8 @@ export class PerformanceAdUnitWithAutomatedExperiment extends PerformanceAdUnit 
         this._automatedExperimentManager = parameters.automatedExperimentManager;
     }
 
-    public show(): Promise<void> {
-        this._automatedExperimentManager.startCampaign(this.getCampaign());
-        return super.show();
-    }
-
     public hide(): Promise<void> {
-        this._automatedExperimentManager.endCampaign(this.getCampaign());
+        this._automatedExperimentManager.endSelectedExperiment(this.getCampaign(), AutomatedExperimentsCategories.PERFORMANCE_ENDCARD);
         return super.hide();
     }
 }
