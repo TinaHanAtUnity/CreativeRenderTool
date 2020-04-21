@@ -21,16 +21,18 @@ export class MediationLoadTrackingManager {
     private _initCompleteTime: number;
     private _nativeInitTime: number | undefined;
     private _experimentType: MediationExperimentType;
+    private _placementCount: number;
 
     private _activeLoads: { [key: string]: { time: number; initialAdRequest: boolean; nativeTimeoutSent: boolean } };
 
-    constructor(loadApi: LoadApi, listener: ListenerApi, mediationName: string, webviewEnabledLoad: boolean, experimentType: MediationExperimentType, nativeInitTime: number | undefined) {
+    constructor(loadApi: LoadApi, listener: ListenerApi, mediationName: string, webviewEnabledLoad: boolean, experimentType: MediationExperimentType, nativeInitTime: number | undefined, placementCount: number) {
         this._loadApi = loadApi;
         this._listener = listener;
         this._mediationName = mediationName;
         this._webviewEnabledLoad = webviewEnabledLoad;
         this._nativeInitTime = nativeInitTime;
         this._experimentType = experimentType;
+        this._placementCount = placementCount;
 
         this._activeLoads = {};
 
@@ -47,6 +49,7 @@ export class MediationLoadTrackingManager {
         this._initCompleteTime = this.getTime();
 
         SDKMetrics.reportTimingEventWithTags(MediationMetric.InitializationComplete, this._initCompleteTime, this.getBaseTrackingTags());
+        this.reportPlacementBucket(MediationMetric.InitCompleteByPlacements, true, this._initCompleteTime);
     }
 
     public reportPlacementCount(placementCount: number) {
@@ -134,12 +137,16 @@ export class MediationLoadTrackingManager {
             SDKMetrics.reportTimingEventWithTags(MediationMetric.LoadRequestFill, timeValue, this.getBaseTrackingTags({
                 'iar': `${this._activeLoads[placementId].initialAdRequest}`
             }));
+            this.reportPlacementBucket(MediationMetric.FillLatencyByPlacements, this._activeLoads[placementId].initialAdRequest, timeValue);
+
             delete this._activeLoads[placementId];
             SDKMetrics.sendBatchedEvents();
         } else if (newState === 'NO_FILL') {
             SDKMetrics.reportTimingEventWithTags(MediationMetric.LoadRequestNofill, timeValue, this.getBaseTrackingTags({
                 'iar': `${this._activeLoads[placementId].initialAdRequest}`
             }));
+            this.reportPlacementBucket(MediationMetric.NofillLatencyByPlacements, this._activeLoads[placementId].initialAdRequest, timeValue);
+
             delete this._activeLoads[placementId];
             SDKMetrics.sendBatchedEvents();
         }
@@ -197,5 +204,18 @@ export class MediationLoadTrackingManager {
             'wel': `${this._webviewEnabledLoad}`,
             'exp': this._experimentType
         };
+    }
+
+    private reportPlacementBucket(metric: MediationMetric, initialAdRequest: boolean, latency: number): void {
+        SDKMetrics.reportTimingEventWithTags(metric, latency, {
+            'iar': `${initialAdRequest}`,
+            'plb': this.getPlacementBucket()
+        });
+    }
+
+    // Limits the placement bucket to a maximum of 10 (100+ placements are in the same bucket)
+    private getPlacementBucket(): string {
+        const bucket = Math.ceil(this._placementCount / 10);
+        return bucket <= 10 ? `${bucket}` : '10';
     }
 }
