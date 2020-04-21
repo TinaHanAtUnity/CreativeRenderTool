@@ -1,5 +1,6 @@
 # Pending
 
+* [Auction V6] Fix Legacy Integration Tests [#14819](https://github.com/Applifier/unity-ads-webview/pull/14819)
 * [Auction China endpointt]ramp up .cn endpoint traffic to 5% [#14800](https://github.com/Applifier/unity-ads-webview/pull/14800)
 
 # Tue Apr 21 17:35:48 UTC 2020
