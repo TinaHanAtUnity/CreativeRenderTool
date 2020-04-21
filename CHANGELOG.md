@@ -1,5 +1,6 @@
 # Pending
 
+* [Auction V6] Reverse AB Test on Groups 6 and 10 [#14854](https://github.com/Applifier/unity-ads-webview/pull/14854)
 * [Deployment Script] Update deployment timestamp [#14742](https://github.com/Applifier/unity-ads-webview/pull/14742)
 * [Auction V6] Fix Legacy Integration Tests [#14819](https://github.com/Applifier/unity-ads-webview/pull/14819)
 * [Auction China endpointt]ramp up .cn endpoint traffic to 5% [#14800](https://github.com/Applifier/unity-ads-webview/pull/14800)
