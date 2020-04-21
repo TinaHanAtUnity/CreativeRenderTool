@@ -1,3 +1,7 @@
+# Pending
+
+* [Auction China endpointt]ramp up .cn endpoint traffic to 5% [#14800](https://github.com/Applifier/unity-ads-webview/pull/14800)
+
 # Tue Apr 21 17:35:48 UTC 2020
 
 * [Privacy] Developer age gate part 2 & opt-out protocol v3 [#13879](https://github.com/Applifier/unity-ads-webview/pull/13879)
