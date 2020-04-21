@@ -1,4 +1,4 @@
-# Pending
+# Tue Apr 21 17:35:48 UTC 2020
 
 * [Privacy] Developer age gate part 2 & opt-out protocol v3 [#13879](https://github.com/Applifier/unity-ads-webview/pull/13879)
 
