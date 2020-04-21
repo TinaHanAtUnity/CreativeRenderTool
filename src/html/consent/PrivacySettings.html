@@ -1,11 +1,11 @@
-<div class="safe-area-content">
+<div ontouchstart="" class="safe-area-content">
     <div class="close-area">
-        <div class="close-button">
+        <div class="close-button ripple-button">
             <span><%= data.t("privacy-settings-close") %></span>
         </div>
     </div>
     <div class="view-container">
-        <div class="back-button">
+        <div class="back-button ripple-circle">
             <span class="consent-icon-arrow"></span>
         </div>
         <div class="main-view-container page-container">
@@ -17,19 +17,19 @@
                 <span><%= data.t("privacy-settings-title") %></span>
             </div>
             <div class="button-container">
-                <div class="personalization-button settings-button">
+                <div class="personalization-button settings-button ripple-button">
                     <span class="consent-icon-person2"></span>
                     <span class="button-text"><%= data.t("privacy-settings-personalization-settings") %></span>
                 </div>
-                <div class="delete-data-button settings-button">
+                <div class="delete-data-button settings-button ripple-button">
                     <span class="consent-icon-lock"></span>
                     <span class="button-text"><%= data.t("privacy-settings-manage-your-data") %></span>
                 </div>
                 <div class="button-row-container button-container">
-                    <div class="report-ad-button row-button">
+                    <div class="report-ad-button row-button ripple-button">
                         <span class="button-text"><%= data.t("privacy-settings-report-ad") %></span>
                     </div>
-                    <div class="build-info-button row-button">
+                    <div class="build-info-button row-button ripple-button">
                         <span class="button-text"><%= data.t("privacy-settings-build-info") %></span>
                     </div>
                 </div>
@@ -91,7 +91,7 @@
                 </p>
             </div>
             <div class="report-container">
-                <div class="report-button">Report</div>
+                <div class="report-button ripple-button">Report</div>
                 <span class="report-confirmed-text text"></span>
             </div>
         </div>
