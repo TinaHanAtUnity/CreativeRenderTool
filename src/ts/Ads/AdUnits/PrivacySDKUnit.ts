@@ -18,7 +18,7 @@ import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { IPrivacySDKViewParameters, PrivacySDKView } from 'Ads/Views/Privacy/PrivacySDKView';
 import { PrivacyConfig } from 'Privacy/PrivacyConfig';
-import { IPrivacyCompletedParams, IPrivacyFetchUrlParams } from 'Privacy/IPrivacySettings';
+import { IPrivacyCompletedParams, IPrivacyFetchUrlParams, IUserPrivacySettings } from 'Privacy/IPrivacySettings';
 
 export interface IPrivacyUnitParameters {
     abGroup: ABGroup;
@@ -179,8 +179,18 @@ export class PrivacySDKUnit implements IAdUnit, IPrivacySDKViewHandler {
         }
 
         this._core.Sdk.logDebug('PRIVACY: Got permissions: ' + JSON.stringify(user));
+        this.handlePrivacySettings(user);
 
+        this._unityPrivacyView.completeCallback();
+
+        this.closePrivacy();
+    }
+
+    private handlePrivacySettings(user: IUserPrivacySettings): void {
         let action: GDPREventAction;
+        const { ads, external, gameExp, ageGateChoice } = user;
+        const permissions: IPrivacyPermissions = { ads, external, gameExp };
+
         switch (user.agreementMethod) {
             case 'all':
                 action = GDPREventAction.CONSENT_AGREE_ALL;
@@ -202,26 +212,22 @@ export class PrivacySDKUnit implements IAdUnit, IPrivacySDKViewHandler {
                 action = GDPREventAction.CONSENT_SAVE_CHOICES;
         }
 
-        const { ads, external, gameExp, ageGateChoice } = user;
-        const permissions: IPrivacyPermissions = { ads, external, gameExp };
-
-        if (this._privacySDK.isAgeGateEnabled()) {
-            if (ageGateChoice === AgeGateChoice.NO) {
-                action = GDPREventAction.AGE_GATE_DISAGREE;
-            }
-
-            this._privacyManager.setUsersAgeGateChoice(ageGateChoice, AgeGateSource.USER);
-
-            if (ageGateChoice === AgeGateChoice.NO || (this._privacySDK.getGamePrivacy().getMethod() === PrivacyMethod.UNITY_CONSENT)) {
-                this.setConsent(permissions, action, GDPREventSource.USER);
-            }
-        } else {
+        if (!this._privacySDK.isAgeGateEnabled() || this._privacyManager.isDeveloperAgeGateActive()) {
             this.setConsent(permissions, action, GDPREventSource.USER);
+            return;
         }
 
-        this._unityPrivacyView.completeCallback();
+        this._privacyManager.setUsersAgeGateChoice(ageGateChoice, AgeGateSource.USER);
 
-        this.closePrivacy();
+        if (ageGateChoice === AgeGateChoice.NO) {
+            action = GDPREventAction.AGE_GATE_DISAGREE;
+            this.setConsent(UserPrivacy.PERM_ALL_FALSE, action, GDPREventSource.USER);
+            return;
+        }
+
+        if (this._privacySDK.getGamePrivacy().getMethod() === PrivacyMethod.UNITY_CONSENT) {
+            this.setConsent(permissions, action, GDPREventSource.USER);
+        }
     }
 
     public onPrivacyReady(): void {
