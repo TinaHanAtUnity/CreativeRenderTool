@@ -1,3 +1,7 @@
+# Pending
+
+* [Privacy] Developer age gate part 2 & opt-out protocol v3 [#13879](https://github.com/Applifier/unity-ads-webview/pull/13879)
+
 # Mon Apr 20 22:15:36 UTC 2020
 
 * [Latency] Ramp Mediation CMA Test to 95% [#14773](https://github.com/Applifier/unity-ads-webview/pull/14773)
