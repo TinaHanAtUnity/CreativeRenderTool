@@ -3,7 +3,7 @@ import { ProgrammaticOperativeEventManager } from 'Ads/Managers/ProgrammaticOper
 import { Backend } from 'Backend/Backend';
 import { IUnityAdsListener } from 'Backend/IUnityAdsListener';
 import { UnityAds } from 'Backend/UnityAds';
-
+import { RequestManager, AuctionProtocol } from 'Core/Managers/RequestManager';
 import { Platform } from 'Core/Constants/Platform';
 import { ConfigManager } from 'Core/Managers/ConfigManager';
 import 'mocha';
@@ -84,6 +84,7 @@ describe('AndroidVastTest', () => {
             ConfigManager.setTestBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
             CampaignManager.setBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
             ProgrammaticOperativeEventManager.setTestBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
+            RequestManager.setTestAuctionProtocol(AuctionProtocol.V4);
 
             UnityAds.initialize(Platform.ANDROID, '333', listener, true);
         });
