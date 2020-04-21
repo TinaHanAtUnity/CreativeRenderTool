@@ -74,7 +74,7 @@ import { MRAIDAdUnitParametersFactory } from 'MRAID/AdUnits/MRAIDAdUnitParameter
 import { PrivacyUnit } from 'Ads/AdUnits/PrivacyUnit';
 import { IStore } from 'Store/IStore';
 import { Store } from 'Store/Store';
-import { RequestManager } from 'Core/Managers/RequestManager';
+import { RequestManager, AuctionProtocol } from 'Core/Managers/RequestManager';
 import { AbstractAdUnitParametersFactory } from 'Ads/AdUnits/AdUnitParametersFactory';
 import { LoadApi } from 'Core/Native/LoadApi';
 import { RefreshManager } from 'Ads/Managers/RefreshManager';
@@ -709,8 +709,7 @@ export class Ads implements IAds {
         }
 
         if (TestEnvironment.get('creativeUrl')) {
-            // reset auction protocol to allow changing between creativeUrl and creativePack modes
-            RequestManager.setTestAuctionProtocol(undefined);
+            RequestManager.setTestAuctionProtocol(AuctionProtocol.V4);
 
             const creativeUrl = TestEnvironment.get<string>('creativeUrl');
             let response: string = '';
@@ -732,8 +731,7 @@ export class Ads implements IAds {
 
         const creativePack: string = TestEnvironment.get('creativePack');
         if (creativePack) {
-            // reset auction protocol to allow changing between creativeUrl and creativePack modes
-            RequestManager.setTestAuctionProtocol(undefined);
+            RequestManager.setTestAuctionProtocol(AuctionProtocol.V5);
 
             const platform = this._core.NativeBridge.getPlatform();
             const response = CampaignResponseUtils.getVideoCreativePackResponse(platform, creativePack);
