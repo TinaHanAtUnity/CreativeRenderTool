@@ -294,7 +294,6 @@ export class AutomatedExperimentManager {
             //GAMES, CAMPAIGN, THE AD
             { l: 'bundleId', c: 'bundle_id' },
             { l: 'gameId', c: 'game_id' },
-            {l: 'source_store_id', c: undefined },
 
             //PRIVACY & OPT-OUTS
             { l: 'coppaCompliant', c: 'coppa_compliant' },
@@ -441,7 +440,7 @@ export class AutomatedExperimentManager {
         features.endcard_portrait_image_url = campaign instanceof PerformanceCampaign ? campaign.getPortrait()!.getUrl() : undefined;
         features.endcard_landscape_image_url = campaign instanceof PerformanceCampaign ? campaign.getLandscape()!.getUrl() : undefined;
         features.target_game_name = campaign instanceof PerformanceCampaign ? campaign.getGameName() : undefined;
-        
+
         // Extract game session counters: targetted game centric
         let ids: string[] = [];
         let starts: number[] = [];
