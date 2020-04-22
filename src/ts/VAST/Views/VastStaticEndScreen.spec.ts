@@ -40,7 +40,7 @@ jest.mock('html/VastStaticEndScreen.html', () => {
             operativeEventManager: new OperativeEventManager(),
             placement: new Placement(),
             campaign: new VastCampaign(),
-            platform: Platform.IOS,
+            platform: platform,
             core: new Core().Api,
             ads: new Ads().Api,
             store: new Store().Api,
