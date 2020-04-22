@@ -1,3 +1,7 @@
+# Pending
+
+* Resend Failed PTS Events in Same Manner as Operative Events [#13174](https://github.com/Applifier/unity-ads-webview/pull/13174)
+
 # Wed Apr 22 17:53:58 UTC 2020
 
 * Redeploy [Load V5] Add Reverse AB test for Load V5 experiment [#14856](https://github.com/Applifier/unity-ads-webview/pull/14856)
