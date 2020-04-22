@@ -294,6 +294,7 @@ export class AutomatedExperimentManager {
             //GAMES, CAMPAIGN, THE AD
             { l: 'bundleId', c: 'bundle_id' },
             { l: 'gameId', c: 'game_id' },
+            {l: 'source_store_id', c: undefined },
 
             //PRIVACY & OPT-OUTS
             { l: 'coppaCompliant', c: 'coppa_compliant' },
@@ -431,6 +432,16 @@ export class AutomatedExperimentManager {
         features.day_of_week = ts.getDay();
         features.local_day_time = ts.getHours() + ts.getMinutes() / 60;
 
+        features.target_store_id = campaign instanceof PerformanceCampaign ? campaign.getAppStoreId() : undefined;
+        features.game_icon_url = campaign instanceof PerformanceCampaign ? campaign.getGameIcon().getUrl() : undefined;
+        features.portrait_video_url = campaign instanceof PerformanceCampaign ? campaign.getPortraitVideo()!.getUrl() : undefined;
+        features.landscape_video_url = campaign instanceof PerformanceCampaign ? campaign.getVideo()!.getUrl() : undefined;
+        features.portrait_creative_id = campaign instanceof PerformanceCampaign ? campaign.getPortraitVideo()!.getCreativeId() : undefined;
+        features.landscape_creative_id = campaign instanceof PerformanceCampaign ? campaign.getVideo()!.getCreativeId() : undefined;
+        features.endcard_portrait_image_url = campaign instanceof PerformanceCampaign ? campaign.getPortrait()!.getUrl() : undefined;
+        features.endcard_landscape_image_url = campaign instanceof PerformanceCampaign ? campaign.getLandscape()!.getUrl() : undefined;
+        features.target_game_name = campaign instanceof PerformanceCampaign ? campaign.getGameName() : undefined;
+        
         // Extract game session counters: targetted game centric
         let ids: string[] = [];
         let starts: number[] = [];
