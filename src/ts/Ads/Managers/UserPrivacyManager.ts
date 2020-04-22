@@ -148,7 +148,7 @@ export class UserPrivacyManager {
     }
 
     public getPrivacyConfig(): PrivacyConfig {
-        const ageGateChoice = this.getAgeGateChoice();
+        const ageGateChoice = this._userPrivacy.isRecorded() ? this.getAgeGateChoice() : AgeGateChoice.MISSING;
 
         const { ads, external, gameExp } = this._userPrivacy.getPermissions();
         const userSummaryUrl = 'https://ads-privacy-api.prd.mz.internal.unity3d.com/api/v1/summary?' +
