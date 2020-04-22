@@ -117,22 +117,46 @@
         {
           "node": "consent",
           "condition": {
-            "==": [
+            "and": [
               {
-                "var": "user.ageGateChoice"
+                "==": [
+                  {
+                    "var": "user.ageGateChoice"
+                  },
+                  "yes"
+                ]
               },
-              "yes"
+              {
+                "==": [
+                  {
+                    "var": "env.privacyMethod"
+                  },
+                  "unity_consent"
+                ]
+              }
             ]
           }
         },
         {
           "node": null,
           "condition": {
-            "==": [
+            "and": [
               {
-                "var": "user.ageGateChoice"
+                "==": [
+                  {
+                    "var": "user.ageGateChoice"
+                  },
+                  "yes"
+                ]
               },
-              "no"
+              {
+                "!=": [
+                  {
+                    "var": "env.privacyMethod"
+                  },
+                  "unity_consent"
+                ]
+              }
             ]
           }
         }
