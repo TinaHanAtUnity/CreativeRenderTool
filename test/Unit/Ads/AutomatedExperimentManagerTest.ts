@@ -133,7 +133,16 @@ describe('AutomatedExperimentManagerTests', () => {
         gsc_target_game_starts: [0],
         gsc_target_game_views: [0],
         day_of_week: 0,
-        is_weekend: true
+        is_weekend: true,
+        target_store_id: undefined,
+        game_icon_url: undefined,
+        portrait_video_url: undefined,
+        landscape_video_url: undefined,
+        portrait_creative_id: undefined,
+        landscape_creative_id: undefined,
+        endcard_portrait_image_url: undefined,
+        endcard_landscape_image_url: undefined,
+        target_game_name:undefined
     };
 
     function ValidateFeaturesInRequestBody(body: string): boolean {
@@ -193,6 +202,8 @@ describe('AutomatedExperimentManagerTests', () => {
         {action1: FooExperimentDeclaration.action1.choiceB, action2: FooExperimentDeclaration.action2.choiceB}
     ].forEach((action) => {
         it(`initialize with request ok, use received action ${JSON.stringify(action)}`, () => {
+            console.log(action.action1)
+            console.log(action.action2)
             const postUrl = AutomatedExperimentManager.BaseUrl + AutomatedExperimentManager.CreateEndPoint;
 
             sandbox.stub(SDKMetrics, 'reportMetricEvent')
