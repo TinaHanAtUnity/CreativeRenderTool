@@ -265,10 +265,8 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
                 this._operativeEventManager.sendView(operativeEventParams);
 
                 // Temporary for PTS Migration Investigation
-                this.sendTrackingEvent(TrackingEvent.VIEW);
+                this.sendTrackingEvent(TrackingEvent.COMPLETE);
             }
-
-            this.sendTrackingEvent(TrackingEvent.COMPLETE);
         } else if (finishState === FinishState.SKIPPED) {
             this._operativeEventManager.sendSkip(operativeEventParams);
         }
