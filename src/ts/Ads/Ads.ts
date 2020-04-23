@@ -558,15 +558,19 @@ export class Ads implements IAds {
                 playerMetadataServerId = playerMetadata.getServerId();
             }
 
+            const isAttemptingToStreamAssets: boolean = !CampaignAssetInfo.isCached(campaign) || campaign.isConnectionNeeded();
+            const hasNoConnection: boolean = connectionType === 'none';
+
+            if (isAttemptingToStreamAssets && hasNoConnection) {
+                // Track to understand impact before blocking show by new criteria
+                SDKMetrics.reportMetricEventWithTags(ErrorMetric.AttemptToStreamCampaignWithoutConnection, {
+                    'cnt': campaign.getContentType()
+                });
+            }
+
             if (campaign.isConnectionNeeded() && connectionType === 'none') {
                 this._showing = false;
                 this.showError(true, placement.getId(), 'No connection');
-
-                const error = new DiagnosticError(new Error('No connection is available'), {
-                    id: campaign.getId()
-                });
-                SessionDiagnostics.trigger('mraid_no_connection', error, campaign.getSession());
-                // If there is no connection, would this metric even be fired? If it does, then maybe we should investigate enabling this regardless of connection
                 SDKMetrics.reportMetricEvent(ErrorMetric.NoConnectionWhenNeeded);
                 return;
             }

@@ -10,7 +10,8 @@ export enum ErrorMetric {
     CampaignExpired = 'campaign_expired',
     NoConnectionWhenNeeded = 'no_connection_when_needed',
     MissingTrackingUrlsOnShow = 'missing_tracking_urls_on_show',
-    PlacementInvalidationPending = 'placement_invalidation_pending'
+    PlacementInvalidationPending = 'placement_invalidation_pending',
+    AttemptToStreamCampaignWithoutConnection = 'attempt_to_stream_campaign_without_connection'
 }
 
 export enum AdmobMetric {
