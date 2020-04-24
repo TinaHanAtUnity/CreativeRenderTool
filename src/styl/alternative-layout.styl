@@ -1,4 +1,4 @@
-.alternative-layout {
+body.alternative-layout.portrait {
     #end-screen {
         .btn-close-region {
             background: #ee66ee65;
@@ -6,7 +6,52 @@
 
         .name-container {
             font-weight: bold;
-            font-size: 0.85em;
+            font-size: .85em;
+            -webkit-box-orient: unset;
+            max-width: unset;
         }
+
+        .game-info-container {
+            display: flex;
+            align-items: center;
+            margin: .5em 1em;
+            padding: .4em;
+            background-color: red;
+            border-radius: .25em;
+        }
+
+        .game-icon {
+            margin-bottom: 0;    
+        }
+
+        .game-text {
+            padding: 0 1em;
+        }
+
+        .game-rating {
+            margin-top: unset;
+            display: flex;
+            align-items: center;
+        }
+
+        .icon-star {
+            margin-top: .3em;
+        }
+
+        .end-screen-info {
+            width: 100%;
+        }
+
+        .download-container {
+            margin: .5em 1em;
+            width: unset;
+            border-radius: 0.25em;
+        }
+
+        .store-container {
+            display: flex;
+            align-items: center;
+        }
+
     }
 }
