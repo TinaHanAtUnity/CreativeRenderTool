@@ -6,11 +6,16 @@ import {
 import { Platform } from 'Core/Constants/Platform';
 import { ICore } from 'Core/ICore';
 import { RequestManagerMock, RequestManager } from 'Core/Managers/__mocks__/RequestManager';
+import { UserPrivacyManagerMock, UserPrivacyManager } from 'Ads/Managers/__mocks__/UserPrivacyManager';
+import { PrivacySDKMock, PrivacySDK } from 'Privacy/__mocks__/PrivacySDK';
+import { AgeGateChoice, LegalFramework } from 'Ads/Managers/UserPrivacyManager';
 
 describe ('PrivacyDataRequestHelper tests', () => {
 
     let core: ICore;
     let requestManager: RequestManagerMock;
+    let userPrivacyManager: UserPrivacyManagerMock;
+    let privacySDK: PrivacySDKMock;
 
     beforeEach(() => {
         core = new Core();
@@ -23,11 +28,19 @@ describe ('PrivacyDataRequestHelper tests', () => {
         core.Config.getCountry = jest.fn().mockReturnValue('FI');
         core.Config.getSubdivision = jest.fn().mockReturnValue('SD');
         core.Config.getToken = jest.fn().mockReturnValue('test-token');
+        core.Config.isCoppaCompliant = jest.fn().mockReturnValue(true);
+        core.Config.getAbGroup = jest.fn().mockReturnValue(100);
 
         requestManager = new RequestManager();
         core.RequestManager = requestManager;
 
-        PrivacyDataRequestHelper.init(core);
+        userPrivacyManager = new UserPrivacyManager();
+        userPrivacyManager.getLegalFramework = jest.fn().mockReturnValue(LegalFramework.CCPA);
+        userPrivacyManager.getAgeGateChoice = jest.fn().mockReturnValue(AgeGateChoice.YES);
+
+        privacySDK = new PrivacySDK();
+
+        PrivacyDataRequestHelper.init(core, userPrivacyManager, privacySDK);
 
     });
 
@@ -65,7 +78,7 @@ describe ('PrivacyDataRequestHelper tests', () => {
 
             it('should have called RequestManager.post with right arguments', () => {
                 const url = 'https://us-central1-unity-ads-debot-prd.cloudfunctions.net/debot/verify';
-                const testData = '{\"idfa\":\"1111-1111\",\"gameID\":\"14850\",\"bundleID\":\"com.test.bundle\",\"projectID\":\"test-project-id\",\"platform\":\"ios\",\"language\":\"en\",\"country\":\"FI\",\"subdivision\":\"SD\",\"token\":\"test-token\",\"email\":\"test@test.com\",\"answer\":\"test.png\"}';
+                const testData = '{\"idfa\":\"1111-1111\",\"gameID\":\"14850\",\"bundleID\":\"com.test.bundle\",\"projectID\":\"test-project-id\",\"platform\":\"ios\",\"language\":\"en\",\"country\":\"FI\",\"subdivision\":\"SD\",\"token\":\"test-token\",\"email\":\"test@test.com\",\"answer\":\"test.png\",\"abGroup\":100,\"legalFramework\":\"ccpa\",\"agreedOverAgeLimit\":\"yes\",\"agreedVersion\":0,\"coppa\":true,\"layout\":\"\"}';
                 expect(core.RequestManager.post).toHaveBeenCalledWith(url, testData);
             });
         });
