@@ -4,6 +4,7 @@ import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
 import { IEndScreenParameters } from 'Ads/Views/EndScreen';
 import { ICore } from 'Core/ICore';
 import { AnimatedDownloadButtonEndScreen } from 'Performance/Views/AnimatedDownloadButtonEndScreen';
+import { AlternativeLayoutEndScreen } from 'Performance/Views/AlternativeLayoutEndScreen';
 import { AutomatedExperimentManager } from 'Ads/Managers/AutomatedExperimentManager';
 import { AutomatedExperimentsCategories } from 'Ads/Models/AutomatedExperimentsList';
 import { PerformanceAdUnitParametersFactory } from 'Performance/AdUnits/PerformanceAdUnitParametersFactory';
@@ -37,10 +38,10 @@ export class PerformanceAdUnitWithAutomatedExperimentParametersFactory extends P
 
         let endScreenCombination: IExperimentActionChoice | undefined;
 
-        if (AnimatedDownloadButtonEndScreen.experimentSupported(experimentID)) {
+        if (AlternativeLayoutEndScreen.experimentSupported(experimentID)) {
             endScreenCombination = this._automatedExperimentManager.activateSelectedExperiment(baseParams.campaign, AutomatedExperimentsCategories.PERFORMANCE_ENDCARD);
         }
-        const endScreen = new AnimatedDownloadButtonEndScreen(endScreenCombination, endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
+        const endScreen = new AlternativeLayoutEndScreen(endScreenCombination, endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
 
         return {
             ... baseParams,
