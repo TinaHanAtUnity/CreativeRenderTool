@@ -64,15 +64,19 @@ export class SwipeUpVideoOverlay extends VideoOverlay {
         }
     }
 
-    protected handleVideoProgressButton() {
-        const isPerformanceCampaign = this._campaign instanceof PerformanceCampaign || this._campaign instanceof XPromoCampaign;
-        if (isPerformanceCampaign && !this._skipEnabled && this._videoProgress > 5000) {
-            //this is for traditional install button sliding in from the right
+    protected showCTAButton() {
+        if (this._campaign instanceof PerformanceCampaign || this._campaign instanceof XPromoCampaign) {
             if (this._ctaMode === 'click') {
                 this.showCallButton();
             } else if (this._ctaMode === 'swipeup') {
-                this.showSwipeUpButton(); //this is for swipe up 'button'
+                this.showSwipeUpButton();
             }
+        }
+    }
+
+    protected handleVideoProgressButton() {
+        if (!this._skipEnabled && this._videoProgress > 5000) {
+            this.showCTAButton();
             return;
         }
     }
@@ -80,13 +84,7 @@ export class SwipeUpVideoOverlay extends VideoOverlay {
     protected showSkipButton() {
         if (this._skipEnabled) {
             this._skipButtonElement.classList.add('show-skip-button');
-            if (this._campaign instanceof PerformanceCampaign || this._campaign instanceof XPromoCampaign) {
-                if (this._ctaMode === 'click') {
-                    this.showCallButton(); //this is for traditional install button sliding from the right
-                } else if (this._ctaMode === 'swipeup') {
-                    this.showSwipeUpButton(); //this is for swipe up 'button'
-                }
-            }
+                this.showCTAButton();
         }
     }
 
@@ -108,12 +106,12 @@ export class SwipeUpVideoOverlay extends VideoOverlay {
 
     protected onClick(event: Event) {
         if (event.type !== 'swipeup') {
-             super.onClick(event);
+            super.onClick(event);
         }
     }
 
     protected setupElementReferences(): void {
         super.setupElementReferences();
-        this._swipeUpButtonElement = <HTMLElement> this._container.querySelector('.swipe-up-button');
+        this._swipeUpButtonElement = <HTMLElement>this._container.querySelector('.swipe-up-button');
     }
 }
