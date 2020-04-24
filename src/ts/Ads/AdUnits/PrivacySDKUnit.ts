@@ -19,6 +19,7 @@ import { RequestManager } from 'Core/Managers/RequestManager';
 import { IPrivacySDKViewParameters, PrivacySDKView } from 'Ads/Views/Privacy/PrivacySDKView';
 import { PrivacyConfig } from 'Privacy/PrivacyConfig';
 import { IPrivacyCompletedParams, IPrivacyFetchUrlParams, IUserPrivacySettings } from 'Privacy/IPrivacySettings';
+import { PrivacyTestEnvironment } from 'Privacy/PrivacyTestEnvironment';
 
 export interface IPrivacyUnitParameters {
     abGroup: ABGroup;
@@ -55,7 +56,8 @@ export class PrivacySDKUnit implements IAdUnit, IPrivacySDKViewHandler {
         this._adsConfig = parameters.adsConfig;
         this._core = parameters.core;
         this._privacySDK = parameters.privacySDK;
-        this._privacyMetricsUrl = this._privacyManager.getPrivacyMetricsUrl();
+        this._privacyMetricsUrl = PrivacyTestEnvironment.isSet('privacySDKMetricsUrl') ?
+            PrivacyTestEnvironment.get('privacySDKMetricsUrl') : 'https://sdk-metrics.privacy.unity3d.com/api/v1/metrics';
 
         this._landingPage = this._privacySDK.isAgeGateEnabled() && !this._privacyManager.isDeveloperAgeGateActive() ? ConsentPage.AGE_GATE : ConsentPage.HOMEPAGE;
 
@@ -247,7 +249,7 @@ export class PrivacySDKUnit implements IAdUnit, IPrivacySDKViewHandler {
     public onPrivacyMetric(metric: { [key: string]: unknown }): void {
         this._requestManager.post(this._privacyMetricsUrl, JSON.stringify(metric))
           .catch(error => {
-              this._core.Sdk.logError(`PRIVACY: sending metrics failed: ${error.message}`);
+              this._core.Sdk.logDebug(`PRIVACY: sending metrics failed: ${error.message}`);
           });
     }
 
