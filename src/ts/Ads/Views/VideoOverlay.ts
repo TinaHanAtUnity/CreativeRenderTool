@@ -225,7 +225,7 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
     }
 
     protected showCTAButton() {
-        if(this._campaign instanceof PerformanceCampaign || this._campaign instanceof XPromoCampaign) {
+        if (this._campaign instanceof PerformanceCampaign || this._campaign instanceof XPromoCampaign) {
             this.showCallButton();
         }
     }
