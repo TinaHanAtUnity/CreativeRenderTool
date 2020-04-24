@@ -135,7 +135,7 @@ export enum AUIMetric {
     EndscreenColorTintThemingFailed = 'endscreen_color_tint_theming_failed',
     OptimizationResponseIgnored = 'campaign_optimization_response_ignored',
     RequestingCampaignOptimization = 'requesting_campaign_optimization',
-    UnknownExperimentName = 'unknown_experiement_name',
+    UnknownExperimentName = 'unknown_experiment_name',
     InvalidVideoOverlayMode = 'invalid-video-overlay-mode',
     UnknownCategoryProvided = 'unknown_automated_experiment_category_provided'
 }

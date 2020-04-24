@@ -2,6 +2,8 @@ import { Swipe } from 'Core/Utilities/Swipe';
 
 export class UpSwipe extends Swipe {
 
+    protected static _moveTolerance = 100;
+
     constructor(element: HTMLElement) {
         super(element);
     }

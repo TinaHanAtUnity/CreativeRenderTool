@@ -1,6 +1,6 @@
 export abstract class Swipe {
 
-    protected static _moveTolerance = 100;
+    protected static _moveTolerance = 75;
 
     private _element: HTMLElement;
 
