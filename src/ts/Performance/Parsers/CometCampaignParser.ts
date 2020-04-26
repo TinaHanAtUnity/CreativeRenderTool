@@ -18,7 +18,6 @@ import {
     StoreName
 } from 'Performance/Models/PerformanceCampaign';
 import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCampaign';
-import { Url } from 'Core/Utilities/Url';
 
 export class CometCampaignParser extends CampaignParser {
     public static ContentType = 'comet/campaign';
@@ -139,7 +138,6 @@ export class CometCampaignParser extends CampaignParser {
                 bypassAppSheet: json.bypassAppSheet,
                 store: storeName,
                 adUnitStyle: json.adUnitStyle ? this.parseAdUnitStyle(json.adUnitStyle, session) : undefined,
-                endScreenUrl: json.endScreenUrl,
                 endScreen: json.endScreenUrl ? new HTML(this.validateAndEncodeUrl(json.endScreenUrl, session), session, json.creativeId) : undefined
             };
 
