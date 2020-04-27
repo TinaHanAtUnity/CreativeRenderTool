@@ -418,6 +418,8 @@ export class AutomatedExperimentManager {
         const features: { [key: string]: ContextualFeature } = {};
         const gameSessionCounters = GameSessionCounters.getCurrentCounters();
 
+        // console.log(campaign)
+
         const ts = new Date();
         features.campaign_id = campaign.getId();
         features.target_game_id = campaign instanceof PerformanceCampaign ? campaign.getGameId() : undefined;
@@ -433,14 +435,16 @@ export class AutomatedExperimentManager {
 
         features.target_store_id = campaign instanceof PerformanceCampaign ? campaign.getAppStoreId() : undefined;
         features.game_icon_url = campaign instanceof PerformanceCampaign ? campaign.getGameIcon().getUrl() : undefined;
-        features.portrait_video_url = campaign instanceof PerformanceCampaign ? campaign.getPortraitVideo()!.getUrl() : undefined;
-        features.landscape_video_url = campaign instanceof PerformanceCampaign ? campaign.getVideo()!.getUrl() : undefined;
-        features.portrait_creative_id = campaign instanceof PerformanceCampaign ? campaign.getPortraitVideo()!.getCreativeId() : undefined;
-        features.landscape_creative_id = campaign instanceof PerformanceCampaign ? campaign.getVideo()!.getCreativeId() : undefined;
-        features.endcard_portrait_image_url = campaign instanceof PerformanceCampaign ? campaign.getPortrait()!.getUrl() : undefined;
-        features.endcard_landscape_image_url = campaign instanceof PerformanceCampaign ? campaign.getLandscape()!.getUrl() : undefined;
         features.target_game_name = campaign instanceof PerformanceCampaign ? campaign.getGameName() : undefined;
 
+        if (campaign && campaign instanceof PerformanceCampaign) {
+            features.portrait_video_url = campaign.getPortraitVideo() ? campaign.getPortraitVideo()!.getUrl() : undefined;
+            features.landscape_video_url = campaign.getVideo() ? campaign.getVideo()!.getUrl() : undefined;
+            features.portrait_creative_id = campaign.getPortraitVideo() ? campaign.getPortraitVideo()!.getCreativeId() : undefined;
+            features.landscape_creative_id =  campaign.getVideo() ? campaign.getVideo()!.getCreativeId() : undefined;
+            features.endcard_portrait_image_url = campaign.getPortrait() ? campaign.getPortrait()!.getUrl() : undefined;
+            features.endcard_landscape_image_url = campaign.getLandscape() ? campaign.getLandscape()!.getUrl() : undefined;
+        }
         // Extract game session counters: targetted game centric
         let ids: string[] = [];
         let starts: number[] = [];
