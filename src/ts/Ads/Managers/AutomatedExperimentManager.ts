@@ -432,7 +432,7 @@ export class AutomatedExperimentManager {
         features.is_weekend = ts.getDay() === 0 || ts.getDay() === 6;
         features.day_of_week = ts.getDay();
         features.local_day_time = ts.getHours() + ts.getMinutes() / 60;
-        
+
         if (campaign && campaign instanceof PerformanceCampaign) {
             features.target_store_id = campaign.getAppStoreId();
             features.game_icon_url = campaign.getGameIcon().getUrl();
