@@ -142,7 +142,7 @@ describe('AutomatedExperimentManagerTests', () => {
         landscape_creative_id: undefined,
         endcard_portrait_image_url: undefined,
         endcard_landscape_image_url: undefined,
-        target_game_name:undefined
+        target_game_name: undefined
     };
 
     function ValidateFeaturesInRequestBody(body: string): boolean {
@@ -202,8 +202,6 @@ describe('AutomatedExperimentManagerTests', () => {
         {action1: FooExperimentDeclaration.action1.choiceB, action2: FooExperimentDeclaration.action2.choiceB}
     ].forEach((action) => {
         it(`initialize with request ok, use received action ${JSON.stringify(action)}`, () => {
-            console.log(action.action1)
-            console.log(action.action2)
             const postUrl = AutomatedExperimentManager.BaseUrl + AutomatedExperimentManager.CreateEndPoint;
 
             sandbox.stub(SDKMetrics, 'reportMetricEvent')
