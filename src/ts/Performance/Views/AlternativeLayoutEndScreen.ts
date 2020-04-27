@@ -22,20 +22,20 @@ export class AlternativeLayoutEndScreen extends PerformanceEndScreen {
 
         combination = this.fixupExperimentChoices(combination);
 
-        switch (combination.scheme) {
-            case ButtonExperimentDeclaration.scheme.LIGHT:
-                this._downloadButtonColor = Color.hexToCssRgba(combination.color);
-                break;
-            case ButtonExperimentDeclaration.scheme.DARK:
-                // This is "pastel blue", to be cohesive with dark mode
-                this._downloadButtonColor = Color.hexToCssRgba('#2ba3ff');
-                this._darkMode = true;
-                break;
-            case ButtonExperimentDeclaration.scheme.COLORMATCHING:
-                this._tintColor = true;
-                break;
-            default:
-        }
+        // switch (combination.scheme) {
+        //     case ButtonExperimentDeclaration.scheme.LIGHT:
+        //         this._downloadButtonColor = Color.hexToCssRgba(combination.color);
+        //         break;
+        //     case ButtonExperimentDeclaration.scheme.DARK:
+        //         // This is "pastel blue", to be cohesive with dark mode
+        //         this._downloadButtonColor = Color.hexToCssRgba('#2ba3ff');
+        //         this._darkMode = true;
+        //         break;
+        //     case ButtonExperimentDeclaration.scheme.COLORMATCHING:
+        //         this._tintColor = true;
+        //         break;
+        //     default:
+        // }
         const simpleRating = campaign.getRating().toFixed(1);
         this._templateData = {
             ...this._templateData,
@@ -68,19 +68,6 @@ export class AlternativeLayoutEndScreen extends PerformanceEndScreen {
 
     public render(): void {
         super.render();
-        this._container.classList.add(`${this._animation}-download-button-end-screen`);
-        if (this.getEndscreenAlt() === SQUARE_END_SCREEN) {
-            this._container.classList.add(`${this._animation}-download-button-end-screen-square`);
-        }
-        if (this._downloadButtonColor) {
-            const ctaButton = <HTMLElement> this._container.querySelector('.download-container');
-            if (ctaButton !== null) {
-                ctaButton.style.backgroundColor = this._downloadButtonColor;
-            }
-        }
-        if (this._tintColor) {
-            this.renderColorTheme();
-        }
     }
 
     private applyAlternativeLayout() {
