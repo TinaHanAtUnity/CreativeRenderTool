@@ -39,7 +39,6 @@ export class AlternativeLayoutEndScreen extends PerformanceEndScreen {
         const simpleRating = campaign.getRating().toFixed(1);
         this._templateData = {
             ...this._templateData,
-            'hasShadow': this._animation === ButtonExperimentDeclaration.animation.BOUNCING,
             'simpleRating': simpleRating
         };
         this._animation = 'static';

@@ -2,13 +2,8 @@
     <span class="icon-close"></span>
 </div>
 <div class="campaign-container<%= data.endscreenAlt ? ' ' + data.endscreenAlt : '' %>">
-    <div class="game-background-container">
-        <div class="game-background game-background-landscape"
-            style="background-image: url('<%= data.endScreenLandscape && data.endScreenLandscape.replace("file://", "") %>')">
-        </div>
-        <div class="game-background game-background-portrait"
-            style="background-image: url('<%= data.endScreenPortrait && data.endScreenPortrait.replace("file://", "") %>')">
-        </div>
+    <div class="game-background-container"
+        style="background-image: url('<%= data.endScreenLandscape && data.endScreenLandscape.replace("file://", "") %>')">
         <div class="gdpr-pop-up">
             <div class="icon-gdpr"></div>
             <div class="gdpr-text">
@@ -18,21 +13,23 @@
             </div>
         </div>
     </div>
-    <div class="end-screen-info-background">
+    <div class="end-screen-info-content">
         <div class="end-screen-info">
             <div class="game-info-container">
                 <div class="game-icon"
                     style="background-image: url('<%= data.gameIcon && data.gameIcon.replace("file://", "") %>')">
                 </div>
-                <div class="game-text">
+                <div>
                     <div class="name-container">
                         <%= data.gameName %>
                     </div>
                     <div class="store-container">
                         <% if(!!data.simpleRating) { %>
                         <span class="game-rating">
-                            <span class="game-rating-number"><%= data.simpleRating %></span>
-                            <span class="icon-star first-icon-star"></span>
+                            <span class="game-rating-stars-bottom">
+                                <span class="game-rating-number"><%= data.simpleRating %></span>
+                                <span class="icon-star first-icon-star"></span>
+                            </span>
                         </span>
                         <% } %>
 
@@ -48,10 +45,10 @@
                 <span class="download-text"><%= data.t("Install Now") %></span>
             </div>
         </div>
-        <div class="bottom-container">
+        <!-- <div class="bottom-container">
             <div class="privacy-button"><span class="icon-gdpr"></span></div>
             <div class="unityads-logo"></div>
             <div class="china-advertisement">广告</div>
-        </div>
+        </div> -->
     </div>
 </div>
