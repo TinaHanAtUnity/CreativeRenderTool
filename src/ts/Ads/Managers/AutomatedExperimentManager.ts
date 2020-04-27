@@ -432,12 +432,11 @@ export class AutomatedExperimentManager {
         features.is_weekend = ts.getDay() === 0 || ts.getDay() === 6;
         features.day_of_week = ts.getDay();
         features.local_day_time = ts.getHours() + ts.getMinutes() / 60;
-
-        features.target_store_id = campaign instanceof PerformanceCampaign ? campaign.getAppStoreId() : undefined;
-        features.game_icon_url = campaign instanceof PerformanceCampaign ? campaign.getGameIcon().getUrl() : undefined;
-        features.target_game_name = campaign instanceof PerformanceCampaign ? campaign.getGameName() : undefined;
-
+        
         if (campaign && campaign instanceof PerformanceCampaign) {
+            features.target_store_id = campaign.getAppStoreId();
+            features.game_icon_url = campaign.getGameIcon().getUrl();
+            features.target_game_name = campaign.getGameName();
             features.portrait_video_url = campaign.getPortraitVideo() ? campaign.getPortraitVideo()!.getUrl() : undefined;
             features.landscape_video_url = campaign.getVideo() ? campaign.getVideo()!.getUrl() : undefined;
             features.portrait_creative_id = campaign.getPortraitVideo() ? campaign.getPortraitVideo()!.getCreativeId() : undefined;
