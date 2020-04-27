@@ -30,7 +30,11 @@ let runningResizeEvent = false;
 
 const changeOrientation = () => {
     // Calculate orientation based on width and height.
-    const orientation: string = document.documentElement.clientWidth / document.documentElement.clientHeight >= 1 ? 'landscape' : 'portrait';
+
+    let orientation: string = 'portrait';
+    if (document.documentElement.clientHeight !== 0) {
+        orientation = document.documentElement.clientWidth / document.documentElement.clientHeight >= 1 ? 'landscape' : 'portrait';
+    }
     document.body.classList.remove('landscape');
     document.body.classList.remove('portrait');
     document.body.classList.add(orientation);
