@@ -315,7 +315,7 @@ export class UserPrivacyManager {
             Diagnostics.trigger('gdpr_request_failed', {
                 url: url
             });
-            this._core.Sdk.logError('Gdpr request failed' + error);
+            this._core.Sdk.logError('User summary request failed' + error);
             throw error;
         });
     }

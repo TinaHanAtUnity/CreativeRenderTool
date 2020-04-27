@@ -605,7 +605,7 @@ describe('UserPrivacyManagerTest', () => {
                 assert.fail('Should throw error');
             }).catch((error) => {
                 assert.equal(error, 'Test Error');
-                sinon.assert.calledWith(logErrorStub, 'Gdpr request failedTest Error');
+                sinon.assert.calledWith(logErrorStub, 'User summary request failedTest Error');
             });
         });
     });

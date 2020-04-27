@@ -91,7 +91,6 @@ import { PerPlacementLoadAdapter } from 'Ads/Managers/PerPlacementLoadAdapter';
 import { PrivacyDataRequestHelper } from 'Privacy/PrivacyDataRequestHelper';
 import { MediationMetaData } from 'Core/Models/MetaData/MediationMetaData';
 import { MediationLoadTrackingManager, MediationExperimentType } from 'Ads/Managers/MediationLoadTrackingManager';
-import { CachedUserSummary } from 'Privacy/CachedUserSummary';
 import { createMeasurementsInstance } from 'Core/Utilities/TimeMeasurements';
 import { XHRequest } from 'Core/Utilities/XHRequest';
 import { LegacyCampaignManager } from 'Ads/Managers/LegacyCampaignManager';
@@ -282,10 +281,6 @@ export class Ads implements IAds {
         }).then(() => {
             if (this.MediationLoadTrackingManager) {
                 this.MediationLoadTrackingManager.setInitComplete();
-            }
-
-            if (this.PrivacyManager.isPrivacySDKTestActive()) {
-                CachedUserSummary.fetch(this.PrivacyManager);
             }
 
             measurements = createMeasurementsInstance(InitializationMetric.WebviewInitializationPhases);
