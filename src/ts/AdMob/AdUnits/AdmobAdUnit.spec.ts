@@ -4,7 +4,7 @@ import { AdMobView } from 'AdMob/Views/__mocks__/AdMobView';
 import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { AdUnitContainer } from 'Ads/AdUnits/Containers/__mocks__/AdUnitContainer';
 import { OperativeEventManager } from 'Ads/Managers/__mocks__/OperativeEventManager';
-import { ThirdPartyEventManager } from 'Ads/Managers/__mocks__/ThirdPartyEventManager';
+import { ThirdPartyEventManager, ThirdPartyEventManagerMock } from 'Ads/Managers/__mocks__/ThirdPartyEventManager';
 import { UserPrivacyManager } from 'Ads/Managers/__mocks__/UserPrivacyManager';
 import { AdsConfiguration } from 'Ads/Models/__mocks__/AdsConfiguration';
 import { Placement, PlacementMock } from 'Ads/Models/__mocks__/Placement';
@@ -22,18 +22,21 @@ import { Store } from 'Store/__mocks__/Store';
 
 import { AdMobAdUnit, IAdMobAdUnitParameters } from 'AdMob/AdUnits/AdMobAdUnit';
 import { SDKMetrics, AdmobMetric } from 'Ads/Utilities/SDKMetrics';
+import { TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
 
 describe('AdmobAdUnitTest', () => {
 
     let admobAdUnit: AdMobAdUnit;
     let admobAdUnitParameters: IAdMobAdUnitParameters;
     let placement: PlacementMock;
+    let thirdPartyEventManager: ThirdPartyEventManagerMock;
 
     beforeEach(() => {
         const ads = new Ads();
         const store = new Store();
         const core = new Core();
         placement = new Placement();
+        thirdPartyEventManager = new ThirdPartyEventManager();
 
         admobAdUnitParameters = {
             view: new AdMobView(),
@@ -43,7 +46,7 @@ describe('AdmobAdUnitTest', () => {
             container: new AdUnitContainer(),
             deviceInfo: new DeviceInfo(),
             clientInfo: new ClientInfo(),
-            thirdPartyEventManager: new ThirdPartyEventManager(),
+            thirdPartyEventManager: thirdPartyEventManager,
             operativeEventManager: new OperativeEventManager(),
             placement: placement,
             campaign: new AdMobCampaign(),
@@ -93,6 +96,10 @@ describe('AdmobAdUnitTest', () => {
 
             it('should have called reportMetricEvent with AdmobMetric.AdmobUserWasRewarded', () => {
                 expect(SDKMetrics.reportMetricEvent).toHaveBeenCalledWith(AdmobMetric.AdmobUserWasRewarded);
+            });
+
+            it('should call the complete event', () => {
+                expect(thirdPartyEventManager.sendTrackingEvents).toHaveBeenCalledWith(admobAdUnitParameters.campaign, TrackingEvent.COMPLETE, 'admob', undefined, undefined);
             });
         });
 
