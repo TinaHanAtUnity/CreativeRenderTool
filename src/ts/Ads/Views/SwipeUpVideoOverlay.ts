@@ -12,6 +12,8 @@ import { AUIMetric, SDKMetrics } from 'Ads/Utilities/SDKMetrics';
 import { AbstractPrivacy, IPrivacyHandlerView } from 'Ads/Views/AbstractPrivacy';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
+import { Template } from 'Core/Utilities/Template';
+import SwipeUpVideoOverlayTemplate from 'html/SwipeUpVideoOverlay.html';
 
 export interface IVideoOverlayParameters<T extends Campaign> {
     platform: Platform;
@@ -35,6 +37,8 @@ export class SwipeUpVideoOverlay extends VideoOverlay {
         combination: IExperimentActionChoice | undefined
     ) {
         super(parameters, privacy, showGDPRBanner, showPrivacyDuringVideo);
+
+        this._template = new Template(SwipeUpVideoOverlayTemplate, this._localization);
 
         if (combination) {
             if (!VideoOverlayDownloadExperiment.isValid(combination)) {
