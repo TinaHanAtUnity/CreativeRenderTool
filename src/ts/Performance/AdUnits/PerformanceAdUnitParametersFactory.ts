@@ -40,6 +40,10 @@ export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParameters
         return new PerformanceEndScreen(endScreenParameters, campaign, country);
     }
 
+    protected createVideoOVerlay(parameters: IAdUnitParameters<Campaign>, privacy: AbstractPrivacy, showGDPRBanner: boolean, showPrivacyDuringVideo: boolean): VideoOverlay {
+        return new VideoOverlay(parameters, privacy, showGDPRBanner, showPrivacyDuringVideo);
+    }
+
     protected createOverlay(parameters: IAdUnitParameters<Campaign>, privacy: AbstractPrivacy): AbstractVideoOverlay {
         let showPrivacyDuringVideo = parameters.placement.skipEndCardOnClose() || false;
 
@@ -49,7 +53,7 @@ export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParameters
         }
 
         const showGDPRBanner = this.showGDPRBanner(parameters) && showPrivacyDuringVideo;
-        const overlay = new VideoOverlay(parameters, privacy, showGDPRBanner, showPrivacyDuringVideo);
+        const overlay = this.createVideoOVerlay(parameters, privacy, showGDPRBanner, showPrivacyDuringVideo);
 
         if (parameters.placement.disableVideoControlsFade()) {
             overlay.setFadeEnabled(false);

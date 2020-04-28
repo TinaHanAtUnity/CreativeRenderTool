@@ -3,9 +3,14 @@ import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
 import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
 import { IEndScreenParameters } from 'Ads/Views/EndScreen';
 import { ICore } from 'Core/ICore';
+import { Campaign } from 'Ads/Models/Campaign';
+import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
+import { VideoOverlay } from 'Ads/Views/VideoOverlay';
+import { SwipeUpVideoOverlay } from 'Ads/Views/SwipeUpVideoOverlay';
 import { AnimatedDownloadButtonEndScreen } from 'Performance/Views/AnimatedDownloadButtonEndScreen';
 import { AutomatedExperimentManager } from 'Ads/Managers/AutomatedExperimentManager';
-import { AutomatedExperimentsCategories } from 'Ads/Models/AutomatedExperimentsList';
+import { VideoOverlayDownloadExperiment, AutomatedExperimentsCategories } from 'Ads/Models/AutomatedExperimentsList';
+import { AUIMetric, SDKMetrics } from 'Ads/Utilities/SDKMetrics';
 import { PerformanceAdUnitParametersFactory } from 'Performance/AdUnits/PerformanceAdUnitParametersFactory';
 import { IExperimentActionChoice } from 'Ads/Models/AutomatedExperiment';
 
@@ -17,6 +22,7 @@ export class PerformanceAdUnitWithAutomatedExperimentParametersFactory extends P
         super(core, core.Ads);
         this._automatedExperimentManager = aem;
         this._automatedExperimentManager.registerExperimentCategory(AutomatedExperimentsCategories.PERFORMANCE_ENDCARD, 'PerformanceCampaign');
+        this._automatedExperimentManager.registerExperimentCategory(AutomatedExperimentsCategories.VIDEO_OVERLAY, 'PerformanceCampaign');
     }
 
     protected createParameters(baseParams: IAdUnitParameters<PerformanceCampaign>) {
@@ -50,5 +56,11 @@ export class PerformanceAdUnitWithAutomatedExperimentParametersFactory extends P
             adUnitStyle: adUnitStyle,
             automatedExperimentManager: this._automatedExperimentManager
         };
+    }
+
+    protected createVideoOverlay(baseParams: IAdUnitParameters<Campaign>, privacy: AbstractPrivacy, showGDPRBanner: boolean, showPrivacyDuringVideo: boolean): VideoOverlay {
+        const videoCombination = this._automatedExperimentManager.activateSelectedExperiment(baseParams.campaign, AutomatedExperimentsCategories.VIDEO_OVERLAY);
+
+        return new SwipeUpVideoOverlay(baseParams, privacy, showGDPRBanner, showPrivacyDuringVideo, videoCombination);
     }
 }
