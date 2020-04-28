@@ -1,4 +1,4 @@
-# Pending
+# Tue Apr 28 23:21:53 UTC 2020
 
 * [AUI] Moved AUI/Optimization related files to own folder [#14743](https://github.com/Applifier/unity-ads-webview/pull/14743)
 * Add more fields to payload sent to ads-debot verify end point [#14940](https://github.com/Applifier/unity-ads-webview/pull/14940)
