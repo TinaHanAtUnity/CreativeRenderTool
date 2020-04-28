@@ -2,7 +2,6 @@ body.alternative-layout.portrait {
     #end-screen {
 
         .btn-close-region {
-            position: fixed;
             display: inline-block;
             line-height: unset;
             width: unset;
@@ -34,7 +33,7 @@ body.alternative-layout.portrait {
         .game-info-container {
             display: flex;
             align-items: center;
-            margin: .5em 1em;
+            margin: .5em 1.5em;
             padding: .4em;
             background-color: red;
             border-radius: .25em;
@@ -64,7 +63,7 @@ body.alternative-layout.portrait {
         }
 
         .download-container {
-            margin: .5em 1em;
+            margin: .5em 1.5em;
             width: unset;
             border-radius: 0.25em;
         }
@@ -83,7 +82,7 @@ body.alternative-layout.portrait {
             -moz-background-size: cover;
             -o-background-size: cover;
             background-size: cover;
-            filter: blur(30px);
+            filter: blur(45px);
             z-index: unset;
         }
 
@@ -96,6 +95,7 @@ body.alternative-layout.portrait {
             top: 0;
             display: flex;
             flex-direction: column;
+            justify-content: space-evenly;
         }
 
         .game-text-container {
@@ -104,7 +104,7 @@ body.alternative-layout.portrait {
         }
 
         .end-screen-image-container {
-            padding: 1em;
+            padding: 1.5em;
 
             .end-screen-image {
                 border-radius: .25em;
@@ -112,7 +112,24 @@ body.alternative-layout.portrait {
             }
         }
 
-
+        .unityads-logo {
+            bottom: unset;
+            left: unset;
+            -webkit-box-orient: unset;
+            -webkit-box-direction: unset;
+            width: unset;
+            text-align: right;
+            -webkit-box-pack: unset;
+            justify-content: unset;
+            position: unset;
+            z-index: unset;
+            max-height: 1rem;
+            color: white;
+            font-size: 1.5rem;
+            filter: unset;
+            opacity: .4;
+            margin: 0 1em;
+        }
 
     }
 }
