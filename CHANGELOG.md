@@ -1,3 +1,9 @@
+# Pending
+
+* [China Auction]increase traffic to 10% [#14943](https://github.com/Applifier/unity-ads-webview/pull/14943)
+* [Mobilityware] Apply custom feature by organization ID [#14774](https://github.com/Applifier/unity-ads-webview/pull/14774)
+* [AdUnit] Support for an optional Ad Unit Id from Configuration response [#14713](https://github.com/Applifier/unity-ads-webview/pull/14713)
+
 # Thu Apr 23 00:05:25 UTC 2020
 
 * [PTS Migration] Temporarily Add Tracking Events for MRAID and Display [#14908](https://github.com/Applifier/unity-ads-webview/pull/14908)
