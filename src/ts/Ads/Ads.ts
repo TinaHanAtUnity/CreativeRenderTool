@@ -209,7 +209,7 @@ export class Ads implements IAds {
             PrivacyMetrics.setAbGroup(this._core.Config.getAbGroup());
             PrivacyMetrics.setSubdivision(this._core.Config.getSubdivision());
 
-            PrivacyDataRequestHelper.init(this._core);
+            PrivacyDataRequestHelper.init(this._core, this.PrivacyManager, this.PrivacySDK);
         }).then(() => {
             return this.setupMediationTrackingManager();
         }).then(() => {
