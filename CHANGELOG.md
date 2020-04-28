@@ -1,5 +1,6 @@
 # Pending
 
+* [AUI] Moved AUI/Optimization related files to own folder [#14743](https://github.com/Applifier/unity-ads-webview/pull/14743)
 * Add more fields to payload sent to ads-debot verify end point [#14940](https://github.com/Applifier/unity-ads-webview/pull/14940)
 * [Bug] Track Occurrences of Connection Required to Show Ad [#14936](https://github.com/Applifier/unity-ads-webview/pull/14936)
 * [China Auction]increase traffic to 10% [#14943](https://github.com/Applifier/unity-ads-webview/pull/14943)
