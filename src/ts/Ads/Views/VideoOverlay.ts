@@ -394,7 +394,7 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
         if (this._skipEnabled) {
             this._skipButtonElement.classList.add('show-skip-button');
             if (this._campaign instanceof PerformanceCampaign || this._campaign instanceof XPromoCampaign) {
-                this.showCallButton();  //this is for traditional install button sliding from the right
+                this.showCallButton();
             }
         }
     }
