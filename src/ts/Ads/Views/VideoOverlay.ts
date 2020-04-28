@@ -35,7 +35,7 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
 
     private _spinnerEnabled: boolean = false;
 
-    protected _skipEnabled: boolean;
+    private _skipEnabled: boolean;
 
     private _videoDurationEnabled: boolean = false;
     protected _videoProgress: number;
@@ -47,7 +47,7 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
     protected _callButtonVisible: boolean = false;
     private _callButtonEnabled: boolean = true;
 
-    protected _skipButtonElement: HTMLElement;
+    private _skipButtonElement: HTMLElement;
     private _spinnerElement: HTMLElement;
     private _muteButtonElement: HTMLElement;
     private _debugMessageElement: HTMLElement;
@@ -56,14 +56,14 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
     private _chinaAdvertisementElement: HTMLElement;
 
     private _fadeTimer?: number;
-    protected _areControlsVisible: boolean = false;
+    private _areControlsVisible: boolean = false;
     private _gameId: string;
 
     private _country: string | undefined;
     protected _campaign: Campaign;
 
     private _useCloseIconInsteadOfSkipIcon: boolean | undefined = false;
-    protected _disableFadeOutOnClick: boolean | undefined = false;
+    private _disableFadeOutOnClick: boolean | undefined = false;
 
     constructor(parameters: IVideoOverlayParameters<Campaign>, privacy: AbstractPrivacy, showGDPRBanner: boolean, showPrivacyDuringVideo: boolean) {
         super(parameters.platform, 'video-overlay', parameters.placement.muteVideo());
@@ -189,7 +189,7 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
         }
     }
 
-    private handleVideoProgress (value: number) {
+    public setVideoProgress(value: number): void {
         if (VideoOverlay.AutoSkip) {
             this._handlers.forEach(handler => handler.onOverlaySkip(value));
         }
@@ -215,24 +215,11 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
             this._chinaAdvertisementElement.classList.add('with-skip-button');
         }
 
-    }
-
-    protected handleVideoProgressButton() {
-        if (!this._skipEnabled && this._videoProgress > 5000) {
+        const isPerformanceCampaign = this._campaign instanceof PerformanceCampaign || this._campaign instanceof XPromoCampaign;
+        if (isPerformanceCampaign && !this._skipEnabled && this._videoProgress > 5000) {
             this.showCallButton();
             return;
         }
-    }
-
-    protected showCTAButton() {
-        if (this._campaign instanceof PerformanceCampaign || this._campaign instanceof XPromoCampaign) {
-            this.showCallButton();
-        }
-    }
-
-    public setVideoProgress(value: number): void {
-        this.handleVideoProgress(value);
-        this.handleVideoProgressButton();
     }
 
     public setMuteEnabled(value: boolean) {
@@ -338,7 +325,7 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
         this.triggerOnOverlayDownload();
     }
 
-    protected triggerOnOverlayDownload(): void {
+    private triggerOnOverlayDownload(): void {
         if (this._campaign instanceof PerformanceCampaign || this._campaign instanceof XPromoCampaign) {
             const campaign = this._campaign;
             this._handlers.filter(handler => typeof handler.onOverlayDownload === 'function')
@@ -367,12 +354,13 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
         this._handlers.forEach(handler => handler.onOverlayPauseForTesting(true));
     }
 
-    protected onClick(event: Event) {
+    private onClick(event: Event) {
         if (this._disableFadeOutOnClick) {
             return;
         }
 
         this.resetFadeTimer();
+
         if (this._areControlsVisible) {
             this.fadeOut();
         } else {
@@ -380,7 +368,7 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
         }
     }
 
-    protected setupElementReferences(): void {
+    private setupElementReferences(): void {
         this._skipButtonElement = <HTMLElement> this._container.querySelector('.skip-button');
         this._spinnerElement = <HTMLElement> this._container.querySelector('.buffering-spinner');
         this._muteButtonElement = <HTMLElement> this._container.querySelector('.mute-button');
@@ -390,7 +378,7 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
         this._chinaAdvertisementElement = <HTMLLIElement> this._container.querySelector('.china-advertisement');
     }
 
-    protected showSkipButton() {
+    private showSkipButton() {
         if (this._skipEnabled) {
             this._skipButtonElement.classList.add('show-skip-button');
             if (this._campaign instanceof PerformanceCampaign || this._campaign instanceof XPromoCampaign) {
@@ -399,7 +387,7 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
         }
     }
 
-    protected resetFadeTimer() {
+    private resetFadeTimer() {
         if (this._fadeTimer) {
             clearTimeout(this._fadeTimer);
             this._fadeTimer = undefined;
@@ -411,7 +399,7 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
         this._callButtonElement.classList.add('show-go-text');
     }
 
-    protected handleFadeIn () {
+    private fadeIn() {
         if (!this._container) {
             return;
         }
@@ -421,20 +409,13 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
         if (this._campaign instanceof PerformanceCampaign || this._campaign instanceof XPromoCampaign) {
             return;
         }
-    }
 
-    protected handleFadeInButton() {
         setTimeout(() => {
             this.showCallButton();
         }, 500);
     }
 
-    protected fadeIn() {
-        this.handleFadeIn();
-        this.handleVideoProgressButton();
-    }
-
-    protected fadeOut() {
+    private fadeOut() {
         this._container.classList.remove('fade-in');
         this._areControlsVisible = false;
     }
