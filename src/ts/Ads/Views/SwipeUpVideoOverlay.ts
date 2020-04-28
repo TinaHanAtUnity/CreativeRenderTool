@@ -114,4 +114,12 @@ export class SwipeUpVideoOverlay extends VideoOverlay {
         super.setupElementReferences();
         this._swipeUpButtonElement = <HTMLElement> this._container.querySelector('.swipe-up-button');
     }
+
+    protected onSwipeUpEvent (event: Event): void {
+        event.preventDefault();
+        event.stopPropagation();
+        this.resetFadeTimer();
+        this._handlers.forEach(handler => handler.onOverlayCallButton());
+        this.triggerOnOverlayDownload();
+    }
 }

@@ -338,15 +338,7 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
         this.triggerOnOverlayDownload();
     }
 
-    protected onSwipeUpEvent (event: Event): void {
-        event.preventDefault();
-        event.stopPropagation();
-        this.resetFadeTimer();
-        this._handlers.forEach(handler => handler.onOverlayCallButton());
-        this.triggerOnOverlayDownload();
-    }
-
-    private triggerOnOverlayDownload(): void {
+    protected triggerOnOverlayDownload(): void {
         if (this._campaign instanceof PerformanceCampaign || this._campaign instanceof XPromoCampaign) {
             const campaign = this._campaign;
             this._handlers.filter(handler => typeof handler.onOverlayDownload === 'function')
@@ -407,7 +399,7 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
         }
     }
 
-    private resetFadeTimer() {
+    protected resetFadeTimer() {
         if (this._fadeTimer) {
             clearTimeout(this._fadeTimer);
             this._fadeTimer = undefined;
