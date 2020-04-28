@@ -10,6 +10,8 @@ import { VastVideoEventHandler } from 'VAST/EventHandlers/VastVideoEventHandler'
 import { IVideoEventHandlerParams } from 'Ads/EventHandlers/BaseVideoEventHandler';
 import { IObserver2, IObserver3 } from 'Core/Utilities/IObserver';
 import { StreamType } from 'Core/Constants/Android/StreamType';
+import { TencentVastOverlayEventHandler } from 'VAST/EventHandlers/TencentVastOverlayEventHandler';
+import { TencentVastEndScreenEventHandler } from 'VAST/EventHandlers/TencentVastEndScreenEventHandler';
 
 export class VastAdUnitFactory extends AbstractAdUnitFactory<VastCampaign, IVastAdUnitParameters> {
 
@@ -21,11 +23,21 @@ export class VastAdUnitFactory extends AbstractAdUnitFactory<VastCampaign, IVast
 
         const vastAdUnit = new VastAdUnit(parameters);
 
-        const vastOverlayHandler = new VastOverlayEventHandler(vastAdUnit, parameters);
+        let vastOverlayHandler: VastOverlayEventHandler;
+        if (CustomFeatures.isTencentSeat(parameters.campaign.getSeatId())) {
+            vastOverlayHandler = new TencentVastOverlayEventHandler(vastAdUnit, parameters);
+        } else {
+            vastOverlayHandler = new VastOverlayEventHandler(vastAdUnit, parameters);
+        }
         parameters.overlay.addEventHandler(vastOverlayHandler);
 
         if ((parameters.campaign.hasStaticEndscreen() || parameters.campaign.hasIframeEndscreen() || parameters.campaign.hasHtmlEndscreen()) && parameters.endScreen) {
-            const vastEndScreenHandler = new VastEndScreenEventHandler(vastAdUnit, parameters);
+            let vastEndScreenHandler: VastEndScreenEventHandler;
+            if (CustomFeatures.isTencentSeat(parameters.campaign.getSeatId())) {
+                vastEndScreenHandler = new TencentVastEndScreenEventHandler(vastAdUnit, parameters);
+            } else {
+                vastEndScreenHandler = new VastEndScreenEventHandler(vastAdUnit, parameters);
+            }
             parameters.endScreen.addEventHandler(vastEndScreenHandler);
 
             if (parameters.platform === Platform.ANDROID) {
