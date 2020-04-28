@@ -418,8 +418,6 @@ export class AutomatedExperimentManager {
         const features: { [key: string]: ContextualFeature } = {};
         const gameSessionCounters = GameSessionCounters.getCurrentCounters();
 
-        // console.log(campaign)
-
         const ts = new Date();
         features.campaign_id = campaign.getId();
         features.target_game_id = campaign instanceof PerformanceCampaign ? campaign.getGameId() : undefined;
