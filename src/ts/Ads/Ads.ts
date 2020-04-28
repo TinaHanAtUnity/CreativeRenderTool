@@ -95,7 +95,7 @@ import { CachedUserSummary } from 'Privacy/CachedUserSummary';
 import { createMeasurementsInstance } from 'Core/Utilities/TimeMeasurements';
 import { XHRequest } from 'Core/Utilities/XHRequest';
 import { LegacyCampaignManager } from 'Ads/Managers/LegacyCampaignManager';
-import { AutomatedExperimentManager } from 'Ads/Managers/AutomatedExperimentManager';
+import { AutomatedExperimentManager } from 'MabExperimentation/AutomatedExperimentManager';
 import { CampaignAssetInfo } from 'Ads/Utilities/CampaignAssetInfo';
 import { AdRequestManager } from 'Ads/Managers/AdRequestManager';
 import { PerPlacementLoadManagerV5 } from 'Ads/Managers/PerPlacementLoadManagerV5';

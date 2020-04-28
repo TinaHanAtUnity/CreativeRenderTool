@@ -1,9 +1,9 @@
 import { PerformanceAdUnit } from 'Performance/AdUnits/PerformanceAdUnit';
 import { IStoreHandler, IStoreHandlerDownloadParameters } from 'Ads/EventHandlers/StoreHandlers/StoreHandler';
-import { AutomatedExperimentManager } from 'Ads/Managers/AutomatedExperimentManager';
-import { AutomatedExperimentsCategories } from 'Ads/Models/AutomatedExperimentsList';
+import { AutomatedExperimentManager } from 'MabExperimentation/AutomatedExperimentManager';
+import { AutomatedExperimentsCategories } from 'MabExperimentation/Models/AutomatedExperimentsList';
 import { PerformanceEndScreenEventHandler } from 'Performance/EventHandlers/PerformanceEndScreenEventHandler';
-import { IPerformanceAdUnitWithAutomatedExperimentParameters } from 'Performance/AdUnits/PerformanceAdUnitWithAutomatedExperiment';
+import { IPerformanceAdUnitWithAutomatedExperimentParameters } from 'MabExperimentation/Performance/PerformanceAdUnitWithAutomatedExperiment';
 
 export class MabDecisionPerformanceEndScreenEventHandler extends PerformanceEndScreenEventHandler {
 
