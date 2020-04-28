@@ -5,7 +5,7 @@ import { IEndScreenParameters } from 'Ads/Views/EndScreen';
 import { ICore } from 'Core/ICore';
 import { AnimatedDownloadButtonEndScreen } from 'Performance/Views/AnimatedDownloadButtonEndScreen';
 import { AutomatedExperimentManager } from 'Ads/Managers/AutomatedExperimentManager';
-import { AutomatedExperimentsCategories, VideoOverlayDownloadExperiment } from 'Ads/Models/AutomatedExperimentsList';
+import { AutomatedExperimentsCategories } from 'Ads/Models/AutomatedExperimentsList';
 import { PerformanceAdUnitParametersFactory } from 'Performance/AdUnits/PerformanceAdUnitParametersFactory';
 import { IExperimentActionChoice } from 'Ads/Models/AutomatedExperiment';
 import { Campaign } from 'Ads/Models/Campaign';
