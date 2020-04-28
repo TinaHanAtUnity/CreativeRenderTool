@@ -20,11 +20,11 @@ import { DeviceInfo } from 'Core/Models/DeviceInfo';
 export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
     private _platform: Platform;
     private _core: ICoreApi;
-    private _vastAdUnit: VastAdUnit;
+    protected _vastAdUnit: VastAdUnit;
     private _request: RequestManager;
     private _vastCampaign: VastCampaign;
     private _moat?: MOAT;
-    private _vastOverlay?: AbstractVideoOverlay;
+    protected _vastOverlay?: AbstractVideoOverlay;
     private _gameSessionId?: number;
     private _abGroup: ABGroup;
     private _om?: VastOpenMeasurementController;

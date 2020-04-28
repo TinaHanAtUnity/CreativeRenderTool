@@ -15,10 +15,10 @@ import { IAdsApi } from 'Ads/IAds';
 import { Placement } from 'Ads/Models/Placement';
 
 export class VastEndScreenEventHandler implements IVastEndScreenHandler {
-    private _vastAdUnit: VastAdUnit;
+    protected _vastAdUnit: VastAdUnit;
     private _request: RequestManager;
     private _vastCampaign: VastCampaign;
-    private _vastEndScreen: VastEndScreen | null;
+    protected _vastEndScreen: VastEndScreen | null;
     private _platform: Platform;
     private _core: ICoreApi;
     private _gameSessionId?: number;
