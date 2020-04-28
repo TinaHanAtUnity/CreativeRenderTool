@@ -78,20 +78,6 @@ export class SwipeUpVideoOverlay extends VideoOverlay {
         }
     }
 
-    protected handleVideoProgressButton() {
-        if (!this._skipEnabled && this._videoProgress > 5000) {
-            this.showCTAButton();
-            return;
-        }
-    }
-
-    protected showSkipButton() {
-        if (this._skipEnabled) {
-            this._skipButtonElement.classList.add('show-skip-button');
-                this.showCTAButton();
-        }
-    }
-
     protected handleFadeInButton() {
         if (this._ctaMode === 'click') {
             setTimeout(() => {
