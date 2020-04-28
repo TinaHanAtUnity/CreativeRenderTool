@@ -29,19 +29,6 @@
             <%= data.t("Buffering") %>
         </div>
     </div>
-    <div class="swipe-up-zone-container">
-        <div class="swipe-up-zone">
-            <div class="swipe-up-button">
-                <svg viewBox="0 0 15.9 15.9">
-                    <path class="up-arrow-background" d="M0,0v15.9h15.9V0H0z M13.2,10.6c-0.4,0.4-1,0.4-1.4,0L7.9,6.7L4,10.6c-0.4,0.4-1,0.4-1.4,0
-                        c-0.4-0.4-0.4-1,0-1.4l4.6-4.5c0.4-0.4,1.1-0.4,1.4,0l4.6,4.5C13.6,9.6,13.6,10.2,13.2,10.6z" />
-                    <path class="up-arrow" d="M7.2,4.7L2.6,9.2c-0.4,0.4-0.4,1,0,1.4s1,0.4,1.4,0l3.9-3.9l3.9,3.9c0.4,0.4,1,0.4,1.4,0s0.4-1,0-1.4L8.6,4.7
-                        C8.3,4.3,7.6,4.3,7.2,4.7z" />
-                </svg>
-                <span class="swipe-up-download-text"><%= data.t("Install Now") %></span>
-            </div>
-        </div>
-    </div>
     <div class="bottom-container">
         <div class="left-corner">
             <div class="mute-button button button-left <%= data.muted ? 'muted' : '' %>">
@@ -74,24 +61,22 @@
         </div>
         <div class="right-corner">
             <% if (data.showInstallButton) { %>
-            <div class="install-button call-button button button-bottom button-right">
-                <div class="tab">
-                    <div class="download-wrapper">
-                        <div class="game-icon"
-                            style="background-image: url('<%= data.gameIcon && data.gameIcon.replace("file://", "" ) %>')">
-                        </div>
-                        <div class="download-container">
-                            <span class="download-text"><%= data.t("Install Now") %></span>
+                <div class="install-button call-button button button-bottom button-right">
+                    <div class="tab">
+                        <div class="download-wrapper">
+                            <div class="game-icon" style="background-image: url('<%= data.gameIcon && data.gameIcon.replace("file://", "" ) %>')"></div>
+                            <div class="download-container">
+                                <span class="download-text"><%= data.t("Install Now") %></span>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
             <% } else { %>
-            <div class="vast-button call-button button button-bottom button-right">
-                <div class="tab">
-                    <span class="text"><%= data.t("Learn More") %> <span class="go-text">GO</span></span>
+                <div class="vast-button call-button button button-bottom button-right">
+                    <div class="tab">
+                        <span class="text"><%= data.t("Learn More") %> <span class="go-text">GO</span></span>
+                    </div>
                 </div>
-            </div>
             <% } %>
         </div>
     </div>
