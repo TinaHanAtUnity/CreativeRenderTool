@@ -17,8 +17,8 @@ export class VastEndScreen extends View<IVastEndScreenHandler> {
     protected _hidePrivacy: boolean = false;
     protected _callButtonEnabled: boolean = true;
 
-    constructor(parameters: IAdUnitParameters<VastCampaign>) {
-        super(parameters.platform, 'vast-end-screen');
+    constructor(parameters: IAdUnitParameters<VastCampaign>, attachTap?: boolean | undefined) {
+        super(parameters.platform, 'vast-end-screen', attachTap);
 
         this._campaign = parameters.campaign;
         this._country = parameters.coreConfig.getCountry();
