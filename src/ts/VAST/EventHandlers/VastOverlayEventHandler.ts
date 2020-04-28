@@ -127,6 +127,11 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
     }
 
     public onOverlayCallButton(): Promise<void> {
+        const clickThroughURL = this._vastAdUnit.getVideoClickThroughURL();
+        return this.onAssembleClickThroughURL(clickThroughURL);
+    }
+
+    protected onAssembleClickThroughURL(clickThroughURL: string | null): Promise<void> {
         super.onOverlayCallButton();
 
         this.setCallButtonEnabled(false);
@@ -135,8 +140,6 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
         if (this._om) {
             this._om.adUserInteraction(InteractionType.CLICK);
         }
-
-        const clickThroughURL = this._vastAdUnit.getVideoClickThroughURL();
         if (clickThroughURL) {
             const useWebViewUserAgentForTracking = this._vastCampaign.getUseWebViewUserAgentForTracking();
             const ctaClickedTime = Date.now();
@@ -149,6 +152,7 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
         } else {
             return Promise.reject(new Error('No clickThroughURL was defined'));
         }
+
     }
 
     private openUrlOnCallButton(url: string, clickDuration: number, clickUrl: string): Promise<void> {

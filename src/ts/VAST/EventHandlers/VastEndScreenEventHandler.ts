@@ -40,6 +40,11 @@ export class VastEndScreenEventHandler implements IVastEndScreenHandler {
     }
 
     public onVastEndScreenClick(): Promise<void> {
+        const clickThroughURL = this._vastAdUnit.getCompanionClickThroughUrl() || this._vastAdUnit.getVideoClickThroughURL();
+        return this.onAssembleClickThroughURL(clickThroughURL);
+    }
+
+    protected onAssembleClickThroughURL(clickThroughURL: string | null): Promise<void> {
         this.setCallButtonEnabled(false);
 
         this._ads.Listener.sendClickEvent(this._placement.getId());
@@ -47,8 +52,6 @@ export class VastEndScreenEventHandler implements IVastEndScreenHandler {
         if (!this._vastAdUnit.hasImpressionOccurred()) {
             SDKMetrics.reportMetricEvent(ErrorMetric.VastClickWithoutImpressionError);
         }
-
-        const clickThroughURL = this._vastAdUnit.getCompanionClickThroughUrl() || this._vastAdUnit.getVideoClickThroughURL();
         if (clickThroughURL) {
             const useWebViewUserAgentForTracking = this._vastCampaign.getUseWebViewUserAgentForTracking();
             const ctaClickedTime = Date.now();
