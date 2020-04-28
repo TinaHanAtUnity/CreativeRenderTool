@@ -1,18 +1,18 @@
-import { Platform } from 'Core/Constants/Platform';
 import { IAdsApi } from 'Ads/IAds';
+import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
+import { AbstractPrivacy, IPrivacyHandlerView } from 'Ads/Views/AbstractPrivacy';
+import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
+import { Platform } from 'Core/Constants/Platform';
+import { Localization } from 'Core/Utilities/Localization';
+import { Template } from 'Core/Utilities/Template';
+
+import VideoOverlayTemplate from 'html/VideoOverlay.html';
+import { Campaign } from 'Ads/Models/Campaign';
+import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { Placement } from 'Ads/Models/Placement';
-
-import { AbstractPrivacy, IPrivacyHandlerView } from 'Ads/Views/AbstractPrivacy';
-import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
-import { Localization } from 'Core/Utilities/Localization';
-import { Template } from 'Core/Utilities/Template';
-import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
-import VideoOverlayTemplate from 'html/VideoOverlay.html';
-import { Campaign } from 'Ads/Models/Campaign';
-import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 
 export interface IVideoOverlayParameters<T extends Campaign> {
