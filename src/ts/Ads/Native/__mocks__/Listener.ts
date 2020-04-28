@@ -6,6 +6,7 @@ export type ListenerMock = Base & {
     sendFinishEvent: jest.Mock;
     sendPlacementStateChangedEvent: jest.Mock;
     sendReadyEvent: jest.Mock;
+    sendClickEvent: jest.Mock;
 };
 
 export const ListenerApi = jest.fn(() => {
@@ -13,6 +14,7 @@ export const ListenerApi = jest.fn(() => {
         onPlacementStateChangedEventSent: Observable(),
         sendFinishEvent: jest.fn().mockImplementation(() => Promise.resolve()),
         sendPlacementStateChangedEvent: jest.fn().mockImplementation(() => Promise.resolve()),
-        sendReadyEvent: jest.fn().mockImplementation(() => Promise.resolve())
+        sendReadyEvent: jest.fn().mockImplementation(() => Promise.resolve()),
+        sendClickEvent: jest.fn()
     };
 });
