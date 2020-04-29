@@ -6,6 +6,6 @@ export type UrlSchemeApiMock = Base & {
 
 export const UrlSchemeApi = jest.fn(() => {
     return <UrlSchemeApiMock>{
-        open: jest.fn().mockImplementation(() => Promise.resolve())
+        open: jest.fn().mockReturnValue(Promise.resolve())
     };
 });

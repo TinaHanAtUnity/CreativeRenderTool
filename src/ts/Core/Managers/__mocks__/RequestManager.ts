@@ -8,8 +8,8 @@ export type RequestManagerMock = Base & {
 
 export const RequestManager = jest.fn(() => {
     return <RequestManagerMock>{
-        get: jest.fn().mockImplementation(() => Promise.resolve()),
-        post: jest.fn().mockImplementation(() => Promise.resolve()),
-        followRedirectChain: jest.fn().mockImplementation(() => Promise.resolve('url'))
+        get: jest.fn().mockResolvedValue(Promise.resolve()),
+        post: jest.fn().mockResolvedValue(Promise.resolve()),
+        followRedirectChain: jest.fn().mockResolvedValue(Promise.resolve('url'))
     };
 });

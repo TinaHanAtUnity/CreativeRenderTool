@@ -8,7 +8,7 @@ export type AbstractVideoOverlayMock = Base & {
 
 export const AbstractVideoOverlay = jest.fn(() => {
     return <AbstractVideoOverlayMock>{
-        tap: jest.fn().mockImplementation(() => new Tap()),
+        tap: jest.fn().mockReturnValue(new Tap()),
         setCallButtonEnabled: jest.fn()
     };
 });

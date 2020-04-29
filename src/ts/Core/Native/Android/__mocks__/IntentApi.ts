@@ -6,6 +6,6 @@ export type IntentApiMock = Base & {
 
 export const IntentApi = jest.fn(() => {
     return <IntentApiMock>{
-        launch: jest.fn().mockImplementation(() => Promise.resolve())
+        launch: jest.fn().mockReturnValue(Promise.resolve())
     };
 });

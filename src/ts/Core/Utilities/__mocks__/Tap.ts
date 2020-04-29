@@ -7,6 +7,6 @@ export type TapMock = Base & {
 
 export const Tap = jest.fn(() => {
     return <TapMock>{
-        getTouchStartPosition: jest.fn().mockImplementation(() => { return {startX: 10, startY: 20 }; })
+        getTouchStartPosition: jest.fn().mockReturnValue({startX: 10, startY: 20 })
     };
 });

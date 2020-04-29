@@ -8,7 +8,7 @@ export type VastEndScreenMock = Base & {
 
 export const VastEndScreen = jest.fn(() => {
     return <VastEndScreenMock>{
-        tap: jest.fn().mockImplementation(() => new Tap()),
+        tap: jest.fn().mockReturnValue(new Tap()),
         setCallButtonEnabled: jest.fn()
     };
 });
