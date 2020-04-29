@@ -35,7 +35,7 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
 
     private _spinnerEnabled: boolean = false;
 
-    protected _skipEnabled: boolean;
+    private _skipEnabled: boolean;
 
     private _videoDurationEnabled: boolean = false;
     protected _videoProgress: number;
