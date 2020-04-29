@@ -190,8 +190,6 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
     }
 
     public setVideoProgress(value: number): void {
-        // this.findVideoProgress(value);
-        // this.showCTAButtonAtCheckpoint();
         if (VideoOverlay.AutoSkip) {
             this._handlers.forEach(handler => handler.onOverlaySkip(value));
         }
@@ -221,14 +219,7 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
             this.showCTAButton();
             return;
         }
-
     }
-    // private findVideoProgress (value: number) {
-    //       }
-
-    // protected showCTAButtonAtCheckpoint() {
-    
-    // }
 
     protected showCTAButton() {
         if (this._campaign instanceof PerformanceCampaign || this._campaign instanceof XPromoCampaign) {
