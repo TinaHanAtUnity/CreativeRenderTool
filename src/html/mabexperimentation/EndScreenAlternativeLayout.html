@@ -30,10 +30,8 @@
                     <div class="store-container">
                         <% if(!!data.simpleRating) { %>
                         <span class="game-rating">
-                            <span class="game-rating-stars-bottom">
-                                <span class="game-rating-number"><%= data.simpleRating %></span>
-                                <span class="icon-star first-icon-star"></span>
-                            </span>
+                            <span class="game-rating-number"><%= data.simpleRating %></span>
+                            <span class="icon-star"></span>
                         </span>
                         <% } %>
 
@@ -52,8 +50,10 @@
             <div class="unityads-logo"></div>
         </div>
         <div class="bottom-container">
-            <div class="privacy-button"><span class="icon-gdpr"></span></div>
             <div class="china-advertisement">广告</div>
+            <div class="privacy-button">
+                <span class="icon-gdpr"></span>
+            </div>
         </div>
     </div>
 </div>

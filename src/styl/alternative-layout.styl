@@ -8,7 +8,7 @@ body.alternative-layout.portrait {
             line-height: unset;
             width: unset;
             text-align: unset;
-            text-shadow: 0.03em 0.05em 0.18em $grey;
+            text-shadow: 0.03em 0.05em 0.18em $black;
         }
 
         .campaign-container {
@@ -54,10 +54,19 @@ body.alternative-layout.portrait {
             margin-top: unset;
             display: flex;
             align-items: center;
+            color: $white;
+            opacity: .5;
+        }
+
+        .game-rating-count {
+            color: white;
+            opacity: .5;    
         }
 
         .icon-star {
             margin-top: .3em;
+            margin-right: 1em;
+            margin-left: unset;
         }
 
         .end-screen-info {
@@ -71,7 +80,7 @@ body.alternative-layout.portrait {
             border-radius: .25em;
             background: #fff;
             text-align: left;
-            box-shadow: -4px -1px 11px 0 $grey;
+            // box-shadow: 2px 2px 20px 0 $black;
             text-transform: uppercase;
             padding: .6rem;
             font-weight: 600;
@@ -80,6 +89,19 @@ body.alternative-layout.portrait {
             line-height: .85rem;
             justify-content: space-between;
             align-items: center;
+
+            .free-text {
+                font-size: 0.65em;
+                padding: 0.15em;
+                line-height: 0.95em;
+                border-style: solid;
+                border-radius: .25em;
+                border-width: 0.2em;
+            }
+
+            .download-text {
+                font-size: .8rem;    
+            }
         }
 
         .store-container {
@@ -118,7 +140,8 @@ body.alternative-layout.portrait {
         }
 
         .end-screen-image-container {
-            padding: 0 1.5em;
+            padding:1.5em;
+            padding-bottom: 0;
 
             .end-screen-image {
                 border-radius: .25em;
@@ -145,13 +168,25 @@ body.alternative-layout.portrait {
             margin: 0 1em;
         }
 
-        .free-text {
-            font-size: 0.65em;
-            padding: 0.15em;
-            line-height: 0.95em;
-            border-style: solid;
-            border-radius: .25em;
-            border-width: 0.2em;
+        .bottom-container {
+            position: unset;
+            left: unset;
+            bottom: unset;
+            margin: unset;
+            height: unset;
+            display: flex;
+            justify-content: flex-end;
+            
+            .privacy-button {
+                position: unset;
+                bottom: unset;
+                z-index: unset;
+                color: $white;
+                margin: 0 1.5em;
+                line-height: unset;
+            }
         }
+
+
     }
 }
