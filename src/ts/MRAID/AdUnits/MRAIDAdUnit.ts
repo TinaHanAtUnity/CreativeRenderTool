@@ -88,6 +88,9 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
             this.sendImpression();
         }
 
+        // Temporary for PTS Migration Investigation
+        this.sendTrackingEvent(TrackingEvent.START);
+
         this._container.addEventHandler(this);
 
         const views: string[] = ['webview'];
@@ -260,9 +263,10 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
 
             if (!this._campaign.getSession().getEventSent(EventType.VIEW)) {
                 this._operativeEventManager.sendView(operativeEventParams);
-            }
 
-            this.sendTrackingEvent(TrackingEvent.COMPLETE);
+                // Temporary for PTS Migration Investigation
+                this.sendTrackingEvent(TrackingEvent.COMPLETE);
+            }
         } else if (finishState === FinishState.SKIPPED) {
             this._operativeEventManager.sendSkip(operativeEventParams);
         }

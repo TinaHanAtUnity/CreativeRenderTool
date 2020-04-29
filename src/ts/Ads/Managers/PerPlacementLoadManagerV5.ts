@@ -11,6 +11,7 @@ import { AdRequestManager } from 'Ads/Managers/AdRequestManager';
 import { Observables } from 'Core/Utilities/Observables';
 import { PerPlacementLoadManager } from 'Ads/Managers/PerPlacementLoadManager';
 import { LoadV5, SDKMetrics } from 'Ads/Utilities/SDKMetrics';
+import { PerformanceAdUnitFactory } from 'Performance/AdUnits/PerformanceAdUnitFactory';
 
 export class PerPlacementLoadManagerV5 extends PerPlacementLoadManager {
     protected _adRequestManager: AdRequestManager;
@@ -60,7 +61,6 @@ export class PerPlacementLoadManagerV5 extends PerPlacementLoadManager {
 
     protected loadPlacement(placementId: string, count: number) {
         if (this._adRequestManager.isPreloadDataExpired()) {
-            SDKMetrics.reportMetricEvent(LoadV5.RefreshManagerPreloadDataExpired);
             this.invalidateActivePlacements();
         }
 
@@ -69,7 +69,6 @@ export class PerPlacementLoadManagerV5 extends PerPlacementLoadManager {
         // It would make sense to use reload request here, however it would require some refactoring,
         // which will be done later.
         if (this._adRequestManager.hasPreloadFailed()) {
-            SDKMetrics.reportMetricEvent(LoadV5.LoadCampaignWithPreloadData);
             return this._adRequestManager.requestPreload().then(() => {
                 super.loadPlacement(placementId, count);
             }).catch((err) => {
@@ -85,7 +84,6 @@ export class PerPlacementLoadManagerV5 extends PerPlacementLoadManager {
 
     protected invalidateExpiredCampaigns(): Promise<void> {
         if (this._adRequestManager.isPreloadDataExpired()) {
-            SDKMetrics.reportMetricEvent(LoadV5.RefreshManagerPreloadDataExpired);
             return this.invalidateActivePlacements();
         }
 
@@ -151,11 +149,30 @@ export class PerPlacementLoadManagerV5 extends PerPlacementLoadManager {
         const placement = this._adsConfig.getPlacement(placementId);
 
         if (placement) {
-            SDKMetrics.reportMetricEvent(LoadV5.RefreshManagerCampaignFailedToInvalidate);
-            placement.setCurrentCampaign(undefined);
-            placement.setCurrentTrackingUrls(undefined);
             placement.setInvalidationPending(false);
-            this.setPlacementState(placementId, PlacementState.NO_FILL);
+
+            let shouldInvalidate = true;
+            const campaign = placement.getCurrentCampaign();
+            if (campaign) {
+                const contentType = campaign.getContentType();
+                switch (contentType) {
+                    case PerformanceAdUnitFactory.ContentType:
+                    case PerformanceAdUnitFactory.ContentTypeMRAID:
+                    case PerformanceAdUnitFactory.ContentTypeVideo:
+                        shouldInvalidate = true;
+                        break;
+                    default:
+                        shouldInvalidate = false;
+                }
+            }
+
+            // Invalidate only Direct Demand campaigns, we would like to show old programmatic campaign.
+            if (shouldInvalidate) {
+                SDKMetrics.reportMetricEvent(LoadV5.RefreshManagerCampaignFailedToInvalidate);
+                placement.setCurrentCampaign(undefined);
+                placement.setCurrentTrackingUrls(undefined);
+                this.setPlacementState(placementId, PlacementState.NO_FILL);
+            }
         }
     }
 }

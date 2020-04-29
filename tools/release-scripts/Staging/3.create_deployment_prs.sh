@@ -21,7 +21,7 @@ pr_message() {
 while IFS= read -r release
 do
     git checkout "staging/$release"
-    hub pull-request -b $release -h "staging/$release" -m "$(pr_message $release)"
+    hub pull-request -b $release -h "staging/$release" -m "$(pr_message $release)" --labels "Deploy"
     sleep 0.5
 done <"$releases"
 

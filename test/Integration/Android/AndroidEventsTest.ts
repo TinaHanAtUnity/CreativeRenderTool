@@ -6,7 +6,7 @@ import { IUnityAdsListener } from 'Backend/IUnityAdsListener';
 import { UnityAds } from 'Backend/UnityAds';
 import { assert } from 'chai';
 import { FinishState } from 'Core/Constants/FinishState';
-
+import { RequestManager, AuctionProtocol } from 'Core/Managers/RequestManager';
 import { Platform } from 'Core/Constants/Platform';
 import { ConfigManager } from 'Core/Managers/ConfigManager';
 import 'mocha';
@@ -140,6 +140,7 @@ describe('AndroidEventsTest', () => {
         ConfigManager.setTestBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
         CampaignManager.setBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
         ProgrammaticOperativeEventManager.setTestBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
+        RequestManager.setTestAuctionProtocol(AuctionProtocol.V4);
 
         UnityAds.initialize(Platform.ANDROID, currentGameId.toString(), listener, true);
     });

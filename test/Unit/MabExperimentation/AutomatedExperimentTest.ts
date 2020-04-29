@@ -1,6 +1,6 @@
 import { assert } from 'chai';
 import 'mocha';
-import { IExperimentDeclaration, IExperimentActionChoice, AutomatedExperiment } from 'Ads/Models/AutomatedExperiment';
+import { IExperimentDeclaration, IExperimentActionChoice, AutomatedExperiment } from 'MabExperimentation/Models/AutomatedExperiment';
 
 describe('AutomatedExperimentTest', () => {
     const FooExperimentDeclaration: IExperimentDeclaration = {
