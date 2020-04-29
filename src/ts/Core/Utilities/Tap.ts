@@ -10,13 +10,16 @@ export class Tap {
     private _onTouchMoveListener: ((event: TouchEvent) => unknown) | undefined;
     private _onTouchEndListener: ((event: TouchEvent) => unknown) | undefined;
     private _onTouchCancelListener: ((event: TouchEvent) => unknown) | undefined;
-    private supportsPassive = false;
+    private supportsPassive = false; // indicate if the browser supports passive event listener
 
     constructor(element: HTMLElement) {
         this._element = element;
         this._moved = false;
         this._startX = 0;
         this._startY = 0;
+
+        // Test via a getter in the options object to see if the passive property is accessed
+        // Details can be found here: https://github.com/WICG/EventListenerOptions/blob/gh-pages/explainer.md
         const opts = Object.defineProperty({}, 'passive', {
             get: () => {
                 this.supportsPassive = true;
@@ -24,6 +27,8 @@ export class Tap {
         });
         document.addEventListener('testPassive', (event) => { this.supportsPassive = false; }, opts);
         document.removeEventListener('testPassive', (event) => { this.supportsPassive = false; }, opts);
+
+        // Use the above detect's results. passive applied if supported, capture will be false either way.
         this._element.addEventListener('touchstart', (event) => this.onTouchStart(event), this.supportsPassive ? { passive: true } : false);
     }
 
