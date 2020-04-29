@@ -91,10 +91,11 @@ import { PerPlacementLoadAdapter } from 'Ads/Managers/PerPlacementLoadAdapter';
 import { PrivacyDataRequestHelper } from 'Privacy/PrivacyDataRequestHelper';
 import { MediationMetaData } from 'Core/Models/MetaData/MediationMetaData';
 import { MediationLoadTrackingManager, MediationExperimentType } from 'Ads/Managers/MediationLoadTrackingManager';
-import { CachedUserSummary } from 'Privacy/CachedUserSummary';
 import { createMeasurementsInstance } from 'Core/Utilities/TimeMeasurements';
 import { XHRequest } from 'Core/Utilities/XHRequest';
 import { LegacyCampaignManager } from 'Ads/Managers/LegacyCampaignManager';
+import { PrivacyTestEnvironment } from 'Privacy/PrivacyTestEnvironment';
+import { MetaData } from 'Core/Utilities/MetaData';
 import { AutomatedExperimentManager } from 'MabExperimentation/AutomatedExperimentManager';
 import { CampaignAssetInfo } from 'Ads/Utilities/CampaignAssetInfo';
 import { AdRequestManager } from 'Ads/Managers/AdRequestManager';
@@ -121,8 +122,6 @@ export class Ads implements IAds {
     public CampaignManager: CampaignManager;
     public RefreshManager: RefreshManager;
     public MediationLoadTrackingManager: MediationLoadTrackingManager;
-
-    private static _forcedConsentUnit: boolean = false;
 
     private _currentAdUnit: AbstractAdUnit;
     private _showing: boolean = false;
@@ -195,13 +194,15 @@ export class Ads implements IAds {
             GameSessionCounters.init();
             return this.setupTestEnvironment();
         }).then(() => {
+            this.setupPrivacyTestEnvironment();
+        }).then(() => {
             this.setupLoadApiEnabled();
             measurements.overrideTag('wel', `${this._webViewEnabledLoad}`);
         }).then(() => {
             return this.Analytics.initialize();
         }).then((gameSessionId: number) => {
             this.SessionManager.setGameSessionId(gameSessionId);
-            this.PrivacyManager = new UserPrivacyManager(this._core.NativeBridge.getPlatform(), this._core.Api, this._core.Config, this.Config, this._core.ClientInfo, this._core.DeviceInfo, this._core.RequestManager, this.PrivacySDK, Ads._forcedConsentUnit);
+            this.PrivacyManager = new UserPrivacyManager(this._core.NativeBridge.getPlatform(), this._core.Api, this._core.Config, this.Config, this._core.ClientInfo, this._core.DeviceInfo, this._core.RequestManager, this.PrivacySDK);
             this.PlacementManager = new PlacementManager(this.Api, this.Config);
 
             PrivacyMetrics.setGameSessionId(gameSessionId);
@@ -280,10 +281,6 @@ export class Ads implements IAds {
         }).then(() => {
             if (this.MediationLoadTrackingManager) {
                 this.MediationLoadTrackingManager.setInitComplete();
-            }
-
-            if (this.PrivacyManager.isPrivacySDKTestActive()) {
-                CachedUserSummary.fetch(this.PrivacyManager);
             }
 
             measurements = createMeasurementsInstance(InitializationMetric.WebviewInitializationPhases);
@@ -696,20 +693,10 @@ export class Ads implements IAds {
             MRAIDAdUnitParametersFactory.setForcedExtendedMRAID(TestEnvironment.get('forcedPlayableMRAID'));
         }
 
-        if (TestEnvironment.get('forcedGDPRBanner')) {
-            AbstractAdUnitParametersFactory.setForcedGDPRBanner(TestEnvironment.get('forcedGDPRBanner'));
-        }
-
         let forcedARMRAID = false;
         if (TestEnvironment.get('forcedARMRAID')) {
             forcedARMRAID = TestEnvironment.get('forcedARMRAID');
             MRAIDAdUnitParametersFactory.setForcedARMRAID(forcedARMRAID);
-        }
-
-        let forcedConsentUnit = false;
-        if (TestEnvironment.get('forcedConsent')) {
-            forcedConsentUnit = TestEnvironment.get('forcedConsent');
-            Ads._forcedConsentUnit = forcedConsentUnit;
         }
 
         if (TestEnvironment.get('creativeUrl')) {
@@ -750,6 +737,12 @@ export class Ads implements IAds {
         if (TestEnvironment.get('forceLoadV5')) {
             this._forceLoadV5 = true;
         }
+    }
+
+    private setupPrivacyTestEnvironment(): Promise<void> {
+        return PrivacyTestEnvironment.setup(new MetaData(this._core.Api)).catch(() => {
+            this._core.Api.Sdk.logDebug('Error setting metadata env for privacy');
+        });
     }
 
     private logChinaMetrics() {
