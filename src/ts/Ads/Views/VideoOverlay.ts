@@ -367,7 +367,7 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
         this._handlers.forEach(handler => handler.onOverlayPauseForTesting(true));
     }
 
-    protected onClick(event: Event) {
+    private onClick(event: Event) {
         if (this._disableFadeOutOnClick) {
             return;
         }
