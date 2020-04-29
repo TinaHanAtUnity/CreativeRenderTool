@@ -47,7 +47,7 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
     protected _callButtonVisible: boolean = false;
     private _callButtonEnabled: boolean = true;
 
-    protected _skipButtonElement: HTMLElement;
+    private _skipButtonElement: HTMLElement;
     private _spinnerElement: HTMLElement;
     private _muteButtonElement: HTMLElement;
     private _debugMessageElement: HTMLElement;
