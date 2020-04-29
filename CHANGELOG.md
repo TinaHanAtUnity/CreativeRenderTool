@@ -1,3 +1,24 @@
+# Pending
+
+* [Tencent clickThrough macros replacement] PR2: Refactor to add optional attachTap params for VastOverlay and VastEndscreen [#14971](https://github.com/Applifier/unity-ads-webview/pull/14971)
+* [Tencent clickThrough macros replacement] PR1: add more mock classes and methods [#14970](https://github.com/Applifier/unity-ads-webview/pull/14970)
+
+# Wed Apr 29 12:12:35 UTC 2020
+
+* Feature/privacy pre ad feature parity [#14744](https://github.com/Applifier/unity-ads-webview/pull/14744)
+
+# Tue Apr 28 23:21:53 UTC 2020
+
+* [AUI] Moved AUI/Optimization related files to own folder [#14743](https://github.com/Applifier/unity-ads-webview/pull/14743)
+* Add more fields to payload sent to ads-debot verify end point [#14940](https://github.com/Applifier/unity-ads-webview/pull/14940)
+* [Bug] Track Occurrences of Connection Required to Show Ad [#14936](https://github.com/Applifier/unity-ads-webview/pull/14936)
+* [China Auction]increase traffic to 10% [#14943](https://github.com/Applifier/unity-ads-webview/pull/14943)
+* [Mobilityware] Apply custom feature by organization ID [#14774](https://github.com/Applifier/unity-ads-webview/pull/14774)
+* [AdUnit] Support for an optional Ad Unit Id from Configuration response [#14713](https://github.com/Applifier/unity-ads-webview/pull/14713)
+* [PTS Migration] Remove View Events and Replace with Complete Events [#14939](https://github.com/Applifier/unity-ads-webview/pull/14939)
+* [Deployment Scripts] Add 5 seconds to sleep to avoid possible race condition [#14937](https://github.com/Applifier/unity-ads-webview/pull/14937)
+* [Bug] Track Occurrences of Connection Required to Show Ad [#14936](https://github.com/Applifier/unity-ads-webview/pull/14936)
+
 # Thu Apr 23 00:05:25 UTC 2020
 
 * [PTS Migration] Temporarily Add Tracking Events for MRAID and Display [#14908](https://github.com/Applifier/unity-ads-webview/pull/14908)

@@ -31,6 +31,7 @@ import { PrivacyMethod } from 'Privacy/Privacy';
 import { IStoreApi } from 'Store/IStore';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { OMID_P } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
+import { PrivacyTestEnvironment } from 'Privacy/PrivacyTestEnvironment';
 
 export interface IAbstractAdUnitParametersFactory<T1 extends Campaign, T2 extends IAdUnitParameters<T1>> {
     create(campaign: T1, placement: Placement, orientation: Orientation, playerMetadataServerId: string, options: unknown): T2;
@@ -64,10 +65,6 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
 
     private _playerMetadataServerId: string;
     private _options: unknown;
-
-    public static setForcedGDPRBanner(value: boolean) {
-        AbstractAdUnitParametersFactory._forceGDPRBanner = value;
-    }
 
     constructor(core: ICore, ads: IAds) {
         this._platform = core.NativeBridge.getPlatform();
@@ -161,7 +158,7 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
 
         if (this._coreConfig.isCoppaCompliant() ||  this._privacyManager.isUserUnderAgeLimit()) {
             privacy = new Privacy(this._platform, this._campaign, this._privacyManager, this._privacySDK.isGDPREnabled(), this._coreConfig.isCoppaCompliant(), this._deviceInfo.getLanguage());
-        } else if (this._privacySDK.getGamePrivacy().getMethod() === PrivacyMethod.UNITY_CONSENT || this._privacyManager._forcedConsentUnit) {
+        } else if (this._privacySDK.getGamePrivacy().getMethod() === PrivacyMethod.UNITY_CONSENT) {
             privacy = new PrivacySettings(this._platform, this._campaign, this._privacyManager, this._privacySDK.isGDPREnabled(), this._coreConfig.isCoppaCompliant(), this._deviceInfo.getLanguage());
         } else {
             privacy = new Privacy(this._platform, this._campaign, this._privacyManager, this._privacySDK.isGDPREnabled(), this._coreConfig.isCoppaCompliant(), this._deviceInfo.getLanguage());
@@ -182,8 +179,8 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
     }
 
     protected showGDPRBanner(parameters: IAdUnitParameters<Campaign>): boolean {
-        if (AbstractAdUnitParametersFactory._forceGDPRBanner) {
-            return true;
+        if (PrivacyTestEnvironment.isSet('showGDPRBanner')) {
+            return PrivacyTestEnvironment.get<boolean>('showGDPRBanner');
         }
 
         if (parameters.coreConfig.isCoppaCompliant()) {
