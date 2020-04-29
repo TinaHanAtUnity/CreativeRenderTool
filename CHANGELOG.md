@@ -1,3 +1,7 @@
+# Pending
+
+* Feature/privacy pre ad feature parity [#14744](https://github.com/Applifier/unity-ads-webview/pull/14744)
+
 # Tue Apr 28 23:21:53 UTC 2020
 
 * [AUI] Moved AUI/Optimization related files to own folder [#14743](https://github.com/Applifier/unity-ads-webview/pull/14743)
