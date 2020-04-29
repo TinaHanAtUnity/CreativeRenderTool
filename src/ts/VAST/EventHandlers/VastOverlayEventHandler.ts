@@ -24,7 +24,7 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
     private _request: RequestManager;
     private _vastCampaign: VastCampaign;
     private _moat?: MOAT;
-    private _vastOverlay?: AbstractVideoOverlay;
+    protected _vastOverlay?: AbstractVideoOverlay;
     private _gameSessionId?: number;
     private _abGroup: ABGroup;
     private _om?: VastOpenMeasurementController;
