@@ -56,7 +56,7 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
     private _chinaAdvertisementElement: HTMLElement;
 
     private _fadeTimer?: number;
-    protected _areControlsVisible: boolean = false;
+    private _areControlsVisible: boolean = false;
     private _gameId: string;
 
     private _country: string | undefined;
