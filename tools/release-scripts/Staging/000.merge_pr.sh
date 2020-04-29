@@ -36,7 +36,6 @@ echo "Attempt to merge PR locally..."
 git checkout master
 git pull
 
-hub merge $url
 hub api -XPUT repos/{owner}/{repo}/pulls/$pr/merge \ -f merge_method=squash
 
 if [ "$?" -ne "0" ]; then
