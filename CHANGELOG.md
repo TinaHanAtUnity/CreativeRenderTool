@@ -1,5 +1,9 @@
 # Pending
 
+* [Tencent clickThrough macros replacement] PR1: add more mock classes and methods [#14970](https://github.com/Applifier/unity-ads-webview/pull/14970)
+
+# Wed Apr 29 12:12:35 UTC 2020
+
 * Feature/privacy pre ad feature parity [#14744](https://github.com/Applifier/unity-ads-webview/pull/14744)
 
 # Tue Apr 28 23:21:53 UTC 2020
