@@ -199,7 +199,7 @@ export class CustomFeatures {
                gameId === '80222';   // Pocketgems, Episode (Google Play Store)
     }
 
-    public static shouldVideoOverlayRemainVisible(gameId: string): boolean {
-        return this.existsInList(MobilityWareGamesJson, gameId);
+    public static shouldVideoOverlayRemainVisible(orgId: string | undefined): boolean {
+        return orgId === '2878851';
     }
 }
