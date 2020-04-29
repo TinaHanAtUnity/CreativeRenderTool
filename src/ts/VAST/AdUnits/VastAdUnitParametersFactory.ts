@@ -11,14 +11,14 @@ import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 export class VastAdUnitParametersFactory extends AbstractAdUnitParametersFactory<VastCampaign, IVastAdUnitParameters> {
     protected createParameters(baseParams: IAdUnitParameters<VastCampaign>) {
         let showPrivacyDuringVideo = true;
-        const useTencentHandlers = CustomFeatures.isTencentSeat(baseParams.campaign.getSeatId());
+        const attachTapForTencentVast = CustomFeatures.isTencentSeat(baseParams.campaign.getSeatId());
 
         // hide privacy icon for China
         if (baseParams.adsConfig.getHidePrivacy()) {
             showPrivacyDuringVideo = false;
         }
 
-        const overlay = new VastVideoOverlay(baseParams, baseParams.privacy, this.showGDPRBanner(baseParams), showPrivacyDuringVideo, useTencentHandlers ? true : undefined);
+        const overlay = new VastVideoOverlay(baseParams, baseParams.privacy, this.showGDPRBanner(baseParams), showPrivacyDuringVideo, attachTapForTencentVast ? true : undefined);
 
         const vastAdUnitParameters: IVastAdUnitParameters = {
             ... baseParams,
@@ -27,7 +27,7 @@ export class VastAdUnitParametersFactory extends AbstractAdUnitParametersFactory
         };
 
         if (baseParams.campaign.hasStaticEndscreen()) {
-            vastAdUnitParameters.endScreen = new VastStaticEndScreen(baseParams, useTencentHandlers ? true : undefined);
+            vastAdUnitParameters.endScreen = new VastStaticEndScreen(baseParams, attachTapForTencentVast ? true : undefined);
         }
 
         const adVerifications: VastAdVerification[] = baseParams.campaign.getVast().getAdVerifications();

@@ -16,6 +16,7 @@ import { TencentVastEndScreenEventHandler } from 'VAST/EventHandlers/TencentVast
 export class VastAdUnitFactory extends AbstractAdUnitFactory<VastCampaign, IVastAdUnitParameters> {
 
     public createAdUnit(parameters: IVastAdUnitParameters): VastAdUnit {
+        const useTencentHandlers = CustomFeatures.isTencentSeat(parameters.campaign.getSeatId());
         const hasAdvertiserDomain = parameters.campaign.getAdvertiserDomain() !== undefined;
         if (hasAdvertiserDomain && parameters.campaign.isMoatEnabled()) {
             MoatViewabilityService.initMoat(parameters.platform, parameters.core, parameters.campaign, parameters.clientInfo, parameters.placement, parameters.deviceInfo, parameters.coreConfig);
@@ -24,7 +25,7 @@ export class VastAdUnitFactory extends AbstractAdUnitFactory<VastCampaign, IVast
         const vastAdUnit = new VastAdUnit(parameters);
 
         let vastOverlayHandler: VastOverlayEventHandler;
-        if (CustomFeatures.isTencentSeat(parameters.campaign.getSeatId())) {
+        if (useTencentHandlers) {
             vastOverlayHandler = new TencentVastOverlayEventHandler(vastAdUnit, parameters);
         } else {
             vastOverlayHandler = new VastOverlayEventHandler(vastAdUnit, parameters);
@@ -33,7 +34,7 @@ export class VastAdUnitFactory extends AbstractAdUnitFactory<VastCampaign, IVast
 
         if ((parameters.campaign.hasStaticEndscreen() || parameters.campaign.hasIframeEndscreen() || parameters.campaign.hasHtmlEndscreen()) && parameters.endScreen) {
             let vastEndScreenHandler: VastEndScreenEventHandler;
-            if (CustomFeatures.isTencentSeat(parameters.campaign.getSeatId())) {
+            if (useTencentHandlers) {
                 vastEndScreenHandler = new TencentVastEndScreenEventHandler(vastAdUnit, parameters);
             } else {
                 vastEndScreenHandler = new VastEndScreenEventHandler(vastAdUnit, parameters);
