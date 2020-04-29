@@ -14,6 +14,17 @@ export enum ErrorMetric {
     AttemptToStreamCampaignWithoutConnection = 'attempt_to_stream_campaign_without_connection'
 }
 
+export enum VideoMetric {
+    GenericError = 'video_player_generic_error',
+    PrepareError = 'video_player_prepare_error',
+    PrepareTimeout = 'video_player_prepare_timeout',
+    SeekToError = 'video_player_seek_to_error',
+    PauseError = 'video_player_pause_error',
+    IllegalStateError = 'video_player_illegal_state_error',
+    TooLongError = 'video_too_long',
+    PlayerStuck = 'video_player_stuck'
+}
+
 export enum AdmobMetric {
     AdmobVideoElementMissing = 'admob_video_element_missing',
     AdmobUsedCachedVideo = 'admob_used_cached_video',
@@ -201,7 +212,7 @@ export enum ChinaAucionEndpoint {
 
 export type TimingEvent = InitializationMetric | MediationMetric | GeneralTimingMetric;
 
-export type PTSEvent = TimingEvent | AuctionV6 | AdmobMetric | BannerMetric | CachingMetric | ChinaMetric | VastMetric | MraidMetric | MiscellaneousMetric | LoadMetric | ErrorMetric | OMMetric | AUIMetric | LoadV5 | ChinaAucionEndpoint;
+export type PTSEvent = VideoMetric | TimingEvent | AuctionV6 | AdmobMetric | BannerMetric | CachingMetric | ChinaMetric | VastMetric | MraidMetric | MiscellaneousMetric | LoadMetric | ErrorMetric | OMMetric | AUIMetric | LoadV5 | ChinaAucionEndpoint;
 
 export class SDKMetrics {
 

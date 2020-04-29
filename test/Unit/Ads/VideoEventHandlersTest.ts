@@ -56,6 +56,7 @@ import { VastEndScreen } from 'VAST/Views/VastEndScreen';
 import { IStoreApi } from 'Store/IStore';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { VastStaticEndScreen } from 'VAST/Views/VastStaticEndScreen';
+import { SDKMetrics } from 'Ads/Utilities/SDKMetrics';
 
 describe('Vast VideoEventHandlersTest', () => {
 
@@ -321,6 +322,7 @@ describe('Performance VideoEventHandlersTest', () => {
         core = TestFixtures.getCoreApi(nativeBridge);
         ads = TestFixtures.getAdsApi(nativeBridge);
         store = TestFixtures.getStoreApi(nativeBridge);
+        sinon.stub(SDKMetrics, 'reportMetricEvent').returns(Promise.resolve());
 
         storageBridge = new StorageBridge(core);
         focusManager = new FocusManager(platform, core);
