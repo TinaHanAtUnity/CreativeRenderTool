@@ -189,6 +189,11 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
         }
     }
 
+    public setVideoProgress(value: number): void {
+        this.handleVideoProgress(value);
+        this.handleVideoProgressButton();
+    }
+
     private handleVideoProgress (value: number) {
         if (VideoOverlay.AutoSkip) {
             this._handlers.forEach(handler => handler.onOverlaySkip(value));
@@ -228,11 +233,6 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
         if (this._campaign instanceof PerformanceCampaign || this._campaign instanceof XPromoCampaign) {
             this.showCallButton();
         }
-    }
-
-    public setVideoProgress(value: number): void {
-        this.handleVideoProgress(value);
-        this.handleVideoProgressButton();
     }
 
     public setMuteEnabled(value: boolean) {
