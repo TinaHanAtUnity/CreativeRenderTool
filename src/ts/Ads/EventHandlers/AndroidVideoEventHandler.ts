@@ -1,5 +1,6 @@
 import { BaseVideoEventHandler, IVideoEventHandlerParams } from 'Ads/EventHandlers/BaseVideoEventHandler';
 import { IAndroidVideoEventHandler } from 'Ads/Native/Android/VideoPlayer';
+import { VideoMetric } from 'Ads/Utilities/SDKMetrics';
 
 export class AndroidVideoEventHandler extends BaseVideoEventHandler implements IAndroidVideoEventHandler {
 
@@ -13,47 +14,26 @@ export class AndroidVideoEventHandler extends BaseVideoEventHandler implements I
 
     public onGenericError(url: string, what: number, extra: number): void {
         this._core.Sdk.logError('Unity Ads video player error ' + ' ' + what + ' ' + extra + ' ' + url);
-
-        this.handleVideoError('video_player_generic_error', {
-            'url': url,
-            'position': this._video.getPosition(),
-            'what': what,
-            'extra': extra
-        });
+        this.handleVideoError(VideoMetric.GenericError);
     }
 
     public onPrepareError(url: string): void {
         this._core.Sdk.logError('Unity Ads video player prepare error '  + url);
-
-        this.handleVideoError('video_player_prepare_error', {
-            'url': url,
-            'position': this._video.getPosition()
-        });
+        this.handleVideoError(VideoMetric.PrepareError);
     }
 
     public onSeekToError(url: string): void {
         this._core.Sdk.logError('Unity Ads video player seek to error '  + url);
-
-        this.handleVideoError('video_player_seek_to_error', {
-            'url': url,
-            'position': this._video.getPosition()
-        });
+        this.handleVideoError(VideoMetric.SeekToError);
     }
 
     public onPauseError(url: string): void {
         this._core.Sdk.logError('Unity Ads video player pause error '  + url);
-
-        this.handleVideoError('video_player_pause_error', {
-            'url': url,
-            'position': this._video.getPosition()
-        });
+        this.handleVideoError(VideoMetric.PauseError);
     }
 
     public onIllegalStateError(url: string, isPlaying: boolean): void {
         this._core.Sdk.logError('Unity Ads video player illegal state error');
-
-        this.handleVideoError('video_player_illegal_state_error', {
-            'position': this._video.getPosition()
-        });
+        this.handleVideoError(VideoMetric.IllegalStateError);
     }
 }

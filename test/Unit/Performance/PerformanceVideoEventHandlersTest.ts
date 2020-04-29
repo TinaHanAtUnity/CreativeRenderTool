@@ -30,6 +30,7 @@ import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { IStoreApi } from 'Store/IStore';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
+import { SDKMetrics } from 'Ads/Utilities/SDKMetrics';
 
 describe('PerformanceVideoEventHandlersTest', () => {
 
@@ -55,6 +56,7 @@ describe('PerformanceVideoEventHandlersTest', () => {
         core = TestFixtures.getCoreApi(nativeBridge);
         ads = TestFixtures.getAdsApi(nativeBridge);
         store = TestFixtures.getStoreApi(nativeBridge);
+        sinon.stub(SDKMetrics, 'reportMetricEvent').returns(Promise.resolve());
 
         storageBridge = new StorageBridge(core);
         container = new Activity(core, ads, TestFixtures.getAndroidDeviceInfo(core));
