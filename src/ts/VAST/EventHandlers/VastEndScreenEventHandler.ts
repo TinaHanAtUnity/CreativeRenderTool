@@ -15,7 +15,7 @@ import { IAdsApi } from 'Ads/IAds';
 import { Placement } from 'Ads/Models/Placement';
 
 export class VastEndScreenEventHandler implements IVastEndScreenHandler {
-    protected _vastAdUnit: VastAdUnit;
+    private _vastAdUnit: VastAdUnit;
     private _request: RequestManager;
     private _vastCampaign: VastCampaign;
     protected _vastEndScreen: VastEndScreen | null;
