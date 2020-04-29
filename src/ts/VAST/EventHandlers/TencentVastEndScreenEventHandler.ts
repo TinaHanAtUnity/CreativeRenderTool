@@ -3,17 +3,17 @@ import { TencentUtils } from 'VAST/Utilities/TencentUtils';
 import { Tap } from 'Core/Utilities/Tap';
 
 export class TencentVastEndScreenEventHandler extends VastEndScreenEventHandler {
-    public onVastEndScreenClick(): Promise<void> {
+    protected getClickThroughURL(): string | null {
         let tap: Tap | undefined;
         if (this._vastEndScreen) {
             tap = this._vastEndScreen.tap('.game-background');
         } else {
             tap = undefined;
         }
-        let clickThroughURL = this._vastAdUnit.getCompanionClickThroughUrl() || this._vastAdUnit.getVideoClickThroughURL();
+        let clickThroughURL = super.getClickThroughURL();
         if (clickThroughURL) {
             clickThroughURL = TencentUtils.replaceClickThroughMacro(clickThroughURL, tap);
         }
-        return this.onAssembleClickThroughURL(clickThroughURL);
+        return clickThroughURL;
     }
 }
