@@ -365,6 +365,7 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
         }
 
         this.resetFadeTimer();
+
         if (this._areControlsVisible) {
             this.fadeOut();
         } else {
