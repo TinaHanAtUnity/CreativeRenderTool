@@ -1,5 +1,5 @@
 import { VideoOverlay } from 'Ads/Views/VideoOverlay';
-import { IExperimentActionChoice } from 'Ads/Models/AutomatedExperiment';
+import { IExperimentActionChoice } from 'MabExperimentation/Models/AutomatedExperiment';
 import { Platform } from 'Core/Constants/Platform';
 import { IAdsApi } from 'Ads/IAds';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
@@ -7,7 +7,7 @@ import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { Placement } from 'Ads/Models/Placement';
 import { Campaign } from 'Ads/Models/Campaign';
-import { VideoOverlayDownloadExperiment, VideoOverlayDownloadExperimentDeclaration } from 'Ads/Models/AutomatedExperimentsList';
+import { VideoOverlayDownloadExperiment, VideoOverlayDownloadExperimentDeclaration } from 'MabExperimentation/Models/AutomatedExperimentsList';
 import { AUIMetric, SDKMetrics } from 'Ads/Utilities/SDKMetrics';
 import { AbstractPrivacy, IPrivacyHandlerView } from 'Ads/Views/AbstractPrivacy';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
