@@ -409,23 +409,17 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
         this._callButtonElement.classList.add('show-go-text');
     }
 
-    protected fadeIn() {
-        this.handleFadeIn();
-        this.handleFadeInButton();
-    }
-
-    protected handleFadeIn () {
+    private fadeIn() {
         if (!this._container) {
             return;
         }
         this._container.classList.add('fade-in');
         this._areControlsVisible = true;
-    }
 
-    protected handleFadeInButton() {
         if (this._campaign instanceof PerformanceCampaign || this._campaign instanceof XPromoCampaign) {
             return;
         }
+
         setTimeout(() => {
             this.showCallButton();
         }, 500);
