@@ -190,11 +190,8 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
     }
 
     public setVideoProgress(value: number): void {
-        this.findVideoProgress(value);
-        this.showCTAButtonAtCheckpoint();
-    }
-
-    private findVideoProgress (value: number) {
+        // this.findVideoProgress(value);
+        // this.showCTAButtonAtCheckpoint();
         if (VideoOverlay.AutoSkip) {
             this._handlers.forEach(handler => handler.onOverlaySkip(value));
         }
@@ -220,14 +217,18 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
             this._chinaAdvertisementElement.classList.add('with-skip-button');
         }
 
-    }
-
-    protected showCTAButtonAtCheckpoint() {
         if (!this._skipEnabled && this._videoProgress > 5000) {
             this.showCTAButton();
             return;
         }
+
     }
+    // private findVideoProgress (value: number) {
+    //       }
+
+    // protected showCTAButtonAtCheckpoint() {
+    
+    // }
 
     protected showCTAButton() {
         if (this._campaign instanceof PerformanceCampaign || this._campaign instanceof XPromoCampaign) {
