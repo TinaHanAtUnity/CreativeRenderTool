@@ -20,13 +20,17 @@ export class Tap {
 
         // Test via a getter in the options object to see if the passive property is accessed
         // Details can be found here: https://github.com/WICG/EventListenerOptions/blob/gh-pages/explainer.md
-        const opts = Object.defineProperty({}, 'passive', {
-            get: () => {
-                this.supportsPassive = true;
-            }
-        });
-        document.addEventListener('testPassive', (event) => { this.supportsPassive = false; }, opts);
-        document.removeEventListener('testPassive', (event) => { this.supportsPassive = false; }, opts);
+        try {
+            const opts = Object.defineProperty({}, 'passive', {
+                get: () => {
+                    this.supportsPassive = true;
+                }
+            });
+            document.addEventListener('testPassive', (event) => { this.supportsPassive = false; }, opts);
+            document.removeEventListener('testPassive', (event) => { this.supportsPassive = false; }, opts);
+        } catch (e) {
+            this.supportsPassive = false;
+        }
 
         // Use the above detect's results. passive applied if supported, capture will be false either way.
         this._element.addEventListener('touchstart', (event) => this.onTouchStart(event), this.supportsPassive ? { passive: true } : false);
