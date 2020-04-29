@@ -52,15 +52,11 @@ import { TencentVastOverlayEventHandler } from 'VAST/EventHandlers/TencentVastOv
         });
 
         describe('when call button get clicked and there is no click through url', () => {
-            it('the error message should be returned to indicate the url is null',  () => {
+            it('the error message should be returned to indicate the url is null',  async () => {
                 const vastAdUnit = new VastAdUnit();
                 vastAdUnit.getVideoClickThroughURL.mockReturnValue(null);
                 vastTencentOverlayHandler = new TencentVastOverlayEventHandler(vastAdUnit, baseParams);
-                vastTencentOverlayHandler.onOverlayCallButton().catch((error) => {
-                    expect(error).toEqual(new Error('No clickThroughURL was defined'));
-                }).then(() => {
-                    expect.hasAssertions();
-                });
+                await expect(vastTencentOverlayHandler.onOverlayCallButton()).rejects.toEqual(new Error('No clickThroughURL was defined'));
             });
         });
 

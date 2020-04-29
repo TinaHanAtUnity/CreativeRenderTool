@@ -52,16 +52,12 @@ import { VastAdUnit } from 'VAST/AdUnits/__mocks__/VastAdUnit';
         });
 
         describe('when onVastEndScreenClick happens and there is no click through url', () => {
-            it('the error message should be returned to indicate the url is null',  () => {
+            it('the error message should be returned to indicate the url is null',  async () => {
                 const vastAdUnit = new VastAdUnit();
                 vastAdUnit.getCompanionClickThroughUrl.mockReturnValue(null);
                 vastAdUnit.getVideoClickThroughURL.mockReturnValue(null);
                 vastTencentEndScreenHandler = new TencentVastEndScreenEventHandler(vastAdUnit, baseParams);
-                vastTencentEndScreenHandler.onVastEndScreenClick().catch((error) => {
-                    expect(error).toEqual(new Error('There is no clickthrough URL for video or companion'));
-                }).then(() => {
-                    expect.hasAssertions();
-                });
+                await expect(vastTencentEndScreenHandler.onVastEndScreenClick()).rejects.toEqual(new Error('There is no clickthrough URL for video or companion'));
             });
         });
 
