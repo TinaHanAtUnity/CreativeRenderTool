@@ -102,10 +102,10 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
             (<HTMLElement> this._container.querySelector('.btn-close-region')).style.display = 'none';
         }
 
-        const ctaButtonColor = this._adUnitStyle && this._adUnitStyle.getCTAButtonColor() ? this._adUnitStyle.getCTAButtonColor() : undefined;
-        if (ctaButtonColor) {
-            (<HTMLElement> this._container.querySelector('.download-container')).style.background = ctaButtonColor;
-        }
+        // const ctaButtonColor = this._adUnitStyle && this._adUnitStyle.getCTAButtonColor() ? this._adUnitStyle.getCTAButtonColor() : undefined;
+        // if (ctaButtonColor) {
+        //     (<HTMLElement> this._container.querySelector('.download-container')).style.background = ctaButtonColor;
+        // }
 
         const endScreenAlt = this.getEndscreenAlt();
         if (typeof endScreenAlt === 'string') {

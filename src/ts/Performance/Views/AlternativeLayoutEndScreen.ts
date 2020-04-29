@@ -68,6 +68,7 @@ export class AlternativeLayoutEndScreen extends PerformanceEndScreen {
 
     public render(): void {
         super.render();
+        this.renderColorTheme();
     }
 
     private applyAlternativeLayout() {
@@ -122,7 +123,9 @@ export class AlternativeLayoutEndScreen extends PerformanceEndScreen {
             return;
         }
 
-        const backgroundElement: HTMLElement | null = this._container.querySelector('.end-screen-info-background');
+        console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>',baseColorTheme)
+
+        const gameInfoContainer: HTMLElement | null = this._container.querySelector('.game-info-container');
         const downloadContainer: HTMLElement | null = this._container.querySelector('.download-container');
         const gameNameContainer: HTMLElement | null = this._container.querySelector('.name-container');
         const gameRatingContainer: HTMLElement | null = this._container.querySelector('.game-rating-count');
@@ -130,16 +133,18 @@ export class AlternativeLayoutEndScreen extends PerformanceEndScreen {
         const unityIconContainer: HTMLElement | null = this._container.querySelector('.bottom-container .unityads-logo');
         const chinaAdvertisementElement: HTMLElement | null = this._container.querySelector('.bottom-container .china-advertisement');
 
-        if (backgroundElement && downloadContainer && gameNameContainer && gameRatingContainer && privacyIconContainer && unityIconContainer && chinaAdvertisementElement) {
+        gameInfoContainer ? gameInfoContainer.style.background = baseColorTheme.medium.toCssRgb() : null;
+        downloadContainer ? downloadContainer.style.color = baseColorTheme.medium.toCssRgb() : null;
+        
+        if (gameInfoContainer && downloadContainer && gameNameContainer && gameRatingContainer && privacyIconContainer && unityIconContainer && chinaAdvertisementElement) {
             const secondary = Color.lerp(secondaryColorTheme.light, secondaryColorTheme.medium, 0.3);
             const baseDark = baseColorTheme.dark.toCssRgb();
-            backgroundElement.style.background = `linear-gradient(${secondary.toCssRgb()},${baseColorTheme.light.toCssRgb()})`;
-            downloadContainer.style.background = baseColorTheme.medium.toCssRgb();
-            gameNameContainer.style.color = baseDark;
-            gameRatingContainer.style.color = baseDark;
-            privacyIconContainer.style.color = baseDark;
-            unityIconContainer.style.color = baseDark;
-            chinaAdvertisementElement.style.color = baseDark;
+            // backgroundElement.style.background = `linear-gradient(${secondary.toCssRgb()},${baseColorTheme.light.toCssRgb()})`;
+            // gameNameContainer.style.color = baseDark;
+            // gameRatingContainer.style.color = baseDark;
+            // privacyIconContainer.style.color = baseDark;
+            // unityIconContainer.style.color = baseDark;
+            // chinaAdvertisementElement.style.color = baseDark;
         } else {
             SDKMetrics.reportMetricEvent(AUIMetric.EndscreenColorTintThemingFailed);
         }
