@@ -1,6 +1,7 @@
 import { VideoState } from 'Ads/AdUnits/VideoAdUnit';
 import { BaseVideoEventHandler, IVideoEventHandlerParams } from 'Ads/EventHandlers/BaseVideoEventHandler';
 import { IIosVideoEventHandler } from 'Ads/Native/iOS/VideoPlayer';
+import { VideoMetric } from 'Ads/Utilities/SDKMetrics';
 
 export class IosVideoEventHandler extends BaseVideoEventHandler implements IIosVideoEventHandler {
 
@@ -26,11 +27,6 @@ export class IosVideoEventHandler extends BaseVideoEventHandler implements IIosV
 
     public onGenericError(url: string, description: string): void {
         this._core.Sdk.logError('Unity Ads video player generic error '  + url + ' ' + description);
-
-        this.handleVideoError('video_player_generic_error', {
-            'url': url,
-            'position': this._video.getPosition(),
-            'description': description
-        });
+        this.handleVideoError(VideoMetric.GenericError);
     }
 }
