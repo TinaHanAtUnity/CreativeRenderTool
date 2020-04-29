@@ -190,11 +190,11 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
     }
 
     public setVideoProgress(value: number): void {
-        this.handleVideoProgress(value);
-        this.handleVideoProgressButton();
+        this.findVideoProgress(value);
+        this.showCTAButtonAtCheckpoint();
     }
 
-    private handleVideoProgress (value: number) {
+    private findVideoProgress (value: number) {
         if (VideoOverlay.AutoSkip) {
             this._handlers.forEach(handler => handler.onOverlaySkip(value));
         }
@@ -222,7 +222,7 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
 
     }
 
-    protected handleVideoProgressButton() {
+    protected showCTAButtonAtCheckpoint() {
         if (!this._skipEnabled && this._videoProgress > 5000) {
             this.showCTAButton();
             return;
@@ -390,14 +390,14 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
         this._chinaAdvertisementElement = <HTMLLIElement> this._container.querySelector('.china-advertisement');
     }
 
-    protected showSkipButton() {
+    private showSkipButton() {
         if (this._skipEnabled) {
             this._skipButtonElement.classList.add('show-skip-button');
             this.showCTAButton();
         }
     }
 
-    protected resetFadeTimer() {
+    private resetFadeTimer() {
         if (this._fadeTimer) {
             clearTimeout(this._fadeTimer);
             this._fadeTimer = undefined;
@@ -425,7 +425,7 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
         }, 500);
     }
 
-    protected fadeOut() {
+    private fadeOut() {
         this._container.classList.remove('fade-in');
         this._areControlsVisible = false;
     }
