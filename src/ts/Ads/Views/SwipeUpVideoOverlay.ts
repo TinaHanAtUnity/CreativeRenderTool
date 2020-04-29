@@ -78,7 +78,16 @@ export class SwipeUpVideoOverlay extends VideoOverlay {
         }
     }
 
-    protected handleFadeInButton() {
+    protected fadeIn() {
+        if (!this._container) {
+            return;
+        }
+        this._container.classList.add('fade-in');
+        this._areControlsVisible = true;
+
+        if (this._campaign instanceof PerformanceCampaign || this._campaign instanceof XPromoCampaign) {
+            return;
+        }
         if (this._ctaMode === 'click') {
             setTimeout(() => {
                 this.showCallButton();
