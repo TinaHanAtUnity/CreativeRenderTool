@@ -44,6 +44,8 @@ if [ "$?" -ne "0" ]; then
     exit
 fi
 
+git pull
+
 echo "Updating changelog..."
 
 log=$(hub pr show -f '* %t [%i](%U)' $pr)
