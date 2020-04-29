@@ -79,7 +79,7 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
         this._useCloseIconInsteadOfSkipIcon = parameters.placement.useCloseIconInsteadOfSkipIcon();
 
         //Disable click fadeout for placements that disabled overlay fadeout for Mobilityware
-        this._disableFadeOutOnClick = CustomFeatures.shouldVideoOverlayRemainVisible(this._gameId) && parameters.placement.disableVideoControlsFade();
+        this._disableFadeOutOnClick = CustomFeatures.shouldVideoOverlayRemainVisible(parameters.coreConfig.getOrganizationId()) && parameters.placement.disableVideoControlsFade();
 
         this._templateData = {
             muted: parameters.placement.muteVideo()

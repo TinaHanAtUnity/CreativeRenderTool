@@ -1,4 +1,10 @@
-import { GDPREventAction, GDPREventSource, LegalFramework, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
+import {
+    AgeGateChoice,
+    GDPREventAction,
+    GDPREventSource,
+    LegalFramework,
+    UserPrivacyManager
+} from 'Ads/Managers/UserPrivacyManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { GamePrivacy, IPrivacyPermissions, PrivacyMethod, UserPrivacy } from 'Privacy/Privacy';
 import { Backend } from 'Backend/Backend';
@@ -77,7 +83,7 @@ describe('UserPrivacyManagerTest', () => {
            ads: false,
            gameExp: false,
            external: false,
-           agreedOverAgeLimit: false,
+           ageGateChoice: AgeGateChoice.MISSING,
            agreementMethod: ''
         });
         privacySDK.getUserPrivacy.returns(userPrivacy);
@@ -598,7 +604,7 @@ describe('UserPrivacyManagerTest', () => {
                 assert.fail('Should throw error');
             }).catch((error) => {
                 assert.equal(error, 'Test Error');
-                sinon.assert.calledWith(logErrorStub, 'Gdpr request failedTest Error');
+                sinon.assert.calledWith(logErrorStub, 'User summary request failedTest Error');
             });
         });
     });
@@ -927,7 +933,7 @@ describe('UserPrivacyManagerTest', () => {
                    ads: false,
                    external: false,
                    gameExp: false,
-                   agreedOverAgeLimit: false,
+                   ageGateChoice: AgeGateChoice.MISSING,
                    agreementMethod: ''
                });
             });

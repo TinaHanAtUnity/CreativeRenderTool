@@ -15,6 +15,6 @@ export const ListenerApi = jest.fn(() => {
         sendFinishEvent: jest.fn().mockImplementation(() => Promise.resolve()),
         sendPlacementStateChangedEvent: jest.fn().mockImplementation(() => Promise.resolve()),
         sendReadyEvent: jest.fn().mockImplementation(() => Promise.resolve()),
-        sendClickEvent: jest.fn()
+        sendClickEvent: jest.fn().mockImplementation(() => Promise.resolve())
     };
 });

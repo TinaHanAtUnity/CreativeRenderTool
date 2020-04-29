@@ -40,7 +40,6 @@ export enum TrackingEvent {
     COMPLETE = 'complete',
     ERROR = 'error',
     SKIP = 'skip',
-    VIEW = 'view',
     STALLED = 'stalled',
     COMPANION_CLICK = 'companionClick',
     COMPANION = 'companion',

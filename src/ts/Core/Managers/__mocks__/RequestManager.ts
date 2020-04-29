@@ -10,6 +10,6 @@ export const RequestManager = jest.fn(() => {
     return <RequestManagerMock>{
         get: jest.fn().mockResolvedValue(Promise.resolve()),
         post: jest.fn().mockResolvedValue(Promise.resolve()),
-        followRedirectChain: jest.fn().mockResolvedValue(Promise.resolve('url'))
+        followRedirectChain: jest.fn().mockResolvedValue(Promise.resolve(''))
     };
 });
