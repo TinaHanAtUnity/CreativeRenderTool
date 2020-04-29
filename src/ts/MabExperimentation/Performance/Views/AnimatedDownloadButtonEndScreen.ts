@@ -1,10 +1,10 @@
 import { IEndScreenParameters } from 'Ads/Views/EndScreen';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { PerformanceEndScreen, SQUARE_END_SCREEN } from 'Performance/Views/PerformanceEndScreen';
-import EndScreenAnimatedDownloadButton from 'html/EndScreenAnimatedDownloadButton.html';
-import SquareEndScreenAnimatedDownloadButtonTemplate from 'html/SquareEndScreenAnimatedDownloadButton.html';
-import { IExperimentActionChoice } from 'Ads/Models/AutomatedExperiment';
-import { ButtonExperimentDeclaration, ButtonAnimationsExperiment } from 'Ads/Models/AutomatedExperimentsList';
+import EndScreenAnimatedDownloadButton from 'html/mabexperimentation/EndScreenAnimatedDownloadButton.html';
+import SquareEndScreenAnimatedDownloadButtonTemplate from 'html/mabexperimentation/SquareEndScreenAnimatedDownloadButton.html';
+import { IExperimentActionChoice } from 'MabExperimentation/Models/AutomatedExperiment';
+import { ButtonExperimentDeclaration, ButtonAnimationsExperiment } from 'MabExperimentation/Models/AutomatedExperimentsList';
 import { AUIMetric, SDKMetrics } from 'Ads/Utilities/SDKMetrics';
 import { Color } from 'Core/Utilities/Color';
 import { ImageAnalysis } from 'Performance/Utilities/ImageAnalysis';

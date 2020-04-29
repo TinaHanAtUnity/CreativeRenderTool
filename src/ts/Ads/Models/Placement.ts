@@ -29,6 +29,7 @@ export interface IRawPlacement {
     position?: string;
     auctionType?: string;
     banner?: { refreshRate?: number };
+    adUnitId?: string;
 }
 
 export interface IPlacement {
@@ -58,6 +59,7 @@ export interface IPlacement {
     position: string | undefined;
     auctionType: PlacementAuctionType;
     bannerRefreshRate: number | undefined;
+    adUnitId: string | undefined;
 
     invalidationPending: boolean;
 }
@@ -86,6 +88,7 @@ export class Placement extends Model<IPlacement> {
             position: ['string', 'undefined'],
             auctionType: ['string'],
             bannerRefreshRate: ['number', 'undefined'],
+            adUnitId: ['string', 'undefined'],
             invalidationPending: ['boolean']
         });
 
@@ -121,6 +124,7 @@ export class Placement extends Model<IPlacement> {
             this.set('bannerRefreshRate', data.banner.refreshRate);
         }
 
+        this.set('adUnitId', data.adUnitId);
         this.set('invalidationPending', false);
     }
 
@@ -242,6 +246,17 @@ export class Placement extends Model<IPlacement> {
 
     public setInvalidationPending(value: boolean) {
         this.set('invalidationPending', value);
+    }
+
+    public getAdUnitId(): string | undefined {
+        return this.get('adUnitId');
+    }
+
+    public hasAdUnitId(): boolean {
+        if (this.getAdUnitId()) {
+            return true;
+        }
+        return false;
     }
 
     public getDTO(): { [key: string]: unknown } {
