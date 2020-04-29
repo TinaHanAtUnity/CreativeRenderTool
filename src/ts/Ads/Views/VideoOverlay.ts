@@ -409,6 +409,11 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
         this._callButtonElement.classList.add('show-go-text');
     }
 
+    protected fadeIn() {
+        this.handleFadeIn();
+        this.handleFadeInButton();
+    }
+
     protected handleFadeIn () {
         if (!this._container) {
             return;
@@ -425,11 +430,6 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
         setTimeout(() => {
             this.showCallButton();
         }, 500);
-    }
-
-    protected fadeIn() {
-        this.handleFadeIn();
-        this.handleVideoProgressButton();
     }
 
     protected fadeOut() {
