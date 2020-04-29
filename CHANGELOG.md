@@ -1,5 +1,6 @@
 # Pending
 
+* [Tencent clickThrough macros replacement] PR5: Introduce Tencent specific EventHandlers and utils [#14974](https://github.com/Applifier/unity-ads-webview/pull/14974)
 * [Tencent clickThrough macros replacement] PR4: Improvement for Tap and View class [#14973](https://github.com/Applifier/unity-ads-webview/pull/14973)
 * [Tencent clickThrough macros replacement] PR3: Refactor VastOverlayEventHandler and VastEndScreenEventHandler [#14972](https://github.com/Applifier/unity-ads-webview/pull/14972)
 * [Tencent clickThrough macros replacement] PR2: Refactor to add optional attachTap params for VastOverlay and VastEndscreen [#14971](https://github.com/Applifier/unity-ads-webview/pull/14971)
