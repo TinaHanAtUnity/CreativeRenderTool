@@ -70,6 +70,10 @@ read -p 'Press any button to push changes to upstream' answer < /dev/tty
 
 git push
 
+# Allow GitHub enough time to process git push and close PR
+echo "Allow enough time for GitHub to process git push and close PR. Wating 5 seconds..."
+sleep 5
+
 echo "Deleting remote branch..."
 git push origin --delete $branch
 

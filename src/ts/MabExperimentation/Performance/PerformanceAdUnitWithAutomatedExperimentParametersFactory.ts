@@ -3,15 +3,15 @@ import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
 import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
 import { IEndScreenParameters } from 'Ads/Views/EndScreen';
 import { ICore } from 'Core/ICore';
-import { AnimatedDownloadButtonEndScreen } from 'Performance/Views/AnimatedDownloadButtonEndScreen';
-import { AutomatedExperimentManager } from 'Ads/Managers/AutomatedExperimentManager';
-import { AutomatedExperimentsCategories } from 'Ads/Models/AutomatedExperimentsList';
+import { AnimatedDownloadButtonEndScreen } from 'MabExperimentation/Performance/Views/AnimatedDownloadButtonEndScreen';
+import { AutomatedExperimentManager } from 'MabExperimentation/AutomatedExperimentManager';
+import { AutomatedExperimentsCategories } from 'MabExperimentation/Models/AutomatedExperimentsList';
 import { PerformanceAdUnitParametersFactory } from 'Performance/AdUnits/PerformanceAdUnitParametersFactory';
-import { IExperimentActionChoice } from 'Ads/Models/AutomatedExperiment';
 import { Campaign } from 'Ads/Models/Campaign';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { VideoOverlay } from 'Ads/Views/VideoOverlay';
 import { SwipeUpVideoOverlay } from 'Ads/Views/SwipeUpVideoOverlay';
+import { IExperimentActionChoice } from 'MabExperimentation/Models/AutomatedExperiment';
 
 export class PerformanceAdUnitWithAutomatedExperimentParametersFactory extends PerformanceAdUnitParametersFactory {
 

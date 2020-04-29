@@ -74,7 +74,7 @@ import { MRAIDAdUnitParametersFactory } from 'MRAID/AdUnits/MRAIDAdUnitParameter
 import { PrivacyUnit } from 'Ads/AdUnits/PrivacyUnit';
 import { IStore } from 'Store/IStore';
 import { Store } from 'Store/Store';
-import { RequestManager } from 'Core/Managers/RequestManager';
+import { RequestManager, AuctionProtocol } from 'Core/Managers/RequestManager';
 import { AbstractAdUnitParametersFactory } from 'Ads/AdUnits/AdUnitParametersFactory';
 import { LoadApi } from 'Core/Native/LoadApi';
 import { RefreshManager } from 'Ads/Managers/RefreshManager';
@@ -91,11 +91,12 @@ import { PerPlacementLoadAdapter } from 'Ads/Managers/PerPlacementLoadAdapter';
 import { PrivacyDataRequestHelper } from 'Privacy/PrivacyDataRequestHelper';
 import { MediationMetaData } from 'Core/Models/MetaData/MediationMetaData';
 import { MediationLoadTrackingManager, MediationExperimentType } from 'Ads/Managers/MediationLoadTrackingManager';
-import { CachedUserSummary } from 'Privacy/CachedUserSummary';
 import { createMeasurementsInstance } from 'Core/Utilities/TimeMeasurements';
 import { XHRequest } from 'Core/Utilities/XHRequest';
 import { LegacyCampaignManager } from 'Ads/Managers/LegacyCampaignManager';
-import { AutomatedExperimentManager } from 'Ads/Managers/AutomatedExperimentManager';
+import { PrivacyTestEnvironment } from 'Privacy/PrivacyTestEnvironment';
+import { MetaData } from 'Core/Utilities/MetaData';
+import { AutomatedExperimentManager } from 'MabExperimentation/AutomatedExperimentManager';
 import { CampaignAssetInfo } from 'Ads/Utilities/CampaignAssetInfo';
 import { AdRequestManager } from 'Ads/Managers/AdRequestManager';
 import { PerPlacementLoadManagerV5 } from 'Ads/Managers/PerPlacementLoadManagerV5';
@@ -121,8 +122,6 @@ export class Ads implements IAds {
     public CampaignManager: CampaignManager;
     public RefreshManager: RefreshManager;
     public MediationLoadTrackingManager: MediationLoadTrackingManager;
-
-    private static _forcedConsentUnit: boolean = false;
 
     private _currentAdUnit: AbstractAdUnit;
     private _showing: boolean = false;
@@ -184,7 +183,7 @@ export class Ads implements IAds {
         this.SessionManager = new SessionManager(this._core.Api, this._core.RequestManager, this._core.StorageBridge);
         this.MissedImpressionManager = new MissedImpressionManager(this._core.Api);
         this.ContentTypeHandlerManager = new ContentTypeHandlerManager();
-        this.ThirdPartyEventManagerFactory = new ThirdPartyEventManagerFactory(this._core.Api, this._core.RequestManager);
+        this.ThirdPartyEventManagerFactory = new ThirdPartyEventManagerFactory(this._core.Api, this._core.RequestManager, this._core.StorageBridge);
         this._automatedExperimentManager = new AutomatedExperimentManager();
     }
 
@@ -195,13 +194,15 @@ export class Ads implements IAds {
             GameSessionCounters.init();
             return this.setupTestEnvironment();
         }).then(() => {
+            this.setupPrivacyTestEnvironment();
+        }).then(() => {
             this.setupLoadApiEnabled();
             measurements.overrideTag('wel', `${this._webViewEnabledLoad}`);
         }).then(() => {
             return this.Analytics.initialize();
         }).then((gameSessionId: number) => {
             this.SessionManager.setGameSessionId(gameSessionId);
-            this.PrivacyManager = new UserPrivacyManager(this._core.NativeBridge.getPlatform(), this._core.Api, this._core.Config, this.Config, this._core.ClientInfo, this._core.DeviceInfo, this._core.RequestManager, this.PrivacySDK, Ads._forcedConsentUnit);
+            this.PrivacyManager = new UserPrivacyManager(this._core.NativeBridge.getPlatform(), this._core.Api, this._core.Config, this.Config, this._core.ClientInfo, this._core.DeviceInfo, this._core.RequestManager, this.PrivacySDK);
             this.PlacementManager = new PlacementManager(this.Api, this.Config);
 
             PrivacyMetrics.setGameSessionId(gameSessionId);
@@ -209,7 +210,7 @@ export class Ads implements IAds {
             PrivacyMetrics.setAbGroup(this._core.Config.getAbGroup());
             PrivacyMetrics.setSubdivision(this._core.Config.getSubdivision());
 
-            PrivacyDataRequestHelper.init(this._core);
+            PrivacyDataRequestHelper.init(this._core, this.PrivacyManager, this.PrivacySDK);
         }).then(() => {
             return this.setupMediationTrackingManager();
         }).then(() => {
@@ -280,10 +281,6 @@ export class Ads implements IAds {
         }).then(() => {
             if (this.MediationLoadTrackingManager) {
                 this.MediationLoadTrackingManager.setInitComplete();
-            }
-
-            if (this.PrivacyManager.isPrivacySDKTestActive()) {
-                CachedUserSummary.fetch(this.PrivacyManager);
             }
 
             measurements = createMeasurementsInstance(InitializationMetric.WebviewInitializationPhases);
@@ -558,15 +555,19 @@ export class Ads implements IAds {
                 playerMetadataServerId = playerMetadata.getServerId();
             }
 
+            const isAttemptingToStreamAssets: boolean = !CampaignAssetInfo.isCached(campaign) || campaign.isConnectionNeeded();
+            const hasNoConnection: boolean = connectionType === 'none';
+
+            if (isAttemptingToStreamAssets && hasNoConnection) {
+                // Track to understand impact before blocking show by new criteria
+                SDKMetrics.reportMetricEventWithTags(ErrorMetric.AttemptToStreamCampaignWithoutConnection, {
+                    'cnt': campaign.getContentType()
+                });
+            }
+
             if (campaign.isConnectionNeeded() && connectionType === 'none') {
                 this._showing = false;
                 this.showError(true, placement.getId(), 'No connection');
-
-                const error = new DiagnosticError(new Error('No connection is available'), {
-                    id: campaign.getId()
-                });
-                SessionDiagnostics.trigger('mraid_no_connection', error, campaign.getSession());
-                // If there is no connection, would this metric even be fired? If it does, then maybe we should investigate enabling this regardless of connection
                 SDKMetrics.reportMetricEvent(ErrorMetric.NoConnectionWhenNeeded);
                 return;
             }
@@ -692,25 +693,14 @@ export class Ads implements IAds {
             MRAIDAdUnitParametersFactory.setForcedExtendedMRAID(TestEnvironment.get('forcedPlayableMRAID'));
         }
 
-        if (TestEnvironment.get('forcedGDPRBanner')) {
-            AbstractAdUnitParametersFactory.setForcedGDPRBanner(TestEnvironment.get('forcedGDPRBanner'));
-        }
-
         let forcedARMRAID = false;
         if (TestEnvironment.get('forcedARMRAID')) {
             forcedARMRAID = TestEnvironment.get('forcedARMRAID');
             MRAIDAdUnitParametersFactory.setForcedARMRAID(forcedARMRAID);
         }
 
-        let forcedConsentUnit = false;
-        if (TestEnvironment.get('forcedConsent')) {
-            forcedConsentUnit = TestEnvironment.get('forcedConsent');
-            Ads._forcedConsentUnit = forcedConsentUnit;
-        }
-
         if (TestEnvironment.get('creativeUrl')) {
-            // reset auction protocol to allow changing between creativeUrl and creativePack modes
-            RequestManager.setTestAuctionProtocol(undefined);
+            RequestManager.setTestAuctionProtocol(AuctionProtocol.V4);
 
             const creativeUrl = TestEnvironment.get<string>('creativeUrl');
             let response: string = '';
@@ -732,8 +722,7 @@ export class Ads implements IAds {
 
         const creativePack: string = TestEnvironment.get('creativePack');
         if (creativePack) {
-            // reset auction protocol to allow changing between creativeUrl and creativePack modes
-            RequestManager.setTestAuctionProtocol(undefined);
+            RequestManager.setTestAuctionProtocol(AuctionProtocol.V5);
 
             const platform = this._core.NativeBridge.getPlatform();
             const response = CampaignResponseUtils.getVideoCreativePackResponse(platform, creativePack);
@@ -748,6 +737,12 @@ export class Ads implements IAds {
         if (TestEnvironment.get('forceLoadV5')) {
             this._forceLoadV5 = true;
         }
+    }
+
+    private setupPrivacyTestEnvironment(): Promise<void> {
+        return PrivacyTestEnvironment.setup(new MetaData(this._core.Api)).catch(() => {
+            this._core.Api.Sdk.logDebug('Error setting metadata env for privacy');
+        });
     }
 
     private logChinaMetrics() {

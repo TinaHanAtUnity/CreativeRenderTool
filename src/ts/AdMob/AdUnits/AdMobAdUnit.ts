@@ -162,14 +162,11 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         this._operativeEventManager.sendSkip(this.getOperativeEventParams());
     }
 
-    public sendCompleteEvent() {
-        this.sendTrackingEvent(TrackingEvent.COMPLETE);
-    }
-
     public sendRewardEvent() {
         const params = this.getOperativeEventParams();
         this._operativeEventManager.sendThirdQuartile(params);
         this._operativeEventManager.sendView(params);
+        this.sendTrackingEvent(TrackingEvent.COMPLETE);
         if (this._isRewardedPlacement) {
             SDKMetrics.reportMetricEvent(AdmobMetric.AdmobUserWasRewarded);
         }
@@ -312,8 +309,6 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
 
         if (this.getFinishState() === FinishState.SKIPPED) {
             this.sendSkipEvent();
-        } else if (this.getFinishState() === FinishState.COMPLETED) {
-            this.sendCompleteEvent();
         }
     }
 

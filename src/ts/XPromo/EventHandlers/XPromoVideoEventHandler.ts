@@ -61,7 +61,7 @@ export class XPromoVideoEventHandler extends VideoEventHandler {
 
     protected handleCompleteEvent(): void {
         this._xpromoOperativeEventManager.sendView(this.getXPromoOperativeEventParams());
-        this.sendTrackingEvent(TrackingEvent.VIEW);
+        this.sendTrackingEvent(TrackingEvent.COMPLETE);
     }
 
     protected getVideoOrientation(): string | undefined {
