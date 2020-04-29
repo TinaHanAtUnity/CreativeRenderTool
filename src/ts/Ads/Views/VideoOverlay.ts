@@ -63,7 +63,7 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
     protected _campaign: Campaign;
 
     private _useCloseIconInsteadOfSkipIcon: boolean | undefined = false;
-    protected _disableFadeOutOnClick: boolean | undefined = false;
+    private _disableFadeOutOnClick: boolean | undefined = false;
 
     constructor(parameters: IVideoOverlayParameters<Campaign>, privacy: AbstractPrivacy, showGDPRBanner: boolean, showPrivacyDuringVideo: boolean) {
         super(parameters.platform, 'video-overlay', parameters.placement.muteVideo());
