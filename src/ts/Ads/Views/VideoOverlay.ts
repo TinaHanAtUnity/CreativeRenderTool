@@ -380,7 +380,7 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
         }
     }
 
-    protected setupElementReferences(): void {
+    private setupElementReferences(): void {
         this._skipButtonElement = <HTMLElement> this._container.querySelector('.skip-button');
         this._spinnerElement = <HTMLElement> this._container.querySelector('.buffering-spinner');
         this._muteButtonElement = <HTMLElement> this._container.querySelector('.mute-button');
