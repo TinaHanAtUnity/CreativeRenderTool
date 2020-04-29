@@ -47,8 +47,7 @@ export class VastEndScreenEventHandler implements IVastEndScreenHandler {
         if (!this._vastAdUnit.hasImpressionOccurred()) {
             SDKMetrics.reportMetricEvent(ErrorMetric.VastClickWithoutImpressionError);
         }
-
-        const clickThroughURL = this._vastAdUnit.getCompanionClickThroughUrl() || this._vastAdUnit.getVideoClickThroughURL();
+        const clickThroughURL = this.getClickThroughURL();
         if (clickThroughURL) {
             const useWebViewUserAgentForTracking = this._vastCampaign.getUseWebViewUserAgentForTracking();
             const ctaClickedTime = Date.now();
@@ -60,6 +59,10 @@ export class VastEndScreenEventHandler implements IVastEndScreenHandler {
             });
         }
         return Promise.reject(new Error('There is no clickthrough URL for video or companion'));
+    }
+
+    protected getClickThroughURL(): string | null {
+        return this._vastAdUnit.getCompanionClickThroughUrl() || this._vastAdUnit.getVideoClickThroughURL();
     }
 
     public onVastEndScreenClose(): void {
