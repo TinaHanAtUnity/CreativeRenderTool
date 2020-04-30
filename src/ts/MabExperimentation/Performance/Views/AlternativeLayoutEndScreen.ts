@@ -126,7 +126,7 @@ export class AlternativeLayoutEndScreen extends PerformanceEndScreen {
         console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>',baseColorTheme)
 
         const gameInfoContainer: HTMLElement | null = this._container.querySelector('.game-info-container');
-        const downloadContainer: HTMLElement | null = this._container.querySelector('.download-container');
+        const installContainer: HTMLElement | null = this._container.querySelector('.install-container');
         const gameNameContainer: HTMLElement | null = this._container.querySelector('.name-container');
         const gameRatingContainer: HTMLElement | null = this._container.querySelector('.game-rating-count');
         const privacyIconContainer: HTMLElement | null = this._container.querySelector('.bottom-container .icon-gdpr');
@@ -134,9 +134,9 @@ export class AlternativeLayoutEndScreen extends PerformanceEndScreen {
         const chinaAdvertisementElement: HTMLElement | null = this._container.querySelector('.bottom-container .china-advertisement');
 
         gameInfoContainer ? gameInfoContainer.style.background = baseColorTheme.medium.toCssRgb() : null;
-        downloadContainer ? downloadContainer.style.color = baseColorTheme.medium.toCssRgb() : null;
+        installContainer ? installContainer.style.color = baseColorTheme.medium.toCssRgb() : null;
         
-        if (gameInfoContainer && downloadContainer && gameNameContainer && gameRatingContainer && privacyIconContainer && unityIconContainer && chinaAdvertisementElement) {
+        if (gameInfoContainer && installContainer && gameNameContainer && gameRatingContainer && privacyIconContainer && unityIconContainer && chinaAdvertisementElement) {
             const secondary = Color.lerp(secondaryColorTheme.light, secondaryColorTheme.medium, 0.3);
             const baseDark = baseColorTheme.dark.toCssRgb();
             // backgroundElement.style.background = `linear-gradient(${secondary.toCssRgb()},${baseColorTheme.light.toCssRgb()})`;
