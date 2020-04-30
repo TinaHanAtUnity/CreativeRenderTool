@@ -43,6 +43,11 @@ interface ILoadV5BodyExtra {
     preloadData: { [key: string]: IParsedPlacementPreloadData };
 }
 
+interface IParsedMediaAndTrackinIds {
+    mediaId: string | undefined;
+    trackingId: string | undefined;
+}
+
 class AdRequestManagerError extends Error {
     public readonly tag: string;
 
@@ -419,75 +424,58 @@ export class AdRequestManager extends CampaignManager {
         return preloadData;
     }
 
-    private parseCampaign(response: IRawAuctionV5Response, placement: Placement, auctionStatusCode: AuctionStatusCode): Promise<Campaign | undefined> {
-        const placementId = placement.getId();
-        let mediaId: string | undefined;
-
-        try {
-            if (response.placements.hasOwnProperty(placementId)) {
-                if (response.placements[placementId].hasOwnProperty('mediaId')) {
-                    mediaId = response.placements[placementId].mediaId;
-                }
-            }
-        } catch (err) {
-            return Promise.reject(new AdRequestManagerError('Failed to get media and tracking url', 'media'));
+    private parseCampaign(response: IRawAuctionV5Response, mediaId: string | undefined, auctionStatusCode: AuctionStatusCode): Promise<Campaign | undefined> {
+        if (!mediaId) {
+            return Promise.resolve(undefined);
         }
 
         if (this._currentSession === null) {
             throw new AdRequestManagerError('Session is not set', 'no_session');
         }
 
-        if (mediaId) {
-            let auctionResponse: AuctionResponse;
-            let parser: CampaignParser;
+        let auctionResponse: AuctionResponse;
+        let parser: CampaignParser;
 
-            try {
-                auctionResponse = new AuctionResponse([], response.media[mediaId], mediaId, response.correlationId, auctionStatusCode);
-            } catch (err) {
-                return Promise.reject(new AdRequestManagerError('Failed to prepare AuctionPlacement and AuctionResponse', 'prep'));
-            }
-
-            try {
-                parser = this.getCampaignParser(auctionResponse.getContentType());
-            } catch (err) {
-                return Promise.reject(new AdRequestManagerError('Failed to create parser', 'create_parser'));
-            }
-
-            return parser.parse(auctionResponse, this._currentSession).catch((err) => {
-                throw new AdRequestManagerError('Failed to parse', 'campaign_parse');
-            }).then((campaign) => {
-                if (campaign) {
-                    campaign.setMediaId(auctionResponse.getMediaId());
-                    campaign.setIsLoadEnabled(true);
-                    return campaign;
-                } else {
-                    throw new AdRequestManagerError('Failed to read campaign', 'no_campaign');
-                }
-            }).then(campaign => {
-                return this._assetManager.setup(campaign).catch((err) => {
-                    // If caching failed, we still can stream an ad.
-                    return campaign;
-                });
-            });
-        } else {
-            // This is no fill case, just return undefined
-            return Promise.resolve(undefined);
+        try {
+            auctionResponse = new AuctionResponse([], response.media[mediaId], mediaId, response.correlationId, auctionStatusCode);
+        } catch (err) {
+            return Promise.reject(new AdRequestManagerError('Failed to prepare AuctionPlacement and AuctionResponse', 'prep'));
         }
+
+        try {
+            parser = this.getCampaignParser(auctionResponse.getContentType());
+        } catch (err) {
+            return Promise.reject(new AdRequestManagerError('Failed to create parser', 'create_parser'));
+        }
+
+        return parser.parse(auctionResponse, this._currentSession).catch((err) => {
+            throw new AdRequestManagerError('Failed to parse', 'campaign_parse');
+        }).then((campaign) => {
+            if (campaign) {
+                campaign.setMediaId(auctionResponse.getMediaId());
+                campaign.setIsLoadEnabled(true);
+                return campaign;
+            } else {
+                throw new AdRequestManagerError('Failed to read campaign', 'no_campaign');
+            }
+        }).then(campaign => {
+            return this._assetManager.setup(campaign).catch((err) => {
+                // If caching failed, we still can stream an ad.
+                return campaign;
+            });
+        });
     }
 
-    private parseTrackingUrls(response: IRawAuctionV5Response, placement: Placement, auctionStatusCode: AuctionStatusCode): Promise<ICampaignTrackingUrls | undefined> {
-        const placementId = placement.getId();
+    private parseTrackingUrls(response: IRawAuctionV5Response, trackingId: string | undefined, auctionStatusCode: AuctionStatusCode): Promise<ICampaignTrackingUrls | undefined> {
+        if (!trackingId) {
+            return Promise.resolve(undefined);
+        }
+
         let trackingUrls: ICampaignTrackingUrls | undefined;
 
         try {
-            if (response.placements.hasOwnProperty(placementId)) {
-                if (response.placements[placementId].hasOwnProperty('trackingId')) {
-                    const trackingId: string = response.placements[placementId].trackingId;
-
-                    if (response.tracking[trackingId]) {
-                        trackingUrls = response.tracking[trackingId];
-                    }
-                }
+            if (response.tracking[trackingId]) {
+                trackingUrls = response.tracking[trackingId];
             }
         } catch (err) {
             return Promise.reject(new AdRequestManagerError('Failed tracking url', 'tracking'));
@@ -497,14 +485,43 @@ export class AdRequestManager extends CampaignManager {
     }
 
     private createLoadedCampaign(response: IRawAuctionV5Response, placement: Placement, auctionStatusCode: AuctionStatusCode): Promise<ILoadedCampaign | undefined> {
-        return Promise.all([
-            this.parseTrackingUrls(response, placement, auctionStatusCode),
-            this.parseCampaign(response, placement, auctionStatusCode)
-        ]).then(([trackingUrls, campaign]) => {
+        return this.parseMediaAndTrackingUrls(response, placement, auctionStatusCode).then(({ mediaId, trackingId }) => {
+            return Promise.all([
+                this.parseTrackingUrls(response, trackingId, auctionStatusCode),
+                this.parseCampaign(response, mediaId, auctionStatusCode)
+            ]);
+        }).then(([trackingUrls, campaign]) => {
             if (!campaign || !trackingUrls) {
                 return Promise.resolve(undefined);
             }
             return { campaign: campaign, trackingUrls: trackingUrls };
+        });
+    }
+
+    private parseMediaAndTrackingUrls(response: IRawAuctionV5Response, placement: Placement, auctionStatusCode: AuctionStatusCode): Promise<IParsedMediaAndTrackinIds> {
+        const placementId = placement.getId();
+        let mediaId: string | undefined;
+        let trackingId: string | undefined;
+
+        try {
+            if (response.placements.hasOwnProperty(placementId)) {
+                if (response.placements[placementId].hasOwnProperty('mediaId')) {
+                    mediaId = response.placements[placementId].mediaId;
+                }
+            }
+
+            if (response.placements.hasOwnProperty(placementId)) {
+                if (response.placements[placementId].hasOwnProperty('trackingId')) {
+                    trackingId = response.placements[placementId].trackingId;
+                }
+            }
+        } catch (err) {
+            return Promise.reject(new AdRequestManagerError('Failed to get media and tracking url', 'media'));
+        }
+
+        return Promise.resolve({
+            mediaId,
+            trackingId
         });
     }
 
