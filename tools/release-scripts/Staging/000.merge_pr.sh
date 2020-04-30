@@ -31,10 +31,7 @@ if [ "$status" != "success" ]; then
     exit
 fi
 
-echo "Attempt to merge PR locally..."
-
-git checkout master
-git pull
+echo "Attempt to merge pull request..."
 
 status=$(hub api -XPUT repos/{owner}/{repo}/pulls/$pr/merge \ -f merge_method=squash)
 
@@ -43,6 +40,10 @@ if [ "$status" != *"Pull Request successfully merged" ]; then
     exit
 fi
 
+echo "Obtaining changes locally..."
+
+
+git checkout master
 git pull
 
 echo "Updating changelog..."
