@@ -40,6 +40,7 @@ body.alternative-layout.portrait {
             margin: .5em 1.5em;
             padding: .6em;
             border-radius: .25em;
+            margin-top: 0.3em;
         }
 
         .game-icon {
@@ -80,7 +81,7 @@ body.alternative-layout.portrait {
             border-radius: .25em;
             background: #fff;
             text-align: left;
-            // box-shadow: 2px 2px 20px 0 $black;
+            box-shadow: 2px 2px 20px 0 rgba(0, 0, 0, 0.3);
             text-transform: uppercase;
             padding: .6rem;
             font-weight: 600;
@@ -89,14 +90,15 @@ body.alternative-layout.portrait {
             line-height: .85rem;
             justify-content: space-between;
             align-items: center;
+            margin-bottom: 0;
 
             .free-text {
-                font-size: 0.65em;
-                padding: 0.15em;
-                line-height: 0.95em;
+                font-size: .65em;
+                padding: .15em;
+                line-height: .95em;
                 border-style: solid;
                 border-radius: .25em;
-                border-width: 0.2em;
+                border-width: .2em;
             }
 
             .download-text {
@@ -131,7 +133,7 @@ body.alternative-layout.portrait {
             top: 0;
             display: flex;
             flex-direction: column;
-            justify-content: space-evenly;
+            justify-content: center;
         }
 
         .game-text-container {
@@ -140,8 +142,8 @@ body.alternative-layout.portrait {
         }
 
         .end-screen-image-container {
-            padding:1.5em;
-            padding-bottom: 0;
+            padding: 0 1.5em;
+            padding-top: .5em;
 
             .end-screen-image {
                 border-radius: .25em;
@@ -166,24 +168,42 @@ body.alternative-layout.portrait {
             filter: unset;
             opacity: .4;
             margin: 0 1em;
+            text-shadow: 0.03em 0.05em 0.18em #000;
         }
 
         .bottom-container {
-            position: unset;
-            left: unset;
-            bottom: unset;
-            margin: unset;
             height: unset;
             display: flex;
             justify-content: flex-end;
+            margin: .2em 0;
+            align-items: center;
             
             .privacy-button {
                 position: unset;
                 bottom: unset;
                 z-index: unset;
-                color: $white;
-                margin: 0 1.5em;
+                margin: 0;
                 line-height: unset;
+                margin-left: 0em;
+                padding: 0 .5em;
+
+                .icon-gdpr {
+                    color: $white;
+                    opacity: .4;
+                    filter: drop-shadow(1px 2px 2px black);
+                }
+            }
+
+            .china-advertisement {
+                position: unset;
+                padding: 0;
+                color: $white;
+                font-size: .7em;
+                right: unset;
+                bottom: unset;
+                margin: 0;
+                opacity: .25;
+                filter: drop-shadow(1px 2px 2px black);
             }
         }
 
