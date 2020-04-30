@@ -82,9 +82,7 @@ describe('TencentVastEndScreenEventHandler', () => {
                 await vastTencentEndScreenHandler.onVastEndScreenClick();
             });
             it('the iOS open url method should be called with replaced url', () => {
-                if (baseParams.core.iOS) {
-                    expect(baseParams.core.iOS.UrlScheme.open).toHaveReturnedWith(Promise.resolve());
-                }
+                expect(baseParams.core.iOS!.UrlScheme.open).toHaveReturnedWith(Promise.resolve());
             });
         });
         describe('for android platform', () => {
@@ -96,9 +94,7 @@ describe('TencentVastEndScreenEventHandler', () => {
                 await vastTencentEndScreenHandler.onVastEndScreenClick();
             });
             it('the android open url method should be called', () => {
-                if (baseParams.core.Android) {
-                    expect(baseParams.core.Android.Intent.launch).toHaveReturnedWith(Promise.resolve());
-                }
+                expect(baseParams.core.Android!.Intent.launch).toHaveReturnedWith(Promise.resolve());
             });
         });
     });

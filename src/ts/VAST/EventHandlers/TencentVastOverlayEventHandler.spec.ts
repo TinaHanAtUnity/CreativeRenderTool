@@ -81,9 +81,7 @@ describe('TencentVastOverlayEventHandler', () => {
                 await vastTencentOverlayHandler.onOverlayCallButton();
             });
             it('the iOS open url method should be called', () => {
-                if (baseParams.core.iOS) {
-                    expect(baseParams.core.iOS.UrlScheme.open).toHaveReturnedWith(Promise.resolve());
-                }
+                expect(baseParams.core.iOS!.UrlScheme.open).toHaveReturnedWith(Promise.resolve());
             });
         });
         describe('for android platform', () => {
@@ -95,9 +93,7 @@ describe('TencentVastOverlayEventHandler', () => {
                 await vastTencentOverlayHandler.onOverlayCallButton();
             });
             it('the android open url method should be called', () => {
-                if (baseParams.core.Android) {
-                    expect(baseParams.core.Android.Intent.launch).toHaveReturnedWith(Promise.resolve());
-                }
+                expect(baseParams.core.Android!.Intent.launch).toHaveReturnedWith(Promise.resolve());
             });
         });
     });
