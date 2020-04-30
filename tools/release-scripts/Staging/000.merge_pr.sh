@@ -36,11 +36,10 @@ echo "Attempt to merge PR locally..."
 git checkout master
 git pull
 
-hub api -XPUT repos/{owner}/{repo}/pulls/$pr/merge \ -f merge_method=squash
+status=$(hub api -XPUT repos/{owner}/{repo}/pulls/$pr/merge \ -f merge_method=squash)
 
-if [ "$?" -ne "0" ]; then
-    git merge --abort
-    echo "Failed to merge PR due to conflicts, aborting."
+if [ "$status" != *"Pull Request successfully merged" ]; then
+    echo "Pull Request #$pr failed to Squash and Merge. Exiting."
     exit
 fi
 
