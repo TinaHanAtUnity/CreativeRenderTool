@@ -13,11 +13,12 @@
     "build": "ANALYZE=true npm run build:release",
     "build:release": "rimraf ./dist && NODE_ENV=production webpack --config tools/webpack/config.release.js",
     "test": "jest",
-    "lint-code": "git diff-index --name-only HEAD | grep -E \"(.*)\\.(ts)\" | xargs eslint -c .eslintrc.js",
+    "lint-code": "git diff-index --name-only HEAD | grep -E \"(.*)\\.(ts)\" | xargs eslint",
     "lint-styles": "git diff-index --name-only HEAD | grep -E \"(.*)\\.(styl)\" | xargs stylint -c stylintrc.json"
   },
   "pre-commit": [
     "lint-code",
+    "lint-code-tests",
     "lint-styles"
   ],
   "license": "Apache-2.0",
