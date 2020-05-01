@@ -97,7 +97,7 @@ export class LegacyCampaignManager extends CampaignManager {
         this._privacy = privacySDK;
         this._userPrivacyManager = userPrivacyManager;
         this._mediationLoadTracking = mediationLoadTracking;
-        this._useChinaAuctionEndpoint = (CustomFeatures.sampleAtGivenPercent(1) && coreConfig.getCountry() === 'CN');
+        this._useChinaAuctionEndpoint = (CustomFeatures.sampleAtGivenPercent(10) && coreConfig.getCountry() === 'CN');
     }
 
     public request(nofillRetry?: boolean): Promise<INativeResponse | void> {

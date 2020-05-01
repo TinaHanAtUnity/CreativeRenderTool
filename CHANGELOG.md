@@ -1,3 +1,57 @@
+# Pending
+
+* [Tencent clickThrough macros replacement] PR6: Enable this feature and create corresponding event handlers [#14975](https://github.com/Applifier/unity-ads-webview/pull/14975)
+* [ABT] Add Metrics to Investigate VideoPlayer Errors [#15001](https://github.com/Applifier/unity-ads-webview/pull/15001)
+* [Tencent clickThrough macros replacement] PR5: Introduce Tencent specific EventHandlers and utils [#14974](https://github.com/Applifier/unity-ads-webview/pull/14974)
+* [Tencent clickThrough macros replacement] PR4: Improvement for Tap and View class [#14973](https://github.com/Applifier/unity-ads-webview/pull/14973)
+* [Tencent clickThrough macros replacement] PR3: Refactor VastOverlayEventHandler and VastEndScreenEventHandler [#14972](https://github.com/Applifier/unity-ads-webview/pull/14972)
+* [Tencent clickThrough macros replacement] PR2: Refactor to add optional attachTap params for VastOverlay and VastEndscreen [#14971](https://github.com/Applifier/unity-ads-webview/pull/14971)
+* [Tencent clickThrough macros replacement] PR1: add more mock classes and methods [#14970](https://github.com/Applifier/unity-ads-webview/pull/14970)
+
+# Wed Apr 29 12:12:35 UTC 2020
+
+* Feature/privacy pre ad feature parity [#14744](https://github.com/Applifier/unity-ads-webview/pull/14744)
+
+# Tue Apr 28 23:21:53 UTC 2020
+
+* [AUI] Moved AUI/Optimization related files to own folder [#14743](https://github.com/Applifier/unity-ads-webview/pull/14743)
+* Add more fields to payload sent to ads-debot verify end point [#14940](https://github.com/Applifier/unity-ads-webview/pull/14940)
+* [Bug] Track Occurrences of Connection Required to Show Ad [#14936](https://github.com/Applifier/unity-ads-webview/pull/14936)
+* [China Auction]increase traffic to 10% [#14943](https://github.com/Applifier/unity-ads-webview/pull/14943)
+* [Mobilityware] Apply custom feature by organization ID [#14774](https://github.com/Applifier/unity-ads-webview/pull/14774)
+* [AdUnit] Support for an optional Ad Unit Id from Configuration response [#14713](https://github.com/Applifier/unity-ads-webview/pull/14713)
+* [PTS Migration] Remove View Events and Replace with Complete Events [#14939](https://github.com/Applifier/unity-ads-webview/pull/14939)
+* [Deployment Scripts] Add 5 seconds to sleep to avoid possible race condition [#14937](https://github.com/Applifier/unity-ads-webview/pull/14937)
+* [Bug] Track Occurrences of Connection Required to Show Ad [#14936](https://github.com/Applifier/unity-ads-webview/pull/14936)
+
+# Thu Apr 23 00:05:25 UTC 2020
+
+* [PTS Migration] Temporarily Add Tracking Events for MRAID and Display [#14908](https://github.com/Applifier/unity-ads-webview/pull/14908)
+* Resend Failed PTS Events in Same Manner as Operative Events [#13174](https://github.com/Applifier/unity-ads-webview/pull/13174)
+
+# Wed Apr 22 17:53:58 UTC 2020
+
+* Redeploy [Load V5] Add Reverse AB test for Load V5 experiment [#14856](https://github.com/Applifier/unity-ads-webview/pull/14856)
+
+# Wed Apr 22 17:20:50 UTC 2020
+
+* Reverted [Load V5] Add Reverse AB test for Load V5 experiment [#14856](https://github.com/Applifier/unity-ads-webview/pull/14856)
+
+# Wed Apr 22 16:50:11 UTC 2020
+
+* [Load V5] Add Reverse AB test for Load V5 experiment [#14856](https://github.com/Applifier/unity-ads-webview/pull/14856)
+
+# Tue Apr 21 21:23:35 UTC 2020
+
+* [Auction V6] Reverse AB Test on Groups 6 and 10 [#14854](https://github.com/Applifier/unity-ads-webview/pull/14854)
+* [Deployment Script] Update deployment timestamp [#14742](https://github.com/Applifier/unity-ads-webview/pull/14742)
+* [Auction V6] Fix Legacy Integration Tests [#14819](https://github.com/Applifier/unity-ads-webview/pull/14819)
+* [Auction China endpointt]ramp up .cn endpoint traffic to 5% [#14800](https://github.com/Applifier/unity-ads-webview/pull/14800)
+
+# Tue Apr 21 17:35:48 UTC 2020
+
+* [Privacy] Developer age gate part 2 & opt-out protocol v3 [#13879](https://github.com/Applifier/unity-ads-webview/pull/13879)
+
 # Mon Apr 20 22:15:36 UTC 2020
 
 * [Latency] Ramp Mediation CMA Test to 95% [#14773](https://github.com/Applifier/unity-ads-webview/pull/14773)

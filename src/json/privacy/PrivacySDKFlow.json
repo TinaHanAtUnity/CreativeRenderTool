@@ -7,33 +7,69 @@
         {
           "node": "consent",
           "condition": {
-            "==": [
+            "and": [
               {
-                "var": "env.developerAgeGate"
+                "==": [
+                  {
+                    "var": "env.developerAgeGate"
+                  },
+                  true
+                ]
               },
-              true
+              {
+                "==": [
+                  {
+                    "var": "env.privacyMethod"
+                  },
+                  "unity_consent"
+                ]
+              }
             ]
           }
         },
         {
           "node": "ageSelect",
           "condition": {
-            ">": [
+            "and": [
               {
-                "var": "env.ageGateLimit"
+                ">": [
+                  {
+                    "var": "env.ageGateLimit"
+                  },
+                  0
+                ]
               },
-              0
+              {
+                "==": [
+                  {
+                    "var": "user.ageGateChoice"
+                  },
+                  "missing"
+                ]
+              }
             ]
           }
         },
         {
           "node": "consent",
           "condition": {
-            "==": [
+            "or": [
               {
-                "var": "env.ageGateLimit"
+                "==": [
+                  {
+                    "var": "env.ageGateLimit"
+                  },
+                  0
+                ]
               },
-              0
+              {
+                "!=": [
+                  {
+                    "var": "user.ageGateChoice"
+                  },
+                  "missing"
+                ]
+              }
             ]
           }
         }
@@ -69,8 +105,8 @@
             "variant": "secondary",
             "actions": [
               {
-                "property": "user.agreedOverAgeLimit",
-                "value": false
+                "property": "user.ageGateChoice",
+                "value": "no"
               }
             ]
           },
@@ -82,8 +118,8 @@
             "variant": "primary",
             "actions": [
               {
-                "property": "user.agreedOverAgeLimit",
-                "value": true
+                "property": "user.ageGateChoice",
+                "value": "yes"
               }
             ]
           }
@@ -93,11 +129,46 @@
         {
           "node": "consent",
           "condition": {
-            "==": [
+            "and": [
               {
-                "var": "user.agreedOverAgeLimit"
+                "==": [
+                  {
+                    "var": "user.ageGateChoice"
+                  },
+                  "yes"
+                ]
               },
-              true
+              {
+                "==": [
+                  {
+                    "var": "env.privacyMethod"
+                  },
+                  "unity_consent"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "node": null,
+          "condition": {
+            "and": [
+              {
+                "==": [
+                  {
+                    "var": "user.ageGateChoice"
+                  },
+                  "yes"
+                ]
+              },
+              {
+                "!=": [
+                  {
+                    "var": "env.privacyMethod"
+                  },
+                  "unity_consent"
+                ]
+              }
             ]
           }
         },
@@ -106,9 +177,9 @@
           "condition": {
             "==": [
               {
-                "var": "user.agreedOverAgeLimit"
+                "var": "user.ageGateChoice"
               },
-              false
+              "no"
             ]
           }
         }
@@ -796,6 +867,12 @@
         {
           "node": null,
           "condition": true
+        }
+      ],
+      "fetchUrls": [
+        {
+          "url": "env.userSummaryUrl",
+          "property": "env.userSummary"
         }
       ],
       "allowGoBack": true

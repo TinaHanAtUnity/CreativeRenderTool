@@ -9,6 +9,11 @@ import CacheModeAllowedExperimentGames from 'json/custom_features/CacheModeAllow
 
 export class CustomFeatures {
 
+    public static isTencentSeat(seatId: number | undefined): boolean {
+        return seatId === 9107 ||
+               seatId === 9258;
+    }
+
     public static isNoGzipGame(gameId: string): boolean {
         return gameId === '1475968' ||
                gameId === '1708468' ||
@@ -199,7 +204,7 @@ export class CustomFeatures {
                gameId === '80222';   // Pocketgems, Episode (Google Play Store)
     }
 
-    public static shouldVideoOverlayRemainVisible(gameId: string): boolean {
-        return this.existsInList(MobilityWareGamesJson, gameId);
+    public static shouldVideoOverlayRemainVisible(orgId: string | undefined): boolean {
+        return orgId === '2878851';
     }
 }
