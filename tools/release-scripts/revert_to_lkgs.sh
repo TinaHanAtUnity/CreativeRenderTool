@@ -11,13 +11,16 @@ if ! [[ $answer =~ [Yy]$ ]]; then
     exit 1
 fi
 
+git checkout master
+git pull
+
 echo "Proceeding in five seconds."
 sleep 5
 
 webviewdir=$(git rev-parse --show-toplevel)
 releases="$webviewdir/tools/release-scripts/releases.txt"
 
-git pull --tags
+git fetch --force --tags
 while IFS= read -r release
     do
     git checkout $release

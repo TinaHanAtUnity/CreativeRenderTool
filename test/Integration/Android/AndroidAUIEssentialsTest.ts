@@ -24,6 +24,9 @@ import { RequestManager } from 'Core/Managers/RequestManager';
 import { JsonParser } from 'Core/Utilities/JsonParser';
 import CreativePackResponseAndroid from 'json/CreativePackResponseAndroid.json';
 import CreativePackResponseIos from 'json/CreativePackResponseIos.json';
+import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
+import { AdsConfigurationParser } from 'Ads/Parsers/AdsConfigurationParser';
+import { PrivacyTestEnvironment } from 'Privacy/PrivacyTestEnvironment';
 
 class TestListener implements IUnityAdsListener {
 
@@ -62,6 +65,7 @@ interface ITestMetadataConfig {
     forcePlayable: boolean;
     forceAR: boolean;
     forceGDPRBanner: boolean;
+    forceGDPRBannerSet: boolean;
     debugJSConsole: boolean;
     creativePack?: string;
 }
@@ -125,13 +129,17 @@ describe('AndroidAUIEssentialsTest', () => {
             .withArgs('campaignId').returns('')
             .withArgs('country').returns('')
             .withArgs('creativePack').returns(config.creativePack);
+
+        targetSandbox.stub(PrivacyTestEnvironment, 'get')
+            .withArgs('showGDPRBanner').returns(config.forceGDPRBanner);
+        targetSandbox.stub(PrivacyTestEnvironment, 'isSet')
+            .withArgs('showGDPRBanner').returns(config.forceGDPRBannerSet);
     };
 
     const initialize = async () => {
         fakeARSupport(sandbox);
         // We must reset these parameters manually because the webview does not get completely reset between runs.
         // The way metadata is read during initialization prevents false value from updating it to the respective systems.
-        AbstractAdUnitParametersFactory.setForcedGDPRBanner(false);
         MRAIDAdUnitParametersFactory.setForcedExtendedMRAID(false);
         MRAIDAdUnitParametersFactory.setForcedARMRAID(false);
         MRAIDView.setDebugJsConsole(false);
@@ -150,6 +158,7 @@ describe('AndroidAUIEssentialsTest', () => {
         AbstractAdUnit.setAutoCloseDelay(10000);
         AbstractAdUnit.setAutoClose(true);
 
+        AdsConfigurationParser.setTestHasArPlacement(true);
         ConfigManager.setTestBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
         CampaignManager.setBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
         ProgrammaticOperativeEventManager.setTestBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
@@ -231,6 +240,7 @@ describe('AndroidAUIEssentialsTest', () => {
                 forcePlayable: false,
                 forceAR: true,
                 forceGDPRBanner: true,
+                forceGDPRBannerSet: true,
                 debugJSConsole: true
             });
             await showAdAndGatherSources(); // initialize().then(showAdAndGatherSources);
@@ -278,6 +288,7 @@ describe('AndroidAUIEssentialsTest', () => {
                 forcePlayable: true,
                 forceAR: false,
                 forceGDPRBanner: false,
+                forceGDPRBannerSet: true,
                 debugJSConsole: false
             });
             await showAdAndGatherSources();
@@ -327,6 +338,7 @@ describe('AndroidAUIEssentialsTest', () => {
                 forcePlayable: false,
                 forceAR: false,
                 forceGDPRBanner: false,
+                forceGDPRBannerSet: true,
                 debugJSConsole: false,
                 creativePack: testCreativePack
             });

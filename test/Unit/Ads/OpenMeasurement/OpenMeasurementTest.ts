@@ -71,7 +71,8 @@ import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 
                 it('should populate the omid-iframe with omid3p container code', () => {
                     om.render();
-                    assert.equal((<HTMLIFrameElement>om.container().querySelector('#omid-iframe' + om.getOMAdSessionId())).srcdoc, MacroUtil.replaceMacro(OMID3p, {'{{ DEFAULT_KEY_ }}': 'default_key'}));
+                    const iframe = <HTMLIFrameElement>om.container().querySelector('#omid-iframe' + om.getOMAdSessionId());
+                    assert.equal(iframe.srcdoc, OMID3p.replace('{{ DEFAULT_KEY_ }}', 'default_key').replace('{{ IFRAME_ID_ }}', iframe.id));
                 });
 
                 it('should not call the remove child function if om does not exist in dom', () => {
@@ -195,7 +196,6 @@ import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 
                             sinon.stub(deviceInfo, 'getScreenWidth').resolves(1280);
                             sinon.stub(deviceInfo, 'getScreenHeight').resolves(768);
-                            sandbox.stub(om, 'loaded');
                             sandbox.stub(om, 'geometryChange');
                             sandbox.stub(om, 'impression');
 
@@ -204,7 +204,6 @@ import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 
                         it('should call session start ad events', () => {
                             return om.onEventProcessed('sessionStart').then(() => {
-                                sinon.assert.called(<sinon.SinonSpy>om.loaded);
                                 sinon.assert.called(<sinon.SinonSpy>om.impression);
                                 sinon.assert.notCalled(<sinon.SinonSpy>om.geometryChange);
                             });
@@ -218,7 +217,6 @@ import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
                                     clock.tick(1000);
                                     clock.restore();
                                     sinon.assert.called(<sinon.SinonSpy>om.impression);
-                                    sinon.assert.called(<sinon.SinonSpy>om.loaded);
                                     sinon.assert.called(<sinon.SinonSpy>om.geometryChange);
                                 });
                             });

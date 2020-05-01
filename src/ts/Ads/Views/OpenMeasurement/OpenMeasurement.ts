@@ -21,13 +21,8 @@ import { OpenMeasurementAdViewBuilder } from 'Ads/Views/OpenMeasurement/OpenMeas
 import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurementUtilities';
 import { MacroUtil } from 'Ads/Utilities/MacroUtil';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
-import { VastVerificationResource } from 'VAST/Models/VastVerificationResource';
 import { Campaign } from 'Ads/Models/Campaign';
-import { ThirdPartyEventManager, ThirdPartyEventMacro } from 'Ads/Managers/ThirdPartyEventManager';
-
-interface IVerificationVendorMap {
-    [vendorKey: string]: string;
-}
+import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 
 enum AdSessionType {
     NATIVE = 'native',
@@ -201,9 +196,8 @@ export class OpenMeasurement<T extends Campaign> extends View<T> {
         super.render();
 
         this._omIframe = <HTMLIFrameElement> this._container.querySelector('#omid-iframe');
-        this._omIframe.srcdoc = MacroUtil.replaceMacro(OMID3p, {'{{ DEFAULT_KEY_ }}': DEFAULT_VENDOR_KEY });
-
         this._omIframe.id += this._omAdSessionId;
+        this._omIframe.srcdoc = MacroUtil.replaceMacro(OMID3p, {'{{ DEFAULT_KEY_ }}': DEFAULT_VENDOR_KEY, '{{ IFRAME_ID_ }}': this._omIframe.id });
         this._omIframe.style.position = 'absolute';
         this._omIframe.style.top = '0';
         this._omIframe.style.left = '0';
@@ -298,10 +292,6 @@ export class OpenMeasurement<T extends Campaign> extends View<T> {
                 SDKMetrics.reportMetricEvent(OMMetric.IASVerificationSessionStarted);
             }
 
-            if (this._campaign instanceof AdMobCampaign) {
-                SDKMetrics.reportMetricEvent(AdmobMetric.AdmobOMSessionStartObserverCalled);
-            }
-
             if (this._campaign instanceof VastCampaign) {
                 return this.sendVASTStartEvents(vendorKey);
             }
@@ -337,7 +327,7 @@ export class OpenMeasurement<T extends Campaign> extends View<T> {
              * admob-session-interface - calls session start for admob
              * vast video event handler - calls session start for vast
              */
-            if (CustomFeatures.isIASVendor(vendorKey) || this._campaign instanceof AdMobCampaign) {
+            if (CustomFeatures.isWhitelistedOMVendor(vendorKey) || this._campaign instanceof AdMobCampaign) {
                 if (this._sessionStartEventData) {
                     this.sessionStart(this._sessionStartEventData);
                 }
@@ -363,16 +353,9 @@ export class OpenMeasurement<T extends Campaign> extends View<T> {
 
                 this.impression(this.buildVastImpressionValues(MediaType.VIDEO, AccessMode.LIMITED, screenWidth, screenHeight));
 
-                if (CustomFeatures.isIASVendor(vendorKey)) {
+                if (CustomFeatures.isWhitelistedOMVendor(vendorKey)) {
                     this.sendIASEvents(IASScreenWidth, IASScreenHeight);
                 }
-
-                this.loaded({
-                    isSkippable: this._placement.allowSkip(),
-                    skipOffset: this._placement.allowSkipInSeconds(),
-                    isAutoplay: true,                   // Always autoplay for video
-                    position: VideoPosition.STANDALONE  // Always standalone video
-                });
             });
     }
 

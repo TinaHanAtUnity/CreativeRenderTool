@@ -16,13 +16,12 @@ import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { PrivacyEvent, PrivacyMetrics } from 'Privacy/PrivacyMetrics';
 import { PrivacyConfig } from 'Privacy/PrivacyConfig';
-import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { PrivacySDKTest } from 'Core/Models/ABGroup';
-import { CachedUserSummary } from 'Privacy/CachedUserSummary';
 
 import PrivacySDKFlow from 'json/privacy/PrivacySDKFlow.json';
 import PrivacyWebUI from 'html/PrivacyWebUI.html';
+import { PrivacyTestEnvironment } from 'Privacy/PrivacyTestEnvironment';
 
 export interface IUserSummary extends ITemplateData {
     deviceModel: string;
@@ -46,6 +45,7 @@ export enum GDPREventAction {
     DEVELOPER_CONSENT = 'developer_consent',
     DEVELOPER_OPTOUT = 'developer_optout',
     AGE_GATE_DISAGREE = 'agegate_disagree',
+    DEVELOPER_AGE_GATE_OPTOUT = 'developer_agegate_optout',
     CONSENT_AGREE_ALL = 'consent_agreed_all',
     CONSENT_DISAGREE = 'consent_disagree',
     CONSENT_SAVE_CHOICES = 'consent_save_choices',
@@ -67,6 +67,12 @@ export enum AgeGateChoice {
     NO = 'no'
 }
 
+export enum AgeGateSource {
+    MISSING = 'missing',
+    USER = 'user',
+    DEVELOPER = 'developer'
+}
+
 export interface IUserPrivacyStorageDataGdpr {
     gdpr: {
         consent: {
@@ -83,15 +89,23 @@ export interface IUserPrivacyStorageDataPrivacy {
     };
 }
 
-export type IUserPrivacyStorageData = IUserPrivacyStorageDataGdpr | IUserPrivacyStorageDataPrivacy;
+export interface IUserPrivacyStorageUserOverAgeLimit {
+    privacy: {
+        useroveragelimit: {
+            value: unknown;
+        };
+    };
+}
+
+export type IUserPrivacyStorageData = IUserPrivacyStorageDataGdpr | IUserPrivacyStorageDataPrivacy | IUserPrivacyStorageUserOverAgeLimit;
 
 export class UserPrivacyManager {
 
     private static GdprConsentStorageKey = 'gdpr.consent.value';
     private static PrivacyConsentStorageKey = 'privacy.consent.value';
+    private static PrivacyAgeGateKey = 'privacy.useroveragelimit.value';
     private static AgeGateChoiceStorageKey = 'privacy.agegateunderagelimit';
-
-    public _forcedConsentUnit: boolean;
+    private static AgeGateSourceStorageKey = 'privacy.agegatesource';
 
     private readonly _platform: Platform;
     private readonly _core: ICoreApi;
@@ -105,9 +119,12 @@ export class UserPrivacyManager {
     private readonly _deviceInfo: DeviceInfo;
     private readonly _request: RequestManager;
     private _ageGateChoice: AgeGateChoice = AgeGateChoice.MISSING;
+    private _ageGateSource: AgeGateSource = AgeGateSource.MISSING;
+    private _developerAgeGateActive: boolean;
+    private _developerAgeGateChoice: boolean;
     private _privacyFormatMetadataSeenInSession: boolean;
 
-    constructor(platform: Platform, core: ICoreApi, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, clientInfo: ClientInfo, deviceInfo: DeviceInfo, request: RequestManager, privacy: PrivacySDK, forcedConsentUnit?: boolean) {
+    constructor(platform: Platform, core: ICoreApi, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, clientInfo: ClientInfo, deviceInfo: DeviceInfo, request: RequestManager, privacy: PrivacySDK) {
         this._platform = platform;
         this._core = core;
         this._coreConfig = coreConfig;
@@ -118,54 +135,57 @@ export class UserPrivacyManager {
         this._clientInfo = clientInfo;
         this._deviceInfo = deviceInfo;
         this._request = request;
-        this._forcedConsentUnit = forcedConsentUnit || false;
+        this._developerAgeGateActive = false;
+        this._developerAgeGateChoice = false;
         this._privacyFormatMetadataSeenInSession = false;
         this._core.Storage.onSet.subscribe((eventType, data) => this.onStorageSet(eventType, <IUserPrivacyStorageData><unknown>data));
     }
 
     public getPrivacyConfig(): PrivacyConfig {
-        let agreedOverAgeLimit = false;
-        switch (this.getAgeGateChoice()) {
-            case AgeGateChoice.YES:
-                agreedOverAgeLimit = true;
-                break;
-            case AgeGateChoice.NO:
-            case AgeGateChoice.MISSING:
-                agreedOverAgeLimit = false;
-                break;
-            default:
-                agreedOverAgeLimit = false;
-        }
+        const ageGateChoice = this._userPrivacy.isRecorded() ? this.getAgeGateChoice() : AgeGateChoice.MISSING;
 
-        const userSummary = CachedUserSummary.get();
+        const { ads, external, gameExp } = this._userPrivacy.getPermissions();
+        const userSummaryUrl = 'https://ads-privacy-api.prd.mz.internal.unity3d.com/api/v1/summary?' +
+          `gameId=${this._clientInfo.getGameId()}&` +
+          `projectId=${this._coreConfig.getUnityProjectId()}&` +
+          `adid=${this._deviceInfo.getAdvertisingIdentifier()}&` +
+          `storeId=${this._deviceInfo.getStores()}`;
 
         return new PrivacyConfig(PrivacySDKFlow,
             {
-                ads: this._userPrivacy.getPermissions().ads,
-                external: this._userPrivacy.getPermissions().external,
-                gameExp: this._userPrivacy.getPermissions().gameExp,
-                agreedOverAgeLimit: agreedOverAgeLimit
+                ads,
+                external,
+                gameExp,
+                ageGateChoice,
+                agreementMethod: ''
             },
             {
                 buildOsVersion: this._deviceInfo.getOsVersion(),
+                deviceModel: this._deviceInfo.getModel(),
                 platform: Platform[this._platform],
-                userLocale: this._deviceInfo.getLanguage() ? this._deviceInfo.getLanguage().replace('_', '-') : undefined,
+                userLocale: this._deviceInfo.getLanguage() ? this.resolveLanguageForPrivacyConfig(this._deviceInfo.getLanguage()) : undefined,
                 country: this._coreConfig.getCountry(),
                 subCountry: this._coreConfig.getSubdivision(),
                 privacyMethod: this._gamePrivacy.getMethod(),
                 ageGateLimit: this._privacy.getAgeGateLimit(),
+                ageGateLimitMinusOne: this._privacy.getAgeGateLimit() - 1,
                 legalFramework: this._privacy.getLegalFramework(),
                 isCoppa: this._coreConfig.isCoppaCompliant(),
                 apiLevel: this._platform === Platform.ANDROID ? (<AndroidDeviceInfo> this._deviceInfo).getApiLevel() : undefined,
-                userSummary: {
-                    deviceModel: userSummary ? userSummary.deviceModel : '-',
-                    country: userSummary ? userSummary.country : '-',
-                    gamePlaysThisWeek: userSummary ? userSummary.gamePlaysThisWeek.toString() : '-',
-                    adsSeenInGameThisWeek: userSummary ? userSummary.adsSeenInGameThisWeek.toString() : '-',
-                    installsFromAds: userSummary ? userSummary.installsFromAds.toString() : '-'
-                }
+                developerAgeGate: this.isDeveloperAgeGateActive(),
+                userSummaryUrl
             },
             PrivacyWebUI);
+    }
+
+    private resolveLanguageForPrivacyConfig(deviceLanguage: string): string {
+        if (deviceLanguage.match('zh(((_#?Hans)?(_\\D\\D)?)|((_\\D\\D)?(_#?Hans)?))$')) {
+            return 'zh-Hans';
+        } else if (deviceLanguage.match('zh(_TW|_HK|_MO|_#?Hant)?(_TW|_HK|_MO|_#?Hant)+$')) {
+            return 'zh-Hant';
+        } else {
+            return deviceLanguage.replace('_', '-');
+        }
     }
 
     public updateUserPrivacy(permissions: IPrivacyPermissions, source: GDPREventSource, action: GDPREventAction, layout? : ConsentPage): Promise<INativeResponse | void> {
@@ -173,7 +193,7 @@ export class UserPrivacyManager {
         const userPrivacy = this._userPrivacy;
         const firstRequest = !this._userPrivacy.isRecorded();
 
-        if (source === GDPREventSource.DEVELOPER) {
+        if (source === GDPREventSource.DEVELOPER && action !== GDPREventAction.DEVELOPER_AGE_GATE_OPTOUT) {
             gamePrivacy.setMethod(PrivacyMethod.DEVELOPER_CONSENT);
             userPrivacy.setMethod(PrivacyMethod.DEVELOPER_CONSENT);
         }
@@ -225,7 +245,7 @@ export class UserPrivacyManager {
 
     private sendPrivacyEvent(permissions: IPrivacyPermissions, source: GDPREventSource, action: GDPREventAction, layout = '', firstRequest: boolean): Promise<INativeResponse> {
         const infoJson: unknown = {
-            'v': 2,
+            'v': 3,
             advertisingId: this._deviceInfo.getAdvertisingIdentifier(),
             abGroup: this._coreConfig.getAbGroup(),
             layout: layout,
@@ -243,7 +263,8 @@ export class UserPrivacyManager {
             bundleId: this._clientInfo.getApplicationName(),
             permissions: permissions,
             legalFramework: this._privacy.getLegalFramework(),
-            agreedOverAgeLimit: this._ageGateChoice
+            agreedOverAgeLimit: this._ageGateChoice,
+            ageGateSource: this._ageGateSource
         };
 
         if (CustomFeatures.sampleAtGivenPercent(1)) {
@@ -295,7 +316,7 @@ export class UserPrivacyManager {
             Diagnostics.trigger('gdpr_request_failed', {
                 url: url
             });
-            this._core.Sdk.logError('Gdpr request failed' + error);
+            this._core.Sdk.logError('User summary request failed' + error);
             throw error;
         });
     }
@@ -308,21 +329,24 @@ export class UserPrivacyManager {
         return this._privacy.getUserPrivacy().getPermissions();
     }
 
-    public setUsersAgeGateChoice(ageGateChoice: AgeGateChoice) {
-        if (ageGateChoice === AgeGateChoice.YES) {
-            PrivacyMetrics.trigger(PrivacyEvent.AGE_GATE_PASS);
-            if (this._gamePrivacy.getMethod() === PrivacyMethod.UNITY_CONSENT) {
-                PrivacyMetrics.trigger(PrivacyEvent.CONSENT_SHOW);
+    public setUsersAgeGateChoice(ageGateChoice: AgeGateChoice, ageGateSource: AgeGateSource) {
+        if (ageGateSource === AgeGateSource.USER) {
+            if (ageGateChoice === AgeGateChoice.YES) {
+                PrivacyMetrics.trigger(PrivacyEvent.AGE_GATE_PASS);
+                if (this._gamePrivacy.getMethod() === PrivacyMethod.UNITY_CONSENT) {
+                    PrivacyMetrics.trigger(PrivacyEvent.CONSENT_SHOW);
+                }
+            } else if (ageGateChoice === AgeGateChoice.NO) {
+                PrivacyMetrics.trigger(PrivacyEvent.AGE_GATE_NOT_PASSED);
             }
-        } else if (ageGateChoice === AgeGateChoice.NO) {
-            PrivacyMetrics.trigger(PrivacyEvent.AGE_GATE_NOT_PASSED);
         }
 
         this._ageGateChoice = ageGateChoice;
+        this._ageGateSource = ageGateSource;
 
-        this._core.Storage.set(StorageType.PRIVATE, UserPrivacyManager.AgeGateChoiceStorageKey, this.isUserUnderAgeLimit()).then(() => {
-            this._core.Storage.write(StorageType.PRIVATE);
-        });
+        this._core.Storage.set(StorageType.PRIVATE, UserPrivacyManager.AgeGateChoiceStorageKey, this.isUserUnderAgeLimit());
+        this._core.Storage.set(StorageType.PRIVATE, UserPrivacyManager.AgeGateSourceStorageKey, ageGateSource);
+        this._core.Storage.write(StorageType.PRIVATE);
     }
 
     public isUserUnderAgeLimit(): boolean {
@@ -337,8 +361,8 @@ export class UserPrivacyManager {
     }
 
     public isPrivacyShowRequired(): boolean {
-        if (this._forcedConsentUnit) {
-            return true;
+        if (PrivacyTestEnvironment.isSet('showPrivacy')) {
+            return PrivacyTestEnvironment.get<boolean>('showPrivacy');
         }
 
         if (this.isAgeGateShowRequired()) {
@@ -367,12 +391,41 @@ export class UserPrivacyManager {
         return this._privacy.getLegalFramework() === LegalFramework.CCPA;
     }
 
+    public isDeveloperAgeGateActive(): boolean {
+        return this._developerAgeGateActive;
+    }
+
+    public getDeveloperAgeGateChoice(): boolean {
+        return this._developerAgeGateChoice;
+    }
+
+    public applyDeveloperAgeGate() {
+        if (this._privacy.isAgeGateEnabled() && this.isDeveloperAgeGateActive() && !this._privacy.isOptOutRecorded() && (this._gamePrivacy.getMethod() === PrivacyMethod.LEGITIMATE_INTEREST || this._gamePrivacy.getMethod() === PrivacyMethod.UNITY_CONSENT)) {
+            if (this.getDeveloperAgeGateChoice()) {
+                this.setUsersAgeGateChoice(AgeGateChoice.YES, AgeGateSource.DEVELOPER);
+            } else {
+                this.setUsersAgeGateChoice(AgeGateChoice.NO, AgeGateSource.DEVELOPER);
+
+                const permissions: IPrivacyPermissions = {
+                    gameExp: false,
+                    ads: false,
+                    external: false
+                };
+                this.updateUserPrivacy(permissions, GDPREventSource.DEVELOPER, GDPREventAction.DEVELOPER_AGE_GATE_OPTOUT);
+            }
+        }
+    }
+
     public isPrivacySDKTestActive(): boolean {
         if (this._platform === Platform.ANDROID && (<AndroidDeviceInfo> this._deviceInfo).getApiLevel() < 19) {
             return false;
         }
 
-        return TestEnvironment.get('forceprivacysdk') || (PrivacySDKTest.isValid(this._coreConfig.getAbGroup()) && this._coreConfig.getCountry() === 'FI');
+        if (PrivacyTestEnvironment.isSet('usePrivacySDK')) {
+            return PrivacyTestEnvironment.get<boolean>('usePrivacySDK');
+        }
+
+        return PrivacySDKTest.isValid(this._coreConfig.getAbGroup());
     }
 
     private pushConsent(consent: boolean): Promise<INativeResponse | void> {
@@ -413,19 +466,58 @@ export class UserPrivacyManager {
 
     private initAgeGateChoice(): void {
         if (this._privacy.isAgeGateEnabled()) {
+            this._core.Storage.get(StorageType.PUBLIC, UserPrivacyManager.PrivacyAgeGateKey).then((data: unknown) => {
+                const value: boolean | undefined = this.getConsentTypeHack(data);
+
+                if (typeof(value) !== 'undefined') {
+                    this._developerAgeGateActive = true;
+                    this._developerAgeGateChoice = value;
+                }
+            });
+
             this._core.Storage.get(StorageType.PRIVATE, UserPrivacyManager.AgeGateChoiceStorageKey).then((data: unknown) => {
                 const value: boolean | undefined = this.getConsentTypeHack(data);
                 if (typeof(value) !== 'undefined') {
+                    // stored value is if user is under age limit, apparent "flipping" of boolean is intentional
                     this._ageGateChoice = value ? AgeGateChoice.NO : AgeGateChoice.YES;
                 } else {
                     this._ageGateChoice = AgeGateChoice.MISSING;
                 }
             });
-        }
 
+            this._core.Storage.get<string>(StorageType.PRIVATE, UserPrivacyManager.AgeGateSourceStorageKey).then(value => {
+                switch (value) {
+                    case AgeGateSource.USER:
+                        this._ageGateSource = AgeGateSource.USER;
+                        break;
+
+                    case AgeGateSource.DEVELOPER:
+                        this._ageGateSource = AgeGateSource.DEVELOPER;
+                        break;
+
+                    default:
+                        this._ageGateSource = AgeGateSource.MISSING;
+                }
+            });
+        }
     }
 
     private onStorageSet(eventType: string, data: IUserPrivacyStorageData) {
+        if (this._privacy.isAgeGateEnabled()) {
+            const ageGateData = <IUserPrivacyStorageUserOverAgeLimit> data;
+
+            if (ageGateData && ageGateData.privacy && ageGateData.privacy.useroveragelimit) {
+                const ageGateValue: boolean | undefined = this.getConsentTypeHack(data);
+
+                if (typeof(ageGateValue) !== 'undefined') {
+                    this._developerAgeGateActive = true;
+                    this._developerAgeGateChoice = ageGateValue;
+                }
+
+                return;
+            }
+        }
+
         // should only use consent when gdpr is enabled in configuration
         if (!this._privacy.isGDPREnabled()) {
             return;
@@ -476,7 +568,7 @@ export class UserPrivacyManager {
     }
 
     private isAgeGateShowRequired(): boolean {
-        if (this._privacy.isAgeGateEnabled()) {
+        if (this._privacy.isAgeGateEnabled() && !this.isDeveloperAgeGateActive()) {
             if (this._gamePrivacy.getMethod() === PrivacyMethod.LEGITIMATE_INTEREST && this._privacy.isGDPREnabled() && !this._privacy.isOptOutRecorded()) {
                 return true;
             }

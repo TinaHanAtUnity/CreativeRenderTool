@@ -5,7 +5,7 @@ import { AbstractAdUnit, IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
 import { AdUnitContainer, IAdUnit, Orientation, ViewConfiguration } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { IAdsApi, IAds } from 'Ads/IAds';
 import { AssetManager } from 'Ads/Managers/AssetManager';
-import { CampaignManager } from 'Ads/Managers/CampaignManager';
+import { LegacyCampaignManager } from 'Ads/Managers/LegacyCampaignManager';
 import { ContentTypeHandlerManager } from 'Ads/Managers/ContentTypeHandlerManager';
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { CampaignRefreshManager } from 'Ads/Managers/CampaignRefreshManager';
@@ -41,14 +41,11 @@ import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { StorageBridge } from 'Core/Utilities/StorageBridge';
 
 import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
-import ConfigurationPromoPlacements from 'json/ConfigurationPromoPlacements.json';
 import OnCometVideoPlcCampaign from 'json/OnCometVideoPlcCampaign.json';
 import 'mocha';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { Performance } from 'Performance/Performance';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
-import { PromoCampaign } from 'Promo/Models/PromoCampaign';
-import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
@@ -60,6 +57,7 @@ import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { IARApi } from 'AR/AR';
 import { MediationMetaData } from 'Core/Models/MetaData/MediationMetaData';
+import { AutomatedExperimentManager } from 'MabExperimentation/AutomatedExperimentManager';
 
 export class TestContainer extends AdUnitContainer {
     public open(adUnit: IAdUnit, views: string[], allowRotation: boolean, forceOrientation: Orientation, disableBackbutton: boolean, options: any): Promise<void> {
@@ -110,7 +108,7 @@ describe('CampaignRefreshManager', () => {
     let vastParser: VastParserStrict;
     let coreConfig: CoreConfiguration;
     let adsConfig: AdsConfiguration;
-    let campaignManager: CampaignManager;
+    let campaignManager: LegacyCampaignManager;
     let wakeUpManager: WakeUpManager;
     let platform: Platform;
     let backend: Backend;
@@ -167,12 +165,14 @@ describe('CampaignRefreshManager', () => {
         deviceInfo = TestFixtures.getAndroidDeviceInfo(core);
         cacheBookkeeping = new CacheBookkeepingManager(core);
         sinon.stub(SDKMetrics, 'reportMetricEvent').returns(Promise.resolve());
+        sinon.stub(SDKMetrics, 'reportMetricEventWithTags').returns(Promise.resolve());
         cache = new CacheManager(core, wakeUpManager, request, cacheBookkeeping);
         campaignParserManager = new ContentTypeHandlerManager();
         assetManager = new AssetManager(platform, core, cache, CacheMode.DISABLED, deviceInfo, cacheBookkeeping);
         privacyManager = sinon.createStubInstance(UserPrivacyManager);
         container = new TestContainer();
         const campaign = TestFixtures.getCampaign();
+        const aem = new AutomatedExperimentManager();
         operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
             platform,
             core,
@@ -194,7 +194,7 @@ describe('CampaignRefreshManager', () => {
         (<sinon.SinonStub>adMobSignalFactory.getAdRequestSignal).returns(Promise.resolve(new AdMobSignal()));
         (<sinon.SinonStub>adMobSignalFactory.getOptionalSignal).returns(Promise.resolve(new AdMobOptionalSignal()));
 
-        const performance = new Performance(ar, coreModule, adsModule);
+        const performance = new Performance(ar, coreModule, aem, adsModule);
         const contentTypeHandlerMap = performance.getContentTypeHandlerMap();
         for (const contentType in contentTypeHandlerMap) {
             if (contentTypeHandlerMap.hasOwnProperty(contentType)) {
@@ -233,7 +233,7 @@ describe('CampaignRefreshManager', () => {
             coreConfig = CoreConfigurationParser.parse(ConfigurationAuctionPlc);
             adsConfig = AdsConfigurationParser.parse(ConfigurationAuctionPlc);
             privacySDK = TestFixtures.getPrivacySDK(core);
-            campaignManager = new CampaignManager(platform, coreModule, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, privacySDK, privacyManager);
+            campaignManager = new LegacyCampaignManager(platform, coreModule, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, privacySDK, privacyManager);
             campaignRefreshManager = new CampaignRefreshManager(platform, core, coreConfig, ads, wakeUpManager, campaignManager, adsConfig, focusManager, sessionManager, clientInfo, request, cache);
         });
 
@@ -626,132 +626,6 @@ describe('CampaignRefreshManager', () => {
                 assert.equal(receivedErrorType, 'error_creating_handle_campaign_chain', 'Incorrect error type');
                 assert.equal(receivedError.error.message, 'model: AuctionResponse key: contentType with value: 1: integer is not in: string', 'Incorrect error message');
             });
-        });
-    });
-
-    describe('On Promo', () => {
-        let sandbox: sinon.SinonSandbox;
-        beforeEach(() => {
-            sandbox = sinon.createSandbox();
-            const clientInfoPromoGame = TestFixtures.getClientInfo(Platform.ANDROID, '00000');
-            coreConfig = CoreConfigurationParser.parse(ConfigurationPromoPlacements);
-            adsConfig = AdsConfigurationParser.parse(ConfigurationPromoPlacements);
-            privacySDK = TestFixtures.getPrivacySDK(core);
-            campaignManager = new CampaignManager(platform, coreModule, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, privacySDK, privacyManager);
-            campaignRefreshManager = new CampaignRefreshManager(platform, core, coreConfig, ads, wakeUpManager, campaignManager, adsConfig, focusManager, sessionManager, clientInfo, request, cache);
-        });
-
-        afterEach(() => {
-            sandbox.restore();
-        });
-
-        it('should mark a placement for a promo campaign as ready if productID is available', () => {
-            sandbox.stub(PurchasingUtilities, 'isCatalogAvailable').returns(true);
-            sandbox.stub(PurchasingUtilities, 'isProductAvailable').returns(true);
-            sinon.stub(campaignManager, 'request').callsFake(() => {
-                const promoCampaign = TestFixtures.getPromoCampaign('purchasing/iap');
-                campaignManager.onCampaign.trigger('promoPlacement', promoCampaign, promoCampaign.getTrackingUrls());
-                return Promise.resolve();
-            });
-
-            return campaignRefreshManager.refresh().then(() => {
-                assert.isDefined(campaignRefreshManager.getCampaign('promoPlacement'));
-                assert.isTrue(campaignRefreshManager.getCampaign('promoPlacement') instanceof PromoCampaign);
-
-                const tmpCampaign = campaignRefreshManager.getCampaign('promoPlacement');
-                assert.isDefined(tmpCampaign);
-                if (tmpCampaign) {
-                    assert.equal(tmpCampaign.getId(), '000000000000000000000123');
-                    assert.equal(tmpCampaign.getAdType(), 'purchasing/iap');
-                }
-
-                assert.equal(adsConfig.getPlacement('promoPlacement').getState(), PlacementState.READY);
-                // Should set tracking urls on placement
-                const trackingUrls = adsConfig.getPlacement('promoPlacement').getCurrentTrackingUrls();
-                assert.deepEqual(trackingUrls, {
-                    impression: [
-                        'http://test.impression.com/blah1',
-                        'http://test.impression.com/blah2',
-                        'http://test.impression.com/%ZONE%/blah?sdkVersion=%SDK_VERSION%'
-                    ],
-                    complete: [
-                        'http://test.complete.com/complete1'
-                    ],
-                    click: [
-                        'http://test.complete.com/click1'
-                    ],
-                    purchase: [
-                        'https://events.iap.unity3d.com/events/v1/purchase',
-                        'http://test.purchase.com/purchase'
-                    ]
-                });
-            });
-        });
-
-        it('should mark a placement for a promo campaign as disabled if product is not available', () => {
-            sandbox.stub(PurchasingUtilities, 'isCatalogAvailable').returns(true);
-            sandbox.stub(PurchasingUtilities, 'isProductAvailable').returns(false);
-            sinon.stub(campaignManager, 'request').callsFake(() => {
-                campaignManager.onCampaign.trigger('promoPlacement', TestFixtures.getPromoCampaign('purchasing/iap'), undefined);
-                return Promise.resolve();
-            });
-
-            return campaignRefreshManager.refresh().then(() => {
-                assert.equal(adsConfig.getPlacement('promoPlacement').getState(), PlacementState.DISABLED);
-            });
-        });
-
-        it('should mark a placement for a promo campaign as waiting if IAP catalog is not fetched yet', () => {
-            sandbox.stub(PurchasingUtilities, 'isCatalogAvailable').returns(false);
-            sinon.stub(campaignManager, 'request').callsFake(() => {
-                const promoCampaign = TestFixtures.getPromoCampaign('purchasing/iap');
-                campaignManager.onCampaign.trigger('promoPlacement', promoCampaign, promoCampaign.getTrackingUrls());
-                return Promise.resolve();
-            });
-
-            return campaignRefreshManager.refresh().then(() => {
-                assert.equal(adsConfig.getPlacement('promoPlacement').getState(), PlacementState.WAITING);
-                // Should set tracking urls on placement
-                const trackingUrls = adsConfig.getPlacement('promoPlacement').getCurrentTrackingUrls();
-                assert.deepEqual(trackingUrls, {
-                    impression: [
-                        'http://test.impression.com/blah1',
-                        'http://test.impression.com/blah2',
-                        'http://test.impression.com/%ZONE%/blah?sdkVersion=%SDK_VERSION%'
-                    ],
-                    complete: [
-                        'http://test.complete.com/complete1'
-                    ],
-                    click: [
-                        'http://test.complete.com/click1'
-                    ],
-                    purchase: [
-                        'https://events.iap.unity3d.com/events/v1/purchase',
-                        'http://test.purchase.com/purchase'
-                    ]
-                });
-            });
-        });
-    });
-
-    describe('should handle onLoad', () => {
-        let placement: Placement;
-        let placementID: string;
-        let sandbox: sinon.SinonSandbox;
-        let sendReadyEventStub: sinon.SinonStub;
-        let sendPlacementStateChangedEventStub: sinon.SinonStub;
-
-        beforeEach(() => {
-            placementID = 'premium';
-            placement = adsConfig.getPlacement(placementID);
-            placement.setState(PlacementState.NOT_AVAILABLE);
-            sandbox = sinon.createSandbox();
-            sendReadyEventStub = sandbox.stub(ads.Listener, 'sendReadyEvent');
-            sendPlacementStateChangedEventStub = sandbox.stub(ads.Listener, 'sendPlacementStateChangedEvent');
-        });
-
-        afterEach(() => {
-            sandbox.restore();
         });
     });
 });

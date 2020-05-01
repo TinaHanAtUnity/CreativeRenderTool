@@ -1,11 +1,18 @@
 import CheetahGamesJson from 'json/custom_features/CheetahGames.json';
 import BitmangoGamesJson from 'json/custom_features/BitmangoGames.json';
+import NestedIframePlayableCreativeJson from 'json/custom_features/NestedIframePlayableCreatives.json';
 import Game7GamesJson from 'json/custom_features/Game7Games.json';
 import LionStudiosGamesJson from 'json/custom_features/LionStudiosGames.json';
 import MobilityWareGamesJson from 'json/custom_features/MobilityWareGames.json';
 import LoadWhitelist from 'json/custom_features/LoadWhitelist.json';
+import CacheModeAllowedExperimentGames from 'json/custom_features/CacheModeAllowedExperimentGames.json';
 
 export class CustomFeatures {
+
+    public static isTencentSeat(seatId: number | undefined): boolean {
+        return seatId === 9107 ||
+               seatId === 9258;
+    }
 
     public static isNoGzipGame(gameId: string): boolean {
         return gameId === '1475968' ||
@@ -28,20 +35,11 @@ export class CustomFeatures {
     }
 
     public static isNestedIframePlayable(creativeId: string | undefined) {
-        return  creativeId === '109455881' ||
-                creativeId === '109455877' ||
-                creativeId === '109091853' ||
-                creativeId === '109091754' ||
-                creativeId === '114617576' || // Hellfest
-                creativeId === '114617336' || // Hellfest
-                creativeId === '145941071' || // Miller Lite Fallback
-                creativeId === '145940860' || // Miller Lite Fallback
-                creativeId === '147367465' || // Carnival Creative
-                creativeId === '151099348' ||
-                creativeId === '151338976' ||
-                creativeId === '151337994' ||
-                creativeId === '152919353' ||
-                creativeId === '153119177';
+        return creativeId !== undefined && this.existsInList(NestedIframePlayableCreativeJson, creativeId);
+    }
+
+    public static isCacheModeAllowedTestGame(gameId: string): boolean {
+        return this.existsInList(CacheModeAllowedExperimentGames, gameId);
     }
 
     public static isLoopMeSeat(seatId: number | undefined): boolean {
@@ -141,6 +139,15 @@ export class CustomFeatures {
                this.existsInList(etermaxGames, gameId);
     }
 
+    public static isLoadV5Game(gameId: string): boolean {
+        const gameIds = [
+            '1783252', '1781853', '1781854', // Initial Games
+            '1428861', '1428862' // Chimera Game
+        ];
+
+        return this.existsInList(gameIds, gameId);
+    }
+
     public static shouldDisableBannerRefresh(gameId: string): boolean {
         if (gameId === '2962474') {
             return true;
@@ -179,11 +186,25 @@ export class CustomFeatures {
                omVendor === 'integralads.com-omid';
     }
 
-    public static isDoubleClickGoogle(vendorKey: string): boolean {
-        return vendorKey.startsWith('doubleclickbygoogle.com');
+    public static isDoubleClickGoogle(vendorKey: string | undefined): boolean {
+        return vendorKey ? vendorKey.startsWith('doubleclickbygoogle.com') : false;
     }
 
-    public static isWhitelistedOMVendor(omVendor: string) {
-        return this.isIASVendor(omVendor) || this.isDoubleClickGoogle(omVendor);
+    public static isWhitelistedOMVendor(omVendor: string | undefined) {
+        return this.isIASVendor(omVendor) ||
+               this.isDoubleClickGoogle(omVendor) ||
+               omVendor === 'doubleverify.com-omid';
+    }
+
+    // Enables experimental PausableListenerApi, which allows pausing and resuming events.
+    // This is needed as a fix for https://jira.unity3d.com/browse/ABT-1125.
+    public static pauseEventsSupported(gameId: string): boolean {
+        return gameId === '1543460' || // richardh, test app (Apple App Store)
+               gameId === '1543461' || // richardh, test app (Google Play Store)
+               gameId === '80222';   // Pocketgems, Episode (Google Play Store)
+    }
+
+    public static shouldVideoOverlayRemainVisible(orgId: string | undefined): boolean {
+        return orgId === '2878851';
     }
 }

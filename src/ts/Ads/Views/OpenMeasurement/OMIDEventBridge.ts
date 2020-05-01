@@ -1,9 +1,7 @@
 import { ICoreApi } from 'Core/ICore';
 import { OpenMeasurement } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
 import { OMID3pEvents, ISessionEvent } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
-import { SDKMetrics, AdmobMetric } from 'Ads/Utilities/SDKMetrics';
 import { Campaign } from 'Ads/Models/Campaign';
-import { AdMobCampaign } from 'AdMob/Models/AdMobCampaign';
 
 export interface IOMIDMessage {
     type: string;
@@ -55,7 +53,7 @@ export class OMIDEventBridge {
         this._campaign = campaign;
 
         this._omidHandlers[OMID3pEvents.ON_EVENT_PROCESSED] = (msg) => this._handler.onEventProcessed(<string>msg.data.eventType, <string>msg.data.vendorKey);
-        this._omidHandlers[EventQueuePostbackEvents.ON_EVENT_REGISTERED] = (msg) => this.onEventRegistered(<string>msg.data.eventName, <string>msg.data.vendorKey, <string>msg.data.uuid);
+        this._omidHandlers[EventQueuePostbackEvents.ON_EVENT_REGISTERED] = (msg) => this.onEventRegistered(<string>msg.data.eventName, <string>msg.data.vendorKey, <string>msg.data.uuid, <string>msg.data.iframeId);
 
         this._registeredFuncs = {
             'omidVideo': []
@@ -137,9 +135,6 @@ export class OMIDEventBridge {
             ...event,
             uuid: uuid
         };
-        if (event.type === 'omidImpression' && this._campaign instanceof AdMobCampaign) {
-            SDKMetrics.reportMetricEvent(AdmobMetric.AdmobOMRegisteredImpression);
-        }
         this.postMessage(jsEvent);
     }
 
@@ -149,7 +144,11 @@ export class OMIDEventBridge {
         }
     }
 
-    public onEventRegistered(eventName: string, vendorKey: string, uuid: string) {
+    public onEventRegistered(eventName: string, vendorKey: string, uuid: string, iframeId: string) {
+        //Prevents uuids from other iframe multi-registered on the event bridge
+        if (iframeId !== this._iframe3p.id) {
+            return;
+        }
         const eventDatas = this._eventHistory[eventName];
 
         if (!this._registeredFuncs[eventName]) {

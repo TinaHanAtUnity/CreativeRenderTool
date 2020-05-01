@@ -162,14 +162,11 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         this._operativeEventManager.sendSkip(this.getOperativeEventParams());
     }
 
-    public sendCompleteEvent() {
-        this.sendTrackingEvent(TrackingEvent.COMPLETE);
-    }
-
     public sendRewardEvent() {
         const params = this.getOperativeEventParams();
         this._operativeEventManager.sendThirdQuartile(params);
         this._operativeEventManager.sendView(params);
+        this.sendTrackingEvent(TrackingEvent.COMPLETE);
         if (this._isRewardedPlacement) {
             SDKMetrics.reportMetricEvent(AdmobMetric.AdmobUserWasRewarded);
         }
@@ -312,8 +309,6 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
 
         if (this.getFinishState() === FinishState.SKIPPED) {
             this.sendSkipEvent();
-        } else if (this.getFinishState() === FinishState.COMPLETED) {
-            this.sendCompleteEvent();
         }
     }
 
@@ -347,15 +342,6 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     private sendPTSCanPlay() {
         // TODO: Add Tagging to remove the below logic
         SDKMetrics.reportMetricEvent(AdmobMetric.AdmobVideoCanPlay);
-        if (this.isDBMCreative() && this._isRewardedPlacement) {
-            SDKMetrics.reportMetricEvent(AdmobMetric.AdmobDBMRewardedCanPlay);
-        } else if (this.isDBMCreative() && !this._isRewardedPlacement) {
-            SDKMetrics.reportMetricEvent(AdmobMetric.AdmobDBMNonRewardedCanPlay);
-        } else if (!this.isDBMCreative() && this._isRewardedPlacement) {
-            SDKMetrics.reportMetricEvent(AdmobMetric.AdmobNonDBMRewardedCanPlay);
-        } else if (!this.isDBMCreative() && !this._isRewardedPlacement) {
-            SDKMetrics.reportMetricEvent(AdmobMetric.AdmobNonDBMNonRewardedCanPlay);
-        }
     }
 
     private sendPTSStart() {
@@ -365,10 +351,6 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
             SDKMetrics.reportMetricEvent(AdmobMetric.AdmobDBMRewardedStarted);
         } else if (this.isDBMCreative() && !this._isRewardedPlacement) {
             SDKMetrics.reportMetricEvent(AdmobMetric.AdmobDBMNonRewardedStarted);
-        } else if (!this.isDBMCreative() && this._isRewardedPlacement) {
-            SDKMetrics.reportMetricEvent(AdmobMetric.AdmobNonDBMRewardedStarted);
-        } else if (!this.isDBMCreative() && !this._isRewardedPlacement) {
-            SDKMetrics.reportMetricEvent(AdmobMetric.AdmobNonDBMNonRewardedStarted);
         }
 
         if (this._view.getOpenMeasurementController()) {

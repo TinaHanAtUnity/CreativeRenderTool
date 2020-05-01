@@ -1,18 +1,19 @@
-export interface IPrivacySettings {
-    user: IUserPrivacySettings;
-    env: { [key: string]: unknown };
-    lastInteraction: IUserLastInteraction;
-}
+import { AgeGateChoice } from 'Ads/Managers/UserPrivacyManager';
 
 export interface IUserPrivacySettings {
     ads: boolean;
     external: boolean;
     gameExp: boolean;
-    agreedOverAgeLimit: boolean;
+    ageGateChoice: AgeGateChoice;
+    agreementMethod: string;
 }
 
-export interface IUserLastInteraction {
-    id: string;
-    type: string;
-    timestamp: string;
+export interface IPrivacyCompletedParams {
+    user: IUserPrivacySettings;
+    error?: string;
+}
+
+export interface IPrivacyFetchUrlParams {
+    url: string;
+    property: string;
 }

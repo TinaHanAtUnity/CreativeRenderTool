@@ -29,6 +29,7 @@ export interface IRawPlacement {
     position?: string;
     auctionType?: string;
     banner?: { refreshRate?: number };
+    adUnitId?: string;
 }
 
 export interface IPlacement {
@@ -58,6 +59,9 @@ export interface IPlacement {
     position: string | undefined;
     auctionType: PlacementAuctionType;
     bannerRefreshRate: number | undefined;
+    adUnitId: string | undefined;
+
+    invalidationPending: boolean;
 }
 
 export class Placement extends Model<IPlacement> {
@@ -83,7 +87,9 @@ export class Placement extends Model<IPlacement> {
             refreshDelay: ['number', 'undefined'],
             position: ['string', 'undefined'],
             auctionType: ['string'],
-            bannerRefreshRate: ['number', 'undefined']
+            bannerRefreshRate: ['number', 'undefined'],
+            adUnitId: ['string', 'undefined'],
+            invalidationPending: ['boolean']
         });
 
         this.set('id', data.id);
@@ -117,6 +123,9 @@ export class Placement extends Model<IPlacement> {
         if (data.banner) {
             this.set('bannerRefreshRate', data.banner.refreshRate);
         }
+
+        this.set('adUnitId', data.adUnitId);
+        this.set('invalidationPending', false);
     }
 
     public getId(): string {
@@ -227,6 +236,25 @@ export class Placement extends Model<IPlacement> {
                     return true;
                 }
             }
+        }
+        return false;
+    }
+
+    public isInvalidationPending(): boolean {
+        return this.get('invalidationPending');
+    }
+
+    public setInvalidationPending(value: boolean) {
+        this.set('invalidationPending', value);
+    }
+
+    public getAdUnitId(): string | undefined {
+        return this.get('adUnitId');
+    }
+
+    public hasAdUnitId(): boolean {
+        if (this.getAdUnitId()) {
+            return true;
         }
         return false;
     }

@@ -2,7 +2,7 @@ import { AdMobSignalFactory } from 'AdMob/Utilities/AdMobSignalFactory';
 import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
 import { IAdsApi } from 'Ads/IAds';
 import { AssetManager } from 'Ads/Managers/AssetManager';
-import { CampaignManager } from 'Ads/Managers/CampaignManager';
+import { LegacyCampaignManager } from 'Ads/Managers/LegacyCampaignManager';
 import { ContentTypeHandlerManager } from 'Ads/Managers/ContentTypeHandlerManager';
 import { PerPlacementLoadManagerWithCometRefreshAfterAnyStart } from 'Ads/Managers/PerPlacementLoadManagerWithCometRefreshAfterAnyStart';
 import { SessionManager } from 'Ads/Managers/SessionManager';
@@ -38,7 +38,7 @@ describe('PerPlacementLoadManagerWithCometRefreshAnyStartTest', () => {
     let clientInfo: ClientInfo;
     let coreConfig: CoreConfiguration;
     let adsConfig: AdsConfiguration;
-    let campaignManager: CampaignManager;
+    let campaignManager: LegacyCampaignManager;
     let wakeUpManager: WakeUpManager;
     let platform: Platform;
     let backend: Backend;
@@ -86,7 +86,7 @@ describe('PerPlacementLoadManagerWithCometRefreshAnyStartTest', () => {
         cache = new CacheManager(core.Api, wakeUpManager, request, cacheBookkeeping);
         assetManager = new AssetManager(platform, core.Api, cache, CacheMode.DISABLED, deviceInfo, cacheBookkeeping);
         userPrivacyManager = new UserPrivacyManager(platform, core.Api, coreConfig, adsConfig, clientInfo, deviceInfo, request, privacySDK);
-        campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, privacySDK, userPrivacyManager);
+        campaignManager = new LegacyCampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, privacySDK, userPrivacyManager);
         loadManager = new PerPlacementLoadManagerWithCometRefreshAfterAnyStart(adsApi, adsConfig, coreConfig, campaignManager, clientInfo, focusManager);
     });
 
@@ -112,11 +112,9 @@ describe('PerPlacementLoadManagerWithCometRefreshAnyStartTest', () => {
         [
             { campaign: TestFixtures.getCampaign(), shouldCall: true },
             { campaign: TestFixtures.getDisplayInterstitialCampaign(), shouldCall: true },
-            { campaign: TestFixtures.getPromoCampaign(), shouldCall: true },
             { campaign: TestFixtures.getProgrammaticMRAIDCampaign(), shouldCall: true },
             { campaign: TestFixtures.getCompanionStaticVastCampaign(), shouldCall: true },
             { campaign: TestFixtures.getDisplayInterstitialCampaign(), shouldCall: true },
-            { campaign: TestFixtures.getPromoCampaign(), shouldCall: true },
             { campaign: TestFixtures.getProgrammaticMRAIDCampaign(), shouldCall: true },
             { campaign: TestFixtures.getCompanionStaticVastCampaign(), shouldCall: true }
         ].forEach(({ campaign, shouldCall }) => {

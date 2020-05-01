@@ -6,11 +6,12 @@ import { MRAIDAdUnitParametersFactory } from 'MRAID/AdUnits/MRAIDAdUnitParameter
 import { IARApi } from 'AR/AR';
 import { ICore } from 'Core/ICore';
 import { IAds } from 'Ads/IAds';
+import { AutomatedExperimentManager } from 'MabExperimentation/AutomatedExperimentManager';
 
 export class MRAID extends AbstractParserModule {
 
-    constructor(ar: IARApi, core: ICore, ads: IAds) {
-        const paramsFactory = new MRAIDAdUnitParametersFactory(ar, core, ads);
+    constructor(ar: IARApi, core: ICore, aem: AutomatedExperimentManager, ads: IAds) {
+        const paramsFactory = new MRAIDAdUnitParametersFactory(ar, core, ads, aem);
         const contentTypeHandlerMap: { [key: string]: IContentTypeHandler } = {};
         const factory = new MRAIDAdUnitFactory(paramsFactory);
         contentTypeHandlerMap[ProgrammaticMraidParser.ContentType] = {

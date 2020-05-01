@@ -11,6 +11,10 @@ import { ARUtil } from 'AR/Utilities/ARUtil';
 import { CurrentPermission, PermissionsUtil, PermissionTypes } from 'Core/Utilities/Permissions';
 import { ICoreApi } from 'Core/ICore';
 import { AdsConfigurationParser } from 'Ads/Parsers/AdsConfigurationParser';
+import { ProgrammaticOperativeEventManager } from 'Ads/Managers/ProgrammaticOperativeEventManager';
+import { AuctionRequest } from 'Ads/Networking/AuctionRequest';
+import { MetricInstance } from 'Ads/Networking/MetricInstance';
+import { HttpKafka } from 'Core/Utilities/HttpKafka';
 
 document.addEventListener('DOMContentLoaded', () => {
     const resizeHandler = (event?: Event) => {
@@ -139,18 +143,32 @@ document.addEventListener('DOMContentLoaded', () => {
         const testModeElement = <HTMLInputElement>window.parent.document.getElementById('testMode');
         const loadModeElement = <HTMLInputElement>window.parent.document.getElementById('loadMode');
         const autoSkipElement = <HTMLInputElement>window.parent.document.getElementById('autoSkip');
+        const useStagingElement = <HTMLInputElement>window.parent.document.getElementById('useStaging');
         const initializeButton = <HTMLButtonElement>window.parent.document.getElementById('initialize');
-        const loadButton = <HTMLButtonElement>window.parent.document.getElementById('load');
+        const loadButtonDefault = <HTMLButtonElement>window.parent.document.getElementById('loadDefault');
+        const loadButtonIncentivize = <HTMLButtonElement>window.parent.document.getElementById('loadIncentivize');
         const campaignResponseElement = <HTMLInputElement>window.parent.document.getElementById('campaignResponse');
 
         const initialize = () => {
+            window.localStorage.setItem('abGroup', abGroupElement.value);
+            window.localStorage.setItem('campaignId', campaignIdElement.value);
+            window.localStorage.setItem('country', countryElement.value);
+            window.localStorage.setItem('platform', platformElement.value);
+            window.localStorage.setItem('gameId', gameIdElement.value);
+            window.localStorage.setItem('testMode', testModeElement.checked.toString());
+            window.localStorage.setItem('loadMode', loadModeElement.checked.toString());
+            window.localStorage.setItem('autoSkip', autoSkipElement.checked.toString());
+            window.localStorage.setItem('useStaging', useStagingElement.checked.toString());
+
             abGroupElement.disabled = true;
             campaignIdElement.disabled = true;
             countryElement.disabled = true;
             platformElement.disabled = true;
             gameIdElement.disabled = true;
             testModeElement.disabled = true;
-            loadButton.disabled = !loadModeElement.checked;
+            useStagingElement.disabled = true;
+            loadButtonDefault.disabled = !loadModeElement.checked;
+            loadButtonIncentivize.disabled = !loadModeElement.checked;
             loadModeElement.disabled = true;
             autoSkipElement.disabled = true;
             initializeButton.disabled = true;
@@ -215,6 +233,15 @@ document.addEventListener('DOMContentLoaded', () => {
             PermissionsUtil.checkPermissionInManifest = () => Promise.resolve(false);
             PermissionsUtil.checkPermissions = (platform: Platform, core: ICoreApi, permission: PermissionTypes) => Promise.resolve(CurrentPermission.DENIED);
 
+            if (useStagingElement.checked) {
+                ProgrammaticOperativeEventManager.setTestBaseUrl('https://auction.staging.unityads.unity3d.com');
+                CampaignManager.setBaseUrl('https://auction.staging.unityads.unity3d.com');
+                AuctionRequest.setBaseUrl('https://auction.staging.unityads.unity3d.com');
+                ConfigManager.setTestBaseUrl('https://ads-game-configuration.staging.unityads.unity3d.com');
+                MetricInstance.setBaseUrl('https://sdk-diagnostics.stg.mz.internal.unity3d.com');
+                HttpKafka.setTestBaseUrl('https://httpkafka.staging.unityads.unity3d.com/v1/events');
+            }
+
             switch (platformElement.value) {
                 case 'android':
                     UnityAds.setBackend(new Backend(Platform.ANDROID));
@@ -254,19 +281,35 @@ document.addEventListener('DOMContentLoaded', () => {
             initialize();
             UnityAds.load('rewardedVideo');
         } else {
+            abGroupElement.value = window.localStorage.getItem('abGroup') === null ? abGroupElement.value : window.localStorage.getItem('abGroup')!;
+            campaignIdElement.value = window.localStorage.getItem('campaignId') === null ? campaignIdElement.value : window.localStorage.getItem('campaignId')!;
+            countryElement.value = window.localStorage.getItem('country') === null ?  countryElement.value : window.localStorage.getItem('country')!;
+            platformElement.value = window.localStorage.getItem('platform') === null ? platformElement.value : window.localStorage.getItem('platform')!;
+            gameIdElement.value =  window.localStorage.getItem('gameId') === null ? gameIdElement.value  : window.localStorage.getItem('gameId')!;
+            testModeElement.checked = window.localStorage.getItem('testMode') === null ? testModeElement.checked : window.localStorage.getItem('testMode') === 'true';
+            loadModeElement.checked = window.localStorage.getItem('loadMode') === null ? loadModeElement.checked : window.localStorage.getItem('loadMode') === 'true';
+            autoSkipElement.checked = window.localStorage.getItem('autoSkip') === null ? autoSkipElement.checked : window.localStorage.getItem('autoSkip') === 'true';
+            useStagingElement.checked = window.localStorage.getItem('useStaging') === null ? useStagingElement.checked : window.localStorage.getItem('useStaging') === 'true';
+
             initializeButton.addEventListener('click', (event: Event) => {
                 event.preventDefault();
                 initialize();
             }, false);
 
-            loadButton.addEventListener('click', (event: Event) => {
+            loadButtonDefault.addEventListener('click', (event: Event) => {
                 event.preventDefault();
-                UnityAds.load('invalidPlacement');
+                UnityAds.load('defaultVideoAndPictureZone');
+            }, false);
+
+            loadButtonIncentivize.addEventListener('click', (event: Event) => {
+                event.preventDefault();
+                UnityAds.load('incentivizedZone');
             }, false);
 
             // tslint:disable-next-line
             (<any>window).parent.document.getElementById('initialize').disabled = false;
-            loadButton.disabled = true;
+            loadButtonDefault.disabled = true;
+            loadButtonIncentivize.disabled = true;
         }
     }
 });

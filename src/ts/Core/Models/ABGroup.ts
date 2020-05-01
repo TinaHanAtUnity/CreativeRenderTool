@@ -27,6 +27,16 @@ class ABTest {
     }
 }
 
+class ReverseABTest extends ABTest {
+    constructor(...groups: AllowedGroups[]) {
+        super(...groups);
+    }
+
+    public isValid(group: ABGroup): boolean {
+        return !super.isValid(group);
+    }
+}
+
 class DisabledABTest extends ABTest {
     constructor(...groups: AllowedGroups[]) {
         super(...groups);
@@ -63,14 +73,16 @@ class ZyngaFilteredABTest extends FilteredABTest {
 export const FakeEnabledABTest = new ABTest(16, 17);
 export const FakeDisabledABTest = new DisabledABTest(16, 17);
 export const FakeZyngaFilteredABTest = new ZyngaFilteredABTest(16, 17);
+export const FakeReverseABTest = new ReverseABTest(16, 17);
 
 // Active AB Tests
-export const MediationCacheModeAllowedTest = new ABTest(5, 6);
+export const MediationCacheModeAllowedTest = new ReverseABTest(5);
 export const MabDisabledABTest = new ZyngaFilteredABTest(7);
-export const LoadExperiment = new ABTest(13);
-export const LoadRefreshV4 = new ABTest(14);
 export const PrivacySDKTest = new ABTest(16);
-export const DiagnosticsRampDown = new ABTest(15);
+export const AuctionXHR = new DisabledABTest();
+export const AuctionV6Test = new ReverseABTest(6, 10);
+export const LoadV5 = new ReverseABTest(18, 19);
+export const BaseLineLoadV5 = new ReverseABTest(18, 19);
 
 // Disabled AB Tests
 export const OpenMeasurementTest = new DisabledABTest();

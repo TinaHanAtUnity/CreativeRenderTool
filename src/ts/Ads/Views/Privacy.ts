@@ -9,22 +9,21 @@ import { Localization } from 'Core/Utilities/Localization';
 import { PrivacyDataRequest } from 'Ads/Views/Privacy/PrivacyDataRequest';
 import { PrivacyLocalization } from 'Privacy/PrivacyLocalization';
 
-enum PrivacyCardState {
-    PRIVACY,
-    BUILD,
-    REPORT
+enum ToolViewState {
+    REPORT,
+    BUILD_INFO
 }
 
 export class Privacy extends AbstractPrivacy {
 
+    private readonly _campaign: Campaign;
+    private readonly _language: string;
+    private readonly _gdprEnabled: boolean = false;
+    private readonly _localization: Localization;
+
     private _dataDeletionConfirmation: boolean = false;
-    private _currentState: PrivacyCardState = PrivacyCardState.PRIVACY;
-    private _campaign: Campaign;
     private _reportSent: boolean = false;
-    private _gdprEnabled: boolean = false;
     private _userSummaryObtained: boolean = false;
-    private _localization: Localization;
-    private _language: string;
 
     constructor(platform: Platform, campaign: Campaign,
                 privacyManager: UserPrivacyManager, gdprEnabled: boolean,
@@ -49,13 +48,13 @@ export class Privacy extends AbstractPrivacy {
             },
             {
                 event: 'click',
-                listener: (event: Event) => this.changePrivacyState(event, true),
-                selector: '.left-side-link'
+                listener: (event: Event) => this.onReportAdButtonEvent(event),
+                selector: '.report-ad-button'
             },
             {
                 event: 'click',
-                listener: (event: Event) => this.changePrivacyState(event, false),
-                selector: '.middle-link'
+                listener: (event: Event) => this.onBuildInfoButtonEvent(event),
+                selector: '.build-info-button'
             },
             {
                 event: 'click',
@@ -92,6 +91,12 @@ export class Privacy extends AbstractPrivacy {
             }
 
         }
+
+        if (this._gdprEnabled) {
+            // Disables reporting for GDPR Regions by hiding the report screen from being activated
+            const reportAdButton = <HTMLDivElement> this._container.querySelector('.report-ad-button');
+            reportAdButton.style.visibility = 'hidden';
+        }
     }
 
     public show(): void {
@@ -124,12 +129,6 @@ export class Privacy extends AbstractPrivacy {
                     this._dataDeletionConfirmation = false;
                 };
             }
-        }
-
-        if (this._gdprEnabled) {
-            // Disables reporting for GDPR Regions by hiding the report screen from being activated
-            const middleLink = <HTMLDivElement> this._container.querySelector('.middle-link');
-            middleLink.style.visibility = 'hidden';
         }
     }
 
@@ -191,6 +190,41 @@ export class Privacy extends AbstractPrivacy {
         activeRadioButton.checked = true;
     }
 
+    private onReportAdButtonEvent(event: Event) {
+        event.preventDefault();
+
+        this.showToolView(ToolViewState.REPORT);
+    }
+
+    private onBuildInfoButtonEvent(event: Event) {
+        event.preventDefault();
+
+        this.showToolView(ToolViewState.BUILD_INFO);
+    }
+
+    private showToolView(viewState: ToolViewState) {
+        let classToAdd: string;
+        switch (viewState) {
+            case ToolViewState.REPORT:
+                classToAdd = 'report';
+                break;
+            case ToolViewState.BUILD_INFO:
+                classToAdd = 'build-info';
+                break;
+            default:
+                classToAdd = '';
+        }
+
+        const states = ['report', 'build-info'];
+        states.forEach(state => {
+            if (state === classToAdd) {
+                this.container().classList.toggle(classToAdd);
+            } else {
+                this.container().classList.remove(state);
+            }
+        });
+    }
+
     private onReportAd(event: Event): void {
         event.preventDefault();
         if (!this._reportSent) {
@@ -216,72 +250,6 @@ export class Privacy extends AbstractPrivacy {
             } else {
                 reportText.innerHTML = 'Please select an option from the list above.';
                 reportText.classList.toggle('active');
-            }
-        }
-    }
-
-    private changePrivacyState(event: Event, isLeftClick: boolean) {
-        event.preventDefault();
-
-        const leftSideLink = <HTMLDivElement> this._container.querySelector('.left-side-link');
-        const middleLink = <HTMLDivElement> this._container.querySelector('.middle-link');
-        const closeButton = <HTMLDivElement> this._container.querySelector('.close-button');
-        const classList = this._container.classList;
-        const reportButtonText = 'Report Ad ⚑';
-        const privacyButtonText = 'Privacy info 👁';
-        const buildButtonText = 'Build info ⚙';
-        const confirmText = this._localization.translate('privacy-dialog-button-confirm');
-        const closeText = this._localization.translate('privacy-dialog-button-close');
-
-        switch (this._currentState) {
-            // Privacy screen showing
-            case PrivacyCardState.PRIVACY: {
-                leftSideLink.innerText = privacyButtonText;
-                closeButton.innerText = closeText;
-                if (isLeftClick) {
-                    this._currentState = PrivacyCardState.BUILD;
-                    middleLink.innerText = reportButtonText;
-                    classList.add('build');
-                } else {
-                    this._currentState = PrivacyCardState.REPORT;
-                    middleLink.innerText = buildButtonText;
-                    classList.add('report');
-                }
-                break;
-            }
-            // Build screen showing
-            case PrivacyCardState.BUILD: {
-                classList.remove('build');
-                if (isLeftClick) {
-                    this._currentState = PrivacyCardState.PRIVACY;
-                    leftSideLink.innerText = buildButtonText;
-                    middleLink.innerText = reportButtonText;
-                    closeButton.innerText = confirmText;
-                } else {
-                    this._currentState = PrivacyCardState.REPORT;
-                    leftSideLink.innerText = privacyButtonText;
-                    middleLink.innerText = buildButtonText;
-                    classList.add('report');
-                }
-                break;
-            }
-            // Report screen showing
-            case PrivacyCardState.REPORT: {
-                classList.remove('report');
-                middleLink.innerText = reportButtonText;
-                if (isLeftClick) {
-                    this._currentState = PrivacyCardState.PRIVACY;
-                    leftSideLink.innerText = buildButtonText;
-                    closeButton.innerText = confirmText;
-                } else {
-                    this._currentState = PrivacyCardState.BUILD;
-                    leftSideLink.innerText = privacyButtonText;
-                    classList.add('build');
-                }
-                break;
-            }
-            default: {
-                // Must be included. Thanks linter.
             }
         }
     }

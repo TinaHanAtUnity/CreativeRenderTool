@@ -5,9 +5,13 @@ import { RequestError } from 'Core/Errors/RequestError';
 import { ICoreApi } from 'Core/ICore';
 import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
 import { Url } from 'Core/Utilities/Url';
-import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { MacroUtil } from 'Ads/Utilities/MacroUtil';
+import { SDKMetrics, MiscellaneousMetric } from 'Ads/Utilities/SDKMetrics';
+import { Diagnostics } from 'Core/Utilities/Diagnostics';
+import { FailedPTSEventManager } from 'Ads/Managers/FailedPTSEventManager';
+import { StorageBridge } from 'Core/Utilities/StorageBridge';
+import { JaegerUtilities } from 'Core/Jaeger/JaegerUtilities';
 
 enum ThirdPartyEventMethod {
     POST,
@@ -36,7 +40,6 @@ export enum TrackingEvent {
     COMPLETE = 'complete',
     ERROR = 'error',
     SKIP = 'skip',
-    VIEW = 'view',
     STALLED = 'stalled',
     COMPANION_CLICK = 'companionClick',
     COMPANION = 'companion',
@@ -57,11 +60,14 @@ export class ThirdPartyEventManager {
 
     private _core: ICoreApi;
     private _request: RequestManager;
+    private _storageBridge: StorageBridge | undefined;
     private _templateValues: { [id: string]: string } = {};
 
-    constructor(core: ICoreApi, request: RequestManager, templateValues?: ITemplateValueMap) {
+    // TODO: Make storageBridge required param if resending the failed PTS Events accounts for the discrepancy
+    constructor(core: ICoreApi, request: RequestManager, templateValues?: ITemplateValueMap, storageBridge?: StorageBridge) {
         this._core = core;
         this._request = request;
+        this._storageBridge = storageBridge;
 
         if (templateValues) {
             this.setTemplateValues(templateValues);
@@ -72,6 +78,10 @@ export class ThirdPartyEventManager {
         const urls = campaign.getTrackingUrlsForEvent(event);
         const sessionId = campaign.getSession().getId();
         const events = [];
+
+        if (event === TrackingEvent.IMPRESSION && CustomFeatures.sampleAtGivenPercent(50)) {
+            SDKMetrics.reportMetricEvent(MiscellaneousMetric.ImpressionDuplicate);
+        }
 
         for (const url of urls) {
             events.push(this.sendWithGet(`${adDescription} ${event}`, sessionId, url, useWebViewUserAgentForTracking, headers));
@@ -139,6 +149,13 @@ export class ThirdPartyEventManager {
                 request = this._request.get(url, headers, options);
         }
         return request.catch(error => {
+
+            if (this._storageBridge && method === ThirdPartyEventMethod.GET && Url.isInternalPTSTrackingProtocol(url)) {
+                new FailedPTSEventManager(this._core, sessionId, JaegerUtilities.uuidv4()).storeFailedEvent(this._storageBridge, {
+                    url: url
+                });
+            }
+
             const urlParts = Url.parse(url);
             const auctionProtocol = RequestManager.getAuctionProtocol();
             const diagnosticData = {

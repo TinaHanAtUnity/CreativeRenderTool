@@ -11,6 +11,7 @@ import { VastHTMLEndScreen } from 'VAST/Views/VastHTMLEndScreen';
 import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 import { IAds } from 'Ads/IAds';
 import { ICore } from 'Core/ICore';
+import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 
 export class VastAdUnitParametersFactory extends AbstractAdUnitParametersFactory<VastCampaign, IVastAdUnitParameters> {
     private readonly _webPlayerContainer: WebPlayerContainer;
@@ -20,13 +21,14 @@ export class VastAdUnitParametersFactory extends AbstractAdUnitParametersFactory
     }
     protected createParameters(baseParams: IAdUnitParameters<VastCampaign>) {
         let showPrivacyDuringVideo = true;
+        const attachTapForTencentVast = CustomFeatures.isTencentSeat(baseParams.campaign.getSeatId());
 
         // hide privacy icon for China
         if (baseParams.adsConfig.getHidePrivacy()) {
             showPrivacyDuringVideo = false;
         }
 
-        const overlay = new VastVideoOverlay(baseParams, baseParams.privacy, this.showGDPRBanner(baseParams), showPrivacyDuringVideo);
+        const overlay = new VastVideoOverlay(baseParams, baseParams.privacy, this.showGDPRBanner(baseParams), showPrivacyDuringVideo, attachTapForTencentVast ? true : undefined);
 
         const vastAdUnitParameters: IVastAdUnitParameters = {
             ... baseParams,
