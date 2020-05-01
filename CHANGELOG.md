@@ -1,5 +1,6 @@
 # Pending
 
+* [Load V5] Revert reverse AB test [#14909](https://github.com/Applifier/unity-ads-webview/pull/14909)
 * [Tencent clickThrough macros replacement] PR6: Enable this feature and create corresponding event handlers [#14975](https://github.com/Applifier/unity-ads-webview/pull/14975)
 * [ABT] Add Metrics to Investigate VideoPlayer Errors [#15001](https://github.com/Applifier/unity-ads-webview/pull/15001)
 * [Tencent clickThrough macros replacement] PR5: Introduce Tencent specific EventHandlers and utils [#14974](https://github.com/Applifier/unity-ads-webview/pull/14974)
