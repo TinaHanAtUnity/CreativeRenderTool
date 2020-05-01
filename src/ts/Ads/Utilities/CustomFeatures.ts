@@ -142,7 +142,8 @@ export class CustomFeatures {
     public static isLoadV5Game(gameId: string): boolean {
         const gameIds = [
             '1783252', '1781853', '1781854', // Initial Games
-            '1428861', '1428862' // Chimera Game
+            '1428861', '1428862', // Chimera Game
+            '1434564', '3079031', '3334336', '3211592', '1566453', '3334337' // First batch
         ];
 
         return this.existsInList(gameIds, gameId);
