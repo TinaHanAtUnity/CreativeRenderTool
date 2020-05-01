@@ -494,7 +494,7 @@ export class AdRequestManager extends CampaignManager {
             if (!campaign || !trackingUrls) {
                 return Promise.resolve(undefined);
             }
-            return { campaign: campaign, trackingUrls: trackingUrls };
+            return Promise.resolve({ campaign: campaign, trackingUrls: trackingUrls });
         });
     }
 
