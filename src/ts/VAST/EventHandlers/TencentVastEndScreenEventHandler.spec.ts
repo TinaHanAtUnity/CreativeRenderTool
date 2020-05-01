@@ -81,7 +81,7 @@ describe('TencentVastEndScreenEventHandler', () => {
                 vastTencentEndScreenHandler = new TencentVastEndScreenEventHandler(vastAdUnit, baseParams);
                 await vastTencentEndScreenHandler.onVastEndScreenClick();
             });
-            it('the iOS open url method should be called with replaced url', () => {
+            it('the iOS open url method should be called', () => {
                 expect(baseParams.core.iOS!.UrlScheme.open).toHaveReturnedWith(Promise.resolve());
             });
         });
