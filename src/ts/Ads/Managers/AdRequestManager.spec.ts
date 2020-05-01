@@ -1,5 +1,5 @@
 import { Platform } from 'Core/Constants/Platform';
-import { AdRequestManager } from 'Ads/Managers/AdRequestManager';
+import { AdRequestManager, INotCachedLoadedCampaign } from 'Ads/Managers/AdRequestManager';
 import { Core } from 'Core/__mocks__/Core';
 import { ICore } from 'Core/ICore';
 import { CoreConfigurationMock, CoreConfiguration } from 'Core/Models/__mocks__/CoreConfiguration';
@@ -17,11 +17,12 @@ import { PrivacySDKMock, PrivacySDK } from 'Privacy/__mocks__/PrivacySDK';
 import { UserPrivacyManagerMock, UserPrivacyManager } from 'Ads/Managers/__mocks__/UserPrivacyManager';
 import { GameSessionCounters } from 'Ads/Utilities/GameSessionCounters';
 import { ILoadedCampaign } from 'Ads/Managers/CampaignManager';
-import { Placement } from 'Ads/Models/__mocks__/Placement';
+import { Placement, PlacementMock, withAdUnit } from 'Ads/Models/__mocks__/Placement';
 import { CometCampaignParser } from 'Performance/Parsers/CometCampaignParser';
 import { INativeResponse } from 'Core/Managers/RequestManager';
 import { Campaign } from 'Ads/Models/Campaign';
 import { SDKMetrics, LoadV5 } from 'Ads/Utilities/SDKMetrics';
+import { IPlacementIdMap } from './PlacementManager';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const LoadV5PreloadResponse = require('json/LoadV5PreloadResponse.json');
@@ -31,6 +32,8 @@ const LoadV5PreloadResponse_NoFill = require('json/LoadV5PreloadResponse_NoFill.
 const LoadV5LoadResponse = require('json/LoadV5LoadResponse.json');
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const LoadV5LoadResponse_2 = require('json/LoadV5LoadResponse_2.json');
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const LoadV5LoadResponseWithAdditinalPlacements = require('json/LoadV5LoadResponseWithAdditinalPlacements.json');
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const LoadV5LoadResponse_NoFill = require('json/LoadV5LoadResponse_NoFill.json');
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -350,6 +353,175 @@ class SatisfiesMatcher {
                     retryDelay: 10000,
                     retryWithConnectionEvents: false
                 });
+            });
+        });
+
+        describe('successful load request with additional placements', () => {
+            let loadedCampaign: ILoadedCampaign | undefined;
+            let onAdditionalPlacementsReady: jest.Mock;
+
+            beforeEach(async () => {
+                request.post.mockResolvedValueOnce({
+                    url: '',
+                    response: JSON.stringify(LoadV5PreloadResponse),
+                    responseCode: 200,
+                    headers: {}
+                }).mockResolvedValueOnce({
+                    url: '',
+                    response: JSON.stringify(LoadV5LoadResponseWithAdditinalPlacements),
+                    responseCode: 200,
+                    headers: {}
+                });
+
+                const placements: { [key: string]: PlacementMock } = {
+                    'video': withAdUnit(Placement('video'), 'test_ad_unit'),
+                    'rewardedVideo': withAdUnit(Placement('rewardedVideo'), 'test_ad_unit'),
+                    'video2': withAdUnit(Placement('video2'), 'test_ad_unit'),
+                    'video3': withAdUnit(Placement('video3'), 'test_ad_unit')
+                };
+
+                adsConfig.getPlacement.mockImplementation((x) => placements[x]);
+                adsConfig.getPlacementsForAdunit.mockReturnValueOnce([placements.video.getId(), placements.rewardedVideo.getId(), placements.video2.getId(), placements.video3.getId()]);
+
+                contentTypeHandlerManager.getParser.mockReturnValue(new CometCampaignParser(core));
+
+                onAdditionalPlacementsReady = jest.fn();
+                adRequestManager.onAdditionalPlacementsReady.subscribe(onAdditionalPlacementsReady);
+
+                await adRequestManager.requestPreload();
+                loadedCampaign = await adRequestManager.loadCampaign(placements.video);
+            });
+
+            it('should getPlacementsForAdunit be called with correct ad unit id', () => {
+                expect(adsConfig.getPlacementsForAdunit).toBeCalledWith('test_ad_unit');
+            });
+
+            it('should send fill metric', () => {
+                expect(SDKMetrics.reportMetricEvent).toBeCalledWith(LoadV5.LoadRequestFill);
+            });
+
+            it('should not increase request count in game session counter', () => {
+                expect(GameSessionCounters.getCurrentCounters()).toEqual({
+                    adRequests: 1,
+                    starts: 0,
+                    views: 0,
+                    startsPerTarget: { },
+                    viewsPerTarget: { },
+                    latestTargetStarts: { }
+                });
+            });
+
+            it('should have a fill', () => {
+                expect(loadedCampaign).toBeDefined();
+            });
+
+            it('should have correct in loadedCampaign', () => {
+                expect(loadedCampaign!.campaign.getId()).toEqual('5be40c5f602f4510ec583881');
+            });
+
+            it('should sessions have id from preload response', () => {
+                expect(loadedCampaign!.campaign.getSession()).toBeDefined();
+                expect(loadedCampaign!.campaign.getSession().getId()).toEqual('d301fd4c-4a9e-48e4-82aa-ad8b07977ca6');
+            });
+
+            it('should make request with correct body', () => {
+                expect(request.post).toHaveBeenCalledTimes(2);
+                expect(request.post).toHaveBeenNthCalledWith(2, expect.anything(), new SatisfiesMatcher({
+                    isLoadEnabled: true,
+                    preload: false,
+                    load: true,
+                    preloadPlacements: {},
+                    placements: {
+                        video: {
+                            adTypes: ['VIDEO'],
+                            allowSkip: false,
+                            auctionType: 'cpm'
+                        },
+                        rewardedVideo: {
+                            adTypes: ['VIDEO'],
+                            allowSkip: false,
+                            auctionType: 'cpm'
+                        }
+                    },
+                    preloadData: {
+                        video: {
+                            campaignAvailable: true,
+                            ttlInSeconds: 3600,
+                            data: 'test-data-preload-1'
+                        },
+                        rewardedVideo: {
+                            campaignAvailable: true,
+                            ttlInSeconds: 3600,
+                            data: 'test-data-preload-2'
+                        }
+                    }
+                }), [], {
+                    followRedirects: false,
+                    retries: 0,
+                    retryDelay: 10000,
+                    retryWithConnectionEvents: false
+                });
+            });
+
+            it('should onAdditionalPlacementsReady be called for additional placements', () => {
+                expect(onAdditionalPlacementsReady).toBeCalledTimes(1);
+            });
+
+            it('should have 3 placements in additional placements', () => {
+                expect(onAdditionalPlacementsReady).toBeCalledTimes(1);
+                const additionalCampaigns: IPlacementIdMap<INotCachedLoadedCampaign | undefined> = <IPlacementIdMap<INotCachedLoadedCampaign | undefined>>onAdditionalPlacementsReady.mock.calls[0][1];
+
+                expect(Object.keys(additionalCampaigns).length).toEqual(3);
+            });
+
+            it('should return correct ad unit id in onAdditionalPlacementsReady', () => {
+                const adUnitId: string = <string>onAdditionalPlacementsReady.mock.calls[0][0];
+
+                expect(adUnitId).toEqual('test_ad_unit');
+            });
+
+            it('should get correct campaign for rewardedVideo', () => {
+                const additionalCampaigns: IPlacementIdMap<INotCachedLoadedCampaign | undefined> = <IPlacementIdMap<INotCachedLoadedCampaign | undefined>>onAdditionalPlacementsReady.mock.calls[0][1];
+                const campaign = additionalCampaigns.rewardedVideo!.notCachedCampaign;
+
+                expect(campaign.getId()).toEqual('load_v5_second');
+
+                expect(campaign.getSession()).toBeDefined();
+                expect(campaign.getSession().getId()).toEqual('d301fd4c-4a9e-48e4-82aa-ad8b07977ca6');
+            });
+
+            it('should get correct campaign video2', () => {
+                const additionalCampaigns: IPlacementIdMap<INotCachedLoadedCampaign | undefined> = <IPlacementIdMap<INotCachedLoadedCampaign | undefined>>onAdditionalPlacementsReady.mock.calls[0][1];
+                const campaign = additionalCampaigns.video2!.notCachedCampaign;
+
+                expect(campaign.getId()).toEqual('load_v5_second');
+
+                expect(campaign.getSession()).toBeDefined();
+                expect(campaign.getSession().getId()).toEqual('d301fd4c-4a9e-48e4-82aa-ad8b07977ca6');
+            });
+
+            it('should get a no fill for video3', () => {
+                const additionalCampaigns: IPlacementIdMap<INotCachedLoadedCampaign | undefined> = <IPlacementIdMap<INotCachedLoadedCampaign | undefined>>onAdditionalPlacementsReady.mock.calls[0][1];
+                const campaign = additionalCampaigns.video3;
+
+                expect(campaign).toBeUndefined();
+            });
+
+            it('should have not the same campaigns in video2 and rewardedVideo', () => {
+                const additionalCampaigns: IPlacementIdMap<INotCachedLoadedCampaign | undefined> = <IPlacementIdMap<INotCachedLoadedCampaign | undefined>>onAdditionalPlacementsReady.mock.calls[0][1];
+
+                const campaign1: Campaign = additionalCampaigns.rewardedVideo!.notCachedCampaign;
+                const campaign2: Campaign = additionalCampaigns.video2!.notCachedCampaign;
+
+                expect(campaign1).not.toBe(campaign2);
+            });
+
+            it('should cache only 1 campaigns', () => {
+                expect(assetManager.setup).toBeCalledTimes(1);
+            });
+
+            it('should start caching in correct order', () => {
+                expect(assetManager.setup).toHaveBeenNthCalledWith(1, loadedCampaign!.campaign);
             });
         });
 
