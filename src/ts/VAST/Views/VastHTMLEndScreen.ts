@@ -93,7 +93,7 @@ export class VastHTMLEndScreen extends VastEndScreen implements IPrivacyHandlerV
         if (this._privacy) {
             this._privacy.hide();
         }
-        this._adUnitContainer.setViewFrame('webview', 0, this._screenHeight - this._controlBarHeight, this._screenWidth, this._controlBarHeight).catch(() => {
+        this._adUnitContainer.setViewFrame('webview', 0, 0, this._screenWidth, this._controlBarHeight).catch(() => {
             this.onCloseEvent(new Event('click'));
         });
     }
@@ -122,7 +122,7 @@ export class VastHTMLEndScreen extends VastEndScreen implements IPrivacyHandlerV
                         this._screenHeight = screenHeight;
                         this._screenWidth = screenWidth;
                         this._adUnitContainer.setViewFrame('webplayer', 0, 0, screenWidth, screenHeight).then(() => {
-                            this._adUnitContainer.setViewFrame('webview', 0, screenHeight - this._controlBarHeight, screenWidth, this._controlBarHeight).then(() => {
+                            this._adUnitContainer.setViewFrame('webview', 0, 0, screenWidth, this._controlBarHeight).then(() => {
                                 return this.setWebplayerEventSettings();
                             });
                         });
