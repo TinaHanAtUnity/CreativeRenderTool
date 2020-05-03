@@ -81,13 +81,6 @@ export abstract class WebPlayerContainer {
         }
     }
     private handleShouldOverrideUrlLoading(viewId: string, url: string, method: string) {
-        if (this._platform === Platform.ANDROID) {
-            if (method) {
-                // Currently a bug with how we handle API > 21 where both methods will fire this single event.
-                // API < 21 does not have the method as a parameter, so we will only send if
-                return;
-            }
-        }
         if (this._viewId === viewId) {
             this.shouldOverrideUrlLoading.trigger(url, method);
         }
