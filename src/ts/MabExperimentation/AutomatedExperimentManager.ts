@@ -360,9 +360,6 @@ export class AutomatedExperimentManager {
 
         const ts = new Date();
         features.campaign_id = campaign.getId();
-        features.target_game_id = campaign instanceof PerformanceCampaign ? campaign.getGameId() : undefined;
-        features.rating = campaign instanceof PerformanceCampaign ? campaign.getRating() : undefined;
-        features.rating_count = campaign instanceof PerformanceCampaign ? campaign.getRatingCount() : undefined;
         features.gsc_ad_requests = gameSessionCounters.adRequests;
         features.gsc_views = gameSessionCounters.views;
         features.gsc_starts = gameSessionCounters.starts;
@@ -371,6 +368,18 @@ export class AutomatedExperimentManager {
         features.day_of_week = ts.getDay();
         features.local_day_time = ts.getHours() + ts.getMinutes() / 60;
 
+        if (campaign && campaign instanceof PerformanceCampaign) {
+            features.target_game_id = campaign.getGameId();
+            features.rating = campaign.getRating();
+            features.rating_count = campaign.getRatingCount();
+            features.target_store_id = campaign.getAppStoreId();
+            features.game_icon_url = campaign.getGameIcon().getUrl();
+            features.target_game_name = campaign.getGameName();
+            features.portrait_creative_id = campaign.getPortraitVideo() ? campaign.getPortraitVideo()!.getCreativeId() : undefined;
+            features.landscape_creative_id =  campaign.getVideo() ? campaign.getVideo()!.getCreativeId() : undefined;
+            features.endcard_portrait_image_url = campaign.getPortrait() ? campaign.getPortrait()!.getUrl() : undefined;
+            features.endcard_landscape_image_url = campaign.getLandscape() ? campaign.getLandscape()!.getUrl() : undefined;
+        }
         // Extract game session counters: targetted game centric
         let ids: string[] = [];
         let starts: number[] = [];
