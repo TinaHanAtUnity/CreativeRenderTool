@@ -1,4 +1,5 @@
 @import 'vars.styl';
+@import "iphone-x-series.styl";
 
 body.alternative-layout #end-screen {
 
@@ -175,7 +176,7 @@ body.alternative-layout #end-screen {
             height: unset;
             display: flex;
             justify-content: flex-end;
-            margin: .25em 0;
+            margin: .5em 0;
             align-items: center;
             position: absolute;
             bottom: 0;
@@ -256,62 +257,139 @@ body.alternative-layout.landscape #end-screen {
     }
 
     .btn-close-region {
-        padding-right: 1em !important;
+        padding-right: 1em;
     }
 
     .privacy-button {
-        padding-right: 1.5em !important;
+        padding-right: 1.5em;
     }
-//     .game-info-container {
-//         padding: .6em;
-//         border-radius: .25em;
-//         margin: 0 1em .5em 0;
-//     }
-
-//     .install-container {
-//         margin: 0;
-//         margin-right: 1rem;
-//     }
-
-//     .unityads-logo {
-//         margin-right: 1rem;
-//     }
 }
 
 @media only screen and (-webkit-device-pixel-ratio: 3) and (device-height: 812px) and (device-width: 375px) {
     .performance-end-screen .alternative-layout.portrait #end-screen .bottom-container {
-        margin: .25em 0;
+        margin: .5em 0;
     }
 }
 
-// @media (orientation: portrait) {
-//     .alternative-layout.portrait {
-        
-//         /* iPhone X & iPhone XS */
-//         @media only screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) {
-//             html {
-//                 $iphone-x-styles();
-//             }
+$iphone-x-performance-end-screen-styles() {
+  .performance-end-screen {
+    .portrait #end-screen {
+      padding: 0;
+      padding-top: env(safe-area-inset-top);
+      padding-top: constant(safe-area-inset-top); // @stylint ignore;
+      width: 100vw;
+      height: calc(100vh - env(safe-area-inset-top));
+      height: calc(100vh - constant(safe-area-inset-top)); // @stylint ignore;
 
-//             $iphone-x-performance-end-screen-styles();
-//         }
+      .bottom-container {
+        margin-bottom: env(safe-area-inset-bottom);
+        margin-bottom: constant(safe-area-inset-bottom); // @stylint ignore;
+      }
+    }
 
-//         /* iPhone XS Max */
-//         @media only screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) {
-//             html {
-//                 $iphone-x-styles();
-//             }
+    .landscape #end-screen {
+      padding: 0;
+      height: 100vh;
+    
+        .bottom-container {
+            height: unset;
+            display: flex;
+            justify-content: flex-end;
+            margin: .25em 0;
+            align-items: center;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            
+            .privacy-button {
+                position: unset;
+                bottom: unset;
+                z-index: unset;
+                line-height: unset;
+                margin: 0;
+                margin-left: 0em;
+                padding: 0 .5em;
+                margin-right: 4em;
 
-//             $iphone-x-performance-end-screen-styles();
-//         }
+                .icon-gdpr {
+                    color: $white;
+                    opacity: .25;
+                    filter: drop-shadow(1px 2px 2px black);
+                }
+            }
 
-//         /* iPhone XR */
-//         @media only screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) {
-//             html {
-//                 $iphone-x-styles();
-//             }
+            .china-advertisement {
+                position: unset;
+                padding: 0;
+                color: $white;
+                font-size: .7em;
+                right: unset;
+                bottom: unset;
+                margin: 0;
+                opacity: .25;
+                filter: drop-shadow(1px 2px 2px black);
+            }
+        }
 
-//             $iphone-x-performance-end-screen-styles();
-//         }
-//     }
-// }
+        &.show-gdpr-banner .gdpr-pop-up {
+            padding-bottom: constant(safe-area-inset-bottom);
+            padding-bottom: env(safe-area-inset-bottom); // @stylint ignore
+
+            .gdpr-text {
+                padding-bottom: 0;
+            }
+        }
+    }
+
+    .ios-landscape-right #end-screen {
+      padding-right: unset;
+      width: 100%;
+    }
+
+    .ios-landscape-left #end-screen {
+      padding-left: unset;
+      width: 100%;
+
+      .bottom-container .privacy-button {
+        right: 0;
+      }
+    }
+
+    #end-screen .end-screen-info-background{
+      @media (orientation: portrait) {
+        /* iPhone X & iPhone XS */
+        @media only screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) {
+          font-size: $default-px-size * 1.5;
+        }
+      }
+    }
+  }
+}
+
+/* iPhone X & iPhone XS */
+@media only screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) {
+  html {
+    $iphone-x-styles();
+  }
+
+  $iphone-x-performance-end-screen-styles();
+}
+
+/* iPhone XS Max */
+@media only screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) {
+  html {
+    $iphone-x-styles();
+  }
+
+  $iphone-x-performance-end-screen-styles();
+}
+
+/* iPhone XR */
+@media only screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) {
+  html {
+    $iphone-x-styles();
+  }
+
+  $iphone-x-performance-end-screen-styles();
+}
