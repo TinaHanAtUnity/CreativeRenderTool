@@ -19,6 +19,8 @@ export type PlacementMock = Base & {
     setCurrentTrackingUrls: Mock;
     isInvalidationPending: Mock<boolean>;
     setInvalidationPending: Mock;
+    hasAdUnitId: Mock<boolean>;
+    getAdUnitId: Mock<string | undefined>;
 };
 
 export const Placement = jest.fn((id: string = 'video', state: PlacementState = PlacementState.READY, campaign: Campaign | undefined = undefined) => {
@@ -45,5 +47,15 @@ export const Placement = jest.fn((id: string = 'video', state: PlacementState = 
         setCurrentTrackingUrls: jest.fn(),
         setInvalidationPending: jest.fn().mockImplementation((x) => classState.invalidationPending = x),
         isInvalidationPending: jest.fn().mockImplementation((x) => classState.invalidationPending),
+        hasAdUnitId: jest.fn().mockReturnValue(false),
+        getAdUnitId: jest.fn().mockReturnValue(undefined)
+    };
+});
+
+export const withAdUnit = jest.fn((placement: PlacementMock, adUnit: string | undefined) => {
+    return <PlacementMock>{
+        ...placement,
+        hasAdUnitId: jest.fn().mockReturnValue(adUnit !== undefined),
+        getAdUnitId: jest.fn().mockReturnValue(adUnit)
     };
 });
