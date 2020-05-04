@@ -4,7 +4,6 @@ import { Color } from 'Core/Utilities/Color';
 
 describe('Color Test', () => {
     it('should parse hex colors correctly', () => {
-
         assert.deepEqual(Color.hexToColor('#df80b8'), { r: 223, g: 128, b: 184, a: 255 }, 'Color was parsed incorrectly');
         assert.deepEqual(Color.hexToColor('#0c36d4'), { r: 12, g: 54, b: 212, a: 255 }, 'Color was parsed incorrectly');
         assert.deepEqual(Color.hexToColor('a6ca5c'), { r: 166, g: 202, b: 92, a: 255 }, 'Color was parsed incorrectly');
