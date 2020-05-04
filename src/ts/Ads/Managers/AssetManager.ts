@@ -115,7 +115,7 @@ export class AssetManager {
 
         if (campaign instanceof PerformanceCampaign || campaign instanceof XPromoCampaign) {
             return this.getOrientedVideo(campaign).then(video => {
-                return [[video], optionalAssets];
+                return [[video, ...requiredAssets], optionalAssets];
             });
         }
 
