@@ -33,7 +33,7 @@ export class PerformanceAdUnitWithAutomatedExperimentParametersFactory extends P
 
         const video = this.getVideo(baseParams.campaign, baseParams.forceOrientation);
 
-        let endScreenCombination: IExperimentActionChoice | undefined = this._automatedExperimentManager.activateSelectedExperiment(baseParams.campaign, AutomatedExperimentsCategories.PERFORMANCE_ENDCARD);
+        const endScreenCombination: IExperimentActionChoice | undefined = this._automatedExperimentManager.activateSelectedExperiment(baseParams.campaign, AutomatedExperimentsCategories.PERFORMANCE_ENDCARD);
 
         const endScreen = new AnimatedDownloadButtonEndScreen(endScreenCombination, endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
 

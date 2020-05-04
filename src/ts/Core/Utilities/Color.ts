@@ -50,6 +50,6 @@ export class Color {
     }
 
     public static isValidHex(hex?: string): boolean {
-        return hex !== undefined && /^#?(([a-f0-9]{3,4})|([a-f0-9]{6}([a-f0-9]{2})?))$/i.test(hex)
+        return hex !== undefined && /^#?(([a-f0-9]{3,4})|([a-f0-9]{6}([a-f0-9]{2})?))$/i.test(hex);
     }
 }
