@@ -1,5 +1,6 @@
 # Pending
 
+* [Auction V6] Remove AB Test and Release Feature [#15092](https://github.com/Applifier/unity-ads-webview/pull/15092)
 * [Chore] Update lint rules and auto fix existing issues (Part 1) [#15093](https://github.com/Applifier/unity-ads-webview/pull/15093)
 * [Load V5, Ad Unit] Update mocks [#15039](https://github.com/Applifier/unity-ads-webview/pull/15039)
 * [PTS Migration] Align MRAID Complete Event with Comet View Event [#15033](https://github.com/Applifier/unity-ads-webview/pull/15033)
