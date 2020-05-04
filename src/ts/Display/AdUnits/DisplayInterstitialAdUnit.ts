@@ -261,6 +261,9 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit implements IAdUnit
         this._operativeEventManager.sendStart(this.getOperativeEventParams()).then(() => {
             this.onStartProcessed.trigger();
         });
+
+        // Temporary for PTS Migration Investigation
+        this.sendTrackingEvent(TrackingEvent.START);
     }
 
     private setWebPlayerViews(): Promise<void> {
@@ -346,7 +349,7 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit implements IAdUnit
         }
     }
 
-    private sendTrackingEvent(event: TrackingEvent) {
+    public sendTrackingEvent(event: TrackingEvent) {
         this._thirdPartyEventManager.sendTrackingEvents(this._campaign, event, 'display', this._campaign.getUseWebViewUserAgentForTracking());
     }
 }

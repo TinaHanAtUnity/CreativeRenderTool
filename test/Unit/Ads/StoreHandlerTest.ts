@@ -16,7 +16,6 @@ import { Backend } from 'Backend/Backend';
 import { ICoreApi } from 'Core/ICore';
 import { IARApi } from 'AR/AR';
 import { RequestManager } from 'Core/Managers/RequestManager';
-import { IPurchasingApi } from 'Purchasing/IPurchasing';
 import { IStoreApi } from 'Store/IStore';
 
 [Platform.ANDROID].forEach(platform => {
@@ -28,7 +27,6 @@ import { IStoreApi } from 'Store/IStore';
         let ads: IAdsApi;
         let store: IStoreApi;
         let ar: IARApi;
-        let purchasing: IPurchasingApi;
         let focusManager: FocusManager;
         let thirdPartyEventManager: ThirdPartyEventManager;
         let wakeUpManager: WakeUpManager;
@@ -42,7 +40,6 @@ import { IStoreApi } from 'Store/IStore';
             ads = TestFixtures.getAdsApi(nativeBridge);
             store = TestFixtures.getStoreApi(nativeBridge);
             ar = TestFixtures.getARApi(nativeBridge);
-            purchasing = TestFixtures.getPurchasingApi(nativeBridge);
             focusManager = new FocusManager(platform, core);
             wakeUpManager = new WakeUpManager(core);
             request = new RequestManager(platform, core, wakeUpManager);
@@ -57,7 +54,7 @@ import { IStoreApi } from 'Store/IStore';
 
                 beforeEach(() => {
                     campaign = TestFixtures.getCampaign();
-                    adUnit = TestFixtures.getPerformanceAdUnit(platform, core, ads, store, ar, purchasing);
+                    adUnit = TestFixtures.getPerformanceAdUnit(platform, core, ads, store, ar);
                     storeHandler = TestFixtures.getStoreHandler(platform, core, ads, store, campaign, adUnit, thirdPartyEventManager, nativeBridge);
                     downloadParameters = TestFixtures.getStoreHandlerDownloadParameters(campaign);
                     return adUnit.show();
@@ -81,7 +78,7 @@ import { IStoreApi } from 'Store/IStore';
 
                 beforeEach(() => {
                     campaign = TestFixtures.getXPromoCampaign();
-                    xPromoAdUnit = TestFixtures.getXPromoAdUnit(platform, core, ads, store, ar, purchasing);
+                    xPromoAdUnit = TestFixtures.getXPromoAdUnit(platform, core, ads, store, ar);
                     storeHandler = TestFixtures.getStoreHandler(platform, core, ads, store, campaign, xPromoAdUnit, thirdPartyEventManager, nativeBridge);
                     downloadParameters = TestFixtures.getStoreHandlerDownloadParameters(campaign);
                     return xPromoAdUnit.show();

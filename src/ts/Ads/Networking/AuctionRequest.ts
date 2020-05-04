@@ -21,11 +21,12 @@ import { Url } from 'Core/Utilities/Url';
 import { TrackingIdentifierFilter } from 'Ads/Utilities/TrackingIdentifierFilter';
 import { IRequestPrivacy, RequestPrivacyFactory } from 'Ads/Models/RequestPrivacy';
 import { ABGroup } from 'Core/Models/ABGroup';
-import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 import { IBannerDimensions } from 'Banners/Utilities/BannerSizeUtil';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { PARTNER_NAME, OM_JS_VERSION } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
 import { AgeGateChoice, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
+import { SDKMetrics, ChinaAucionEndpoint } from 'Ads/Utilities/SDKMetrics';
+import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 
 export interface IAuctionResponse {
     correlationId: string;
@@ -92,7 +93,6 @@ interface IAuctionRequestBody {
     volume: number;
     requestSignal: string;
     ext: { [key: string]: unknown };
-    isPromoCatalogAvailable: boolean;
     cachedCampaigns: string[] | undefined;
     versionCode: number | undefined;
     mediationName: string | undefined;
@@ -125,6 +125,7 @@ interface IAuctionRequestBody {
  * keeping a reference. See {@link AuctionRequestFactory} for creating Auction requests.
  */
 export class AuctionRequest {
+    private _useChinaAuctionEndpoint: boolean | undefined = false;
 
     public static create(params: IAuctionRequestParams) {
         return new AuctionRequest(params);
@@ -210,6 +211,7 @@ export class AuctionRequest {
         this._privacy = RequestPrivacyFactory.create(params.privacySDK, this._deviceInfo.getLimitAdTracking());
         this._privacySDK = params.privacySDK;
         this._userPrivacyManager = params.userPrivacyManager;
+        this._useChinaAuctionEndpoint = (CustomFeatures.sampleAtGivenPercent(10) && params.coreConfig.getCountry() === 'CN');
         this.assignBaseUrl();
     }
 
@@ -226,6 +228,9 @@ export class AuctionRequest {
             if (AuctionRequest.CampaignResponse) {
                 return this.getStaticResponse(url);
             }
+            if (this._useChinaAuctionEndpoint) {
+                SDKMetrics.reportMetricEvent(ChinaAucionEndpoint.AuctionRequest);
+            }
             return this._request.post(url, JSON.stringify(body), this._headers, {
                 retries: this._retryCount,
                 retryDelay: this._retryDelay,
@@ -235,6 +240,9 @@ export class AuctionRequest {
             }).then((response) => {
                 this._response = response;
                 this._requestDuration = Date.now() - this._requestStart;
+                if (this._useChinaAuctionEndpoint) {
+                    SDKMetrics.reportMetricEvent(ChinaAucionEndpoint.AuctionResponse);
+                }
                 return JSON.parse(response.response);
             });
         });
@@ -308,6 +316,11 @@ export class AuctionRequest {
             return Promise.resolve(this._url);
         }
         let url = this.getBaseURL();
+
+        if (this._useChinaAuctionEndpoint) {
+            url = url.replace(/(.*auction\.unityads\.)(unity3d\.com)(.*)/, '$1unity.cn$3');
+        }
+
         url = Url.addParameters(url, TrackingIdentifierFilter.getDeviceTrackingIdentifiers(this._platform, this._deviceInfo));
 
         url = Url.addParameters(url, {
@@ -451,7 +464,6 @@ export class AuctionRequest {
                     volume: volume,
                     requestSignal: requestSignal,
                     ext: optionalSignal,
-                    isPromoCatalogAvailable: PurchasingUtilities.isCatalogAvailable(),
                     cachedCampaigns: (fullyCachedCampaignIds && fullyCachedCampaignIds.length > 0) ? fullyCachedCampaignIds : undefined,
                     versionCode: versionCode,
                     mediationName: mediation ? mediation.getName() : undefined,

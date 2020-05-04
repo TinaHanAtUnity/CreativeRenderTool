@@ -57,7 +57,6 @@ import { MRAID } from 'MRAID/MRAID';
 import { MRAIDView } from 'MRAID/Views/MRAIDView';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { Performance } from 'Performance/Performance';
-import { Promo } from 'Promo/Promo';
 import { VAST } from 'VAST/VAST';
 import { VPAID } from 'VPAID/VPAID';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
@@ -72,11 +71,10 @@ import { ARUtil } from 'AR/Utilities/ARUtil';
 import { PermissionsUtil, PermissionTypes } from 'Core/Utilities/Permissions';
 import { AbstractParserModule } from 'Ads/Modules/AbstractParserModule';
 import { MRAIDAdUnitParametersFactory } from 'MRAID/AdUnits/MRAIDAdUnitParametersFactory';
-import { PromoCampaign } from 'Promo/Models/PromoCampaign';
 import { PrivacyUnit } from 'Ads/AdUnits/PrivacyUnit';
 import { IStore } from 'Store/IStore';
 import { Store } from 'Store/Store';
-import { RequestManager } from 'Core/Managers/RequestManager';
+import { RequestManager, AuctionProtocol } from 'Core/Managers/RequestManager';
 import { AbstractAdUnitParametersFactory } from 'Ads/AdUnits/AdUnitParametersFactory';
 import { LoadApi } from 'Core/Native/LoadApi';
 import { RefreshManager } from 'Ads/Managers/RefreshManager';
@@ -85,7 +83,7 @@ import { Analytics } from 'Analytics/Analytics';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { PrivacyParser } from 'Privacy/Parsers/PrivacyParser';
 import { Promises } from 'Core/Utilities/Promises';
-import { LoadExperiment, LoadRefreshV4, MediationCacheModeAllowedTest, AuctionXHR, AuctionV6Test, LoadV5, BaseLineLoadV5, TemporaryCacheModeAllowedTest } from 'Core/Models/ABGroup';
+import { MediationCacheModeAllowedTest, AuctionXHR, AuctionV6Test, LoadV5, BaseLineLoadV5 } from 'Core/Models/ABGroup';
 import { PerPlacementLoadManagerV4 } from 'Ads/Managers/PerPlacementLoadManagerV4';
 import { PrivacyMetrics } from 'Privacy/PrivacyMetrics';
 import { PrivacySDKUnit } from 'Ads/AdUnits/PrivacySDKUnit';
@@ -93,12 +91,12 @@ import { PerPlacementLoadAdapter } from 'Ads/Managers/PerPlacementLoadAdapter';
 import { PrivacyDataRequestHelper } from 'Privacy/PrivacyDataRequestHelper';
 import { MediationMetaData } from 'Core/Models/MetaData/MediationMetaData';
 import { MediationLoadTrackingManager, MediationExperimentType } from 'Ads/Managers/MediationLoadTrackingManager';
-import { CachedUserSummary } from 'Privacy/CachedUserSummary';
 import { createMeasurementsInstance } from 'Core/Utilities/TimeMeasurements';
 import { XHRequest } from 'Core/Utilities/XHRequest';
-import { NofillImmediatelyManager } from 'Ads/Managers/NofillImmediatelyManager';
 import { LegacyCampaignManager } from 'Ads/Managers/LegacyCampaignManager';
-import { AutomatedExperimentManager } from 'Ads/Managers/AutomatedExperimentManager';
+import { PrivacyTestEnvironment } from 'Privacy/PrivacyTestEnvironment';
+import { MetaData } from 'Core/Utilities/MetaData';
+import { AutomatedExperimentManager } from 'MabExperimentation/AutomatedExperimentManager';
 import { CampaignAssetInfo } from 'Ads/Utilities/CampaignAssetInfo';
 import { AdRequestManager } from 'Ads/Managers/AdRequestManager';
 import { PerPlacementLoadManagerV5 } from 'Ads/Managers/PerPlacementLoadManagerV5';
@@ -124,16 +122,12 @@ export class Ads implements IAds {
     public CampaignManager: CampaignManager;
     public RefreshManager: RefreshManager;
     public MediationLoadTrackingManager: MediationLoadTrackingManager;
-    public NofillImmediatelyManager: NofillImmediatelyManager;
-
-    private static _forcedConsentUnit: boolean = false;
 
     private _currentAdUnit: AbstractAdUnit;
     private _showing: boolean = false;
     private _showingPrivacy: boolean = false;
     private _loadApiEnabled: boolean = false;
     private _webViewEnabledLoad: boolean = false;
-    private _nofillImmediately: boolean = false;
     private _forceLoadV5: boolean = false;
     private _mediationName: string;
     private _core: ICore;
@@ -189,36 +183,26 @@ export class Ads implements IAds {
         this.SessionManager = new SessionManager(this._core.Api, this._core.RequestManager, this._core.StorageBridge);
         this.MissedImpressionManager = new MissedImpressionManager(this._core.Api);
         this.ContentTypeHandlerManager = new ContentTypeHandlerManager();
-        this.ThirdPartyEventManagerFactory = new ThirdPartyEventManagerFactory(this._core.Api, this._core.RequestManager);
+        this.ThirdPartyEventManagerFactory = new ThirdPartyEventManagerFactory(this._core.Api, this._core.RequestManager, this._core.StorageBridge);
         this._automatedExperimentManager = new AutomatedExperimentManager();
     }
 
     public initialize(): Promise<void> {
-        const measurements = createMeasurementsInstance(InitializationMetric.WebviewInitializationPhases);
+        let measurements = createMeasurementsInstance(InitializationMetric.WebviewInitializationPhases);
         return Promise.resolve().then(() => {
             SdkStats.setInitTimestamp();
             GameSessionCounters.init();
             return this.setupTestEnvironment();
         }).then(() => {
+            this.setupPrivacyTestEnvironment();
+        }).then(() => {
             this.setupLoadApiEnabled();
             measurements.overrideTag('wel', `${this._webViewEnabledLoad}`);
-
-            let promise = Promise.resolve();
-
-            this._nofillImmediately = CustomFeatures.isNofillImmediatelyGame(this._core.ClientInfo.getGameId()) && !!(performance && performance.now);
-            if (this._nofillImmediately) {
-                promise = this.setupMediationTrackingManager().then(() => {
-                    this.NofillImmediatelyManager = new NofillImmediatelyManager(this.Api.LoadApi, this.Api.Listener, this.Api.Placement, this.Config.getPlacementIds());
-                    return this._core.Api.Sdk.initComplete();
-                });
-            }
-            return promise;
         }).then(() => {
-            measurements.measure('setup_environment');
             return this.Analytics.initialize();
         }).then((gameSessionId: number) => {
             this.SessionManager.setGameSessionId(gameSessionId);
-            this.PrivacyManager = new UserPrivacyManager(this._core.NativeBridge.getPlatform(), this._core.Api, this._core.Config, this.Config, this._core.ClientInfo, this._core.DeviceInfo, this._core.RequestManager, this.PrivacySDK, Ads._forcedConsentUnit);
+            this.PrivacyManager = new UserPrivacyManager(this._core.NativeBridge.getPlatform(), this._core.Api, this._core.Config, this.Config, this._core.ClientInfo, this._core.DeviceInfo, this._core.RequestManager, this.PrivacySDK);
             this.PlacementManager = new PlacementManager(this.Api, this.Config);
 
             PrivacyMetrics.setGameSessionId(gameSessionId);
@@ -226,17 +210,14 @@ export class Ads implements IAds {
             PrivacyMetrics.setAbGroup(this._core.Config.getAbGroup());
             PrivacyMetrics.setSubdivision(this._core.Config.getSubdivision());
 
-            PrivacyDataRequestHelper.init(this._core);
+            PrivacyDataRequestHelper.init(this._core, this.PrivacyManager, this.PrivacySDK);
         }).then(() => {
-            measurements.measure('privacy_init');
             return this.setupMediationTrackingManager();
         }).then(() => {
-            measurements.measure('mediation_tracking_init');
             return this.PrivacyManager.getConsentAndUpdateConfiguration().catch(() => {
                 // do nothing since it's normal to have undefined developer consent
             });
         }).then(() => {
-            measurements.measure('consent_update');
             const defaultPlacement = this.Config.getDefaultPlacement();
             this.Api.Placement.setDefaultPlacement(defaultPlacement.getId());
 
@@ -245,16 +226,8 @@ export class Ads implements IAds {
                 this.AssetManager.setCacheDiagnostics(true);
             }
 
-            const promo = new Promo(this._core, this, this._core.Purchasing);
-            const promoContentTypeHandlerMap = promo.getContentTypeHandlerMap();
-            for (const contentType in promoContentTypeHandlerMap) {
-                if (promoContentTypeHandlerMap.hasOwnProperty(contentType)) {
-                    this.ContentTypeHandlerManager.addHandler(contentType, promoContentTypeHandlerMap[contentType]);
-                }
-            }
-
             this.BannerModule = new BannerModule(this._core, this);
-            this.Monetization = new Monetization(this._core, this, promo, this._core.Purchasing);
+            this.Monetization = new Monetization(this._core, this);
             this.AR = new AR(this._core);
 
             if (this.SessionManager.getGameSessionId() % 1000 === 0) {
@@ -297,8 +270,6 @@ export class Ads implements IAds {
             this.configureRefreshManager();
             SdkStats.initialize(this._core.Api, this._core.RequestManager, this._core.Config, this.Config, this.SessionManager, this.CampaignManager, this._core.MetaDataManager, this._core.ClientInfo, this._core.CacheManager);
 
-            promo.initialize();
-
             this.Monetization.Api.Listener.isMonetizationEnabled().then((enabled) => {
                 if (enabled) {
                     this.Monetization.initialize();
@@ -306,29 +277,19 @@ export class Ads implements IAds {
             });
 
         }).then(() => {
-            measurements.measure('managers_init');
             return this._core.Api.Sdk.initComplete();
         }).then(() => {
-            measurements.measure('init_complete_to_native');
             if (this.MediationLoadTrackingManager) {
                 this.MediationLoadTrackingManager.setInitComplete();
             }
 
-            if (this.NofillImmediatelyManager) {
-                this.NofillImmediatelyManager.setInitComplete();
-            }
-
-            if (this.PrivacyManager.isPrivacySDKTestActive()) {
-                CachedUserSummary.fetch(this.PrivacyManager);
-            }
+            measurements = createMeasurementsInstance(InitializationMetric.WebviewInitializationPhases);
 
             return Promises.voidResult(this.RefreshManager.initialize());
         }).then(() => {
             measurements.measure('request_on_init');
             return Promises.voidResult(this.SessionManager.sendUnsentSessions());
         }).then(() => {
-            measurements.measure('ads_ready');
-
             if (performance && performance.now) {
                 const webviewInitTime = performance.now();
                 SDKMetrics.reportTimingEventWithTags(InitializationMetric.WebviewInitialization, webviewInitTime, {
@@ -384,17 +345,12 @@ export class Ads implements IAds {
         }
 
         if (this._loadApiEnabled && this._webViewEnabledLoad) {
-            const abGroup = this._core.Config.getAbGroup();
             const isZyngaDealGame = CustomFeatures.isZyngaDealGame(this._core.ClientInfo.getGameId());
 
             if (isZyngaDealGame) {
                 this.RefreshManager = new PerPlacementLoadManagerV4(this.Api, this.Config, this._core.Config, this.CampaignManager, this._core.ClientInfo, this._core.FocusManager);
             } else {
-                if (LoadRefreshV4.isValid(abGroup)) {
-                    this.RefreshManager = new PerPlacementLoadManagerV4(this.Api, this.Config, this._core.Config, this.CampaignManager, this._core.ClientInfo, this._core.FocusManager);
-                } else {
-                    this.RefreshManager = new PerPlacementLoadManager(this.Api, this.Config, this._core.Config, this.CampaignManager, this._core.ClientInfo, this._core.FocusManager);
-                }
+                this.RefreshManager = new PerPlacementLoadManager(this.Api, this.Config, this._core.Config, this.CampaignManager, this._core.ClientInfo, this._core.FocusManager);
             }
         } else if (this._loadApiEnabled) {
             this.RefreshManager = new PerPlacementLoadAdapter(this._core.NativeBridge.getPlatform(), this._core.Api, this._core.Config, this.Api, this._core.WakeUpManager, this.CampaignManager, this.Config, this._core.FocusManager, this.SessionManager, this._core.ClientInfo, this._core.RequestManager, this._core.CacheManager);
@@ -418,14 +374,8 @@ export class Ads implements IAds {
                 if (mediation && mediation.getName() && performance && performance.now) {
 
                     let experimentType = MediationExperimentType.None;
-                    const whitelistedCMATest = CustomFeatures.isCacheModeAllowedTestGame(this._core.ClientInfo.getGameId()) && MediationCacheModeAllowedTest.isValid(this._core.Config.getAbGroup());
-                    const temporaryCMATest = TemporaryCacheModeAllowedTest.isValid(this._core.Config.getAbGroup());
-                    if (whitelistedCMATest || temporaryCMATest) {
-                        this.Config.set('cacheMode', CacheMode.ALLOWED);
-                        experimentType = MediationExperimentType.CacheModeAllowed;
-                    } else if (this._nofillImmediately) {
-                        experimentType = MediationExperimentType.NofillImmediately;
-                    } else if (this._core.NativeBridge.getPlatform() === Platform.ANDROID && AuctionXHR.isValid(this._core.Config.getAbGroup())) {
+
+                    if (this._core.NativeBridge.getPlatform() === Platform.ANDROID && AuctionXHR.isValid(this._core.Config.getAbGroup())) {
                         if (XHRequest.isAvailable()) {
                             experimentType = MediationExperimentType.AuctionXHR;
                         } else {
@@ -433,12 +383,13 @@ export class Ads implements IAds {
                         }
                     } else if (this.isLoadV5Enabled() && this._webViewEnabledLoad) {
                         experimentType = MediationExperimentType.LoadV5;
-                    } else if (AuctionV6Test.isValid(this._core.Config.getAbGroup())) {
-                        experimentType = MediationExperimentType.AuctionV6;
+                    } else if (MediationCacheModeAllowedTest.isValid(this._core.Config.getAbGroup())) {
+                        this.Config.set('cacheMode', CacheMode.ALLOWED);
+                        experimentType = MediationExperimentType.CacheModeAllowed;
                     }
 
                     this._mediationName = mediation.getName()!;
-                    this.MediationLoadTrackingManager = new MediationLoadTrackingManager(this.Api.LoadApi, this.Api.Listener, mediation.getName()!, this._webViewEnabledLoad, experimentType, nativeInitTime);
+                    this.MediationLoadTrackingManager = new MediationLoadTrackingManager(this.Api.LoadApi, this.Api.Listener, mediation.getName()!, this._webViewEnabledLoad, experimentType, nativeInitTime, this.Config.getPlacementCount());
                     this.MediationLoadTrackingManager.reportPlacementCount(this.Config.getPlacementCount());
                 }
             }).catch();
@@ -553,12 +504,6 @@ export class Ads implements IAds {
 
         SdkStats.sendShowEvent(placementId);
 
-        if (campaign instanceof PromoCampaign && campaign.getRequiredAssets().length === 0) {
-            this.showError(false, placementId, 'No creatives found for promo campaign');
-            SDKMetrics.reportMetricEvent(ErrorMetric.PromoWithoutCreatives);
-            return;
-        }
-
         if (campaign.isExpired()) {
             this.showError(true, placementId, 'Campaign has expired');
             this.RefreshManager.refresh();
@@ -610,15 +555,19 @@ export class Ads implements IAds {
                 playerMetadataServerId = playerMetadata.getServerId();
             }
 
+            const isAttemptingToStreamAssets: boolean = !CampaignAssetInfo.isCached(campaign) || campaign.isConnectionNeeded();
+            const hasNoConnection: boolean = connectionType === 'none';
+
+            if (isAttemptingToStreamAssets && hasNoConnection) {
+                // Track to understand impact before blocking show by new criteria
+                SDKMetrics.reportMetricEventWithTags(ErrorMetric.AttemptToStreamCampaignWithoutConnection, {
+                    'cnt': campaign.getContentType()
+                });
+            }
+
             if (campaign.isConnectionNeeded() && connectionType === 'none') {
                 this._showing = false;
                 this.showError(true, placement.getId(), 'No connection');
-
-                const error = new DiagnosticError(new Error('No connection is available'), {
-                    id: campaign.getId()
-                });
-                SessionDiagnostics.trigger('mraid_no_connection', error, campaign.getSession());
-                // If there is no connection, would this metric even be fired? If it does, then maybe we should investigate enabling this regardless of connection
                 SDKMetrics.reportMetricEvent(ErrorMetric.NoConnectionWhenNeeded);
                 return;
             }
@@ -744,25 +693,14 @@ export class Ads implements IAds {
             MRAIDAdUnitParametersFactory.setForcedExtendedMRAID(TestEnvironment.get('forcedPlayableMRAID'));
         }
 
-        if (TestEnvironment.get('forcedGDPRBanner')) {
-            AbstractAdUnitParametersFactory.setForcedGDPRBanner(TestEnvironment.get('forcedGDPRBanner'));
-        }
-
         let forcedARMRAID = false;
         if (TestEnvironment.get('forcedARMRAID')) {
             forcedARMRAID = TestEnvironment.get('forcedARMRAID');
             MRAIDAdUnitParametersFactory.setForcedARMRAID(forcedARMRAID);
         }
 
-        let forcedConsentUnit = false;
-        if (TestEnvironment.get('forcedConsent')) {
-            forcedConsentUnit = TestEnvironment.get('forcedConsent');
-            Ads._forcedConsentUnit = forcedConsentUnit;
-        }
-
         if (TestEnvironment.get('creativeUrl')) {
-            // reset auction protocol to allow changing between creativeUrl and creativePack modes
-            RequestManager.setTestAuctionProtocol(undefined);
+            RequestManager.setTestAuctionProtocol(AuctionProtocol.V4);
 
             const creativeUrl = TestEnvironment.get<string>('creativeUrl');
             let response: string = '';
@@ -784,8 +722,7 @@ export class Ads implements IAds {
 
         const creativePack: string = TestEnvironment.get('creativePack');
         if (creativePack) {
-            // reset auction protocol to allow changing between creativeUrl and creativePack modes
-            RequestManager.setTestAuctionProtocol(undefined);
+            RequestManager.setTestAuctionProtocol(AuctionProtocol.V5);
 
             const platform = this._core.NativeBridge.getPlatform();
             const response = CampaignResponseUtils.getVideoCreativePackResponse(platform, creativePack);
@@ -800,6 +737,12 @@ export class Ads implements IAds {
         if (TestEnvironment.get('forceLoadV5')) {
             this._forceLoadV5 = true;
         }
+    }
+
+    private setupPrivacyTestEnvironment(): Promise<void> {
+        return PrivacyTestEnvironment.setup(new MetaData(this._core.Api)).catch(() => {
+            this._core.Api.Sdk.logDebug('Error setting metadata env for privacy');
+        });
     }
 
     private logChinaMetrics() {
@@ -844,11 +787,9 @@ export class Ads implements IAds {
         const isMopubTestGame = CustomFeatures.isMopubTestGameForLoad(this._core.ClientInfo.getGameId());
         const isCheetahTestGame = CustomFeatures.isCheetahTestGameForLoad(this._core.ClientInfo.getGameId());
         const isFanateeExtermaxGameForLoad = CustomFeatures.isFanateeExtermaxGameForLoad(this._core.ClientInfo.getGameId());
-        const isOriginalLoad = LoadExperiment.isValid(this._core.Config.getAbGroup()) && CustomFeatures.isWhiteListedForLoadApi(this._core.ClientInfo.getGameId());
-        const isLoadV4 = LoadRefreshV4.isValid(this._core.Config.getAbGroup()) && CustomFeatures.isWhiteListedForLoadApi(this._core.ClientInfo.getGameId());
         const loadV5 = this.isLoadV5Enabled();
 
-        if (isOriginalLoad || isLoadV4 || isZyngaDealGame || isMopubTestGame || isCheetahTestGame || isFanateeExtermaxGameForLoad || loadV5) {
+        if (isZyngaDealGame || isMopubTestGame || isCheetahTestGame || isFanateeExtermaxGameForLoad || loadV5) {
             this._webViewEnabledLoad = true;
         }
     }

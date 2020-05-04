@@ -11,7 +11,7 @@ describe('MediationLoadTrackingManager', () => {
     beforeEach(() => {
         loadApi = LoadApi();
         listenerApi = ListenerApi();
-        medLoadTrackingManager = new MediationLoadTrackingManager(loadApi, listenerApi, 'fakeMed', false, MediationExperimentType.None, undefined);
+        medLoadTrackingManager = new MediationLoadTrackingManager(loadApi, listenerApi, 'fakeMed', false, MediationExperimentType.None, undefined, 15);
     });
 
     describe('current experiment', () => {
@@ -27,7 +27,67 @@ describe('MediationLoadTrackingManager', () => {
         });
 
         it('should send event', () => {
-            expect(SDKMetrics.reportTimingEventWithTags).toBeCalledTimes(1);
+            expect(SDKMetrics.reportTimingEventWithTags).toBeCalledTimes(2);
+        });
+
+        it('should report with correct event', () => {
+            expect(SDKMetrics.reportTimingEventWithTags).toBeCalledWith(MediationMetric.LoadRequestFill, expect.anything(), expect.anything());
+        });
+
+        it('should report with correct placement bucket event', () => {
+            expect(SDKMetrics.reportTimingEventWithTags).toBeCalledWith(MediationMetric.FillLatencyByPlacements, expect.anything(), expect.objectContaining({'plb': '2'}));
+        });
+    });
+
+    describe('when placementCount varies', () => {
+        const plbTests: {
+            placementCount: number;
+            expectedBucket: string;
+        }[] = [{
+            placementCount: 0,
+            expectedBucket: '0'
+        }, {
+            placementCount: 5,
+            expectedBucket: '1'
+        }, {
+            placementCount: 9,
+            expectedBucket: '1'
+        }, {
+            placementCount: 10,
+            expectedBucket: '1'
+        }, {
+            placementCount: 11,
+            expectedBucket: '2'
+        }, {
+            placementCount: 50,
+            expectedBucket: '5'
+        }, {
+            placementCount: 100,
+            expectedBucket: '10'
+        }, {
+            placementCount: 999,
+            expectedBucket: '10'
+        }];
+
+        plbTests.forEach(t => {
+            describe(`when placementCount is ${t.placementCount}`, () => {
+                beforeEach(() => {
+                    loadApi = LoadApi();
+                    listenerApi = ListenerApi();
+                    medLoadTrackingManager = new MediationLoadTrackingManager(loadApi, listenerApi, 'fakeMed', false, MediationExperimentType.None, undefined, t.placementCount);
+                });
+
+                describe('when reporting fill', () => {
+                    beforeEach(() => {
+                        loadApi.onLoad.subscribe.mock.calls[0][0]({ 'placementId': 1 });
+                        listenerApi.onPlacementStateChangedEventSent.subscribe.mock.calls[0][0]('placementId', 'NOT_AVAILABLE', 'READY');
+                    });
+
+                    it('should reporting with the correct placement bucket', () => {
+                        expect(SDKMetrics.reportTimingEventWithTags).toBeCalledWith(MediationMetric.FillLatencyByPlacements, expect.anything(), expect.objectContaining({ 'plb': t.expectedBucket }));
+                    });
+                });
+            });
         });
     });
 
@@ -139,7 +199,7 @@ describe('MediationLoadTrackingManager', () => {
         });
 
         it('should not report timing events', () => {
-            expect(SDKMetrics.reportTimingEventWithTags).toBeCalledTimes(1);
+            expect(SDKMetrics.reportTimingEventWithTags).toBeCalledTimes(2);
             expect(SDKMetrics.reportTimingEventWithTags).toBeCalledWith(expect.anything(), 999.99, expect.anything());
         });
     });
@@ -169,8 +229,15 @@ describe('MediationLoadTrackingManager', () => {
         });
 
         it('should report timing event', () => {
-            expect(SDKMetrics.reportTimingEventWithTags).toBeCalledTimes(1);
-            expect(SDKMetrics.reportTimingEventWithTags).toBeCalledWith(expect.anything(), 999.99, expect.anything());
+            expect(SDKMetrics.reportTimingEventWithTags).toBeCalledTimes(2);
+        });
+
+        it('should report with correct metric', () => {
+            expect(SDKMetrics.reportTimingEventWithTags).toBeCalledWith(MediationMetric.LoadRequestNofill, expect.anything(), expect.anything());
+        });
+
+        it('should report with correct placement bucket event', () => {
+            expect(SDKMetrics.reportTimingEventWithTags).toBeCalledWith(MediationMetric.NofillLatencyByPlacements, expect.anything(), expect.objectContaining({'plb': '2'}));
         });
     });
 
@@ -217,8 +284,13 @@ describe('MediationLoadTrackingManager', () => {
         });
 
         it('should report metric event with tags', () => {
-            expect(SDKMetrics.reportTimingEventWithTags).toBeCalledTimes(1);
+            expect(SDKMetrics.reportTimingEventWithTags).toBeCalledTimes(2);
         });
+
+        it('should report metric event with tags', () => {
+            expect(SDKMetrics.reportTimingEventWithTags).toBeCalledWith(MediationMetric.InitCompleteByPlacements, expect.anything(), expect.objectContaining({ 'iar': 'true' }));
+        });
+
     });
 
     describe('should report reason when it is set', () => {
@@ -244,14 +316,14 @@ describe('MediationLoadTrackingManager', () => {
     });
 
     [false, true].forEach(flag => {
-        describe(`should create the str with the ${flag} flag`, () => {
+        describe(`should create the str with the ${!flag} flag`, () => {
             beforeEach(() => {
                 medLoadTrackingManager.reportAdShown(flag);
             });
 
             it('should report metric event with tags', () => {
                 expect(SDKMetrics.reportMetricEventWithTags).toBeCalledTimes(1);
-                expect(SDKMetrics.reportMetricEventWithTags).toBeCalledWith(MediationMetric.AdShow, expect.objectContaining({ 'str': `${flag}` }));
+                expect(SDKMetrics.reportMetricEventWithTags).toBeCalledWith(MediationMetric.AdShow, expect.objectContaining({ 'str': `${!flag}` }));
             });
         });
     });

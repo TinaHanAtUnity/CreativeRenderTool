@@ -89,7 +89,6 @@
 | analyticsUserId | string | Unity Analytics user ID in Unity Engine (does not apply to analytics events Unity Ads SDK is sending) | SDK | all |
 | analyticsSessionId | string | Unity Analytics session ID in Unity Engine (does not apply to analytics events Unity Ads SDK is sending), note: sent as string to avoid problems with 64 bit integers being over JavaScript safe number limit | SDK | all |
 | privacy | object | Contains the GDPR consent information, combines data received from configuration-service and data collected from user in SDK | SDK | all |
-| isPromoCatalogAvailable | boolean | Flag describing if the developer has a set up a catalog for their IAP Promo Placement | SDK | all |
 | isLoadEnabled | boolean | Flag describing if the campaign was loaded using Load API or from Precached Initialization | SDK | all |
 | omidPartnerName | string | Flag describing the omid partner name indicating omid is supported | SDK | all |
 | omidJSVersion | string | Flag describing the omid js implementation version indicating omid is supported | SDK | all |
@@ -197,7 +196,6 @@
 | optOutEnabled | all | False | True | boolean | Whether the user has opted out from behavioral ads targeting in current game | Server | all |
 | abGroup | no | False | True | number | AB Group number assigned to this user from configuration | Server | all |
 | privacy | all | False | True | object | Contains the GDPR consent information, combines data received from configuration-service and data collected from user in SDK | SDK | all |
-| isPromoCatalogAvailable | all | False | True | boolean | Flag describing if the developer has a set up a catalog for their IAP Promo Placement | SDK | all |
 | isLoadEnabled | all | False | True | boolean | Flag describing if the campaign was loaded using Load API or from Precached Initialization | SDK | all |
 | omidPartnerName | all | False | True | string | Flag describing the omid partner name indicating omid is supported | SDK | all |
 | omidJSVersion | all | False | True | string | Flag describing the omid js implementation version indicating omid is supported | SDK | all |

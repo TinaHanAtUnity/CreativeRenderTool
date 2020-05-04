@@ -12,8 +12,6 @@ export enum EventCategory {
     LIFECYCLE,
     DEVICEINFO,
     WEBPLAYER,
-    PURCHASING,
-    CUSTOM_PURCHASING,
     DECISION,
     PLACEMENT_CONTENT,
     BANNER,

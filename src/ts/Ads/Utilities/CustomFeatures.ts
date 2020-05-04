@@ -9,11 +9,9 @@ import CacheModeAllowedExperimentGames from 'json/custom_features/CacheModeAllow
 
 export class CustomFeatures {
 
-    public static isNofillImmediatelyGame(gameId: string): boolean {
-        return gameId === '1781853' ||
-               gameId === '1781854' ||
-               gameId === '3152568' ||
-               gameId === '3152569';
+    public static isTencentSeat(seatId: number | undefined): boolean {
+        return seatId === 9107 ||
+               seatId === 9258;
     }
 
     public static isNoGzipGame(gameId: string): boolean {
@@ -142,7 +140,11 @@ export class CustomFeatures {
     }
 
     public static isLoadV5Game(gameId: string): boolean {
-        const gameIds = ['1783252', '1781853', '1781854'];
+        const gameIds = [
+            '1783252', '1781853', '1781854', // Initial Games
+            '1428861', '1428862', // Chimera Game
+            '1434564', '3079031', '3334336', '3211592', '1566453', '3334337' // First batch
+        ];
 
         return this.existsInList(gameIds, gameId);
     }
@@ -201,5 +203,9 @@ export class CustomFeatures {
         return gameId === '1543460' || // richardh, test app (Apple App Store)
                gameId === '1543461' || // richardh, test app (Google Play Store)
                gameId === '80222';   // Pocketgems, Episode (Google Play Store)
+    }
+
+    public static shouldVideoOverlayRemainVisible(orgId: string | undefined): boolean {
+        return orgId === '2878851';
     }
 }

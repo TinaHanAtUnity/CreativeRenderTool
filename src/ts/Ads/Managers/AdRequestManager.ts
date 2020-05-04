@@ -53,6 +53,8 @@ class AdRequestManagerError extends Error {
 }
 
 export class AdRequestManager extends CampaignManager {
+    protected static LoadV5BaseUrl: string = 'https://auction-load.unityads.unity3d.com/v5/games';
+
     private _preloadData: IPlacementIdMap<IParsedPlacementPreloadData> | null;
     private _preloadDataExpireAt: number;
 
@@ -173,18 +175,16 @@ export class AdRequestManager extends CampaignManager {
         });
     }
 
-    public requestLoad(placementId: string): Promise<ILoadedCampaign | undefined> {
+    public requestLoad(placementId: string, rescheduled: boolean = false): Promise<ILoadedCampaign | undefined> {
         // setting that placementId is being loaded,
         // this is used to track load cancellation due to reload request
         this._ongoingLoadRequests[placementId] = true;
 
         // schedule load request after preload
         if (this._ongoingPreloadRequest !== null) {
-            SDKMetrics.reportMetricEvent(LoadV5.LoadRequestWhilePreloadOngoing);
-
             let promiseResolve: () => void;
             const promise = new Promise((resolve) => { promiseResolve = resolve; }).then(() =>
-                this.requestLoad(placementId)
+                this.requestLoad(placementId, true)
             );
 
             this._ongoingPreloadRequest = this._ongoingPreloadRequest.then(() => { promiseResolve(); });
@@ -194,11 +194,9 @@ export class AdRequestManager extends CampaignManager {
 
         // schedule load request after reload
         if (this._ongoingReloadRequest !== null) {
-            SDKMetrics.reportMetricEvent(LoadV5.LoadRequestWhileReloadOngoing);
-
             let promiseResolve: () => void;
             const promise = new Promise((resolve) => { promiseResolve = resolve; }).then(() =>
-                this.requestLoad(placementId)
+                this.requestLoad(placementId, true)
             );
 
             this._ongoingReloadRequest = this._ongoingReloadRequest.then(() => { promiseResolve(); });
@@ -213,17 +211,17 @@ export class AdRequestManager extends CampaignManager {
 
         return Promise.resolve().then(() => {
             if (this.hasPreloadFailed()) {
-                SDKMetrics.reportMetricEvent(LoadV5.LoadRequestNoPreloadData);
-                throw new AdRequestManagerError('Preload data does not exists', 'no_preload');
+                if (rescheduled) {
+                    throw new AdRequestManagerError('Preload data is missing due to failure to receive it after load request was rescheduled', 'rescheduled_failed_preload');
+                }
+                throw new AdRequestManagerError('Preload data is missing due to failure to receive it', 'failed_preload');
             }
 
             if (this.isPreloadDataExpired()) {
-                SDKMetrics.reportMetricEvent(LoadV5.LoadRequestPreloadDataExpired);
                 throw new AdRequestManagerError('Preload data expired', 'expired');
             }
 
             if (this._currentSession === null) {
-                SDKMetrics.reportMetricEvent(LoadV5.LoadRequestCurrentSessionIsNotSet);
                 throw new AdRequestManagerError('Session is not set', 'no_session');
             }
 
@@ -270,7 +268,6 @@ export class AdRequestManager extends CampaignManager {
 
     public requestReload(placementsToLoad: string[]) {
         if (this._ongoingReloadRequest !== null) {
-            SDKMetrics.reportMetricEvent(LoadV5.ReloadRequestOngoing);
             return Promise.resolve();
         }
 
@@ -346,7 +343,7 @@ export class AdRequestManager extends CampaignManager {
 
     private getBaseUrl(): string {
         return [
-            CampaignManager.AuctionV5BaseUrl,
+            AdRequestManager.LoadV5BaseUrl,
             this._clientInfo.getGameId(),
             'requests'
         ].join('/');
@@ -451,7 +448,6 @@ export class AdRequestManager extends CampaignManager {
         }
 
         if (this._currentSession === null) {
-            SDKMetrics.reportMetricEvent(LoadV5.LoadRequestCurrentSessionMissing);
             throw new AdRequestManagerError('Session is not set', 'no_session');
         }
 
@@ -459,6 +455,9 @@ export class AdRequestManager extends CampaignManager {
             let auctionPlacement: AuctionPlacement;
             let auctionResponse: AuctionResponse;
             let parser: CampaignParser;
+
+            // We do this copy so that linter would not complain about incompatible types.
+            const selectedTrackingUrls = trackingUrls;
 
             try {
                 auctionPlacement = new AuctionPlacement(placementId, mediaId, trackingUrls);
@@ -485,17 +484,14 @@ export class AdRequestManager extends CampaignManager {
                 }
             }).then(campaign => {
                 return this._assetManager.setup(campaign).catch((err) => {
-                    throw new AdRequestManagerError('Failed to setup campaign', 'campaign_setup');
+                    // If caching failed, we still can stream an ad.
+                    return campaign;
                 });
             }).then((campaign) => {
-                if (trackingUrls) {
-                    return {
-                        campaign: campaign,
-                        trackingUrls: trackingUrls
-                    };
-                } else {
-                    throw new AdRequestManagerError('No tracking URLs', 'tracking');
-                }
+                return {
+                    campaign: campaign,
+                    trackingUrls: selectedTrackingUrls
+                };
             });
         } else {
             return Promise.reject(new AdRequestManagerError('No media or tracking url', 'media_or_url'));
@@ -570,7 +566,7 @@ export class AdRequestManager extends CampaignManager {
         }
 
         if (ttl === undefined) {
-            ttl = 3600;
+            ttl = 7200;
         }
 
         this._preloadDataExpireAt = Date.now() + ttl * 1000;

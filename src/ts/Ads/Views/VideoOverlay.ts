@@ -63,9 +63,10 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
     protected _campaign: Campaign;
 
     private _useCloseIconInsteadOfSkipIcon: boolean | undefined = false;
+    private _disableFadeOutOnClick: boolean | undefined = false;
 
-    constructor(parameters: IVideoOverlayParameters<Campaign>, privacy: AbstractPrivacy, showGDPRBanner: boolean, showPrivacyDuringVideo: boolean) {
-        super(parameters.platform, 'video-overlay', parameters.placement.muteVideo());
+    constructor(parameters: IVideoOverlayParameters<Campaign>, privacy: AbstractPrivacy, showGDPRBanner: boolean, showPrivacyDuringVideo: boolean, attachTap?: boolean | undefined) {
+        super(parameters.platform, 'video-overlay', parameters.placement.muteVideo(), attachTap);
 
         this._ads = parameters.ads;
         this._localization = new Localization(parameters.deviceInfo.getLanguage(), 'overlay');
@@ -76,6 +77,9 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
         this._showGDPRBanner = showGDPRBanner;
         this._showPrivacyDuringVideo = showPrivacyDuringVideo;
         this._useCloseIconInsteadOfSkipIcon = parameters.placement.useCloseIconInsteadOfSkipIcon();
+
+        //Disable click fadeout for placements that disabled overlay fadeout for Mobilityware
+        this._disableFadeOutOnClick = CustomFeatures.shouldVideoOverlayRemainVisible(parameters.coreConfig.getOrganizationId()) && parameters.placement.disableVideoControlsFade();
 
         this._templateData = {
             muted: parameters.placement.muteVideo()
@@ -351,6 +355,10 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
     }
 
     private onClick(event: Event) {
+        if (this._disableFadeOutOnClick) {
+            return;
+        }
+
         this.resetFadeTimer();
 
         if (this._areControlsVisible) {

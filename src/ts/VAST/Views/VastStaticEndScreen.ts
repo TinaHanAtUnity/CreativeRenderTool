@@ -10,8 +10,8 @@ export class VastStaticEndScreen extends VastEndScreen implements IPrivacyHandle
 
     private _privacy: AbstractPrivacy;
 
-    constructor(parameters: IAdUnitParameters<VastCampaign>) {
-        super(parameters);
+    constructor(parameters: IAdUnitParameters<VastCampaign>, attachTap?: boolean | undefined) {
+        super(parameters, attachTap);
 
         this._privacy = parameters.privacy;
         this._template = new Template(VastStaticEndScreenTemplate);

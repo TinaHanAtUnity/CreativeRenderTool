@@ -22,7 +22,6 @@ import { Url } from 'Core/Utilities/Url';
 import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
 import { ILegacyRequestPrivacy, IRequestPrivacy } from 'Ads/Models/RequestPrivacy';
 import { TrackingIdentifierFilter } from 'Ads/Utilities/TrackingIdentifierFilter';
-import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 import { GeneralTimingMetric } from 'Ads/Utilities/SDKMetrics';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { PARTNER_NAME, OM_JS_VERSION } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
@@ -244,7 +243,6 @@ export abstract class CampaignManager {
             body.volume = volume;
             body.requestSignal = requestSignal;
             body.ext = optionalSignal;
-            body.isPromoCatalogAvailable = PurchasingUtilities.isCatalogAvailable();
 
             if (fullyCachedCampaignIds && fullyCachedCampaignIds.length > 0) {
                 body.cachedCampaigns = fullyCachedCampaignIds;
