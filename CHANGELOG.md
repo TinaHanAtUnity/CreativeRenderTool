@@ -1,5 +1,6 @@
 # Pending
 
+* [Tencent clickThroughURL macros replacement follow up] Modify unit tests to avoid platform check [#15034](https://github.com/Applifier/unity-ads-webview/pull/15034)
 * [AUI] Refactoring in preparation for new Swipe up to Download experiment [#14944](https://github.com/Applifier/unity-ads-webview/pull/14944)
 
 # Fri May  1 23:13:38 UTC 2020
