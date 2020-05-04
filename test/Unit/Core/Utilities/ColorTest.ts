@@ -4,16 +4,17 @@ import { Color } from 'Core/Utilities/Color';
 
 describe('Color Test', () => {
     it('should parse hex colors correctly', () => {
-        assert.deepEqual(Color.hexToColor('#df80b8'), {r: 223, g: 128, b: 184, a: 255}, 'Color was parsed incorrectly');
-        assert.deepEqual(Color.hexToColor('#0c36d4'), {r: 12, g: 54, b: 212, a: 255}, 'Color was parsed incorrectly');
-        assert.deepEqual(Color.hexToColor('a6ca5c'), {r: 166, g: 202, b: 92, a: 255}, 'Color was parsed incorrectly');
-        assert.deepEqual(Color.hexToColor('#9d72a9ca'), {r: 157, g: 114, b: 169, a: 202}, 'Color was parsed incorrectly');
-        assert.deepEqual(Color.hexToColor('6d4488e2'), {r: 109, g: 68, b: 136, a: 226}, 'Color was parsed incorrectly');
-        assert.deepEqual(Color.hexToColor('789'), {r: 119, g: 136, b: 153, a: 255}, 'Color was parsed incorrectly');
-        assert.deepEqual(Color.hexToColor('36d4'), {r: 51, g: 102, b: 221, a: 68}, 'Color was parsed incorrectly');
-        assert.deepEqual(Color.hexToColor('##0c36d4'), {r: 0, g: 0, b: 0, a: 0}, 'Invalid color was validated incorrectly');
-        assert.deepEqual(Color.hexToColor('48F4c8x'), {r: 0, g: 0, b: 0, a: 0}, 'Invalid color was validated incorrectly');
-        assert.deepEqual(Color.hexToColor(undefined), {r: 0, g: 0, b: 0, a: 0}, 'Invalid color was validated incorrectly');
+
+        assert.deepEqual(Color.hexToColor('#df80b8'), { r: 223, g: 128, b: 184, a: 255 }, 'Color was parsed incorrectly');
+        assert.deepEqual(Color.hexToColor('#0c36d4'), { r: 12, g: 54, b: 212, a: 255 }, 'Color was parsed incorrectly');
+        assert.deepEqual(Color.hexToColor('a6ca5c'), { r: 166, g: 202, b: 92, a: 255 }, 'Color was parsed incorrectly');
+        assert.deepEqual(Color.hexToColor('#9d72a9ca'), { r: 157, g: 114, b: 169, a: 202 }, 'Color was parsed incorrectly');
+        assert.deepEqual(Color.hexToColor('6d4488e2'), { r: 109, g: 68, b: 136, a: 226 }, 'Color was parsed incorrectly');
+        assert.deepEqual(Color.hexToColor('789'), { r: 119, g: 136, b: 153, a: 255 }, 'Color was parsed incorrectly');
+        assert.deepEqual(Color.hexToColor('36d4'), { r: 51, g: 102, b: 221, a: 68 }, 'Color was parsed incorrectly');
+        assert.deepEqual(Color.hexToColor('##0c36d4'), { r: 0, g: 0, b: 0, a: 0 }, 'Invalid color was validated incorrectly');
+        assert.deepEqual(Color.hexToColor('48F4c8x'), { r: 0, g: 0, b: 0, a: 0 }, 'Invalid color was validated incorrectly');
+        assert.deepEqual(Color.hexToColor(undefined), { r: 0, g: 0, b: 0, a: 0 }, 'Invalid color was validated incorrectly');
     });
 
     it('should convert css rgba colors from hex colors correctly', () => {
@@ -31,22 +32,22 @@ describe('Color Test', () => {
 
     it('should lerp colors correctly', () => {
         const values = [{
-            c1: {r: 109, g: 68, b: 136, a: 226},
-            c2: {r: 223, g: 128, b: 184, a: 255},
+            c1: { r: 109, g: 68, b: 136, a: 226 },
+            c2: { r: 223, g: 128, b: 184, a: 255 },
             t: 0.78
         }, {
-            c1: {r: 119, g: 136, b: 153, a: 50},
-            c2: {r: 51, g: 102, b: 221, a: 68},
+            c1: { r: 119, g: 136, b: 153, a: 50 },
+            c2: { r: 51, g: 102, b: 221, a: 68 },
             t: 0.5
         }, {
-            c1: {r: 157, g: 114, b: 169, a: 202},
-            c2: {r: 200, g: 0, b: 5, a: 255},
+            c1: { r: 157, g: 114, b: 169, a: 202 },
+            c2: { r: 200, g: 0, b: 5, a: 255 },
             t: 0.01
         }];
         const mixed = [
-            {r: 198, g: 115, b: 173, a: 249},
-            {r: 85, g: 119, b: 187, a: 59},
-            {r: 157, g: 113, b: 167, a: 203}
+            { r: 198, g: 115, b: 173, a: 249 },
+            { r: 85, g: 119, b: 187, a: 59 },
+            { r: 157, g: 113, b: 167, a: 203 }
         ];
 
         for (let i = 0; i < values.length; i++) {

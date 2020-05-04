@@ -80,7 +80,6 @@ export const MediationCacheModeAllowedTest = new ReverseABTest(5);
 export const MabDisabledABTest = new ZyngaFilteredABTest(7);
 export const PrivacySDKTest = new ABTest(16);
 export const AuctionXHR = new DisabledABTest();
-export const AuctionV6Test = new ReverseABTest(6, 10);
 export const LoadV5 = new ABTest(18, 19);
 export const BaseLineLoadV5 = new ABTest(18, 19);
 

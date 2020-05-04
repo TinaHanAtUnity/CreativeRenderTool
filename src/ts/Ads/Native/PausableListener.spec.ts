@@ -46,7 +46,7 @@ describe('PausableListenerTest', () => {
             listener.sendFinishEvent('video', FinishState.COMPLETED);
             listener.sendClickEvent('video');
             listener.sendPlacementStateChangedEvent('video', 'WAITING', 'READY');
-            listener.sendErrorEvent('test', 'error details');        });
+            listener.sendErrorEvent('test', 'error details'); });
 
         it('should not send events', () => {
             expect(nativeBridge.invoke.mock.calls.length).toBe(0);

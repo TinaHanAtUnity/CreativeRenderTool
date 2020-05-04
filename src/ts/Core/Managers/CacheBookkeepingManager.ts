@@ -158,7 +158,7 @@ export class CacheBookkeepingManager {
     }
 
     public writeFileForCampaign(campaignId: string, fileId: string): Promise<void> {
-        return this._core.Storage.set(StorageType.PRIVATE, this.makeCacheKey(CacheKey.CAMPAIGNS, campaignId, FileId.getFileIdHash(fileId)), {extension: FileId.getFileIdExtension(fileId)}).then(() => {
+        return this._core.Storage.set(StorageType.PRIVATE, this.makeCacheKey(CacheKey.CAMPAIGNS, campaignId, FileId.getFileIdHash(fileId)), { extension: FileId.getFileIdExtension(fileId) }).then(() => {
             this._core.Storage.write(StorageType.PRIVATE);
         }).catch(() => {
             return Promise.resolve();

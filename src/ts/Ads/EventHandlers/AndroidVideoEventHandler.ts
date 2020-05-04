@@ -18,17 +18,17 @@ export class AndroidVideoEventHandler extends BaseVideoEventHandler implements I
     }
 
     public onPrepareError(url: string): void {
-        this._core.Sdk.logError('Unity Ads video player prepare error '  + url);
+        this._core.Sdk.logError('Unity Ads video player prepare error ' + url);
         this.handleVideoError(VideoMetric.PrepareError);
     }
 
     public onSeekToError(url: string): void {
-        this._core.Sdk.logError('Unity Ads video player seek to error '  + url);
+        this._core.Sdk.logError('Unity Ads video player seek to error ' + url);
         this.handleVideoError(VideoMetric.SeekToError);
     }
 
     public onPauseError(url: string): void {
-        this._core.Sdk.logError('Unity Ads video player pause error '  + url);
+        this._core.Sdk.logError('Unity Ads video player pause error ' + url);
         this.handleVideoError(VideoMetric.PauseError);
     }
 

@@ -222,7 +222,7 @@ describe('UserPrivacyManagerTest', () => {
                     userPrivacy.getPermissions.returns(currentPermissions);
                     userPrivacy.getMethod.returns(PrivacyMethod.DEVELOPER_CONSENT);
                     userPrivacy.getVersion.returns(0);
-                    storageTrigger('', {gdpr: {consent: {value: b}}});
+                    storageTrigger('', { gdpr: { consent: { value: b } } });
                     return Promise.resolve().then(() => {
                         return (<Promise<void>>updateUserPrivacy.firstCall.returnValue).then(() => {
                             sinon.assert.notCalled(httpKafkaSpy);
@@ -235,7 +235,7 @@ describe('UserPrivacyManagerTest', () => {
         describe('prioritises privacy.consent over gdpr.consent', () => {
             beforeEach(() => {
                 isGDPREnabled = true;
-                userPrivacy.getPermissions.returns({ads: false, external: true, gameExp: false});
+                userPrivacy.getPermissions.returns({ ads: false, external: true, gameExp: false });
                 userPrivacy.getMethod.returns(PrivacyMethod.DEVELOPER_CONSENT);
                 userPrivacy.getVersion.returns(0);
                 getStub.reset();
@@ -551,7 +551,7 @@ describe('UserPrivacyManagerTest', () => {
 
         beforeEach(() => {
             getRequestStub = <sinon.SinonStub>request.get;
-            getRequestStub.resolves({response: '{"adsSeenInGameThisWeek":27,"gamePlaysThisWeek":39,"installsFromAds":0}'});
+            getRequestStub.resolves({ response: '{"adsSeenInGameThisWeek":27,"gamePlaysThisWeek":39,"installsFromAds":0}' });
             diagnosticTriggerStub = sinon.stub(Diagnostics, 'trigger');
             logErrorStub = sinon.stub(core.Sdk, 'logError');
 
@@ -611,7 +611,7 @@ describe('UserPrivacyManagerTest', () => {
 
     describe('Sending privacy events', () => {
         let sandbox: sinon.SinonSandbox;
-        const permissions = {ads: true, external: true, gameExp: false};
+        const permissions = { ads: true, external: true, gameExp: false };
         const source = GDPREventSource.USER;
         const action = GDPREventAction.PERSONALIZED_PERMISSIONS;
         const layout = ConsentPage.MY_CHOICES;
@@ -782,7 +782,7 @@ describe('UserPrivacyManagerTest', () => {
             isGDPREnabled = true;
             privacyConsent = undefined;
             gdprConsent = undefined;
-            userPrivacy.getPermissions.returns({ads: false, external: true, gameExp: false});
+            userPrivacy.getPermissions.returns({ ads: false, external: true, gameExp: false });
             userPrivacy.getMethod.returns(PrivacyMethod.DEVELOPER_CONSENT);
             userPrivacy.getVersion.returns(0);
             getStub.withArgs(StorageType.PUBLIC, 'gdpr.consent.value').callsFake(() => {
@@ -812,9 +812,9 @@ describe('UserPrivacyManagerTest', () => {
         [true, false, undefined].forEach((gdprInitDevConsent) => {
             describe('when developer consent was set on init with gdpr.consent=' + gdprInitDevConsent, () => {
                 const allowedTransitions = [
-                    {from: 'privacy', to: 'privacy'},
-                    {from: 'gdpr', to: 'privacy'},
-                    {from: 'gdpr', to: 'gdpr'}];
+                    { from: 'privacy', to: 'privacy' },
+                    { from: 'gdpr', to: 'privacy' },
+                    { from: 'gdpr', to: 'gdpr' }];
                 beforeEach(() => {
                     gdprConsent = gdprInitDevConsent;
                     return privacyManager.getConsentAndUpdateConfiguration().then(() => {

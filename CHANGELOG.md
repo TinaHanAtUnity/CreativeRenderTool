@@ -1,5 +1,19 @@
-# Fri May  1 23:13:38 UTC 2020
+# Pending
 
+* [Auction V6] Remove AB Test and Release Feature [#15092](https://github.com/Applifier/unity-ads-webview/pull/15092)
+* [Chore] Update lint rules and auto fix existing issues (Part 1) [#15093](https://github.com/Applifier/unity-ads-webview/pull/15093)
+* [Load V5, Ad Unit] Update mocks [#15039](https://github.com/Applifier/unity-ads-webview/pull/15039)
+* [PTS Migration] Align MRAID Complete Event with Comet View Event [#15033](https://github.com/Applifier/unity-ads-webview/pull/15033)
+* [AUI] Add Performance Campaign Info to Payload [#14910](https://github.com/Applifier/unity-ads-webview/pull/14910)
+* [Deploy] Squash Commits on Pull Request Merge [#15003](https://github.com/Applifier/unity-ads-webview/pull/15003)
+* [Chore] Add pre-commit hook to run lint on changed files [#15031](https://github.com/Applifier/unity-ads-webview/pull/15031)
+* Add required assets to performance campaigns [#15030](https://github.com/Applifier/unity-ads-webview/pull/15030)
+* [Tencent clickThroughURL macros replacement follow up] Correct private variable naming style [#15035](https://github.com/Applifier/unity-ads-webview/pull/15035)
+* [Tencent clickThroughURL macros replacement follow up] Modify unit tests to avoid platform check [#15034](https://github.com/Applifier/unity-ads-webview/pull/15034)
+* [AUI] Refactoring in preparation for new Swipe up to Download experiment [#14944](https://github.com/Applifier/unity-ads-webview/pull/14944)
+
+# Fri May  1 23:13:38 UTC 2020
+'
 * [Load V5] Expand Load V5 for additional 6 game ids [#15040](https://github.com/Applifier/unity-ads-webview/pull/15040)
 * [Load V5] Revert reverse AB test [#14909](https://github.com/Applifier/unity-ads-webview/pull/14909)
 

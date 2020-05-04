@@ -12,8 +12,14 @@
     "start:release": "rimraf ./dist && NODE_ENV=production webpack-dev-server --port 8000 --host 0.0.0.0 --config tools/webpack/server.release.js",
     "build": "ANALYZE=true npm run build:release",
     "build:release": "rimraf ./dist && NODE_ENV=production webpack --config tools/webpack/config.release.js",
-    "test": "jest"
+    "test": "jest",
+    "lint-code": "git diff-index --name-only HEAD | grep -E \"(.*)\\.(ts)\" | xargs eslint",
+    "lint-styles": "git diff-index --name-only HEAD | grep -E \"(.*)\\.(styl)\" | xargs stylint -c stylintrc.json"
   },
+  "pre-commit": [
+    "lint-code",
+    "lint-styles"
+  ],
   "license": "Apache-2.0",
   "dependencies": {
     "@types/chai": "4.1.7",
@@ -94,6 +100,7 @@
     "webpack-bundle-analyzer": "^3.3.2",
     "webpack-cli": "^3.3.6",
     "webpack-dev-server": "^3.7.2",
-    "webpack-merge": "^4.2.1"
+    "webpack-merge": "^4.2.1",
+    "pre-commit": "1.2.2"
   }
 }

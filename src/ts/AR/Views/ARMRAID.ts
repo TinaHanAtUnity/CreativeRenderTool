@@ -164,7 +164,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
                     width,
                     height
                 })));
-                this._arErrorObserver = this._ar.AR.onError.subscribe(errorCode => this.handleAREvent('error', JSON.stringify({errorCode})));
+                this._arErrorObserver = this._ar.AR.onError.subscribe(errorCode => this.handleAREvent('error', JSON.stringify({ errorCode })));
                 this._arSessionInterruptedObserver = this._ar.AR.onSessionInterrupted.subscribe(() => this.handleAREvent('sessioninterrupted', ''));
                 this._arSessionInterruptionEndedObserver = this._ar.AR.onSessionInterruptionEnded.subscribe(() => this.handleAREvent('sessioninterruptionended', ''));
                 if (this._platform === Platform.ANDROID) {
@@ -199,7 +199,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
         this._showTimestamp = Date.now();
         const backgroundTime = this._backgroundTime / 1000;
 
-        if (this.isKPIDataValid({backgroundTime}, 'playable_show')) {
+        if (this.isKPIDataValid({ backgroundTime }, 'playable_show')) {
             this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(0, 0, backgroundTime, 'playable_show', {}));
         }
 
@@ -330,7 +330,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
             this._handlers.forEach(handler => handler.onMraidClose());
         }
 
-        if (this.isKPIDataValid({timeFromShow, timeFromPlayableStart, backgroundTime}, eventName)) {
+        if (this.isKPIDataValid({ timeFromShow, timeFromPlayableStart, backgroundTime }, eventName)) {
             this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(timeFromShow, timeFromPlayableStart, backgroundTime, eventName, undefined));
         }
     }
@@ -340,7 +340,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
         const timeFromPlayableStart = (Date.now() - this._playableStartTimestamp - this._backgroundTime) / 1000;
         const backgroundTime = this._backgroundTime / 1000;
 
-        if (this.isKPIDataValid({timeFromShow, timeFromPlayableStart, backgroundTime}, eventName)) {
+        if (this.isKPIDataValid({ timeFromShow, timeFromPlayableStart, backgroundTime }, eventName)) {
             this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(timeFromShow, timeFromPlayableStart, backgroundTime, eventName, eventData));
         }
     }
@@ -360,14 +360,14 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
         const timeFromShow = (this._playableStartTimestamp - this._showTimestamp - this._backgroundTime) / 1000;
         const backgroundTime = this._backgroundTime / 1000;
 
-        if (this.isKPIDataValid({timeFromShow, backgroundTime}, 'playable_loading_time')) {
+        if (this.isKPIDataValid({ timeFromShow, backgroundTime }, 'playable_loading_time')) {
             this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(frameLoadDuration, timeFromShow, backgroundTime, 'playable_loading_time', {}));
         }
     }
 
     private handleAREvent(event: string, parameters: string) {
         if (this._iframeLoaded) {
-            this._iframe.contentWindow!.postMessage({type: 'AREvent', data: {parameters, event}}, '*');
+            this._iframe.contentWindow!.postMessage({ type: 'AREvent', data: { parameters, event } }, '*');
         }
     }
 
@@ -516,7 +516,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
                 const timeFromShow = (this._playableStartTimestamp - this._showTimestamp - this._backgroundTime) / 1000;
                 const backgroundTime = this._backgroundTime / 1000;
 
-                if (this.isKPIDataValid({timeFromShow, backgroundTime}, 'playable_start')) {
+                if (this.isKPIDataValid({ timeFromShow, backgroundTime }, 'playable_start')) {
                     this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(timeFromShow, 0, backgroundTime, 'playable_start', undefined));
                 }
 

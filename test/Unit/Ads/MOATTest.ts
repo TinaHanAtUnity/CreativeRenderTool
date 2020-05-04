@@ -34,23 +34,23 @@ describe('MOAT', () => {
             event: any;
             assertions: IAssertionFunction;
         }[] = [{
-            event: {data: {type: 'MOATVideoError', error: 'test error'}},
+            event: { data: { type: 'MOATVideoError', error: 'test error' } },
             assertions: () => {
                 sinon.assert.calledWithExactly(diagnosticsTriggerStub, 'moat_video_error', 'test error');
             }
         }, {
-            event: {data: {type: 'loaded'}},
+            event: { data: { type: 'loaded' } },
             assertions: () => {
                 sinon.assert.notCalled(diagnosticsTriggerStub);
             }
         }, {
-            event: {data: {}},
+            event: { data: {} },
             assertions: () => {
                 sinon.assert.notCalled(logWarningStub);
                 sinon.assert.notCalled(diagnosticsTriggerStub);
             }
         }, {
-            event: {data: {type: 'test'}},
+            event: { data: { type: 'test' } },
             assertions: () => {
                 sinon.assert.calledWithExactly(logWarningStub, 'MOAT Unknown message type test');
                 sinon.assert.notCalled(diagnosticsTriggerStub);

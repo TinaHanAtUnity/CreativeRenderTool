@@ -87,7 +87,7 @@ describe('GDPREventHandlerTest', () => {
     describe('When calling onGDPRPopupSkipped on legalFramework GDPR', () => {
         beforeEach(() => {
             (<sinon.SinonStub>adUnitParameters.privacySDK.getLegalFramework).returns(LegalFramework.GDPR);
-            (<sinon.SinonStub>adUnitParameters.privacySDK.getGamePrivacy).returns(new GamePrivacy({method: PrivacyMethod.LEGITIMATE_INTEREST}));
+            (<sinon.SinonStub>adUnitParameters.privacySDK.getGamePrivacy).returns(new GamePrivacy({ method: PrivacyMethod.LEGITIMATE_INTEREST }));
         });
 
         it('should send GDPR skip event', () => {
@@ -99,7 +99,7 @@ describe('GDPREventHandlerTest', () => {
     describe('When calling onGDPRPopupSkipped on legalFramework CCPA', () => {
         beforeEach(() => {
             (<sinon.SinonStub>adUnitParameters.privacySDK.getLegalFramework).returns(LegalFramework.CCPA);
-            (<sinon.SinonStub>adUnitParameters.privacySDK.getGamePrivacy).returns(new GamePrivacy({method: PrivacyMethod.LEGITIMATE_INTEREST}));
+            (<sinon.SinonStub>adUnitParameters.privacySDK.getGamePrivacy).returns(new GamePrivacy({ method: PrivacyMethod.LEGITIMATE_INTEREST }));
         });
 
         it('should send GDPR skip event', () => {

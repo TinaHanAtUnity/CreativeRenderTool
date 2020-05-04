@@ -212,7 +212,7 @@ import { IMRAIDHandler, MRAIDEvents } from 'MRAID/EventBridge/MRAIDEventAdapter'
                         });
                     };
                 };
-                beforeEach(sendEvent(MRAIDEvents.ORIENTATION, {allowOrientationChange: true, forceOrientation: 'landscape'}));
+                beforeEach(sendEvent(MRAIDEvents.ORIENTATION, { allowOrientationChange: true, forceOrientation: 'landscape' }));
                 it(`should handle the ${MRAIDEvents.ORIENTATION} event`, () => {
                     sinon.assert.calledWith(<sinon.SinonSpy>containerHandler.onBridgeSetOrientationProperties, true, Orientation.LANDSCAPE);
                 });

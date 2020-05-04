@@ -4,14 +4,14 @@ import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Observable1, Observable2, Observable4 } from 'Core/Utilities/Observable';
 
 enum BannerEvents {
-    BannerEventResized          = 'BANNER_RESIZED',
+    BannerEventResized = 'BANNER_RESIZED',
     BannerEventVisibilityChange = 'BANNER_VISIBILITY_CHANGED',
-    BannerOpenedEvent           = 'BANNER_ATTACHED',
-    BannerClosedEvent           = 'BANNER_DETACHED',
-    BannerLoadedEvent           = 'BANNER_LOADED',
-    BannerDestroyedEvent        = 'BANNER_DESTROYED',
-    BannerLoadPlacement         = 'BANNER_LOAD_PLACEMENT',
-    BannerDestroyBanner         = 'BANNER_DESTROY_BANNER'
+    BannerOpenedEvent = 'BANNER_ATTACHED',
+    BannerClosedEvent = 'BANNER_DETACHED',
+    BannerLoadedEvent = 'BANNER_LOADED',
+    BannerDestroyedEvent = 'BANNER_DESTROYED',
+    BannerLoadPlacement = 'BANNER_LOAD_PLACEMENT',
+    BannerDestroyBanner = 'BANNER_DESTROY_BANNER'
 }
 
 export enum Visibility {
@@ -108,7 +108,7 @@ export class BannerApi extends NativeApi implements IBannerApi {
     private handleBannerLoadPlacementEvent(parameters: unknown[]) {
         if (parameters.length >= 3) {
             const placementId: string = <string> parameters[0];
-            const bannerAdViewId: string = <string>  parameters[1];
+            const bannerAdViewId: string = <string> parameters[1];
             const width: number = <number> parameters[2];
             const height: number = <number> parameters[3];
             this.onBannerLoadPlacement.trigger(placementId, bannerAdViewId, width, height);
@@ -129,7 +129,7 @@ export class BannerApi extends NativeApi implements IBannerApi {
         const width = <number>parameters[3];
         const height = <number>parameters[4];
         const alpha = <number>parameters[5];
-        this.onBannerResized.trigger(bannerAdViewId, {x, y, width, height, alpha});
+        this.onBannerResized.trigger(bannerAdViewId, { x, y, width, height, alpha });
     }
 
     private handleBannerVisibilityChanged(parameters: unknown[]) {

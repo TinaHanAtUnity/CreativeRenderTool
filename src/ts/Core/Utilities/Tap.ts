@@ -10,7 +10,7 @@ export class Tap {
     private _onTouchMoveListener: ((event: TouchEvent) => unknown) | undefined;
     private _onTouchEndListener: ((event: TouchEvent) => unknown) | undefined;
     private _onTouchCancelListener: ((event: TouchEvent) => unknown) | undefined;
-    private supportsPassive = false; // indicate if the browser supports passive event listener
+    private _supportsPassive = false; // indicate if the browser supports passive event listener
 
     constructor(element: HTMLElement) {
         this._element = element;
@@ -23,17 +23,17 @@ export class Tap {
         try {
             const opts = Object.defineProperty({}, 'passive', {
                 get: () => {
-                    this.supportsPassive = true;
+                    this._supportsPassive = true;
                 }
             });
-            document.addEventListener('testPassive', (event) => { this.supportsPassive = false; }, opts);
-            document.removeEventListener('testPassive', (event) => { this.supportsPassive = false; }, opts);
+            document.addEventListener('testPassive', (event) => { this._supportsPassive = false; }, opts);
+            document.removeEventListener('testPassive', (event) => { this._supportsPassive = false; }, opts);
         } catch (e) {
-            this.supportsPassive = false;
+            this._supportsPassive = false;
         }
 
         // Use the above detect's results. passive applied if supported, capture will be false either way.
-        this._element.addEventListener('touchstart', (event) => this.onTouchStart(event), this.supportsPassive ? { passive: true } : false);
+        this._element.addEventListener('touchstart', (event) => this.onTouchStart(event), this._supportsPassive ? { passive: true } : false);
     }
 
     public getTouchStartPosition() {
@@ -42,14 +42,14 @@ export class Tap {
 
     private onTouchStart(event: TouchEvent) {
         event.stopPropagation();
-        if (!this.supportsPassive) {
+        if (!this._supportsPassive) {
             event.preventDefault();
         }
 
         this._onTouchMoveListener = (touchEvent) => this.onTouchMove(touchEvent);
         this._onTouchEndListener = (touchEvent) => this.onTouchEnd(touchEvent);
         this._onTouchCancelListener = (touchEvent) => this.onTouchCancel(touchEvent);
-        this._element.addEventListener('touchmove', this._onTouchMoveListener, this.supportsPassive ? { passive: true } : false);
+        this._element.addEventListener('touchmove', this._onTouchMoveListener, this._supportsPassive ? { passive: true } : false);
         this._element.addEventListener('touchend', this._onTouchEndListener, false);
         this._element.addEventListener('touchcancel', this._onTouchCancelListener, false);
         this._moved = false;

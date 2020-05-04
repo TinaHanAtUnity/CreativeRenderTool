@@ -122,8 +122,8 @@ import { BannerViewType } from 'Banners/Native/BannerApi';
                                 return adUnit.onLoad().then(() => {
                                     const call = asSpy(webPlayerContainer.setEventSettings).getCall(0);
                                     call.calledWith({
-                                        'onPageFinished': {'sendEvent': true},
-                                        'onReceivedSslError': {'shouldCallSuper': true}
+                                        'onPageFinished': { 'sendEvent': true },
+                                        'onReceivedSslError': { 'shouldCallSuper': true }
                                     });
                                 });
                             });
@@ -143,8 +143,8 @@ import { BannerViewType } from 'Banners/Native/BannerApi';
                                 return adUnit.onLoad().then(() => {
                                     const call = asSpy(webPlayerContainer.setEventSettings).getCall(0);
                                     call.calledWith({
-                                        'onPageFinished': {'sendEvent': true},
-                                        'onReceivedSslError': {'shouldCallSuper': true}
+                                        'onPageFinished': { 'sendEvent': true },
+                                        'onReceivedSslError': { 'shouldCallSuper': true }
                                     });
                                 });
                             });
@@ -171,8 +171,8 @@ import { BannerViewType } from 'Banners/Native/BannerApi';
                                 return adUnit.onLoad().then(() => {
                                     const call = asSpy(webPlayerContainer.setEventSettings).getCall(1);
                                     sinon.assert.calledWith(call, {
-                                        'shouldOverrideUrlLoading': {'sendEvent': true, 'returnValue': true},
-                                        'onReceivedSslError': {'shouldCallSuper': true}
+                                        'shouldOverrideUrlLoading': { 'sendEvent': true, 'returnValue': true },
+                                        'onReceivedSslError': { 'shouldCallSuper': true }
                                     });
                                 });
                             });
@@ -185,8 +185,8 @@ import { BannerViewType } from 'Banners/Native/BannerApi';
                                 return adUnit.onLoad().then(() => {
                                     const call = asSpy(webPlayerContainer.setEventSettings).getCall(1);
                                     sinon.assert.calledWith(call, {
-                                        'onCreateWindow': {'sendEvent': true},
-                                        'onReceivedSslError': {'shouldCallSuper': true}
+                                        'onCreateWindow': { 'sendEvent': true },
+                                        'onReceivedSslError': { 'shouldCallSuper': true }
                                     });
                                 });
                             });

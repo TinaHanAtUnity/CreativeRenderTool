@@ -13,7 +13,7 @@ import { CacheManager } from 'Core/Managers/CacheManager';
 import { ContentTypeHandlerManager } from 'Ads/Managers/ContentTypeHandlerManager';
 import { PerformanceAdUnitParametersFactory } from 'Performance/AdUnits/PerformanceAdUnitParametersFactory';
 import { AbstractAdUnitParametersFactory } from 'Ads/AdUnits/AdUnitParametersFactory';
-import { PerformanceAdUnitFactory} from 'Performance/AdUnits/PerformanceAdUnitFactory';
+import { PerformanceAdUnitFactory } from 'Performance/AdUnits/PerformanceAdUnitFactory';
 import { CacheMode } from 'Core/Models/CoreConfiguration';
 import { CoreConfigurationParser } from 'Core/Parsers/CoreConfigurationParser';
 import { AdsConfigurationParser } from 'Ads/Parsers/AdsConfigurationParser';
@@ -132,7 +132,14 @@ describe('AutomatedExperimentManagerTests', () => {
         gsc_target_game_starts: [0],
         gsc_target_game_views: [0],
         day_of_week: 0,
-        is_weekend: true
+        is_weekend: true,
+        target_store_id: 'com.unity3d.ads.example',
+        game_icon_url: 'com.unity3d.ads.example',
+        portrait_creative_id: '582bb5e352e4c4abd7fab850',
+        landscape_creative_id: '582bb5e352e4c4abd7fab850',
+        endcard_portrait_image_url: 'http://cdn-creatives-highwinds-prd.unityads.unity3d.com/assets/6e6f9a65-1862-4051-bda1-dda61ebb2f65/Lucky%20Day%203x4%20FULL%20END%20CARD%20UNITY.png',
+        endcard_landscape_image_url: 'http://cdn-creatives-highwinds-prd.unityads.unity3d.com/assets/6e6f9a65-1862-4051-bda1-dda61ebb2f65/Lucky%20Day%203x4%20FULL%20END%20CARD%20UNITY.png',
+        target_game_name: 'Example game name'
     };
 
     function ValidateFeaturesInRequestBody(body: string): boolean {
@@ -186,10 +193,10 @@ describe('AutomatedExperimentManagerTests', () => {
     }
 
     [
-        {action1: FooExperimentDeclaration.action1.choiceA, action2: FooExperimentDeclaration.action2.choiceA},
-        {action1: FooExperimentDeclaration.action1.choiceA, action2: FooExperimentDeclaration.action2.choiceB},
-        {action1: FooExperimentDeclaration.action1.choiceB, action2: FooExperimentDeclaration.action2.choiceA},
-        {action1: FooExperimentDeclaration.action1.choiceB, action2: FooExperimentDeclaration.action2.choiceB}
+        { action1: FooExperimentDeclaration.action1.choiceA, action2: FooExperimentDeclaration.action2.choiceA },
+        { action1: FooExperimentDeclaration.action1.choiceA, action2: FooExperimentDeclaration.action2.choiceB },
+        { action1: FooExperimentDeclaration.action1.choiceB, action2: FooExperimentDeclaration.action2.choiceA },
+        { action1: FooExperimentDeclaration.action1.choiceB, action2: FooExperimentDeclaration.action2.choiceB }
     ].forEach((action) => {
         it(`initialize with request ok, use received action ${JSON.stringify(action)}`, () => {
             const postUrl = AutomatedExperimentManager.BaseUrl + AutomatedExperimentManager.CreateEndPoint;
@@ -290,7 +297,7 @@ describe('AutomatedExperimentManagerTests', () => {
 
             const rewardPostUrl = AutomatedExperimentManager.BaseUrl + AutomatedExperimentManager.RewardEndPoint;
             const rewardRequestBodyText = JSON.stringify({
-                user_info: {ab_group: 99, auction_id: '12345'},
+                user_info: { ab_group: 99, auction_id: '12345' },
                 reward: rewarded,
                 experiments:
                 [
@@ -304,7 +311,7 @@ describe('AutomatedExperimentManagerTests', () => {
 
             const postStubReward = postStub.onSecondCall().resolves(<INativeResponse>{
                 responseCode: 200,
-                response: JSON.stringify({success: true})
+                response: JSON.stringify({ success: true })
             });
 
             aem.initialize(core, campaignSource);
