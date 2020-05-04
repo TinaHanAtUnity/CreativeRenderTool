@@ -1,3 +1,7 @@
+# Pending
+
+* [AUI] Refactoring in preparation for new Swipe up to Download experiment [#14944](https://github.com/Applifier/unity-ads-webview/pull/14944)
+
 # Fri May  1 23:13:38 UTC 2020
 
 * [Load V5] Expand Load V5 for additional 6 game ids [#15040](https://github.com/Applifier/unity-ads-webview/pull/15040)
