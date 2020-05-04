@@ -214,6 +214,11 @@ body.alternative-layout #end-screen {
 }
 
 body.alternative-layout.landscape #end-screen {
+
+    .campaign-container {
+        background: $black;
+    }
+
     .game-background-container {
         width: 100%;
         height: 100%;
@@ -228,8 +233,6 @@ body.alternative-layout.landscape #end-screen {
         padding-top: unset;
         margin-left: 1.5em;
         align-self: center;
-        // min-width: 40%;
-        // text-align: center;
 
         .end-screen-image {
             max-height: 300px;
@@ -251,6 +254,14 @@ body.alternative-layout.landscape #end-screen {
         }
 
     }
+
+    .btn-close-region {
+        padding-right: 1em !important;
+    }
+
+    .privacy-button {
+        padding-right: 1.5em !important;
+    }
 //     .game-info-container {
 //         padding: .6em;
 //         border-radius: .25em;
@@ -267,3 +278,40 @@ body.alternative-layout.landscape #end-screen {
 //     }
 }
 
+@media only screen and (-webkit-device-pixel-ratio: 3) and (device-height: 812px) and (device-width: 375px) {
+    .performance-end-screen .alternative-layout.portrait #end-screen .bottom-container {
+        margin: .25em 0;
+    }
+}
+
+// @media (orientation: portrait) {
+//     .alternative-layout.portrait {
+        
+//         /* iPhone X & iPhone XS */
+//         @media only screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) {
+//             html {
+//                 $iphone-x-styles();
+//             }
+
+//             $iphone-x-performance-end-screen-styles();
+//         }
+
+//         /* iPhone XS Max */
+//         @media only screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) {
+//             html {
+//                 $iphone-x-styles();
+//             }
+
+//             $iphone-x-performance-end-screen-styles();
+//         }
+
+//         /* iPhone XR */
+//         @media only screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) {
+//             html {
+//                 $iphone-x-styles();
+//             }
+
+//             $iphone-x-performance-end-screen-styles();
+//         }
+//     }
+// }

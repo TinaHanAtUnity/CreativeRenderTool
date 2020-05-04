@@ -97,31 +97,34 @@
 
 // @stylint off
 
+
+@media (orientation: portrait) {
 /* iPhone X & iPhone XS */
-@media only screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) {
-  html {
-    $iphone-x-styles();
+  @media only screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) {
+    html {
+      $iphone-x-styles();
+    }
+
+    $iphone-x-performance-end-screen-styles();
   }
 
-  $iphone-x-performance-end-screen-styles();
-}
+  /* iPhone XS Max */
+  @media only screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) {
+    html {
+      $iphone-x-styles();
+    }
 
-/* iPhone XS Max */
-@media only screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) {
-  html {
-    $iphone-x-styles();
+    $iphone-x-performance-end-screen-styles();
   }
 
-  $iphone-x-performance-end-screen-styles();
-}
+  /* iPhone XR */
+  @media only screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) {
+    html {
+      $iphone-x-styles();
+    }
 
-/* iPhone XR */
-@media only screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) {
-  html {
-    $iphone-x-styles();
+    $iphone-x-performance-end-screen-styles();
   }
-
-  $iphone-x-performance-end-screen-styles();
 }
 
 // @stylint on
