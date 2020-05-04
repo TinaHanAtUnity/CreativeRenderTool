@@ -13,7 +13,7 @@ export class VastCompanionAdStaticResourceValidator implements IValidator {
     private static readonly _minPortraitWidth = 320;
     private static readonly _minLandscapeHeight = 320;
     private static readonly _minLandscapeWidth = 480;
-    private static readonly _minSquareSize = 200;   // minimum size requirement
+    private static readonly _minSquareSize = 200; // minimum size requirement
 
     private _errors: CampaignError[] = [];
 

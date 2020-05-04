@@ -146,7 +146,7 @@ describe('RequestPrivacyFactoryTests', () => {
             gdprEnabled: true,
             optOutRecorded: false,
             optOutEnabled: false,
-            gamePrivacy: {method: PrivacyMethod.UNITY_CONSENT},
+            gamePrivacy: { method: PrivacyMethod.UNITY_CONSENT },
             legalFramework: LegalFramework.GDPR
         };
         const newUserPrivacy = {
@@ -154,8 +154,8 @@ describe('RequestPrivacyFactoryTests', () => {
             permissions: {
                 ads: true,
                 external: true,
-                gameExp: true},
-            version: CurrentUnityConsentVersion};
+                gameExp: true },
+            version: CurrentUnityConsentVersion };
         beforeEach(() => {
             privacySDK = PrivacyParser.parse(<IRawAdsConfiguration>privacyParts, clientInfo, deviceInfo);
         });

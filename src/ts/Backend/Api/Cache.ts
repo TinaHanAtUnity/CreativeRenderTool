@@ -91,7 +91,7 @@ export class Cache extends BackendApi {
     }
 
     public addFile(id: string, mtime: number, size: number): void {
-        const fileInfo: IFileInfo = {id: id, mtime: mtime, size: size, found: true};
+        const fileInfo: IFileInfo = { id: id, mtime: mtime, size: size, found: true };
         this._files[id] = fileInfo;
     }
 

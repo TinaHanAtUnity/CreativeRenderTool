@@ -202,7 +202,7 @@ describe('LegacyCampaignManager', () => {
             mockRequest.expects('post').returns(Promise.resolve({
                 response: JSON.stringify(OnProgrammaticVastPlcCampaignInsideOutsideJson)
             }));
-            mockRequest.expects('get').withArgs('http://demo.tremormedia.com/proddev/vast/vast_inline_linear.xml', [], {retries: 2, retryDelay: 10000, followRedirects: true, retryWithConnectionEvents: false}).returns(Promise.resolve({
+            mockRequest.expects('get').withArgs('http://demo.tremormedia.com/proddev/vast/vast_inline_linear.xml', [], { retries: 2, retryDelay: 10000, followRedirects: true, retryWithConnectionEvents: false }).returns(Promise.resolve({
                 response: VastInlineLinear
             }));
 
@@ -278,10 +278,10 @@ describe('LegacyCampaignManager', () => {
             mockRequest.expects('post').returns(Promise.resolve({
                 response: JSON.stringify(OnProgrammaticVastPlcCampaignWrapped)
             }));
-            mockRequest.expects('get').withArgs(Url.encodeUrlWithQueryParams('https://x.vindicosuite.com/?l=454826&t=x&rnd=[Cachebuster_If_Supported_In_Console]'), [], {retries: 2, retryDelay: 10000, followRedirects: true, retryWithConnectionEvents: false}).returns(Promise.resolve({
+            mockRequest.expects('get').withArgs(Url.encodeUrlWithQueryParams('https://x.vindicosuite.com/?l=454826&t=x&rnd=[Cachebuster_If_Supported_In_Console]'), [], { retries: 2, retryDelay: 10000, followRedirects: true, retryWithConnectionEvents: false }).returns(Promise.resolve({
                 response: JSON.stringify(WrappedVast1)
             }));
-            mockRequest.expects('get').withArgs(Url.encodeUrlWithQueryParams('https://ads.pointroll.com/PortalServe/?pid=2810492V01420160323193924&pos=o&secure=1&r=1466475479'), [], {retries: 2, retryDelay: 10000, followRedirects: true, retryWithConnectionEvents: false}).returns(Promise.resolve({
+            mockRequest.expects('get').withArgs(Url.encodeUrlWithQueryParams('https://ads.pointroll.com/PortalServe/?pid=2810492V01420160323193924&pos=o&secure=1&r=1466475479'), [], { retries: 2, retryDelay: 10000, followRedirects: true, retryWithConnectionEvents: false }).returns(Promise.resolve({
                 response: JSON.stringify(WrappedVast2)
             }));
 
@@ -441,7 +441,7 @@ describe('LegacyCampaignManager', () => {
             // given a VAST placement that wraps another VAST
             const mockRequest = sinon.mock(request);
             mockRequest.expects('post').returns(Promise.resolve(response));
-            mockRequest.expects('get').withArgs(wrappedUrl, [], {retries: 2, retryDelay: 10000, followRedirects: true, retryWithConnectionEvents: false}).returns(wrappedResponse);
+            mockRequest.expects('get').withArgs(wrappedUrl, [], { retries: 2, retryDelay: 10000, followRedirects: true, retryWithConnectionEvents: false }).returns(wrappedResponse);
             if (errorURLs) {
                 for (const errorURL of errorURLs) {
                     mockRequest.expects('get').withArgs(errorURL, []).returns(Promise.resolve());
@@ -1067,7 +1067,7 @@ describe('LegacyCampaignManager', () => {
                     assert.equal(triggeredCampaign.getSeatId(), 902);
                     assert.equal(triggeredCampaign.getCorrelationId(), 'zGg2TfRsBNbqlc7AVdhLAw');
                     assert.deepEqual((<MRAIDCampaign>triggeredCampaign).getResource(), '<div>markup</div>');
-                    assert.deepEqual((<MRAIDCampaign>triggeredCampaign).getTrackingUrls(), {impression: ['https://ads-brand-postback.unityads.unity3d.com/brands/2000/%ZONE%/impression/common?data=Kz2J']});
+                    assert.deepEqual((<MRAIDCampaign>triggeredCampaign).getTrackingUrls(), { impression: ['https://ads-brand-postback.unityads.unity3d.com/brands/2000/%ZONE%/impression/common?data=Kz2J'] });
                 });
             });
 

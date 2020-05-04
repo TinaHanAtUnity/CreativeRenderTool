@@ -22,7 +22,16 @@ module.exports = {
     '@typescript-eslint/interface-name-prefix': ['error', 'always'],
     'no-trailing-spaces': ['error'],
     'no-tabs': ['error'],
-    
+    'no-multi-spaces': ['error'],
+    'block-spacing': ['error', 'always'],
+    'comma-spacing': ['error', { 'before': false, 'after': true }],
+    'semi-spacing': ['error'],
+    'keyword-spacing': ['error', { 'after': true }],
+    'array-bracket-spacing': ['error', 'never'],
+    'space-in-parens': ['error', 'never'],
+    'object-curly-spacing': ['error', 'always'],
+    '@typescript-eslint/no-var-requires': ['warn'],
+
     '@typescript-eslint/explicit-function-return-type': ['off'], // TODO
     '@typescript-eslint/explicit-member-accessibility': ['off'], // TODO
     '@typescript-eslint/no-non-null-assertion': ['off'], // TODO

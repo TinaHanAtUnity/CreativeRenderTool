@@ -114,7 +114,7 @@ describe('VastParserStrict', () => {
 
             TestFixtures.getVastParserStrict().retrieveVast(wrappedVAST, core, request);
             const newUrl = 'http://demo.tremormedia.com/proddev/vast/vast_wrapper_linear_2.xml';
-            sinon.assert.calledWith(<sinon.SinonStub>request.get, newUrl, [], {retries: 2, retryDelay: 10000, followRedirects: true, retryWithConnectionEvents: false});
+            sinon.assert.calledWith(<sinon.SinonStub>request.get, newUrl, [], { retries: 2, retryDelay: 10000, followRedirects: true, retryWithConnectionEvents: false });
         });
 
         context('for IAS', () => {
@@ -126,7 +126,7 @@ describe('VastParserStrict', () => {
                 const newUrl = 'https://vastpixel3.adsafeprotected.com/vast/fwjsvid/st/291274/36617114/skeleton.xml?scoot=doot;omid_p=Unity3d/1.2.10';
 
                 TestFixtures.getVastParserStrict().retrieveVast(wrappedVAST, core, request);
-                sinon.assert.calledWith(<sinon.SinonStub>request.get, newUrl, headers, {retries: 2, retryDelay: 10000, followRedirects: true, retryWithConnectionEvents: false});
+                sinon.assert.calledWith(<sinon.SinonStub>request.get, newUrl, headers, { retries: 2, retryDelay: 10000, followRedirects: true, retryWithConnectionEvents: false });
             });
 
             it('should splice bundleID as first url query param', () => {
@@ -137,7 +137,7 @@ describe('VastParserStrict', () => {
                 const newUrl = 'https://vastpixel3.adsafeprotected.com/vast/fwjsvid/st/291274/36617114/skeleton.xml?bundleId=booyah&scoot=doot;omid_p=Unity3d/1.2.10';
 
                 TestFixtures.getVastParserStrict().retrieveVast(wrappedVAST, core, request, 'booyah');
-                sinon.assert.calledWith(<sinon.SinonStub>request.get, newUrl, headers, {retries: 2, retryDelay: 10000, followRedirects: true, retryWithConnectionEvents: false});
+                sinon.assert.calledWith(<sinon.SinonStub>request.get, newUrl, headers, { retries: 2, retryDelay: 10000, followRedirects: true, retryWithConnectionEvents: false });
             });
 
             it('should create a Vast tag that is Publica when Publica check is true', () => {

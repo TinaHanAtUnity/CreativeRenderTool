@@ -13,7 +13,7 @@ import { AutomatedExperimentManager } from 'MabExperimentation/AutomatedExperime
 import { MabDisabledABTest } from 'Core/Models/ABGroup';
 
 export class Performance extends AbstractParserModule {
-    constructor(ar: IARApi, core: ICore, aem: AutomatedExperimentManager,  ads: IAds) {
+    constructor(ar: IARApi, core: ICore, aem: AutomatedExperimentManager, ads: IAds) {
         const contentTypeHandlerMap: { [key: string]: IContentTypeHandler } = {};
         const parser = new CometCampaignParser(core);
 

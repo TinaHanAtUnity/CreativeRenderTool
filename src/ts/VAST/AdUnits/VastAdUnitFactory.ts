@@ -42,7 +42,7 @@ export class VastAdUnitFactory extends AbstractAdUnitFactory<VastCampaign, IVast
             parameters.endScreen.addEventHandler(vastEndScreenHandler);
 
             if (parameters.platform === Platform.ANDROID) {
-                const onBackKeyObserver = parameters.ads.Android!.AdUnit.onKeyDown.subscribe((keyCode, eventTime, downTime, repeatCount) =>  {
+                const onBackKeyObserver = parameters.ads.Android!.AdUnit.onKeyDown.subscribe((keyCode, eventTime, downTime, repeatCount) => {
                     vastEndScreenHandler.onKeyEvent(keyCode);
                     if (CustomFeatures.isCloseIconSkipEnabled(parameters.clientInfo.getGameId())) {
                         vastOverlayHandler.onKeyEvent(keyCode);

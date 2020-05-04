@@ -170,7 +170,7 @@ export class DeviceIdManager {
                 if (permission === requestedPermission && granted) {
                     resolve();
                     this._core.Permissions.onPermissionsResult.unsubscribe(onPermissionResultObserver);
-                }  else {
+                } else {
                     reject(new Error(DeviceIdMessage.PERMISSION_DENIED));
                 }
             });

@@ -31,7 +31,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
         it('should fetch correctly', () => {
             backend.Api.Storage.setStorageContents(<any>{
                 player: {
-                    server_id: {value: 'test_sid'}
+                    server_id: { value: 'test_sid' }
                 }
             });
 

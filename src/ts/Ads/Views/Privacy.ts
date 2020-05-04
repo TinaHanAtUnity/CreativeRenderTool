@@ -102,7 +102,7 @@ export class Privacy extends AbstractPrivacy {
     public show(): void {
         super.show();
 
-        if (!this._userPrivacyManager.isUserUnderAgeLimit() &&  !this._isCoppaCompliant) {
+        if (!this._userPrivacyManager.isUserUnderAgeLimit() && !this._isCoppaCompliant) {
             this.populateUserSummary();
         }
 

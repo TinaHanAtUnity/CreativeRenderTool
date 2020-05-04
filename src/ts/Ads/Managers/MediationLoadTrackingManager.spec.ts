@@ -35,7 +35,7 @@ describe('MediationLoadTrackingManager', () => {
         });
 
         it('should report with correct placement bucket event', () => {
-            expect(SDKMetrics.reportTimingEventWithTags).toBeCalledWith(MediationMetric.FillLatencyByPlacements, expect.anything(), expect.objectContaining({'plb': '2'}));
+            expect(SDKMetrics.reportTimingEventWithTags).toBeCalledWith(MediationMetric.FillLatencyByPlacements, expect.anything(), expect.objectContaining({ 'plb': '2' }));
         });
     });
 
@@ -137,18 +137,18 @@ describe('MediationLoadTrackingManager', () => {
             });
 
             it('iar flag should be set', () => {
-                expect(SDKMetrics.reportMetricEventWithTags).toBeCalledWith(MediationMetric.LoadRequest, expect.objectContaining({'iar': 'true'}));
+                expect(SDKMetrics.reportMetricEventWithTags).toBeCalledWith(MediationMetric.LoadRequest, expect.objectContaining({ 'iar': 'true' }));
             });
 
             it('exp flag should be set correctly', () => {
-                expect(SDKMetrics.reportMetricEventWithTags).toBeCalledWith(MediationMetric.LoadRequest, expect.objectContaining({'exp': 'none'}));
+                expect(SDKMetrics.reportMetricEventWithTags).toBeCalledWith(MediationMetric.LoadRequest, expect.objectContaining({ 'exp': 'none' }));
             });
         });
 
         [
-            { time: 250, expected: { 'iar': 'true' }},
-            { time: 251, expected: { 'iar': 'false' }}
-        ].forEach(({time, expected}) => {
+            { time: 250, expected: { 'iar': 'true' } },
+            { time: 251, expected: { 'iar': 'false' } }
+        ].forEach(({ time, expected }) => {
             describe(`after init complete withing ${time}ms`, () => {
                 let windowSpy: jest.SpyInstance;
 
@@ -237,7 +237,7 @@ describe('MediationLoadTrackingManager', () => {
         });
 
         it('should report with correct placement bucket event', () => {
-            expect(SDKMetrics.reportTimingEventWithTags).toBeCalledWith(MediationMetric.NofillLatencyByPlacements, expect.anything(), expect.objectContaining({'plb': '2'}));
+            expect(SDKMetrics.reportTimingEventWithTags).toBeCalledWith(MediationMetric.NofillLatencyByPlacements, expect.anything(), expect.objectContaining({ 'plb': '2' }));
         });
     });
 
