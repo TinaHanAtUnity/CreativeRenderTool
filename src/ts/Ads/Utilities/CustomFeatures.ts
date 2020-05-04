@@ -9,6 +9,11 @@ import CacheModeAllowedExperimentGames from 'json/custom_features/CacheModeAllow
 
 export class CustomFeatures {
 
+    public static isTencentSeat(seatId: number | undefined): boolean {
+        return seatId === 9107 ||
+               seatId === 9258;
+    }
+
     public static isNoGzipGame(gameId: string): boolean {
         return gameId === '1475968' ||
                gameId === '1708468' ||
@@ -137,7 +142,8 @@ export class CustomFeatures {
     public static isLoadV5Game(gameId: string): boolean {
         const gameIds = [
             '1783252', '1781853', '1781854', // Initial Games
-            '1428861', '1428862' // Chimera Game
+            '1428861', '1428862', // Chimera Game
+            '1434564', '3079031', '3334336', '3211592', '1566453', '3334337' // First batch
         ];
 
         return this.existsInList(gameIds, gameId);

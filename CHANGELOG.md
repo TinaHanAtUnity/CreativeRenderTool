@@ -1,4 +1,19 @@
-# Pending
+# Fri May  1 23:13:38 UTC 2020
+
+* [Load V5] Expand Load V5 for additional 6 game ids [#15040](https://github.com/Applifier/unity-ads-webview/pull/15040)
+* [Load V5] Revert reverse AB test [#14909](https://github.com/Applifier/unity-ads-webview/pull/14909)
+
+# Thu Apr 30 00:40:00 UTC 2020
+
+* [Tencent clickThrough macros replacement] PR6: Enable this feature and create corresponding event handlers [#14975](https://github.com/Applifier/unity-ads-webview/pull/14975)
+* [ABT] Add Metrics to Investigate VideoPlayer Errors [#15001](https://github.com/Applifier/unity-ads-webview/pull/15001)
+* [Tencent clickThrough macros replacement] PR5: Introduce Tencent specific EventHandlers and utils [#14974](https://github.com/Applifier/unity-ads-webview/pull/14974)
+* [Tencent clickThrough macros replacement] PR4: Improvement for Tap and View class [#14973](https://github.com/Applifier/unity-ads-webview/pull/14973)
+* [Tencent clickThrough macros replacement] PR3: Refactor VastOverlayEventHandler and VastEndScreenEventHandler [#14972](https://github.com/Applifier/unity-ads-webview/pull/14972)
+* [Tencent clickThrough macros replacement] PR2: Refactor to add optional attachTap params for VastOverlay and VastEndscreen [#14971](https://github.com/Applifier/unity-ads-webview/pull/14971)
+* [Tencent clickThrough macros replacement] PR1: add more mock classes and methods [#14970](https://github.com/Applifier/unity-ads-webview/pull/14970)
+
+# Wed Apr 29 12:12:35 UTC 2020
 
 * Feature/privacy pre ad feature parity [#14744](https://github.com/Applifier/unity-ads-webview/pull/14744)
 
