@@ -5,7 +5,7 @@ import VastStaticEndScreenTemplate from 'html/VastStaticEndScreen.html';
 import { VastEndScreen } from 'VAST/Views/VastEndScreen';
 import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
-import {AdUnitContainer, ViewConfiguration} from 'Ads/AdUnits/Containers/AdUnitContainer';
+import { AdUnitContainer, ViewConfiguration } from 'Ads/AdUnits/Containers/AdUnitContainer';
 
 export class VastStaticEndScreen extends VastEndScreen implements IPrivacyHandlerView {
 

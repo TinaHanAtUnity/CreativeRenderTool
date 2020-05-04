@@ -10,6 +10,6 @@ export const Vast = jest.fn(() => {
     return <VastMock> {
         isPublicaTag: jest.fn(),
         getAdVerifications: jest.fn(),
-        getHtmlCompanionResourceContent: jest.fn().mockImplementation(() => 'html content')
+        getHtmlCompanionResourceContent: jest.fn().mockReturnValue('html content')
     };
 });

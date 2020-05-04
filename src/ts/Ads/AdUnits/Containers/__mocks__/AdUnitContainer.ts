@@ -13,9 +13,9 @@ export const AdUnitContainer = jest.fn(() => {
     return <AdUnitContainerMock>{
         addEventHandler: jest.fn(),
         removeEventHandler: jest.fn(),
-        open: jest.fn().mockImplementation(() => Promise.resolve()),
-        close: jest.fn().mockImplementation(() => Promise.resolve()),
-        reconfigure: jest.fn().mockImplementation(() => Promise.resolve()),
-        setViewFrame: jest.fn().mockImplementation(() => Promise.resolve())
+        open: jest.fn().mockResolvedValue(Promise.resolve()),
+        close: jest.fn().mockResolvedValue(Promise.resolve()),
+        reconfigure: jest.fn().mockResolvedValue(Promise.resolve()),
+        setViewFrame: jest.fn().mockResolvedValue(Promise.resolve())
     };
 });

@@ -19,7 +19,7 @@ export class VastHTMLEndScreen extends VastEndScreen implements IPrivacyHandlerV
     private _privacy: AbstractPrivacy;
     private _webPlayerContainer: WebPlayerContainer;
     private _htmlContentTemplate: Template;
-    private readonly _htmlContentTemplateData: ITemplateData  = {};
+    private readonly _htmlContentTemplateData: ITemplateData = {};
     private _adUnitContainer: AdUnitContainer;
     private _deviceInfo: DeviceInfo;
     private _shouldOverrideUrlLoadingObserver: IObserver2<string, string>;
@@ -100,7 +100,7 @@ export class VastHTMLEndScreen extends VastEndScreen implements IPrivacyHandlerV
 
     private setUpWebPlayers(): Promise<void> {
         if (this._platform === Platform.IOS) {
-            this._onCreateWebview =  this._webPlayerContainer.onCreateWebView.subscribe((url) => {
+            this._onCreateWebview = this._webPlayerContainer.onCreateWebView.subscribe((url) => {
                 this.shouldOverrideUrlLoading(url, undefined);
             });
         } else {

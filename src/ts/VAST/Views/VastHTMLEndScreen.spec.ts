@@ -83,9 +83,15 @@ jest.mock('html/VastHTMLEndScreen.html', () => {
         });
 
         describe('when privacy is closed', () => {
-            it('the privacy should hide and webiview frames should change back', () => {
+            it('the privacy should hide', () => {
                 htmlEndScreen.onPrivacyClose();
                 expect(privacy.hide).toHaveBeenCalled();
+            });
+        });
+
+        describe('when privacy is closed', () => {
+            it('the webiview frames should change back', () => {
+                htmlEndScreen.onPrivacyClose();
                 expect(adUnitContainer.setViewFrame).toHaveBeenCalled();
             });
         });

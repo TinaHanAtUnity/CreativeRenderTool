@@ -1,4 +1,4 @@
-import { InterstitialWebPlayerContainer as Base} from 'Ads/Utilities/WebPlayer/InterstitialWebPlayerContainer';
+import { InterstitialWebPlayerContainer as Base } from 'Ads/Utilities/WebPlayer/InterstitialWebPlayerContainer';
 import { Observable, ObservableMock } from 'Core/Utilities/__mocks__/Observable';
 
 export type InterstitialWebPlayerContainerMock = Base & {
@@ -13,11 +13,11 @@ export type InterstitialWebPlayerContainerMock = Base & {
 
 export const InterstitialWebPlayerContainer = jest.fn(() => {
     return <InterstitialWebPlayerContainerMock>{
-        setUrl: jest.fn().mockImplementation(() => Promise.resolve()),
-        setData: jest.fn().mockImplementation(() => Promise.resolve()),
-        setSettings: jest.fn().mockImplementation(() => Promise.resolve()),
-        setEventSettings: jest.fn().mockImplementation(() => Promise.resolve()),
-        sendEvent: jest.fn().mockImplementation(() => Promise.resolve()),
+        setUrl: jest.fn().mockResolvedValue(Promise.resolve()),
+        setData: jest.fn().mockResolvedValue(Promise.resolve()),
+        setSettings: jest.fn().mockResolvedValue(Promise.resolve()),
+        setEventSettings: jest.fn().mockResolvedValue(Promise.resolve()),
+        sendEvent: jest.fn().mockResolvedValue(Promise.resolve()),
         onCreateWebView: new Observable(),
         shouldOverrideUrlLoading: new Observable()
     };
