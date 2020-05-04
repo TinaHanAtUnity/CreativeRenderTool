@@ -1,4 +1,4 @@
-# Pending
+# Mon May  4 21:33:27 UTC 2020
 
 * [Auction V6] Remove AB Test and Release Feature [#15092](https://github.com/Applifier/unity-ads-webview/pull/15092)
 * [Chore] Update lint rules and auto fix existing issues (Part 1) [#15093](https://github.com/Applifier/unity-ads-webview/pull/15093)
