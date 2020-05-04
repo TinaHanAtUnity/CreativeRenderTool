@@ -20,7 +20,7 @@ export class VastVerificationResource extends Model<IVastVerificationResource> {
         this.set('resourceUrl', resourceUrl);
         this.set('apiFramework', apiFramework);
         this.set('browserOptional', browserOptional || null);
-        this.set('type', type || 'other');  // javascript and other
+        this.set('type', type || 'other'); // javascript and other
     }
 
     public getResourceUrl(): string {

@@ -1,4 +1,4 @@
-import { VastAdVerification as Base} from 'VAST/Models/VastAdVerification';
+import { VastAdVerification as Base } from 'VAST/Models/VastAdVerification';
 
 export type VastAdVerificationMock = Base & {
   getVerificationParameters: jest.Mock;

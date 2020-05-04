@@ -51,7 +51,7 @@ describe('TencentVastEndScreenEventHandler', () => {
     });
 
     describe('when onVastEndScreenClick happens and there is no click through url', () => {
-        it('the error message should be returned to indicate the url is null',  async () => {
+        it('the error message should be returned to indicate the url is null', async () => {
             const vastAdUnit = new VastAdUnit();
             vastAdUnit.getCompanionClickThroughUrl.mockReturnValue(null);
             vastAdUnit.getVideoClickThroughURL.mockReturnValue(null);

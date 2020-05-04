@@ -376,7 +376,7 @@ export class AutomatedExperimentManager {
             features.game_icon_url = campaign.getGameIcon().getUrl();
             features.target_game_name = campaign.getGameName();
             features.portrait_creative_id = campaign.getPortraitVideo() ? campaign.getPortraitVideo()!.getCreativeId() : undefined;
-            features.landscape_creative_id =  campaign.getVideo() ? campaign.getVideo()!.getCreativeId() : undefined;
+            features.landscape_creative_id = campaign.getVideo() ? campaign.getVideo()!.getCreativeId() : undefined;
             features.endcard_portrait_image_url = campaign.getPortrait() ? campaign.getPortrait()!.getUrl() : undefined;
             features.endcard_landscape_image_url = campaign.getLandscape() ? campaign.getLandscape()!.getUrl() : undefined;
         }

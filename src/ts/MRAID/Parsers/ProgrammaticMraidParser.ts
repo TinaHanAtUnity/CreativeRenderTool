@@ -23,7 +23,7 @@ export class ProgrammaticMraidParser extends CampaignParser {
         if (!jsonMraid.markup) {
             const MRAIDError = new DiagnosticError(
                 new Error('MRAID Campaign missing markup'),
-                {mraid: jsonMraid}
+                { mraid: jsonMraid }
             );
             throw MRAIDError;
         }

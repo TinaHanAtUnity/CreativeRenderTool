@@ -1,7 +1,7 @@
-import {AdsConfiguration, IRawAdsConfiguration} from 'Ads/Models/AdsConfiguration';
-import {PrivacyMethod} from 'Privacy/Privacy';
-import {AdsConfigurationParser} from 'Ads/Parsers/AdsConfigurationParser';
-import {assert} from 'chai';
+import { AdsConfiguration, IRawAdsConfiguration } from 'Ads/Models/AdsConfiguration';
+import { PrivacyMethod } from 'Privacy/Privacy';
+import { AdsConfigurationParser } from 'Ads/Parsers/AdsConfigurationParser';
+import { assert } from 'chai';
 import ConfigurationJson from 'json/ConfigurationAuctionPlc.json';
 import 'mocha';
 import { CacheMode } from 'Core/Models/CoreConfiguration';

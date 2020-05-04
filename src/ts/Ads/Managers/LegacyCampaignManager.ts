@@ -61,7 +61,7 @@ export class LegacyCampaignManager extends CampaignManager {
     protected _adsConfig: AdsConfiguration;
     protected _clientInfo: ClientInfo;
     protected _cacheBookkeeping: CacheBookkeepingManager;
-    protected  _privacy: PrivacySDK;
+    protected _privacy: PrivacySDK;
     private _contentTypeHandlerManager: ContentTypeHandlerManager;
     private _adMobSignalFactory: AdMobSignalFactory;
     private _sessionManager: SessionManager;

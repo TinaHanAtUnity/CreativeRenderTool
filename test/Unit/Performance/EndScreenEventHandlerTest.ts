@@ -679,7 +679,7 @@ describe('EndScreenEventHandlerTest', () => {
 
                 return new Promise((resolve, reject) => setTimeout(resolve, 500)).then(() => {
                     sinon.assert.called(<sinon.SinonSpy>store.iOS!.AppSheet.present);
-                    sinon.assert.calledWith(<sinon.SinonSpy>store.iOS!.AppSheet.present, {id: 11111});
+                    sinon.assert.calledWith(<sinon.SinonSpy>store.iOS!.AppSheet.present, { id: 11111 });
                     sinon.assert.called(<sinon.SinonSpy>store.iOS!.AppSheet.destroy);
                 });
             });

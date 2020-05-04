@@ -125,7 +125,7 @@ describe('VastTest', () => {
 
         it('should return image urls when image mime type is in caps', () => {
             vastAd.addStaticCompanionAd(new VastCompanionAdStaticResource('id1', 320, 480, 'image/GIF', 'http://url.com/landscape.gif', 'https://url.com/click'));
-            vastAd.addStaticCompanionAd(new VastCompanionAdStaticResource('id2', 480, 320, 'IMAGE/Gif',  'http://url.com/portrait.gif', 'https://url.com/click'));
+            vastAd.addStaticCompanionAd(new VastCompanionAdStaticResource('id2', 480, 320, 'IMAGE/Gif', 'http://url.com/portrait.gif', 'https://url.com/click'));
             const vast = new Vast([vastAd], []);
             assert.equal(vast.getStaticCompanionLandscapeUrl(), 'http://url.com/landscape.gif');
             assert.equal(vast.getStaticCompanionPortraitUrl(), 'http://url.com/portrait.gif');

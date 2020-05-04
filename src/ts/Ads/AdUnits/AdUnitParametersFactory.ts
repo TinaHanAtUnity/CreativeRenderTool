@@ -156,7 +156,7 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
     protected createPrivacy(): AbstractPrivacy {
         let privacy: AbstractPrivacy;
 
-        if (this._coreConfig.isCoppaCompliant() ||  this._privacyManager.isUserUnderAgeLimit()) {
+        if (this._coreConfig.isCoppaCompliant() || this._privacyManager.isUserUnderAgeLimit()) {
             privacy = new Privacy(this._platform, this._campaign, this._privacyManager, this._privacySDK.isGDPREnabled(), this._coreConfig.isCoppaCompliant(), this._deviceInfo.getLanguage());
         } else if (this._privacySDK.getGamePrivacy().getMethod() === PrivacyMethod.UNITY_CONSENT) {
             privacy = new PrivacySettings(this._platform, this._campaign, this._privacyManager, this._privacySDK.isGDPREnabled(), this._coreConfig.isCoppaCompliant(), this._deviceInfo.getLanguage());

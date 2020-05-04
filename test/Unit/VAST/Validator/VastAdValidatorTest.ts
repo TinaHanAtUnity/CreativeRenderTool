@@ -47,7 +47,7 @@ describe('VastAdValidatorTest', () => {
                 'test');
             const companionAd = new VastCompanionAdStaticResource('testId', 480, 320, 'invalid', 'http://google.com?someQuery=test&other=no', 'invalidClick', [], {
                 'click': ['', 'abc'],
-                'impression': ['abc?no=hello']            });
+                'impression': ['abc?no=hello'] });
             const vastAd = new VastAd(
                 'vastAdId',
                 [creative1, creative1],

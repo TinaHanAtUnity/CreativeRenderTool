@@ -935,7 +935,7 @@ describe('xpromo VideoEventHandlersTest', () => {
             xPromoVideoEventHandler.onCompleted('https://test.com');
 
             const params: IOperativeEventParams = { placement: xPromoAdUnitParameters.placement,
-                videoOrientation: xPromoAdUnit.getVideoOrientation()};
+                videoOrientation: xPromoAdUnit.getVideoOrientation() };
 
             sinon.assert.called(<sinon.SinonSpy>operativeEventManager.sendView);
             sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendHttpKafkaEvent, 'ads.xpromo.operative.videoview.v1.json', 'view', params);
