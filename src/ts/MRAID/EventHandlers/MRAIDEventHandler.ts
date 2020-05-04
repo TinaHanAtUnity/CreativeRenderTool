@@ -1,7 +1,7 @@
 import { GDPREventHandler } from 'Ads/EventHandlers/GDPREventHandler';
 import { IAdsApi } from 'Ads/IAds';
 import { IOperativeEventParams, OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
-import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
+import { ThirdPartyEventManager, TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
 import { Placement } from 'Ads/Models/Placement';
 import { EventType } from 'Ads/Models/Session';
 import { FinishState } from 'Core/Constants/FinishState';
@@ -137,6 +137,7 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
         }
         if (!this._campaign.getSession().getEventSent(EventType.VIEW)) {
             this._operativeEventManager.sendView(operativeEventParams);
+            this._adUnit.sendTrackingEvent(TrackingEvent.COMPLETE);
         }
         if (!this._campaign.getSession().getEventSent(EventType.CLICK)) {
             this._operativeEventManager.sendClick(operativeEventParams);
