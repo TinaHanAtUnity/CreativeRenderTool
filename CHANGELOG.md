@@ -1,5 +1,6 @@
 # Pending
 
+* [Chore] Add pre-commit hook to run lint on changed files [#15031](https://github.com/Applifier/unity-ads-webview/pull/15031)
 * Add required assets to performance campaigns [#15030](https://github.com/Applifier/unity-ads-webview/pull/15030)
 * [Tencent clickThroughURL macros replacement follow up] Correct private variable naming style [#15035](https://github.com/Applifier/unity-ads-webview/pull/15035)
 * [Tencent clickThroughURL macros replacement follow up] Modify unit tests to avoid platform check [#15034](https://github.com/Applifier/unity-ads-webview/pull/15034)
