@@ -13,6 +13,7 @@ describe('Color Test', () => {
         assert.deepEqual(Color.hexToColor('36d4'), {r: 51, g: 102, b: 221, a: 68}, 'Color was parsed incorrectly');
         assert.deepEqual(Color.hexToColor('##0c36d4'), {r: 0, g: 0, b: 0, a: 0}, 'Invalid color was validated incorrectly');
         assert.deepEqual(Color.hexToColor('48F4c8x'), {r: 0, g: 0, b: 0, a: 0}, 'Invalid color was validated incorrectly');
+        assert.deepEqual(Color.hexToColor(undefined), {r: 0, g: 0, b: 0, a: 0}, 'Invalid color was validated incorrectly');
     });
 
     it('should convert css rgba colors from hex colors correctly', () => {
@@ -25,6 +26,7 @@ describe('Color Test', () => {
         assert.equal(Color.hexToCssRgba('36d4'), 'rgba(51, 102, 221, 0.267)', 'Color was converted incorrectly');
         assert.equal(Color.hexToCssRgba('##0c36d4'), 'rgba(0, 0, 0, 0)', 'Invalid color was validated incorrectly');
         assert.equal(Color.hexToCssRgba('48F4c8x'), 'rgba(0, 0, 0, 0)', 'Invalid color was validated incorrectly');
+        assert.equal(Color.hexToCssRgba(undefined), 'rgba(0, 0, 0, 0)', 'Invalid color was validated incorrectly');
     });
 
     it('should lerp colors correctly', () => {
