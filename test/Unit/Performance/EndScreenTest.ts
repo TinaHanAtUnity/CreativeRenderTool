@@ -64,7 +64,7 @@ describe('EndScreenTest', () => {
         return new PerformanceEndScreen(params, campaign);
     };
 
-    const createAnimatedDownloadButtonEndScreen = (language: string, scheme: string, buttonColor: string): AnimatedDownloadButtonEndScreen => {
+    const createAnimatedDownloadButtonEndScreen = (language: string, scheme?: string, buttonColor?: string): AnimatedDownloadButtonEndScreen => {
         const privacyManager = sinon.createStubInstance(UserPrivacyManager);
         const campaign = TestFixtures.getCampaign();
         privacy = new Privacy(platform, campaign, privacyManager, false, false, 'en');
@@ -127,7 +127,7 @@ describe('EndScreenTest', () => {
             return res;
         }
 
-        const validateExperimentAttributes = (endScreen: PerformanceEndScreen, buttonColor: string) => {
+        const validateExperimentAttributes = (endScreen: PerformanceEndScreen, buttonColor?: string) => {
             endScreen.render();
             const downloadButton = <HTMLElement> endScreen.container().querySelectorAll('.download-container')[0];
             const color = downloadButton.style.backgroundColor;
@@ -143,8 +143,12 @@ describe('EndScreenTest', () => {
             }
         };
 
-        Object.values(ButtonExperimentDeclaration.color).forEach((c: string) => {
-            validateExperimentAttributes(createAnimatedDownloadButtonEndScreen('fi', ButtonExperimentDeclaration.scheme.LIGHT, c), c);
+        Object.values(ButtonExperimentDeclaration.color).forEach((c?: string) => {
+            if (c === undefined) {
+                validateExperimentAttributes(createAnimatedDownloadButtonEndScreen('fi', ButtonExperimentDeclaration.scheme.LIGHT, c), ButtonExperimentDeclaration.color.BLUE);
+            } else {
+                validateExperimentAttributes(createAnimatedDownloadButtonEndScreen('fi', ButtonExperimentDeclaration.scheme.LIGHT, c), c);
+            }
         });
 
         //Dark mode should ignore the color of the button, and set it to '#2ba3ff'
