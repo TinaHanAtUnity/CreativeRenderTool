@@ -5,6 +5,7 @@ export type AdsConfigurationMock = Base & {
     getPlacements: jest.Mock;
     getPlacementIds: jest.Mock;
     getHidePrivacy: jest.Mock<boolean>;
+    getPlacementsForAdunit: jest.Mock<string[]>;
 };
 
 export const AdsConfiguration = jest.fn(() => {
@@ -12,6 +13,7 @@ export const AdsConfiguration = jest.fn(() => {
         getPlacement: jest.fn(),
         getPlacements: jest.fn().mockReturnValue({}),
         getPlacementIds: jest.fn().mockReturnValue([]),
-        getHidePrivacy: jest.fn().mockImplementation(() => true)
+        getHidePrivacy: jest.fn().mockImplementation(() => true),
+        getPlacementsForAdunit: jest.fn().mockReturnValue([])
     };
 });

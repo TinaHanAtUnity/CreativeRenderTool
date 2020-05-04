@@ -65,8 +65,8 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
     private _useCloseIconInsteadOfSkipIcon: boolean | undefined = false;
     protected _disableFadeOutOnClick: boolean | undefined = false;
 
-    constructor(parameters: IVideoOverlayParameters<Campaign>, privacy: AbstractPrivacy, showGDPRBanner: boolean, showPrivacyDuringVideo: boolean) {
-        super(parameters.platform, 'video-overlay', parameters.placement.muteVideo());
+    constructor(parameters: IVideoOverlayParameters<Campaign>, privacy: AbstractPrivacy, showGDPRBanner: boolean, showPrivacyDuringVideo: boolean, attachTap?: boolean | undefined) {
+        super(parameters.platform, 'video-overlay', parameters.placement.muteVideo(), attachTap);
 
         this._ads = parameters.ads;
         this._localization = new Localization(parameters.deviceInfo.getLanguage(), 'overlay');
@@ -215,10 +215,15 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
             this._chinaAdvertisementElement.classList.add('with-skip-button');
         }
 
-        const isPerformanceCampaign = this._campaign instanceof PerformanceCampaign || this._campaign instanceof XPromoCampaign;
-        if (isPerformanceCampaign && !this._skipEnabled && this._videoProgress > 5000) {
-            this.showCallButton();
+        if (!this._skipEnabled && this._videoProgress > 5000) {
+            this.showCTAButton();
             return;
+        }
+    }
+
+    protected showCTAButton() {
+        if (this._campaign instanceof PerformanceCampaign || this._campaign instanceof XPromoCampaign) {
+            this.showCallButton();
         }
     }
 
@@ -381,9 +386,7 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
     protected showSkipButton() {
         if (this._skipEnabled) {
             this._skipButtonElement.classList.add('show-skip-button');
-            if (this._campaign instanceof PerformanceCampaign || this._campaign instanceof XPromoCampaign) {
-                this.showCallButton();
-            }
+            this.showCTAButton();
         }
     }
 
