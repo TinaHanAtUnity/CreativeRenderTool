@@ -36,6 +36,7 @@ export class AnimatedDownloadButtonEndScreen extends PerformanceEndScreen {
             default:
         }
 
+        // combination.animation will be defined at this point
         this._animation = combination.animation!;
         this._templateData = {
             ...this._templateData,

@@ -27,12 +27,12 @@ export class Color {
             Math.round(c1.a + (c2.a - c1.a) * t));
     }
 
-    public static hexToCssRgba(hex?: string): string {
+    public static hexToCssRgba(hex: string|undefined): string {
         const color = this.hexToColor(hex);
         return color.toCssRgba();
     }
 
-    public static hexToColor(hex?: string): Color {
+    public static hexToColor(hex: string|undefined): Color {
         if (!this.isValidHex(hex)) { return new Color(0, 0, 0, 0); }
         hex = hex!.replace('#', '');
         if (hex.length < 6) {
@@ -49,7 +49,7 @@ export class Color {
             hex.length === 8 ? parseInt(hex.slice(6, 8), 16) : 255);
     }
 
-    public static isValidHex(hex?: string): boolean {
+    public static isValidHex(hex: string|undefined): boolean {
         return hex !== undefined && /^#?(([a-f0-9]{3,4})|([a-f0-9]{6}([a-f0-9]{2})?))$/i.test(hex);
     }
 }
