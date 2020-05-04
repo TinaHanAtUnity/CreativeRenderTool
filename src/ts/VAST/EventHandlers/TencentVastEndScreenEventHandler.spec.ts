@@ -21,67 +21,80 @@ import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
 import { Core } from 'Core/__mocks__/Core';
 import { VastAdUnit } from 'VAST/AdUnits/__mocks__/VastAdUnit';
 
-[Platform.ANDROID, Platform.IOS].forEach(platform => {
-    describe('TencentVastEndScreenEventHandler', () => {
-        let vastTencentEndScreenHandler: TencentVastEndScreenEventHandler;
-        let baseParams: IAdUnitParameters<VastCampaignMock>;
-        beforeEach(() => {
-            baseParams = {
-                forceOrientation: Orientation.LANDSCAPE,
-                focusManager: new FocusManager(),
-                container: new AdUnitContainer(),
-                deviceInfo: new DeviceInfo(),
-                clientInfo: new ClientInfo(),
-                thirdPartyEventManager: new ThirdPartyEventManager(),
-                operativeEventManager: new OperativeEventManager(),
-                placement: new Placement(),
-                campaign: new VastCampaign(),
-                platform: platform,
-                core: new Core().Api,
-                ads: new Ads().Api,
-                store: new Store().Api,
-                coreConfig: new CoreConfiguration(),
-                adsConfig: new AdsConfiguration(),
-                request: new RequestManager(),
-                options: undefined,
-                privacyManager: new UserPrivacyManager(),
-                gameSessionId: 0,
-                privacy: new AbstractPrivacy(),
-                privacySDK: new PrivacySDK()
-            };
-        });
+describe('TencentVastEndScreenEventHandler', () => {
+    let vastTencentEndScreenHandler: TencentVastEndScreenEventHandler;
+    let baseParams: IAdUnitParameters<VastCampaignMock>;
+    beforeEach(() => {
+        baseParams = {
+            forceOrientation: Orientation.LANDSCAPE,
+            focusManager: new FocusManager(),
+            container: new AdUnitContainer(),
+            deviceInfo: new DeviceInfo(),
+            clientInfo: new ClientInfo(),
+            thirdPartyEventManager: new ThirdPartyEventManager(),
+            operativeEventManager: new OperativeEventManager(),
+            placement: new Placement(),
+            campaign: new VastCampaign(),
+            platform: Platform.TEST,
+            core: new Core().Api,
+            ads: new Ads().Api,
+            store: new Store().Api,
+            coreConfig: new CoreConfiguration(),
+            adsConfig: new AdsConfiguration(),
+            request: new RequestManager(),
+            options: undefined,
+            privacyManager: new UserPrivacyManager(),
+            gameSessionId: 0,
+            privacy: new AbstractPrivacy(),
+            privacySDK: new PrivacySDK()
+        };
+    });
 
-        describe('when onVastEndScreenClick happens and there is no click through url', () => {
-            it('the error message should be returned to indicate the url is null',  async () => {
+    describe('when onVastEndScreenClick happens and there is no click through url', () => {
+        it('the error message should be returned to indicate the url is null',  async () => {
+            const vastAdUnit = new VastAdUnit();
+            vastAdUnit.getCompanionClickThroughUrl.mockReturnValue(null);
+            vastAdUnit.getVideoClickThroughURL.mockReturnValue(null);
+            vastTencentEndScreenHandler = new TencentVastEndScreenEventHandler(vastAdUnit, baseParams);
+            await expect(vastTencentEndScreenHandler.onVastEndScreenClick()).rejects.toEqual(new Error('There is no clickthrough URL for video or companion'));
+        });
+    });
+
+    describe('when onVastEndScreenClick happens and there is valid click through url', () => {
+        describe('the url should be replaced', () => {
+            const expectedUrl = 'https://c2.gdt.qq.com/gdt_click.fcg?s={"req_width":"0","req_height":"0","width":"0","height":"0","down_x":"10","down_y":"20","up_x":"10","up_y":"20"}';
+            beforeEach(async () => {
                 const vastAdUnit = new VastAdUnit();
-                vastAdUnit.getCompanionClickThroughUrl.mockReturnValue(null);
-                vastAdUnit.getVideoClickThroughURL.mockReturnValue(null);
                 vastTencentEndScreenHandler = new TencentVastEndScreenEventHandler(vastAdUnit, baseParams);
-                await expect(vastTencentEndScreenHandler.onVastEndScreenClick()).rejects.toEqual(new Error('There is no clickthrough URL for video or companion'));
+                vastAdUnit.getVideoClickThroughURL.mockReturnValue('https://c2.gdt.qq.com/gdt_click.fcg?s={"req_width":"__REQ_WIDTH__","req_height":"__REQ_HEIGHT__","width":"__WIDTH__","height":"__HEIGHT__","down_x":"__DOWN_X__","down_y":"__DOWN_Y__","up_x":"__UP_X__","up_y":"__UP_Y__"}');
+                await vastTencentEndScreenHandler.onVastEndScreenClick();
+            });
+            it('replaced clickThroughURL should be passed to followRedirectChain', () => {
+                expect(baseParams.request.followRedirectChain).toHaveBeenCalledWith(expectedUrl, undefined, expect.anything());
             });
         });
-
-        describe('when onVastEndScreenClick happens and there is valid click through url', () => {
-            let replacedUrl: string;
+        describe('for iOS platform', () => {
             beforeEach(async () => {
-                replacedUrl = 'https://c2.gdt.qq.com/gdt_click.fcg?viewid=mlsITUl9ffgwhhyanfhFC6PSKRWegO22lApBWRQXHAV39lzK_kqg8TYfD8aX53xMdP7MVrwCKH4Feu4!3oa_BBhWt4YBqeKe1CQG54t8WpQkNtl9VuTpec1s21Mb21TlcDl4w8Bslj9pyTeoEYdHJIhHkPDr0DGYUOOtUf1gtgaJ7oQKIOfEjVP8S8o9DdM7WTg450XRS0g72SnvSznljQsVbq9Q_TH!SjpIgcBMdqh0vD5u2_dh5VT5BuedXIn3Qkmk3PlWoRQ&jtype=0&i=1&os=1&lpp=click_ext=eyJnZHRfcHJvZHVjdF9pZCI6IjE0ODM4ODQ4NTgiLCJpc2Zyb213diI6MX0%3D&clklpp=__CLICK_LPP__&cdnxj=1&xp=3&acttype=35&s={"req_width":"0","req_height":"0","width":"0","height":"0","down_x":"10","down_y":"20","up_x":"10","up_y":"20"}';
+                baseParams.platform = Platform.IOS;
                 const vastAdUnit = new VastAdUnit();
-                vastAdUnit.getVideoClickThroughURL.mockReturnValue('https://c2.gdt.qq.com/gdt_click.fcg?viewid=mlsITUl9ffgwhhyanfhFC6PSKRWegO22lApBWRQXHAV39lzK_kqg8TYfD8aX53xMdP7MVrwCKH4Feu4!3oa_BBhWt4YBqeKe1CQG54t8WpQkNtl9VuTpec1s21Mb21TlcDl4w8Bslj9pyTeoEYdHJIhHkPDr0DGYUOOtUf1gtgaJ7oQKIOfEjVP8S8o9DdM7WTg450XRS0g72SnvSznljQsVbq9Q_TH!SjpIgcBMdqh0vD5u2_dh5VT5BuedXIn3Qkmk3PlWoRQ&jtype=0&i=1&os=1&lpp=click_ext=eyJnZHRfcHJvZHVjdF9pZCI6IjE0ODM4ODQ4NTgiLCJpc2Zyb213diI6MX0%3D&clklpp=__CLICK_LPP__&cdnxj=1&xp=3&acttype=35&s={"req_width":"__REQ_WIDTH__","req_height":"__REQ_HEIGHT__","width":"__WIDTH__","height":"__HEIGHT__","down_x":"__DOWN_X__","down_y":"__DOWN_Y__","up_x":"__UP_X__","up_y":"__UP_Y__"}');
+                vastAdUnit.getVideoClickThroughURL.mockReturnValue('url');
                 vastTencentEndScreenHandler = new TencentVastEndScreenEventHandler(vastAdUnit, baseParams);
                 await vastTencentEndScreenHandler.onVastEndScreenClick();
             });
-            it('the url should be replaced', () => {
-                expect(baseParams.request.followRedirectChain).toHaveBeenCalledWith(replacedUrl, undefined, expect.anything());
+            it('the iOS open url method should be called', () => {
+                expect(baseParams.core.iOS!.UrlScheme.open).toHaveReturnedWith(Promise.resolve());
             });
-            it('for iOS platform, the iOS open url method should be called', () => {
-                if (platform === Platform.IOS && baseParams.core.iOS) {
-                    expect(baseParams.core.iOS.UrlScheme.open).toHaveReturnedWith(Promise.resolve());
-                }
+        });
+        describe('for android platform', () => {
+            beforeEach(async () => {
+                baseParams.platform = Platform.ANDROID;
+                const vastAdUnit = new VastAdUnit();
+                vastAdUnit.getVideoClickThroughURL.mockReturnValue('url');
+                vastTencentEndScreenHandler = new TencentVastEndScreenEventHandler(vastAdUnit, baseParams);
+                await vastTencentEndScreenHandler.onVastEndScreenClick();
             });
-            it('for android platform, the android open url method should be called', () => {
-                if (platform === Platform.ANDROID && baseParams.core.Android) {
-                    expect(baseParams.core.Android.Intent.launch).toHaveReturnedWith(Promise.resolve());
-                }
+            it('the android open url method should be called', () => {
+                expect(baseParams.core.Android!.Intent.launch).toHaveReturnedWith(Promise.resolve());
             });
         });
     });
