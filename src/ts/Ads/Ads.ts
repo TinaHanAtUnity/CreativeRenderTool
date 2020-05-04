@@ -83,7 +83,7 @@ import { Analytics } from 'Analytics/Analytics';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { PrivacyParser } from 'Privacy/Parsers/PrivacyParser';
 import { Promises } from 'Core/Utilities/Promises';
-import { MediationCacheModeAllowedTest, AuctionXHR, AuctionV6Test, LoadV5, BaseLineLoadV5 } from 'Core/Models/ABGroup';
+import { MediationCacheModeAllowedTest, AuctionXHR, LoadV5, BaseLineLoadV5 } from 'Core/Models/ABGroup';
 import { PerPlacementLoadManagerV4 } from 'Ads/Managers/PerPlacementLoadManagerV4';
 import { PrivacyMetrics } from 'Privacy/PrivacyMetrics';
 import { PrivacySDKUnit } from 'Ads/AdUnits/PrivacySDKUnit';
@@ -263,7 +263,7 @@ export class Ads implements IAds {
                 }
             });
 
-            RequestManager.configureAuctionProtocol(this._core.Config.getTestMode(), AuctionV6Test.isValid(this._core.Config.getAbGroup()));
+            RequestManager.configureAuctionProtocol(this._core.Config.getTestMode());
 
             this.configureCampaignManager();
             this.configureAutomatedExperimentManager();
