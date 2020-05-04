@@ -35,7 +35,7 @@ echo "Attempt to merge pull request..."
 
 status=$(hub api -XPUT repos/{owner}/{repo}/pulls/$pr/merge \ -f merge_method=squash)
 
-if [ "$status" != *"Pull Request successfully merged" ]; then
+if [ "$status" == *"\"merged\":false" ]; then
     echo "Pull Request #$pr failed to Squash and Merge. Exiting."
     exit
 fi
