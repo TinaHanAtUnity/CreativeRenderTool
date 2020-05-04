@@ -48,7 +48,7 @@ describe('FailedOperativeEventManagerTest', () => {
                 return Promise.resolve();
             });
             sinon.stub(core.Storage, 'get').callsFake(() => {
-                return Promise.resolve({url: 'http://test.url', data: '{\"testdata\": \"test\"}'});
+                return Promise.resolve({ url: 'http://test.url', data: '{\"testdata\": \"test\"}' });
             });
             sinon.stub(core.Storage, 'delete').callsFake(() => {
                 return Promise.resolve();
@@ -106,7 +106,7 @@ describe('FailedOperativeEventManagerTest', () => {
                 it('Single event', () => {
                     (<sinon.SinonStub>core.Storage.get).restore();
                     sinon.stub(core.Storage, 'get').callsFake(() => {
-                        return Promise.resolve({kafkaType: 'test.kafka.type', data: '{\"testdata\": \"test\"}'});
+                        return Promise.resolve({ kafkaType: 'test.kafka.type', data: '{\"testdata\": \"test\"}' });
                     });
 
                     HttpKafka.setRequest(request);
@@ -138,11 +138,11 @@ describe('FailedOperativeEventManagerTest', () => {
             it('Single event', () => {
                 const storagePromise = StorageBridgeHelper.waitForPrivateStorageBatch(storageBridge);
                 const manager = new FailedOperativeEventManager(core, '12345', '12345');
-                return manager.storeFailedEvent(storageBridge, {test1: 'test1', test2: 'test2'}).then(() => {
+                return manager.storeFailedEvent(storageBridge, { test1: 'test1', test2: 'test2' }).then(() => {
                     return storagePromise;
                 }).then(() => {
                     sinon.assert.calledOnce(<sinon.SinonSpy>core.Storage.set);
-                    sinon.assert.calledWith(<sinon.SinonSpy>core.Storage.set, StorageType.PRIVATE, 'session.12345.operative.12345', {test1: 'test1', test2: 'test2'});
+                    sinon.assert.calledWith(<sinon.SinonSpy>core.Storage.set, StorageType.PRIVATE, 'session.12345.operative.12345', { test1: 'test1', test2: 'test2' });
                     sinon.assert.calledOnce(<sinon.SinonSpy>core.Storage.write);
                 });
             });

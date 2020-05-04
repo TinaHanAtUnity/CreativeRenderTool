@@ -33,7 +33,7 @@ import { IMRAIDHandler, MRAIDEvents } from 'MRAID/EventBridge/MRAIDEventAdapter'
             nativeBridge = TestFixtures.getNativeBridge(platform, backend);
             core = TestFixtures.getCoreApi(nativeBridge);
             ads = TestFixtures.getAdsApi(nativeBridge);
-            webPlayerAPI =  new WebPlayerApi(nativeBridge);
+            webPlayerAPI = new WebPlayerApi(nativeBridge);
             (<any>webPlayerAPI).onWebPlayerEvent = new Observable1<string>();
             (<any>nativeBridge).Webplayer = webPlayerAPI;
 

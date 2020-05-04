@@ -104,7 +104,7 @@ export class MRAIDCampaign extends ProgrammaticCampaign<IMRAIDCampaign> {
     }
 
     public getRequiredAssets() {
-        const resourceUrl =  this.getResourceUrl();
+        const resourceUrl = this.getResourceUrl();
         return resourceUrl ? [resourceUrl] : [];
     }
 

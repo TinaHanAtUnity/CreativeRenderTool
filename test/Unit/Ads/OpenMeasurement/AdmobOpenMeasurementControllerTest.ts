@@ -159,10 +159,10 @@ import { OpenMeasurement } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
             });
 
             it('should build adview and om impression object', () => {
-                const impressionDataAndroid = {'mediaType': 'video', 'viewport': {'width': 540, 'height': 960},
-                'adView': {'percentageInView': 100, 'geometry': {'x': 0, 'y': 200, 'width': 300, 'height': 300}, 'onScreenGeometry': {'x': 0, 'y': 200, 'width': 300, 'height': 300, 'obstructions': []}, 'measuringElement': false, 'reasons': []}};
-                const impressionDataIOS = {'mediaType': 'video', 'viewport': {'width': 1080, 'height': 1920},
-                'adView': {'percentageInView': 100, 'geometry': {'x': 0, 'y': 200, 'width': 300, 'height': 300}, 'onScreenGeometry': {'x': 0, 'y': 200, 'width': 300, 'height': 300, 'obstructions': []}, 'measuringElement': false, 'reasons': []}};
+                const impressionDataAndroid = { 'mediaType': 'video', 'viewport': { 'width': 540, 'height': 960 },
+                'adView': { 'percentageInView': 100, 'geometry': { 'x': 0, 'y': 200, 'width': 300, 'height': 300 }, 'onScreenGeometry': { 'x': 0, 'y': 200, 'width': 300, 'height': 300, 'obstructions': [] }, 'measuringElement': false, 'reasons': [] } };
+                const impressionDataIOS = { 'mediaType': 'video', 'viewport': { 'width': 1080, 'height': 1920 },
+                'adView': { 'percentageInView': 100, 'geometry': { 'x': 0, 'y': 200, 'width': 300, 'height': 300 }, 'onScreenGeometry': { 'x': 0, 'y': 200, 'width': 300, 'height': 300, 'obstructions': [] }, 'measuringElement': false, 'reasons': [] } };
 
                 return omManager.admobImpression(omAdViewBuilder).then(() => {
                     sinon.assert.called(<sinon.SinonStub>OpenMeasurementController.prototype.impression);
@@ -218,8 +218,8 @@ import { OpenMeasurement } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
                     verificationParameters: 'scootage1'
                 };
 
-                const openMeasurement0 =  new OpenMeasurement<AdMobCampaign>(platform, core, clientInformation, campaign, placement, deviceInfo, thirdPartyEventManager, 'scootage');
-                const openMeasurement1 =  new OpenMeasurement<AdMobCampaign>(platform, core, clientInformation, campaign, placement, deviceInfo, thirdPartyEventManager, 'scootage1');
+                const openMeasurement0 = new OpenMeasurement<AdMobCampaign>(platform, core, clientInformation, campaign, placement, deviceInfo, thirdPartyEventManager, 'scootage');
+                const openMeasurement1 = new OpenMeasurement<AdMobCampaign>(platform, core, clientInformation, campaign, placement, deviceInfo, thirdPartyEventManager, 'scootage1');
                 sandbox.stub(openMeasurement0, 'getVerificationResource').returns(verificationResource0);
                 sandbox.stub(openMeasurement1, 'getVerificationResource').returns(verificationResource1);
 
@@ -257,11 +257,11 @@ import { OpenMeasurement } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
                 return omManager.admobImpression(omAdViewBuilder).then(() => {
                     sinon.assert.called(<sinon.SinonStub>omManager.geometryChange);
                     if (platform === Platform.ANDROID) {
-                        assert.deepEqual(JSON.stringify((<sinon.SinonStub>omManager.geometryChange).getCall(0).args[0]), JSON.stringify({'width': 540, 'height': 960}));
-                        assert.deepEqual(JSON.stringify((<sinon.SinonStub>omManager.geometryChange).getCall(0).args[1]), JSON.stringify({'percentageInView': 100, 'geometry': {'x': 0, 'y': 200, 'width': 300, 'height': 300}, 'onScreenGeometry': {'x': 0, 'y': 200, 'width': 300, 'height': 300, 'obstructions': []}, 'measuringElement': false, 'reasons': []}));
+                        assert.deepEqual(JSON.stringify((<sinon.SinonStub>omManager.geometryChange).getCall(0).args[0]), JSON.stringify({ 'width': 540, 'height': 960 }));
+                        assert.deepEqual(JSON.stringify((<sinon.SinonStub>omManager.geometryChange).getCall(0).args[1]), JSON.stringify({ 'percentageInView': 100, 'geometry': { 'x': 0, 'y': 200, 'width': 300, 'height': 300 }, 'onScreenGeometry': { 'x': 0, 'y': 200, 'width': 300, 'height': 300, 'obstructions': [] }, 'measuringElement': false, 'reasons': [] }));
                     } else {
-                        assert.deepEqual(JSON.stringify((<sinon.SinonStub>omManager.geometryChange).getCall(0).args[0]), JSON.stringify({'width': 1080, 'height': 1920}));
-                        assert.deepEqual(JSON.stringify((<sinon.SinonStub>omManager.geometryChange).getCall(0).args[1]), JSON.stringify({'percentageInView': 100, 'geometry': {'x': 0, 'y': 200, 'width': 300, 'height': 300}, 'onScreenGeometry': {'x': 0, 'y': 200, 'width': 300, 'height': 300, 'obstructions': []}, 'measuringElement': false, 'reasons': []}));
+                        assert.deepEqual(JSON.stringify((<sinon.SinonStub>omManager.geometryChange).getCall(0).args[0]), JSON.stringify({ 'width': 1080, 'height': 1920 }));
+                        assert.deepEqual(JSON.stringify((<sinon.SinonStub>omManager.geometryChange).getCall(0).args[1]), JSON.stringify({ 'percentageInView': 100, 'geometry': { 'x': 0, 'y': 200, 'width': 300, 'height': 300 }, 'onScreenGeometry': { 'x': 0, 'y': 200, 'width': 300, 'height': 300, 'obstructions': [] }, 'measuringElement': false, 'reasons': [] }));
                     }
                 });
             });

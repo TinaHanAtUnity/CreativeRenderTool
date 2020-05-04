@@ -12,7 +12,7 @@ import { ICoreApi } from 'Core/ICore';
 import { Backend } from 'Backend/Backend';
 import { VastAdVerification } from 'VAST/Models/VastAdVerification';
 import { VastVerificationResource } from 'VAST/Models/VastVerificationResource';
-import { AccessMode, ISessionEvent, IContext, AdSessionType, PARTNER_NAME, OM_JS_VERSION, OMID_P} from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
+import { AccessMode, ISessionEvent, IContext, AdSessionType, PARTNER_NAME, OM_JS_VERSION, OMID_P } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
 import SimpleVast from 'xml/SimpleVast.xml';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
@@ -109,10 +109,10 @@ import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
             it('should be called with correct data', () => {
 
                 const contextData: IContext = {
-                    apiVersion: OMID_P,                                   // Version code of official OMID JS Verification Client API
-                    environment: 'app',                                   // OMID JS Verification Client API
-                    accessMode: AccessMode.LIMITED,                       // Verification code is executed in a sandbox with only indirect information about ad
-                    adSessionType: AdSessionType.HTML,                  // Needed to be native for IAS for some reason
+                    apiVersion: OMID_P, // Version code of official OMID JS Verification Client API
+                    environment: 'app', // OMID JS Verification Client API
+                    accessMode: AccessMode.LIMITED, // Verification code is executed in a sandbox with only indirect information about ad
+                    adSessionType: AdSessionType.HTML, // Needed to be native for IAS for some reason
                     omidNativeInfo: {
                         partnerName: PARTNER_NAME,
                         partnerVersion: '2.0.0-alpha2'

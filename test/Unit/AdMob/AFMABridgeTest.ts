@@ -141,8 +141,8 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
             }, {
                 event: AFMAEvents.GET_CLICK_SIGNAL,
                 data: {
-                    start: {x: 1, y: 1},
-                    end: {x: 2, y: 2}
+                    start: { x: 1, y: 1 },
+                    end: { x: 2, y: 2 }
                 },
                 verify: (data?: any) => sinon.assert.calledWith(<sinon.SinonSpy>handler.onAFMAClickSignalRequest, data)
             }, {

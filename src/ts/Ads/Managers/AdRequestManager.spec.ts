@@ -845,7 +845,7 @@ class SatisfiesMatcher {
             });
 
             it('should send metric when reload rescheduled', () => {
-                expect(SDKMetrics.reportMetricEventWithTags).toBeCalledWith(LoadV5.LoadRequestFailed, expect.objectContaining({'rsn': 'rescheduled_failed_preload'}));
+                expect(SDKMetrics.reportMetricEventWithTags).toBeCalledWith(LoadV5.LoadRequestFailed, expect.objectContaining({ 'rsn': 'rescheduled_failed_preload' }));
             });
         });
 

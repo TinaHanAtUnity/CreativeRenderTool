@@ -11,7 +11,7 @@ export class GoogleStore {
     private _billingSupportedCallbacks: { [requestId: number]: CallbackContainer<number> };
     private _skuDetailsCallbacks: { [requestId: number]: CallbackContainer<IGoogleSkuDetails> };
     private _getPurchasesCallbacks: { [requestId: number]: CallbackContainer<IGooglePurchases> };
-    private _purchaseHistoryCallbacks:  { [requestId: number]: CallbackContainer<IGooglePurchases> };
+    private _purchaseHistoryCallbacks: { [requestId: number]: CallbackContainer<IGooglePurchases> };
 
     constructor(store: IStoreApi) {
         this._store = store;

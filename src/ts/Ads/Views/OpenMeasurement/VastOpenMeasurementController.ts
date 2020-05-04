@@ -73,7 +73,7 @@ export class VastOpenMeasurementController extends OpenMeasurementController {
             event.data.vendorkey = vendorKey;
 
             if (CustomFeatures.isIASVendor(vendorKey)) {
-                contextData.adSessionType = AdSessionType.NATIVE;  // TODO: Adjust. IAS expects native to run properly
+                contextData.adSessionType = AdSessionType.NATIVE; // TODO: Adjust. IAS expects native to run properly
             }
 
             event.data.context = contextData;
@@ -85,9 +85,9 @@ export class VastOpenMeasurementController extends OpenMeasurementController {
 
     private buildSessionContext(): IContext {
         const contextData: IContext = {
-            apiVersion: OMID_P,                                   // Version code of official OMID JS Verification Client API
-            environment: 'app',                                   // OMID JS Verification Client API
-            accessMode: AccessMode.LIMITED,                       // Verification code is executed in a sandbox with only indirect information about ad
+            apiVersion: OMID_P, // Version code of official OMID JS Verification Client API
+            environment: 'app', // OMID JS Verification Client API
+            accessMode: AccessMode.LIMITED, // Verification code is executed in a sandbox with only indirect information about ad
             adSessionType: AdSessionType.HTML,
             omidNativeInfo: {
                 partnerName: PARTNER_NAME,

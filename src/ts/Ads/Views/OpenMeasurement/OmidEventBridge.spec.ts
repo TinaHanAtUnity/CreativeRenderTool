@@ -28,7 +28,7 @@ describe('OmidEventBridge', () => {
                 postMessage: jest.fn()
             }
         });
-        Object.defineProperty(iframe, 'id', {value: 'iframeId'});
+        Object.defineProperty(iframe, 'id', { value: 'iframeId' });
 
         omidEventBridge = new OMIDEventBridge(core.Api, handler, iframe, omInstance, campaign);
     });
@@ -39,7 +39,7 @@ describe('OmidEventBridge', () => {
             omidEventBridge.triggerVideoEvent('omidImpression');
 
             // tslint:disable-next-line
-            expect(iframe.contentWindow!.postMessage).toHaveBeenCalledWith({'adSessionId': '', 'payload': undefined, 'timestamp': 1000, 'type': 'omidImpression', 'uuid': '1'}, '*');
+            expect(iframe.contentWindow!.postMessage).toHaveBeenCalledWith({ 'adSessionId': '', 'payload': undefined, 'timestamp': 1000, 'type': 'omidImpression', 'uuid': '1' }, '*');
         });
     });
 });

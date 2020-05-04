@@ -212,7 +212,7 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         delete this._privacy;
     }
 
-    protected sendTrackingEvent(event: TrackingEvent): void {
+    public sendTrackingEvent(event: TrackingEvent): void {
         this._thirdPartyEventManager.sendTrackingEvents(this._campaign, event, 'mraid', this._campaign.getUseWebViewUserAgentForTracking());
     }
 

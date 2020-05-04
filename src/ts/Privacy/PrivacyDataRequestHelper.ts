@@ -2,7 +2,7 @@ import { INativeResponse } from 'Core/Managers/RequestManager';
 import { RequestError } from 'Core/Errors/RequestError';
 import { Platform } from 'Core/Constants/Platform';
 import { ICore } from 'Core/ICore';
-import { CaptchaEvent, PrivacyMetrics} from 'Privacy/PrivacyMetrics';
+import { CaptchaEvent, PrivacyMetrics } from 'Privacy/PrivacyMetrics';
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 

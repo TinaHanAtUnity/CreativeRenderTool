@@ -31,7 +31,7 @@ export class CustomFeatures {
     }
 
     public static isWhitelistedToShowInBackground(gameId: string) {
-        return gameId === '3016669';    // anipang2 from Korea dev
+        return gameId === '3016669'; // anipang2 from Korea dev
     }
 
     public static isNestedIframePlayable(creativeId: string | undefined) {
@@ -142,7 +142,8 @@ export class CustomFeatures {
     public static isLoadV5Game(gameId: string): boolean {
         const gameIds = [
             '1783252', '1781853', '1781854', // Initial Games
-            '1428861', '1428862' // Chimera Game
+            '1428861', '1428862', // Chimera Game
+            '1434564', '3079031', '3334336', '3211592', '1566453', '3334337' // First batch
         ];
 
         return this.existsInList(gameIds, gameId);
@@ -166,18 +167,18 @@ export class CustomFeatures {
     }
 
     private static isMRAIDWebPlayerAndroidGamesTest(gameId: string) {
-        return gameId === '1789727' ||      // ru.iprado.spot
-               gameId === '1373394' ||      // pl.idreams.Dino
-               gameId === '2950248' ||      // com.game5mobile.lineandwater
-               gameId === '2950184' ||      // com.game5mobile.popular
-               gameId === '2639270' ||      // com.ohmgames.paperplane
-               gameId === '1300959';        // com.sadpuppy.lemmings
+        return gameId === '1789727' || // ru.iprado.spot
+               gameId === '1373394' || // pl.idreams.Dino
+               gameId === '2950248' || // com.game5mobile.lineandwater
+               gameId === '2950184' || // com.game5mobile.popular
+               gameId === '2639270' || // com.ohmgames.paperplane
+               gameId === '1300959'; // com.sadpuppy.lemmings
     }
 
     private static isMRAIDWebPlayerCreativesTest(creativeId: string | undefined) {
         return creativeId === 'futur_idlec_p1.1' ||
-               creativeId === 'lions_hooke_p1'   ||
-               creativeId === 'gg_bounzy'        ||
+               creativeId === 'lions_hooke_p1' ||
+               creativeId === 'gg_bounzy' ||
                creativeId === 'social_dc';
     }
 
@@ -201,7 +202,7 @@ export class CustomFeatures {
     public static pauseEventsSupported(gameId: string): boolean {
         return gameId === '1543460' || // richardh, test app (Apple App Store)
                gameId === '1543461' || // richardh, test app (Google Play Store)
-               gameId === '80222';   // Pocketgems, Episode (Google Play Store)
+               gameId === '80222'; // Pocketgems, Episode (Google Play Store)
     }
 
     public static shouldVideoOverlayRemainVisible(orgId: string | undefined): boolean {

@@ -289,7 +289,7 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit implements IAdUnit
     private setWebPlayerData(data: string, mimeType: string, encoding: string): Promise<void> {
         return this._webPlayerContainer.setData(data, mimeType, encoding).catch((error) => {
             this._core.Sdk.logError(JSON.stringify(error));
-            Diagnostics.trigger('webplayer_set_data_error', new DiagnosticError(error, {data: data, mimeType: mimeType, encoding: encoding}));
+            Diagnostics.trigger('webplayer_set_data_error', new DiagnosticError(error, { data: data, mimeType: mimeType, encoding: encoding }));
             this.setFinishState(FinishState.ERROR);
             this.hide();
         });

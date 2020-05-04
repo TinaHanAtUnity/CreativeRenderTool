@@ -26,7 +26,7 @@ export class IosVideoEventHandler extends BaseVideoEventHandler implements IIosV
     }
 
     public onGenericError(url: string, description: string): void {
-        this._core.Sdk.logError('Unity Ads video player generic error '  + url + ' ' + description);
+        this._core.Sdk.logError('Unity Ads video player generic error ' + url + ' ' + description);
         this.handleVideoError(VideoMetric.GenericError);
     }
 }

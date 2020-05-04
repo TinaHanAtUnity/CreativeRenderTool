@@ -283,9 +283,9 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             abGroupElement.value = window.localStorage.getItem('abGroup') === null ? abGroupElement.value : window.localStorage.getItem('abGroup')!;
             campaignIdElement.value = window.localStorage.getItem('campaignId') === null ? campaignIdElement.value : window.localStorage.getItem('campaignId')!;
-            countryElement.value = window.localStorage.getItem('country') === null ?  countryElement.value : window.localStorage.getItem('country')!;
+            countryElement.value = window.localStorage.getItem('country') === null ? countryElement.value : window.localStorage.getItem('country')!;
             platformElement.value = window.localStorage.getItem('platform') === null ? platformElement.value : window.localStorage.getItem('platform')!;
-            gameIdElement.value =  window.localStorage.getItem('gameId') === null ? gameIdElement.value  : window.localStorage.getItem('gameId')!;
+            gameIdElement.value = window.localStorage.getItem('gameId') === null ? gameIdElement.value : window.localStorage.getItem('gameId')!;
             testModeElement.checked = window.localStorage.getItem('testMode') === null ? testModeElement.checked : window.localStorage.getItem('testMode') === 'true';
             loadModeElement.checked = window.localStorage.getItem('loadMode') === null ? loadModeElement.checked : window.localStorage.getItem('loadMode') === 'true';
             autoSkipElement.checked = window.localStorage.getItem('autoSkip') === null ? autoSkipElement.checked : window.localStorage.getItem('autoSkip') === 'true';
