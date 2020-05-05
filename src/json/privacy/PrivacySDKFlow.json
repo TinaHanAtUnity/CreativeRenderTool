@@ -132,18 +132,6 @@
               {
                 "property": "user.ageGateChoice",
                 "value": "yes"
-              },
-              {
-                "property": "user.gameExp",
-                "value": true
-              },
-              {
-                "property": "user.ads",
-                "value": true
-              },
-              {
-                "property": "user.external",
-                "value": true
               }
             ]
           }
