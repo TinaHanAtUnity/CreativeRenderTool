@@ -1,7 +1,7 @@
 # For details, see https://help.github.com/en/github/creating-cloning-and-archiving-repositories/about-code-owners
 
 # Global Owners
-* @ad-sdk
+* @ads-sdk-sf
 
 # Ad Unit Innovation
 src/ts/MabExperimentation/ @aui-sdk
