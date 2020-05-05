@@ -1,274 +1,270 @@
 @import 'vars.styl';
-@import "iphone-x-series.styl";
+@import 'iphone-x-series.styl';
 
 body.alternative-layout #end-screen {
+  .btn-close-region {
+    display: inline-block;
+    line-height: unset;
+    width: unset;
+    text-align: unset;
+    text-shadow: 0.03em 0.05em 0.18em $black;
+    color: $white;
+  }
 
-        .btn-close-region {
-            display: inline-block;
-            line-height: unset;
-            width: unset;
-            text-align: unset;
-            text-shadow: 0.03em 0.05em 0.18em $black;
-            color: $white;
-        }
+  .campaign-container {
+    background: $black;
+  }
 
-        .campaign-container {
-            background: $black;
-        }
+  .square-end-screen .campaign-container {
+    position: unset;
+    display: unset;
+    -webkit-box-orient: unset;
+    -webkit-box-direction: unset;
+    -ms-flex-direction: unset;
+    flex-direction: unset;
+    background-color: unset;
+  }
 
-        .square-end-screen .campaign-container {
-            position: unset;
-            display: unset;
-            -webkit-box-orient: unset;
-            -webkit-box-direction: unset;
-            -ms-flex-direction: unset;
-            flex-direction: unset;
-            background-color: unset;
-        }
+  .name-container {
+    font-weight: bold;
+    font-size: 0.75em;
+    -webkit-box-orient: unset;
+    max-width: unset;
+    text-align: left;
+    color: $white;
+  }
 
-        .name-container {
-            font-weight: bold;
-            font-size: .75em;
-            -webkit-box-orient: unset;
-            max-width: unset;
-            text-align: left;
-            color: $white;
-        }
+  .game-info-container {
+    display: flex;
+    align-items: center;
+    margin: 0.5rem 1.5rem;
+    padding: 0.6em;
+    border-radius: 0.25em;
+    margin-top: 0.3em;
+  }
 
-        .game-info-container {
-            display: flex;
-            align-items: center;
-            margin: .5rem 1.5rem;
-            padding: .6em;
-            border-radius: .25em;
-            margin-top: 0.3em;
-        }
+  .game-icon {
+    margin-bottom: 0;
+  }
 
-        .game-icon {
-            margin-bottom: 0;    
-        }
+  .game-text {
+    padding: 0 1em;
+  }
 
-        .game-text {
-            padding: 0 1em;
-        }
+  .game-rating {
+    margin-top: unset;
+    display: flex;
+    align-items: center;
+    color: $white;
+    opacity: 0.5;
+  }
 
-        .game-rating {
-            margin-top: unset;
-            display: flex;
-            align-items: center;
-            color: $white;
-            opacity: .5;
-        }
+  .game-rating-count {
+    color: white;
+    opacity: 0.5;
+  }
 
-        .game-rating-count {
-            color: white;
-            opacity: .5;    
-        }
+  .icon-star {
+    margin-top: 0.3em;
+    margin-right: 1em;
+    margin-left: unset;
+  }
 
-        .icon-star {
-            margin-top: .3em;
-            margin-right: 1em;
-            margin-left: unset;
-        }
+  .end-screen-info {
+    width: 100%;
+    align-self: flex-end;
+  }
 
-        .end-screen-info {
-            width: 100%;
-            align-self: flex-end;
-        }
+  .install-container {
+    margin: 0.5rem 1.5rem;
+    width: unset;
+    border-radius: 0.25em;
+    background: #fff;
+    text-align: left;
+    box-shadow: 2px 2px 20px 0 rgba(0, 0, 0, 0.3);
+    text-transform: uppercase;
+    padding: 0.6rem;
+    font-weight: 600;
+    font-size: 0.85em;
+    display: flex;
+    line-height: 0.85rem;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0;
 
-        .install-container {
-            margin: .5rem 1.5rem;
-            width: unset;
-            border-radius: .25em;
-            background: #fff;
-            text-align: left;
-            box-shadow: 2px 2px 20px 0 rgba(0, 0, 0, 0.3);
-            text-transform: uppercase;
-            padding: .6rem;
-            font-weight: 600;
-            font-size: .85em;
-            display: flex;
-            line-height: .85rem;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 0;
+    .free-text {
+      font-size: 0.65em;
+      padding: 0.15em;
+      line-height: 0.95em;
+      border-style: solid;
+      border-radius: 0.25em;
+      border-width: 0.2em;
+    }
 
-            .free-text {
-                font-size: .65em;
-                padding: .15em;
-                line-height: .95em;
-                border-style: solid;
-                border-radius: .25em;
-                border-width: .2em;
-            }
+    .download-text {
+      font-size: 0.85rem;
+    }
+  }
 
-            .download-text {
-                font-size: .85rem;    
-            }
-        }
+  .store-container {
+    display: flex;
+    align-items: center;
+  }
 
-        .store-container {
-            display: flex;
-            align-items: center;
-        }
+  .game-background-container {
+    position: unset;
+    width: 100%;
+    height: 100%;
+    background: no-repeat center center fixed;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+    filter: blur(45px);
+    z-index: unset;
+  }
 
-        .game-background-container {
-            position: unset;
-            width: 100%;
-            height: 100%;
-            background: no-repeat center center fixed; 
-            -webkit-background-size: cover;
-            -moz-background-size: cover;
-            -o-background-size: cover;
-            background-size: cover;
-            filter: blur(45px);
-            z-index: unset;
-        }
+  .end-screen-info-content {
+    background: unset;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    position: absolute;
+    top: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
 
-        .end-screen-info-content {
-            background: unset;
-            width: 100%;
-            height: 100%;    
-            overflow: hidden;
-            position: absolute;
-            top: 0;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
+  .game-text-container {
+    width: max-content;
+    padding: 0.4em 0 0.4em 0.7em;
+  }
 
-        .game-text-container {
-            width: 100%;
-            padding: .7em;
-        }
+  .end-screen-image-container {
+    padding: 0 1.5em;
+    padding-top: 0.5em;
 
-        .end-screen-image-container {
-            padding: 0 1.5em;
-            padding-top: .5em;
+    .end-screen-image {
+      border-radius: 0.25em;
+      width: 100%;
+    }
+  }
 
-            .end-screen-image {
-                border-radius: .25em;
-                width: 100%;
-            }
-        }
+  .unityads-logo {
+    bottom: unset;
+    left: unset;
+    -webkit-box-orient: unset;
+    -webkit-box-direction: unset;
+    width: unset;
+    text-align: right;
+    -webkit-box-pack: unset;
+    justify-content: unset;
+    position: unset;
+    z-index: unset;
+    max-height: 1rem;
+    color: $white;
+    font-size: 1.5rem;
+    filter: unset;
+    opacity: 0.4;
+    margin: 0 1em;
+    text-shadow: 0.03em 0.05em 0.18em #000;
+  }
 
-        .unityads-logo {
-            bottom: unset;
-            left: unset;
-            -webkit-box-orient: unset;
-            -webkit-box-direction: unset;
-            width: unset;
-            text-align: right;
-            -webkit-box-pack: unset;
-            justify-content: unset;
-            position: unset;
-            z-index: unset;
-            max-height: 1rem;
-            color: $white;
-            font-size: 1.5rem;
-            filter: unset;
-            opacity: .4;
-            margin: 0 1em;
-            text-shadow: 0.03em 0.05em 0.18em #000;
-        }
+  .bottom-container {
+    height: unset;
+    display: flex;
+    justify-content: flex-end;
+    margin: 0.5em 0;
+    align-items: center;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
 
-        .bottom-container {
-            height: unset;
-            display: flex;
-            justify-content: flex-end;
-            margin: .5em 0;
-            align-items: center;
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            
-            .privacy-button {
-                position: unset;
-                bottom: unset;
-                z-index: unset;
-                margin: 0;
-                line-height: unset;
-                margin-left: 0em;
-                padding: 0 .5em;
+    .privacy-button {
+      position: unset;
+      bottom: unset;
+      z-index: unset;
+      margin: 0;
+      line-height: unset;
+      margin-left: 0em;
+      padding: 0 0.5em;
 
-                .icon-gdpr {
-                    color: $white;
-                    opacity: .25;
-                    filter: drop-shadow(1px 2px 2px black);
-                }
-            }
+      .icon-gdpr {
+        color: $white;
+        opacity: 0.25;
+        filter: drop-shadow(1px 2px 2px black);
+      }
+    }
 
-            .china-advertisement {
-                position: unset;
-                padding: 0;
-                color: $white;
-                font-size: .7em;
-                right: unset;
-                bottom: unset;
-                margin: 0;
-                opacity: .25;
-                filter: drop-shadow(1px 2px 2px black);
-            }
-        }
-
+    .china-advertisement {
+      position: unset;
+      padding: 0;
+      color: $white;
+      font-size: 0.7em;
+      right: unset;
+      bottom: unset;
+      margin: 0;
+      opacity: 0.25;
+      filter: drop-shadow(1px 2px 2px black);
+    }
+  }
 }
 
 body.alternative-layout.landscape #end-screen {
+  .campaign-container {
+    background: $black;
+  }
 
-    .campaign-container {
-        background: $black;
+  .game-background-container {
+    width: 100%;
+    height: 100%;
+  }
+
+  .end-screen-info-content {
+    flex-direction: row;
+  }
+
+  .end-screen-image-container {
+    padding: unset;
+    padding-top: unset;
+    margin-left: 1.5em;
+    align-self: center;
+
+    .end-screen-image {
+      max-height: 300px;
+      width: unset;
     }
+  }
 
-    .game-background-container {
-        width: 100%;
-        height: 100%;
+  .end-screen-info {
+    display: unset;
+    flex-direction: unset;
+    justify-content: unset;
+    align-items: unset;
+    align-self: center;
+    width: unset;
+    min-width: 300px;
+
+    .game-icon {
+      margin-bottom: 0;
     }
+  }
 
-    .end-screen-info-content {
-        flex-direction: row;
-    }
+  .btn-close-region {
+    padding-right: 1em;
+  }
 
-    .end-screen-image-container {
-        padding: unset;
-        padding-top: unset;
-        margin-left: 1.5em;
-        align-self: center;
-
-        .end-screen-image {
-            max-height: 300px;
-            width: unset;
-        }
-    }
-
-    .end-screen-info {
-        display: unset;
-        flex-direction: unset;
-        justify-content: unset;
-        align-items: unset;
-        align-self: center;
-        width: unset;
-        min-width: 300px;
-
-        .game-icon {
-            margin-bottom: 0;    
-        }
-
-    }
-
-    .btn-close-region {
-        padding-right: 1em;
-    }
-
-    .privacy-button {
-        padding-right: 1.5em;
-    }
+  .privacy-button {
+    padding-right: 1.5em;
+  }
 }
 
 @media only screen and (-webkit-device-pixel-ratio: 3) and (device-height: 812px) and (device-width: 375px) {
-    .performance-end-screen .alternative-layout.portrait #end-screen .bottom-container {
-        margin: .5em 0;
-    }
+  .performance-end-screen .alternative-layout.portrait #end-screen .bottom-container {
+    margin: 0.5em 0;
+  }
 }
 
 $iphone-x-performance-end-screen-styles() {
@@ -290,56 +286,56 @@ $iphone-x-performance-end-screen-styles() {
     .landscape #end-screen {
       padding: 0;
       height: 100vh;
-    
-        .bottom-container {
-            height: unset;
-            display: flex;
-            justify-content: flex-end;
-            margin: .25em 0;
-            align-items: center;
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            
-            .privacy-button {
-                position: unset;
-                bottom: unset;
-                z-index: unset;
-                line-height: unset;
-                margin: 0;
-                margin-left: 0em;
-                padding: 0 .5em;
-                margin-right: 4em;
 
-                .icon-gdpr {
-                    color: $white;
-                    opacity: .25;
-                    filter: drop-shadow(1px 2px 2px black);
-                }
-            }
+      .bottom-container {
+        height: unset;
+        display: flex;
+        justify-content: flex-end;
+        margin: 0.25em 0;
+        align-items: center;
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
 
-            .china-advertisement {
-                position: unset;
-                padding: 0;
-                color: $white;
-                font-size: .7em;
-                right: unset;
-                bottom: unset;
-                margin: 0;
-                opacity: .25;
-                filter: drop-shadow(1px 2px 2px black);
-            }
+        .privacy-button {
+          position: unset;
+          bottom: unset;
+          z-index: unset;
+          line-height: unset;
+          margin: 0;
+          margin-left: 0em;
+          padding: 0 0.5em;
+          margin-right: 4em;
+
+          .icon-gdpr {
+            color: $white;
+            opacity: 0.25;
+            filter: drop-shadow(1px 2px 2px black);
+          }
         }
 
-        &.show-gdpr-banner .gdpr-pop-up {
-            padding-bottom: constant(safe-area-inset-bottom);
-            padding-bottom: env(safe-area-inset-bottom); // @stylint ignore
-
-            .gdpr-text {
-                padding-bottom: 0;
-            }
+        .china-advertisement {
+          position: unset;
+          padding: 0;
+          color: $white;
+          font-size: 0.7em;
+          right: unset;
+          bottom: unset;
+          margin: 0;
+          opacity: 0.25;
+          filter: drop-shadow(1px 2px 2px black);
         }
+      }
+
+      &.show-gdpr-banner .gdpr-pop-up {
+        padding-bottom: constant(safe-area-inset-bottom);
+        padding-bottom: env(safe-area-inset-bottom); // @stylint ignore
+
+        .gdpr-text {
+          padding-bottom: 0;
+        }
+      }
     }
 
     .ios-landscape-right #end-screen {
@@ -356,7 +352,7 @@ $iphone-x-performance-end-screen-styles() {
       }
     }
 
-    #end-screen .end-screen-info-background{
+    #end-screen .end-screen-info-background {
       @media (orientation: portrait) {
         /* iPhone X & iPhone XS */
         @media only screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) {
