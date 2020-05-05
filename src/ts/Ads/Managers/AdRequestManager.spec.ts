@@ -135,8 +135,9 @@ class SatisfiesMatcher {
                 }), [], {
                     followRedirects: false,
                     retries: 0,
-                    retryDelay: 10000,
-                    retryWithConnectionEvents: false
+                    retryDelay: 0,
+                    retryWithConnectionEvents: false,
+                    timeout: 10000
                 });
             });
 
@@ -323,8 +324,9 @@ class SatisfiesMatcher {
                 }), [], {
                     followRedirects: false,
                     retries: 0,
-                    retryDelay: 10000,
-                    retryWithConnectionEvents: false
+                    retryDelay: 0,
+                    retryWithConnectionEvents: false,
+                    timeout: 10000
                 });
                 expect(request.post).toHaveBeenNthCalledWith(3, expect.anything(), new SatisfiesMatcher({
                     preload: false,
@@ -347,8 +349,9 @@ class SatisfiesMatcher {
                 }), [], {
                     followRedirects: false,
                     retries: 0,
-                    retryDelay: 10000,
-                    retryWithConnectionEvents: false
+                    retryDelay: 0,
+                    retryWithConnectionEvents: false,
+                    timeout: 10000
                 });
             });
         });
@@ -440,7 +443,8 @@ class SatisfiesMatcher {
                     followRedirects: false,
                     retries: 0,
                     retryDelay: 10000,
-                    retryWithConnectionEvents: false
+                    retryWithConnectionEvents: false,
+                    timeout: 10000
                 });
             });
         });
@@ -534,7 +538,8 @@ class SatisfiesMatcher {
                     followRedirects: false,
                     retries: 0,
                     retryDelay: 10000,
-                    retryWithConnectionEvents: false
+                    retryWithConnectionEvents: false,
+                    timeout: 10000
                 });
             });
         });
