@@ -1,3 +1,7 @@
+# Pending
+
+* [Load V5] Include groups 14 and 15 groups for test [#15104](https://github.com/Applifier/unity-ads-webview/pull/15104)
+
 # Mon May  4 21:33:27 UTC 2020
 
 * [Auction V6] Remove AB Test and Release Feature [#15092](https://github.com/Applifier/unity-ads-webview/pull/15092)
