@@ -38,9 +38,9 @@ body.alternative-layout #end-screen {
     display: flex;
     align-items: center;
     margin: 0.5rem 1.5rem;
-    padding: 0.6em;
+    padding: 0.6rem;
     border-radius: 0.25em;
-    margin-top: 0.3em;
+    margin-top: 0.3rem;
   }
 
   .game-icon {
@@ -233,8 +233,9 @@ body.alternative-layout.landscape #end-screen {
     align-self: center;
 
     .end-screen-image {
-      max-height: 300px;
       width: unset;
+      height: calc(100vh - 60px);
+      max-height: 475px;
     }
   }
 
@@ -246,8 +247,10 @@ body.alternative-layout.landscape #end-screen {
     align-self: center;
     width: unset;
     min-width: 300px;
+    max-width: 350px;
 
     .game-icon {
+      margin: 0;
       margin-bottom: 0;
     }
   }
@@ -388,4 +391,10 @@ $iphone-x-performance-end-screen-styles() {
   }
 
   $iphone-x-performance-end-screen-styles();
+}
+
+@media only screen and (orientation: landscape) and (min-width: 800px) {
+  body.alternative-layout.landscape #end-screen .end-screen-info {
+    font-size: 1.2em;
+  }
 }
