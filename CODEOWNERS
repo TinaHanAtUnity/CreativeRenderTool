@@ -7,8 +7,10 @@
 src/ts/MabExperimentation/ @aui-sdk
 
 # Privacy SDK
-src/ts/Privacy/ @privacy-sdk
+src/ts/Ads/Managers/UserPrivacyManager.ts @privacy-sdk
+src/ts/Ads/Models/RequestPrivacy.ts @privacy-sdk
+src/ts/Ads/Views/AbstractPrivacy.ts @privacy-sdk
 src/ts/Ads/Views/Privacy/ @privacy-sdk
 src/ts/Ads/Views/Privacy.ts @privacy-sdk
-src/ts/Ads/Views/AbstractPrivacy.ts @privacy-sdk
+src/ts/Privacy/ @privacy-sdk
 
