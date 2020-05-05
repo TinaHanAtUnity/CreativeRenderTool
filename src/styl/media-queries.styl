@@ -75,6 +75,7 @@
 * Landscape
 ***********/
 @media (orientation: landscape)
+
   @media (min-width: 960px) and (max-width: 1024px) {
     html {
       font-size: $default-px-size * 2;
@@ -93,6 +94,8 @@
       font-size: $default-px-size * 1.25;
     }
   }
+
+// @stylint off
 
 /* iPhone X & iPhone XS */
 @media only screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) {
@@ -120,3 +123,5 @@
 
   $iphone-x-performance-end-screen-styles();
 }
+
+// @stylint on
