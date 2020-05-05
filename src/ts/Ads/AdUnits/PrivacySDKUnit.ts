@@ -221,15 +221,15 @@ export class PrivacySDKUnit implements IAdUnit, IPrivacySDKViewHandler {
 
         this._privacyManager.setUsersAgeGateChoice(ageGateChoice, AgeGateSource.USER);
 
-        if (ageGateChoice === AgeGateChoice.NO) {
-            action = GDPREventAction.AGE_GATE_DISAGREE;
-            this.setConsent(UserPrivacy.PERM_ALL_FALSE, action, GDPREventSource.USER);
+        if (this._privacySDK.getGamePrivacy().getMethod() !== PrivacyMethod.UNITY_CONSENT) {
             return;
         }
 
-        if (this._privacySDK.getGamePrivacy().getMethod() === PrivacyMethod.UNITY_CONSENT) {
-            this.setConsent(permissions, action, GDPREventSource.USER);
+        if (ageGateChoice === AgeGateChoice.NO) {
+            action = GDPREventAction.AGE_GATE_DISAGREE;
         }
+
+        this.setConsent(permissions, action, GDPREventSource.USER);
     }
 
     public onPrivacyReady(): void {
