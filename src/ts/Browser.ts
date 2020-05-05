@@ -251,7 +251,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     UnityAds.getBackend().Api.Request.setPassthrough(true);
                     setClientInfo();
                     setAndroidDeviceInfo();
-                    UnityAds.getBackend().Api.Storage.set(StorageType.PUBLIC, "test.forceLoadV5.value", forceLoadV5Element.checked);
+                    UnityAds.getBackend().Api.Storage.set(StorageType.PUBLIC, 'test.forceLoadV5.value', forceLoadV5Element.checked);
                     UnityAds.initialize(Platform.ANDROID, gameIdElement.value, listener, testModeElement.checked, loadModeElement.checked);
                     break;
 
@@ -260,7 +260,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     UnityAds.getBackend().Api.Request.setPassthrough(true);
                     setClientInfo();
                     setIosDeviceInfo();
-                    UnityAds.getBackend().Api.Storage.set(StorageType.PUBLIC, "test.forceLoadV5.value", forceLoadV5Element.checked);
+                    UnityAds.getBackend().Api.Storage.set(StorageType.PUBLIC, 'test.forceLoadV5.value', forceLoadV5Element.checked);
                     UnityAds.initialize(Platform.IOS, gameIdElement.value, listener, testModeElement.checked, loadModeElement.checked);
                     break;
 
