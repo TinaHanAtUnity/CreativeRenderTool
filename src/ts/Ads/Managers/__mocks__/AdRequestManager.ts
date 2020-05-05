@@ -21,6 +21,6 @@ export const AdRequestManager = jest.fn(() => {
         requestReload: jest.fn().mockImplementation(() => Promise.resolve()),
         request: jest.fn().mockImplementation(() => Promise.resolve()),
         isPreloadDataExpired: jest.fn().mockReturnValue(false),
-        hasPreloadFailed: jest.fn().mockReturnValue(false),
+        hasPreloadFailed: jest.fn().mockReturnValue(false)
     };
 });

@@ -23,17 +23,17 @@ import { INativeResponse } from 'Core/Managers/RequestManager';
 import { Campaign } from 'Ads/Models/Campaign';
 import { SDKMetrics, LoadV5 } from 'Ads/Utilities/SDKMetrics';
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+// eslint-disable-next-line
 const LoadV5PreloadResponse = require('json/LoadV5PreloadResponse.json');
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+// eslint-disable-next-line
 const LoadV5PreloadResponse_NoFill = require('json/LoadV5PreloadResponse_NoFill.json');
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+// eslint-disable-next-line
 const LoadV5LoadResponse = require('json/LoadV5LoadResponse.json');
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+// eslint-disable-next-line
 const LoadV5LoadResponse_2 = require('json/LoadV5LoadResponse_2.json');
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+// eslint-disable-next-line
 const LoadV5LoadResponse_NoFill = require('json/LoadV5LoadResponse_NoFill.json');
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+// eslint-disable-next-line
 const LoadV5ReloadResponse = require('json/LoadV5ReloadResponse.json');
 
 class SatisfiesMatcher {
