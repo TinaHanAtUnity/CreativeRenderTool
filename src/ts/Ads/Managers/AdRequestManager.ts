@@ -419,7 +419,7 @@ export class AdRequestManager extends CampaignManager {
             const additionalCampaigns = loadedCampaigns.reduce<IPlacementIdMap<INotCachedLoadedCampaign | undefined>>((previousValue, currentValue, currentIndex) => {
                 previousValue[additionalPlacements[currentIndex]] = currentValue;
                 return previousValue;
-            }, {})
+            }, {});
             this.onAdditionalPlacementsReady.trigger(placement.getAdUnitId(), additionalCampaigns);
         }).catch(() => {
             // Skip any errors so that we can handle actual load request
@@ -529,7 +529,7 @@ export class AdRequestManager extends CampaignManager {
         if (notCachedLoadedCampaign === undefined) {
             return Promise.resolve(undefined);
         }
- 
+
         return this._assetManager.setup(notCachedLoadedCampaign.notCachedCampaign).catch((err) => {
             // If caching failed, we still can stream an ad.
             return notCachedLoadedCampaign.notCachedCampaign;
@@ -572,7 +572,7 @@ export class AdRequestManager extends CampaignManager {
 
         return Promise.all(
             placementsToLoad.map((x) => this.parseCampaign(json, x, auctionStatusCode)
-                .then((x) => this.cacheCampaign(x)).catch((err) => {
+                .then((loadedCampaign) => this.cacheCampaign(loadedCampaign)).catch((err) => {
                 this.handleError(LoadV5.ReloadRequestParseCampaignFailed, err);
                 return undefined;
             }))
