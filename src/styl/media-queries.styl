@@ -1,21 +1,20 @@
-@import "vars.styl";
-@import "iphone-x-series.styl";
+@import 'vars.styl';
+@import 'iphone-x-series.styl';
 
 /*
   No {} for root media rule due to formatting tool becomes insane.
   And for whatever reason lint tool allows it only here, probably because it is nested media rule.
 */
-
 @media (min-width: 1025px) {
   html {
     font-size: $default-px-size * 2.7;
   }
 }
 
-/**********
-* Portrait
-***********/
-@media (orientation: portrait)
+/* *********
+ * Portrait
+********** */
+@media (orientation: portrait) {
   @media (min-width: 960px) and (max-width: 1024px) {
     html {
       font-size: $default-px-size * 2.5;
@@ -70,12 +69,12 @@
       font-size: $default-px-size * 1.25;
     }
   }
+}
 
-/***********
-* Landscape
-***********/
-@media (orientation: landscape)
-
+/* **********
+ * Landscape
+********** */
+@media (orientation: landscape) {
   @media (min-width: 960px) and (max-width: 1024px) {
     html {
       font-size: $default-px-size * 2;
@@ -94,37 +93,31 @@
       font-size: $default-px-size * 1.25;
     }
   }
-
-// @stylint off
-
-
-@media (orientation: portrait) {
-/* iPhone X & iPhone XS */
-  @media only screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) {
-    html {
-      $iphone-x-styles();
-    }
-
-    $iphone-x-performance-end-screen-styles();
-  }
-
-  /* iPhone XS Max */
-  @media only screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) {
-    html {
-      $iphone-x-styles();
-    }
-
-    $iphone-x-performance-end-screen-styles();
-  }
-
-  /* iPhone XR */
-  @media only screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) {
-    html {
-      $iphone-x-styles();
-    }
-
-    $iphone-x-performance-end-screen-styles();
-  }
 }
 
-// @stylint on
+/* iPhone X & iPhone XS */
+@media only screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) {
+  html {
+    $iphone-x-styles();
+  }
+
+  $iphone-x-performance-end-screen-styles();
+}
+
+/* iPhone XS Max */
+@media only screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) {
+  html {
+    $iphone-x-styles();
+  }
+
+  $iphone-x-performance-end-screen-styles();
+}
+
+/* iPhone XR */
+@media only screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) {
+  html {
+    $iphone-x-styles();
+  }
+
+  $iphone-x-performance-end-screen-styles();
+}
