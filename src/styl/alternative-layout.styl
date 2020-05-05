@@ -1,14 +1,14 @@
-@import 'vars.styl';
-@import 'iphone-x-series.styl';
+@import "vars.styl";
+@import "iphone-x-series.styl";
 
 body.alternative-layout #end-screen {
   .btn-close-region {
     display: inline-block;
-    line-height: unset;
     width: unset;
-    text-align: unset;
-    text-shadow: 0.03em 0.05em 0.18em $black;
     color: $white;
+    text-align: unset;
+    text-shadow: .03em .05em .18em $black;
+    line-height: unset;
   }
 
   .campaign-container {
@@ -18,29 +18,29 @@ body.alternative-layout #end-screen {
   .square-end-screen .campaign-container {
     position: unset;
     display: unset;
-    -webkit-box-orient: unset;
-    -webkit-box-direction: unset;
-    -ms-flex-direction: unset;
     flex-direction: unset;
     background-color: unset;
+    -webkit-box-direction: unset;
+    -webkit-box-orient: unset;
+    -ms-flex-direction: unset;
   }
 
   .name-container {
-    font-weight: bold;
-    font-size: 0.75em;
-    -webkit-box-orient: unset;
     max-width: unset;
-    text-align: left;
     color: $white;
+    text-align: left;
+    font-weight: bold;
+    font-size: .75em;
+    -webkit-box-orient: unset;
   }
 
   .game-info-container {
     display: flex;
     align-items: center;
-    margin: 0.5rem 1.5rem;
-    padding: 0.6rem;
-    border-radius: 0.25em;
-    margin-top: 0.3rem;
+    margin: .5rem 1.5rem;
+    margin-top: .3rem;
+    padding: .6rem;
+    border-radius: .25em;
   }
 
   .game-icon {
@@ -52,57 +52,57 @@ body.alternative-layout #end-screen {
   }
 
   .game-rating {
-    margin-top: unset;
     display: flex;
     align-items: center;
+    margin-top: unset;
     color: $white;
-    opacity: 0.5;
+    opacity: .5;
   }
 
   .game-rating-count {
     color: white;
-    opacity: 0.5;
+    opacity: .5;
   }
 
   .icon-star {
-    margin-top: 0.3em;
+    margin-top: .3em;
     margin-right: 1em;
     margin-left: unset;
   }
 
   .end-screen-info {
-    width: 100%;
     align-self: flex-end;
+    width: 100%;
   }
 
   .install-container {
-    margin: 0.5rem 1.5rem;
-    width: unset;
-    border-radius: 0.25em;
-    background: #fff;
-    text-align: left;
-    box-shadow: 2px 2px 20px 0 rgba(0, 0, 0, 0.3);
-    text-transform: uppercase;
-    padding: 0.6rem;
-    font-weight: 600;
-    font-size: 0.85em;
     display: flex;
-    line-height: 0.85rem;
     justify-content: space-between;
     align-items: center;
+    margin: .5rem 1.5rem;
     margin-bottom: 0;
+    padding: .6rem;
+    width: unset;
+    border-radius: .25em;
+    background: $white;
+    box-shadow: 2px 2px 20px 0 rgba(0, 0, 0, .3);
+    text-align: left;
+    text-transform: uppercase;
+    font-weight: 600;
+    font-size: .85em;
+    line-height: .85rem;
 
     .free-text {
-      font-size: 0.65em;
-      padding: 0.15em;
-      line-height: 0.95em;
+      padding: .15em;
+      border-width: .2em;
       border-style: solid;
-      border-radius: 0.25em;
-      border-width: 0.2em;
+      border-radius: .25em;
+      font-size: .65em;
+      line-height: .95em;
     }
 
     .download-text {
-      font-size: 0.85rem;
+      font-size: .85rem;
     }
   }
 
@@ -113,69 +113,69 @@ body.alternative-layout #end-screen {
 
   .game-background-container {
     position: unset;
+    z-index: unset;
     width: 100%;
     height: 100%;
     background: no-repeat center center fixed;
+    filter: blur(45px);
+    background-size: cover;
     -webkit-background-size: cover;
     -moz-background-size: cover;
     -o-background-size: cover;
-    background-size: cover;
-    filter: blur(45px);
-    z-index: unset;
   }
 
   .end-screen-info-content {
-    background: unset;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
     position: absolute;
     top: 0;
     display: flex;
     flex-direction: column;
     justify-content: center;
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+    background: unset;
   }
 
   .game-text-container {
+    padding: .4em 0 .4em .7em;
     width: max-content;
-    padding: 0.4em 0 0.4em 0.7em;
   }
 
   .end-screen-image-container {
     padding: 0 1.5em;
-    padding-top: 0.5em;
+    padding-top: .5em;
 
     .end-screen-image {
-      border-radius: 0.25em;
       width: 100%;
+      border-radius: .25em;
     }
   }
 
   .unityads-logo {
+    position: unset;
     bottom: unset;
     left: unset;
+    z-index: unset;
+    justify-content: unset;
+    margin: 0 1em;
+    max-height: 1rem;
+    width: unset;
+    filter: unset;
+    color: $white;
+    text-align: right;
+    text-shadow: .03em .05em .18em $black;
+    font-size: 1.5rem;
+    opacity: .4;
     -webkit-box-orient: unset;
     -webkit-box-direction: unset;
-    width: unset;
-    text-align: right;
     -webkit-box-pack: unset;
-    justify-content: unset;
-    position: unset;
-    z-index: unset;
-    max-height: 1rem;
-    color: $white;
-    font-size: 1.5rem;
-    filter: unset;
-    opacity: 0.4;
-    margin: 0 1em;
-    text-shadow: 0.03em 0.05em 0.18em #000;
   }
 
   .bottom-container {
     height: unset;
     display: flex;
     justify-content: flex-end;
-    margin: 0.5em 0;
+    margin: .5em 0;
     align-items: center;
     position: absolute;
     bottom: 0;
@@ -189,11 +189,11 @@ body.alternative-layout #end-screen {
       margin: 0;
       line-height: unset;
       margin-left: 0em;
-      padding: 0 0.5em;
+      padding: 0 .5em;
 
       .icon-gdpr {
         color: $white;
-        opacity: 0.25;
+        opacity: .25;
         filter: drop-shadow(1px 2px 2px black);
       }
     }
@@ -202,11 +202,11 @@ body.alternative-layout #end-screen {
       position: unset;
       padding: 0;
       color: $white;
-      font-size: 0.7em;
+      font-size: .7em;
       right: unset;
       bottom: unset;
       margin: 0;
-      opacity: 0.25;
+      opacity: .25;
       filter: drop-shadow(1px 2px 2px black);
     }
   }
@@ -265,7 +265,7 @@ body.alternative-layout.landscape #end-screen {
 
 @media only screen and (-webkit-device-pixel-ratio: 3) and (device-height: 812px) and (device-width: 375px) {
   .performance-end-screen .alternative-layout.portrait #end-screen .bottom-container {
-    margin: 0.5em 0;
+    margin: .5em 0;
   }
 }
 
@@ -293,7 +293,7 @@ $iphone-x-performance-end-screen-styles() {
         height: unset;
         display: flex;
         justify-content: flex-end;
-        margin: 0.25em 0;
+        margin: .25em 0;
         align-items: center;
         position: absolute;
         bottom: 0;
@@ -307,12 +307,12 @@ $iphone-x-performance-end-screen-styles() {
           line-height: unset;
           margin: 0;
           margin-left: 0em;
-          padding: 0 0.5em;
+          padding: 0 .5em;
           margin-right: 4em;
 
           .icon-gdpr {
             color: $white;
-            opacity: 0.25;
+            opacity: .25;
             filter: drop-shadow(1px 2px 2px black);
           }
         }
@@ -321,11 +321,11 @@ $iphone-x-performance-end-screen-styles() {
           position: unset;
           padding: 0;
           color: $white;
-          font-size: 0.7em;
+          font-size: .7em;
           right: unset;
           bottom: unset;
           margin: 0;
-          opacity: 0.25;
+          opacity: .25;
           filter: drop-shadow(1px 2px 2px black);
         }
       }
