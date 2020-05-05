@@ -17,7 +17,12 @@ export class AlternativeLayoutEndScreen extends PerformanceEndScreen {
     private _tintColor: boolean;
     private _alternativeLayout: boolean;
 
-    constructor(combination: IExperimentActionChoice | undefined, parameters: IEndScreenParameters, campaign: PerformanceCampaign, country?: string) {
+    constructor(
+        combination: IExperimentActionChoice | undefined,
+        parameters: IEndScreenParameters,
+        campaign: PerformanceCampaign,
+        country?: string
+    ) {
         super(parameters, campaign, country);
 
         combination = this.fixupExperimentChoices(combination);
@@ -39,13 +44,17 @@ export class AlternativeLayoutEndScreen extends PerformanceEndScreen {
         const simpleRating = campaign.getRating().toFixed(1);
         this._templateData = {
             ...this._templateData,
-            'simpleRating': simpleRating
+            simpleRating: simpleRating
         };
         this._animation = 'static';
         this._darkMode = false;
         this._tintColor = false;
         this._alternativeLayout = true;
-        console.log(this._templateData)
+        this._bindings.push({
+            event: 'click',
+            listener: (event: Event) => this.onDownloadEvent(event),
+            selector: '.end-screen-image, .install-container'
+        });
     }
 
     private fixupExperimentChoices(actions: IExperimentActionChoice | undefined): IExperimentActionChoice {
@@ -81,70 +90,60 @@ export class AlternativeLayoutEndScreen extends PerformanceEndScreen {
         const squareImage = this._campaign.getSquare();
 
         const deviceInfo = this._core.DeviceInfo;
-        Promise.all([deviceInfo.getScreenWidth(), deviceInfo.getScreenHeight()])
-            .then(([screenWidth, screenHeight]) => {
-                const isLandscape = screenWidth > screenHeight;
-                let image;
-                if (squareImage) {
-                    image = squareImage;
-                } else if (isLandscape && portraitImage) {
-                    image = portraitImage; // when the device is in landscape mode, we are showing a portrait image
-                } else if (landscapeImage) {
-                    image = landscapeImage;
-                } else {
-                    image = portraitImage;
-                }
+        Promise.all([deviceInfo.getScreenWidth(), deviceInfo.getScreenHeight()]).then(([screenWidth, screenHeight]) => {
+            const isLandscape = screenWidth > screenHeight;
+            let image;
+            if (squareImage) {
+                image = squareImage;
+            } else if (isLandscape && portraitImage) {
+                image = portraitImage; // when the device is in landscape mode, we are showing a portrait image
+            } else if (landscapeImage) {
+                image = landscapeImage;
+            } else {
+                image = portraitImage;
+            }
 
-                if (image) {
-                    ImageAnalysis.getImageSrc(this._core.Cache, image)
-                        .then(ImageAnalysis.analyseImage)
-                        .then(swatches => {
-                            if (!swatches || !swatches.length) {
-                                SDKMetrics.reportMetricEvent(AUIMetric.InvalidEndscreenColorTintSwitches);
-                                return;
-                            }
+            if (image) {
+                ImageAnalysis.getImageSrc(this._core.Cache, image)
+                    .then(ImageAnalysis.analyseImage)
+                    .then((swatches) => {
+                        if (!swatches || !swatches.length) {
+                            SDKMetrics.reportMetricEvent(AUIMetric.InvalidEndscreenColorTintSwitches);
+                            return;
+                        }
 
-                            const baseColorTheme = swatches[0].getColorTheme();
-                            const secondaryColorTheme = ((swatches.length > 1) ? swatches[1] : swatches[0]).getColorTheme();
-                            this.applyColorTheme(baseColorTheme, secondaryColorTheme);
-                        }).catch((msg: string) => {
+                        const baseColorTheme = swatches[0].getColorTheme();
+                        const secondaryColorTheme = (swatches.length > 1 ? swatches[1] : swatches[0]).getColorTheme();
+                        this.applyColorTheme(baseColorTheme, secondaryColorTheme);
+                    })
+                    .catch((msg: string) => {
                         SDKMetrics.reportMetricEventWithTags(AUIMetric.EndscreenColorTintError, {
-                            'msg': msg
+                            msg: msg
                         });
                     });
-                }
-            });
+            }
+        });
     }
 
     private applyColorTheme(baseColorTheme: IColorTheme, secondaryColorTheme: IColorTheme): void {
-        if (!baseColorTheme.light || !baseColorTheme.medium || !baseColorTheme.dark ||
-            !secondaryColorTheme.light || !secondaryColorTheme.medium || !secondaryColorTheme.dark) {
+        if (
+            !baseColorTheme.light ||
+            !baseColorTheme.medium ||
+            !baseColorTheme.dark ||
+            !secondaryColorTheme.light ||
+            !secondaryColorTheme.medium ||
+            !secondaryColorTheme.dark
+        ) {
             SDKMetrics.reportMetricEvent(AUIMetric.InvalidEndscreenColorTintTheme);
             return;
         }
 
-        console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>',baseColorTheme)
-
         const gameInfoContainer: HTMLElement | null = this._container.querySelector('.game-info-container');
         const installContainer: HTMLElement | null = this._container.querySelector('.install-container');
-        const gameNameContainer: HTMLElement | null = this._container.querySelector('.name-container');
-        const gameRatingContainer: HTMLElement | null = this._container.querySelector('.game-rating-count');
-        const privacyIconContainer: HTMLElement | null = this._container.querySelector('.bottom-container .icon-gdpr');
-        const unityIconContainer: HTMLElement | null = this._container.querySelector('.bottom-container .unityads-logo');
-        const chinaAdvertisementElement: HTMLElement | null = this._container.querySelector('.bottom-container .china-advertisement');
 
-        gameInfoContainer ? gameInfoContainer.style.background = baseColorTheme.medium.toCssRgb() : null;
-        installContainer ? installContainer.style.color = baseColorTheme.medium.toCssRgb() : null;
-        
-        if (gameInfoContainer && installContainer && gameNameContainer && gameRatingContainer && privacyIconContainer && unityIconContainer && chinaAdvertisementElement) {
-            const secondary = Color.lerp(secondaryColorTheme.light, secondaryColorTheme.medium, 0.3);
-            const baseDark = baseColorTheme.dark.toCssRgb();
-            // backgroundElement.style.background = `linear-gradient(${secondary.toCssRgb()},${baseColorTheme.light.toCssRgb()})`;
-            // gameNameContainer.style.color = baseDark;
-            // gameRatingContainer.style.color = baseDark;
-            // privacyIconContainer.style.color = baseDark;
-            // unityIconContainer.style.color = baseDark;
-            // chinaAdvertisementElement.style.color = baseDark;
+        if (gameInfoContainer && installContainer) {
+            gameInfoContainer.style.background = baseColorTheme.medium.toCssRgb();
+            installContainer.style.color = baseColorTheme.medium.toCssRgb();
         } else {
             SDKMetrics.reportMetricEvent(AUIMetric.EndscreenColorTintThemingFailed);
         }
@@ -174,7 +173,7 @@ export class AlternativeLayoutEndScreen extends PerformanceEndScreen {
     }
 
     private handleResize() {
-        const element = <HTMLElement> document.getElementById('end-screen');
+        const element = <HTMLElement>document.getElementById('end-screen');
         if (element == null) {
             return;
         }
