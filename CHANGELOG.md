@@ -1,3 +1,7 @@
+# Pending
+
+* [AUI] Remove explicit types from experiment declarations [#15094](https://github.com/Applifier/unity-ads-webview/pull/15094)
+
 # Tue May  5 22:52:34 UTC 2020
 
 * [Load V5] Include another 20 game ids for the test [#15103](https://github.com/Applifier/unity-ads-webview/pull/15103)
