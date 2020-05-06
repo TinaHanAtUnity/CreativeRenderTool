@@ -1,11 +1,11 @@
-import { AutomatedExperiment, IExperimentDeclaration, IExperimentActionChoice } from 'MabExperimentation/Models/AutomatedExperiment';
+import { AutomatedExperiment, IExperimentActionChoice } from 'MabExperimentation/Models/AutomatedExperiment';
 
 export enum AutomatedExperimentsCategories {
     PERFORMANCE_ENDCARD = 'webview-perf-ad-endcard',
     MRAID_AR = 'webview-ar-mraid'
 }
 
-export const ButtonExperimentDeclaration: IExperimentDeclaration = {
+export const ButtonExperimentDeclaration = {
   scheme: {
       DARK: 'dark',
       LIGHT: 'light',
@@ -38,7 +38,7 @@ export const ButtonAnimationsExperiment = new AutomatedExperiment({
 
 // AR Ads
 
-export const ArAvailableButtonExperimentDeclaration: IExperimentDeclaration = {
+export const ArAvailableButtonExperimentDeclaration = {
     skip: {
         YES: 'true',
         NO: 'false'
