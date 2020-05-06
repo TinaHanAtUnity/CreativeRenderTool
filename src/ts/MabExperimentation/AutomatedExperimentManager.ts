@@ -150,7 +150,6 @@ export class AutomatedExperimentManager {
             return Promise.resolve();
         }
 
-        try {
             const categorizedExp = this._campaign.CategorizedExperiments[category];
 
             if (categorizedExp.Stage !== CategorizedExperimentStage.RUNNING) {
@@ -158,11 +157,6 @@ export class AutomatedExperimentManager {
             }
 
             return this.publishCampaignOutcomes(campaign, categorizedExp, CategorizedExperimentStage.ENDED);
-        }
-        finally {
-            this._campaign = new OptimizedCampaign();
-        }
-
      }
 
      public rewardSelectedExperiment(campaign: Campaign, category: string): Promise<void> {

@@ -7,13 +7,14 @@ import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { Placement } from 'Ads/Models/Placement';
 import { Campaign } from 'Ads/Models/Campaign';
-import { VideoOverlayDownloadExperiment, VideoOverlayDownloadExperimentDeclaration } from 'MabExperimentation/Models/AutomatedExperimentsList';
+import { VideoOverlayDownloadExperiment, VideoOverlayDownloadExperimentDeclaration, AutomatedExperimentsCategories } from 'MabExperimentation/Models/AutomatedExperimentsList';
 import { AUIMetric, SDKMetrics } from 'Ads/Utilities/SDKMetrics';
 import { AbstractPrivacy, IPrivacyHandlerView } from 'Ads/Views/AbstractPrivacy';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 import { Template } from 'Core/Utilities/Template';
 import SwipeUpVideoOverlayTemplate from 'html/SwipeUpVideoOverlay.html';
+import { AutomatedExperimentManager } from 'MabExperimentation/AutomatedExperimentManager';
 
 export interface IVideoOverlayParameters<T extends Campaign> {
     platform: Platform;
@@ -28,17 +29,20 @@ export interface IVideoOverlayParameters<T extends Campaign> {
 export class SwipeUpVideoOverlay extends VideoOverlay {
     private _ctaMode: string;
     protected _swipeUpButtonElement: HTMLElement;
+    private _automatedExperimentManager: AutomatedExperimentManager;
 
     constructor(
         parameters: IVideoOverlayParameters<Campaign>,
         privacy: AbstractPrivacy,
         showGDPRBanner: boolean,
         showPrivacyDuringVideo: boolean,
-        combination: IExperimentActionChoice | undefined
+        combination: IExperimentActionChoice | undefined,
+        automatedExperimentManager: AutomatedExperimentManager
     ) {
         super(parameters, privacy, showGDPRBanner, showPrivacyDuringVideo);
 
         this._template = new Template(SwipeUpVideoOverlayTemplate, this._localization);
+        this._automatedExperimentManager = automatedExperimentManager;
 
         if (combination) {
             if (!VideoOverlayDownloadExperiment.isValid(combination)) {
@@ -120,5 +124,27 @@ export class SwipeUpVideoOverlay extends VideoOverlay {
         this.resetFadeTimer();
         this._handlers.forEach(handler => handler.onOverlayCallButton());
         this.triggerOnOverlayDownload();
+        this._automatedExperimentManager.rewardSelectedExperiment(this._campaign, AutomatedExperimentsCategories.VIDEO_OVERLAY);
+    }
+
+    protected onCallButtonEvent(event: Event) {
+        super.onCallButtonEvent(event);
+        this._automatedExperimentManager.rewardSelectedExperiment(this._campaign, AutomatedExperimentsCategories.VIDEO_OVERLAY);
+    }
+
+    protected onSkipEvent(event: Event): void {
+        super.onSkipEvent(event);
+        this._automatedExperimentManager.endSelectedExperiment(this._campaign, AutomatedExperimentsCategories.VIDEO_OVERLAY);
+    }
+
+    private getRemainingVideoTime() {
+        if (Number(this._timerElement.innerText) <= 1) {
+        this._automatedExperimentManager.endSelectedExperiment(this._campaign, AutomatedExperimentsCategories.VIDEO_OVERLAY);
+        }
+    }
+
+    public hide(): void {
+        super.hide();
+        this.getRemainingVideoTime();
     }
 }
