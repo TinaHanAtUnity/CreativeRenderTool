@@ -82,7 +82,7 @@ export abstract class OpenMeasurementController implements IOMController {
 
             this._omInstances.forEach((om) => {
                     om.triggerVideoEvent(OMID3pEvents.OMID_START, {
-                    duration: duration,
+                    duration: Math.trunc(duration / 1000),
                     videoPlayerVolume: this._placement.muteVideo() ? 0 : 1,
                     deviceVolume: this._deviceVolume
                 });
