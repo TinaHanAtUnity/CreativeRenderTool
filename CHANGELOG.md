@@ -1,4 +1,4 @@
-# Pending
+# Wed May 6 17:55:34 UTC 2020
 
 * [AUI] Remove ExperimentId and made color optional for MAB experiments  [#15066](https://github.com/Applifier/unity-ads-webview/pull/15066)
 * [AUI] Remove explicit types from experiment declarations [#15094](https://github.com/Applifier/unity-ads-webview/pull/15094)
