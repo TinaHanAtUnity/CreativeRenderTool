@@ -64,7 +64,7 @@ describe('EndScreenTest', () => {
         return new PerformanceEndScreen(params, campaign);
     };
 
-    const createAnimatedDownloadButtonEndScreen = (language: string, scheme: string|undefined, buttonColor: string|undefined): AnimatedDownloadButtonEndScreen => {
+    const createAnimatedDownloadButtonEndScreen = (language: string, scheme: string | undefined, buttonColor: string | undefined): AnimatedDownloadButtonEndScreen => {
         const privacyManager = sinon.createStubInstance(UserPrivacyManager);
         const campaign = TestFixtures.getCampaign();
         privacy = new Privacy(platform, campaign, privacyManager, false, false, 'en');
@@ -127,7 +127,7 @@ describe('EndScreenTest', () => {
             return res;
         }
 
-        const validateExperimentAttributes = (endScreen: PerformanceEndScreen, buttonColor: string|undefined) => {
+        const validateExperimentAttributes = (endScreen: PerformanceEndScreen, buttonColor: string | undefined) => {
             endScreen.render();
             const downloadButton = <HTMLElement> endScreen.container().querySelectorAll('.download-container')[0];
             const color = downloadButton.style.backgroundColor;
@@ -143,7 +143,7 @@ describe('EndScreenTest', () => {
             }
         };
 
-        Object.values(ButtonExperimentDeclaration.color).forEach((c: string|undefined) => {
+        Object.values(ButtonExperimentDeclaration.color).forEach((c: string | undefined) => {
             if (c === undefined) {
                 validateExperimentAttributes(createAnimatedDownloadButtonEndScreen('fi', ButtonExperimentDeclaration.scheme.LIGHT, c), ButtonExperimentDeclaration.color.BLUE);
             } else {
