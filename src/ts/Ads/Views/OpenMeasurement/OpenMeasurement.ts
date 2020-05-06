@@ -30,7 +30,7 @@ enum AdSessionType {
 }
 
 interface IOmidJsInfo {
-    omidImplementer: string;
+    omidImplementor: string;
     serviceVersion: string;
     sessionClientVersion: string;
     partnerName: string;

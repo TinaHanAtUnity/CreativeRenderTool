@@ -110,7 +110,7 @@ describe('AdmobSessionInterface', () => {
                             'adId': undefined,
                             'appId': 'com.unity.ads',
                             'libraryVersion': '1.2.10',
-                            'omidImplementer': '{{ OMID_IMPLEMENTOR }}'
+                            'omidImplementor': '{{ OMID_IMPLEMENTOR }}'
                         },
                         'customReferenceIdentifier': undefined,
                         'environment': 'app',
@@ -163,12 +163,12 @@ describe('AdmobSessionInterface', () => {
                             'adId': undefined,
                             'appId': 'com.unity.ads',
                             'libraryVersion': '1.2.10',
-                            'omidImplementer': '{{ OMID_IMPLEMENTOR }}'
+                            'omidImplementor': '{{ OMID_IMPLEMENTOR }}'
                         },
                         'customReferenceIdentifier': undefined,
                         'environment': 'app',
                         'omidJsInfo': {
-                            'omidImplementer': '{{ OMID_IMPLEMENTOR }}',
+                            'omidImplementor': '{{ OMID_IMPLEMENTOR }}',
                             'partnerName': 'google',
                             'partnerVersion': '1.1',
                             'serviceVersion': '1.2.10',
@@ -184,7 +184,7 @@ describe('AdmobSessionInterface', () => {
                     'timestamp': 1577836800000,
                     'type': 'sessionStart',
                   }
-            }, '*')
+            }, '*');
         });
     });
 });

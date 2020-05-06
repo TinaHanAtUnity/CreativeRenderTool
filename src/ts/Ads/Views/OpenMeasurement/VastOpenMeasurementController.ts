@@ -94,7 +94,7 @@ export class VastOpenMeasurementController extends OpenMeasurementController {
                 partnerVersion: this._clientInfo.getSdkVersionName()
             },
             omidJsInfo: {
-                omidImplementer: PARTNER_NAME,
+                omidImplementor: PARTNER_NAME,
                 serviceVersion: this._clientInfo.getSdkVersionName(),
                 sessionClientVersion: OMID_P,
                 partnerName: PARTNER_NAME,
