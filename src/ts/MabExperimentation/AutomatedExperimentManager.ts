@@ -150,11 +150,11 @@ export class AutomatedExperimentManager {
             return Promise.resolve();
         }
 
-        const categorizedExp = this._campaign.CategorizedExperiments[category];	
+        const categorizedExp = this._campaign.CategorizedExperiments[category];
 
-            if (categorizedExp.Stage !== CategorizedExperimentStage.RUNNING) {	
-                return Promise.resolve();	
-            }	
+            if (categorizedExp.Stage !== CategorizedExperimentStage.RUNNING) {
+                return Promise.resolve();
+            }
 
 
             return this.publishCampaignOutcomes(campaign, categorizedExp, CategorizedExperimentStage.ENDED);
