@@ -16,6 +16,7 @@ import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { Double } from 'Core/Utilities/Double';
 import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
 import { CreativeBlocking, BlockingReason } from 'Core/Utilities/CreativeBlocking';
+import { VideoMetric } from 'Ads/Utilities/SDKMetrics';
 
 export class VideoEventHandler extends BaseVideoEventHandler implements IVideoEventHandler {
 
@@ -76,51 +77,12 @@ export class VideoEventHandler extends BaseVideoEventHandler implements IVideoEv
 
             if (progress === lastPosition) {
                 const repeats: number = this._video.getPositionRepeats();
-                const repeatTreshold: number = 5000 / this._adUnit.getProgressInterval();
+                const repeatThreshold: number = 5000 / this._adUnit.getProgressInterval();
 
                 // if video player has been repeating the same video position for more than 5000 milliseconds, video player is stuck
-                if (repeats > repeatTreshold) {
+                if (repeats > repeatThreshold) {
                     this._core.Sdk.logError('Unity Ads video player stuck to ' + progress + 'ms position');
-
-                    const error: { [key: string]: unknown } = {
-                        repeats: repeats,
-                        position: progress,
-                        duration: this._video.getDuration(),
-                        url: this._video.getUrl(),
-                        originalUrl: this._video.getOriginalUrl(),
-                        cached: this._video.isCached(),
-                        cacheMode: this._adsConfig.getCacheMode(),
-                        lowMemory: this._adUnit.isLowMemory()
-                    };
-
-                    const fileId = this._video.getFileId();
-
-                    if (fileId) {
-                        this._core.Cache.getFileInfo(fileId).then((fileInfo) => {
-                            error.fileInfo = fileInfo;
-                            if (fileInfo.found) {
-                                return VideoFileInfo.getVideoInfo(this._platform, this._core.Cache, fileId).then(([width, height, duration]) => {
-                                    const videoInfo: { [key: string]: unknown } = {
-                                        width: width,
-                                        height: height,
-                                        duration: duration
-                                    };
-                                    error.videoInfo = videoInfo;
-                                    return error;
-                                });
-                            } else {
-                                return error;
-                            }
-                        }).then((videoError) => {
-                            this.handleVideoError('video_player_stuck', videoError);
-                        }).catch(() => {
-                            this.handleVideoError('video_player_stuck', error);
-                        });
-                    } else {
-                        this.handleVideoError('video_player_stuck', error);
-                    }
-
-                    return;
+                    this.handleVideoError(VideoMetric.PlayerStuck);
                 } else {
                     this._video.setPositionRepeats(repeats + 1);
                 }
@@ -170,20 +132,10 @@ export class VideoEventHandler extends BaseVideoEventHandler implements IVideoEv
         this._adUnit.setVideoState(VideoState.READY);
 
         if (duration > VideoFileInfo._maxVideoDuration) {
-            const originalUrl = this._video.getOriginalUrl();
-            const error = new DiagnosticError(new Error('Too long video'), {
-                duration: duration,
-                campaignId: this._campaign.getId(),
-                url: url,
-                originalUrl: originalUrl,
-                isCached: CampaignAssetInfo.isCached(this._campaign)
-            });
-
             CreativeBlocking.report(this._campaign.getCreativeId(), this._campaign.getSeatId(), this._campaign.getId(), BlockingReason.VIDEO_TOO_LONG, {
                 videoLength: duration
             });
-
-            return this.handleVideoError('video_too_long', error);
+            return this.handleVideoError(VideoMetric.TooLongError);
         }
 
         const overlay = this._adUnit.getOverlay();
@@ -219,12 +171,8 @@ export class VideoEventHandler extends BaseVideoEventHandler implements IVideoEv
     }
 
     public onPrepareTimeout(url: string): void {
-        this._core.Sdk.logError('Unity Ads video player prepare timeout '  + url);
-
-        this.handleVideoError('video_player_prepare_timeout', {
-            'url': url,
-            'position': this._video.getPosition()
-        });
+        this._core.Sdk.logError('Unity Ads video player prepare timeout ' + url);
+        this.handleVideoError(VideoMetric.PrepareTimeout);
     }
 
     public onPlay(url: string): void {

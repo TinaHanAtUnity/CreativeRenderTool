@@ -32,8 +32,8 @@ export abstract class AbstractVideoOverlay extends View<IOverlayHandler> {
     protected _fadeEnabled: boolean = true;
     protected _isPrivacyShowing: boolean = false;
 
-    constructor(platform: Platform, containerId: string, muted: boolean) {
-        super(platform, containerId);
+    constructor(platform: Platform, containerId: string, muted: boolean, attachTap?: boolean | undefined) {
+        super(platform, containerId, attachTap);
         this._muted = muted;
     }
 

@@ -55,7 +55,7 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
             onLoaded: (vastProperties: IVastProperties) => this.loaded(vastProperties),
             onStart: (duration: number, videoPlayerVolume: number) => this.start(duration), // TODO: Add for admob videos
             onSendFirstQuartile: () => this.sendFirstQuartile(),
-            onSendMidpoint: () =>  this.sendMidpoint(),
+            onSendMidpoint: () => this.sendMidpoint(),
             onSendThirdQuartile: () => this.sendThirdQuartile(),
             onCompleted: () => this.completed(),
             onPause: () => this.pause(),

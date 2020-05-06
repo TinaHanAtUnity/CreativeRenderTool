@@ -19,7 +19,7 @@ describe('DiagnosticErrorTest', () => {
         });
 
         it('should contain the diagnostic data', () => {
-            const diagnosticError = new DiagnosticError(originalError, {foo: 'foo1', bar: 'bar2'});
+            const diagnosticError = new DiagnosticError(originalError, { foo: 'foo1', bar: 'bar2' });
 
             // tslint:disable:no-string-literal
             assert.equal(diagnosticError.diagnostic['foo'], 'foo1');
@@ -28,7 +28,7 @@ describe('DiagnosticErrorTest', () => {
         });
 
         it('should serialize correctly', () => {
-            const diagnosticError = new DiagnosticError(originalError, {foo: 'foo1', bar: 'bar2'});
+            const diagnosticError = new DiagnosticError(originalError, { foo: 'foo1', bar: 'bar2' });
             const result = JSON.stringify(diagnosticError);
 
             assert.notEqual(result.indexOf('"name":"SyntaxError"'), -1);

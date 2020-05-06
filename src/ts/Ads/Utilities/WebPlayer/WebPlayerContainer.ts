@@ -41,15 +41,15 @@ export abstract class WebPlayerContainer {
         return this._ads.WebPlayer.setUrl(url, this._viewId);
     }
 
-    public setData(data: string, mimeType: string, encoding: string): Promise<void>  {
+    public setData(data: string, mimeType: string, encoding: string): Promise<void> {
         return this._ads.WebPlayer.setData(data, mimeType, encoding, this._viewId);
     }
 
-    public setDataWithUrl(baseUrl: string, data: string, mimeType: string, encoding: string): Promise<void>  {
+    public setDataWithUrl(baseUrl: string, data: string, mimeType: string, encoding: string): Promise<void> {
         return this._ads.WebPlayer.setDataWithUrl(baseUrl, data, mimeType, encoding, this._viewId);
     }
 
-    public setSettings(webSettings: IWebPlayerWebSettingsAndroid | IWebPlayerWebSettingsIos, webPlayerSettings: IWebPlayerPlayerSettingsAndroid): Promise<void>  {
+    public setSettings(webSettings: IWebPlayerWebSettingsAndroid | IWebPlayerWebSettingsIos, webPlayerSettings: IWebPlayerPlayerSettingsAndroid): Promise<void> {
         return this._ads.WebPlayer.setSettings(webSettings, webPlayerSettings, this._viewId);
     }
 

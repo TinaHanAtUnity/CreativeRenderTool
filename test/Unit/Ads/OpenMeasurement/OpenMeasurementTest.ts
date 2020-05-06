@@ -71,7 +71,8 @@ import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 
                 it('should populate the omid-iframe with omid3p container code', () => {
                     om.render();
-                    assert.equal((<HTMLIFrameElement>om.container().querySelector('#omid-iframe' + om.getOMAdSessionId())).srcdoc, MacroUtil.replaceMacro(OMID3p, {'{{ DEFAULT_KEY_ }}': 'default_key'}));
+                    const iframe = <HTMLIFrameElement>om.container().querySelector('#omid-iframe' + om.getOMAdSessionId());
+                    assert.equal(iframe.srcdoc, OMID3p.replace('{{ DEFAULT_KEY_ }}', 'default_key').replace('{{ IFRAME_ID_ }}', iframe.id));
                 });
 
                 it('should not call the remove child function if om does not exist in dom', () => {
@@ -136,7 +137,7 @@ import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
                         });
 
                         it('should error with VERIFICATION_RESOURCE_REJECTED when resource is not a js file and replace OMIDPARTNER,OMIDPARTNER,OMIDPARTNER macros', () => {
-                            sinon.assert.calledWith(<sinon.SinonSpy>thirdPartyEventManager.sendWithGet, 'adVerificationErrorEvent', '12345', 'https://ade.googlesyndication.com/errorcode=%5BREASON%5D', undefined, undefined, {'%5BREASON%5D': '1'});
+                            sinon.assert.calledWith(<sinon.SinonSpy>thirdPartyEventManager.sendWithGet, 'adVerificationErrorEvent', '12345', 'https://ade.googlesyndication.com/errorcode=%5BREASON%5D', undefined, undefined, { '%5BREASON%5D': '1' });
                         });
                     });
 
@@ -158,7 +159,7 @@ import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
                         });
 
                         it('should error with ERROR_RESOURCE_LOADING when resource is invalid url', () => {
-                            sinon.assert.calledWith(<sinon.SinonSpy>thirdPartyEventManager.sendWithGet, 'adVerificationErrorEvent', '12345', 'https://ade.googlesyndication.com/errorcode=%5BREASON%5D', undefined, undefined, {'%5BREASON%5D': '3'});
+                            sinon.assert.calledWith(<sinon.SinonSpy>thirdPartyEventManager.sendWithGet, 'adVerificationErrorEvent', '12345', 'https://ade.googlesyndication.com/errorcode=%5BREASON%5D', undefined, undefined, { '%5BREASON%5D': '3' });
                         });
                     });
                 });

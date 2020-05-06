@@ -10,7 +10,19 @@ export enum ErrorMetric {
     CampaignExpired = 'campaign_expired',
     NoConnectionWhenNeeded = 'no_connection_when_needed',
     MissingTrackingUrlsOnShow = 'missing_tracking_urls_on_show',
-    PlacementInvalidationPending = 'placement_invalidation_pending'
+    PlacementInvalidationPending = 'placement_invalidation_pending',
+    AttemptToStreamCampaignWithoutConnection = 'attempt_to_stream_campaign_without_connection'
+}
+
+export enum VideoMetric {
+    GenericError = 'video_player_generic_error',
+    PrepareError = 'video_player_prepare_error',
+    PrepareTimeout = 'video_player_prepare_timeout',
+    SeekToError = 'video_player_seek_to_error',
+    PauseError = 'video_player_pause_error',
+    IllegalStateError = 'video_player_illegal_state_error',
+    TooLongError = 'video_too_long',
+    PlayerStuck = 'video_player_stuck'
 }
 
 export enum AdmobMetric {
@@ -117,14 +129,14 @@ export enum MraidMetric {
 }
 
 export enum AUIMetric {
-    CampaignAlreadyActive = 'campaign_already_active',
+    CampaignCategoryAlreadyActive = 'campaign_category_already_active',
+    CampaignCategoryInactive = 'campaign_category_inactive',
     CampaignInitializationError = 'automated_experiment_manager_initialization_error',
     FailedToCollectStaticFeatures = 'FailedToCollectStaticFeatures',
     FailedToCollectDeviceFeatures = 'failed_to_collect_device_features',
     FailedToFetchAutomatedExperiements = 'failed_to_fetch_automated_experiments',
     FailedToParseExperimentResponse = 'failed_to_parse_automated_experiments_response',
     FailedToPublishOutcome = 'failed_to_publish_experiment_outcome',
-    IgnoringNonPerformanceCampaign = 'ignoring_non_performance_campaign',
     InvalidEndscreenAnimation = 'invalid_endscreen_animation',
     OptimizationResponseApplied = 'campaign_optimization_response_applied',
     AutomatedExperimentManagerInitializationError = 'automated_experiment_manager_initialization_error',
@@ -135,7 +147,8 @@ export enum AUIMetric {
     EndscreenColorTintThemingFailed = 'endscreen_color_tint_theming_failed',
     OptimizationResponseIgnored = 'campaign_optimization_response_ignored',
     RequestingCampaignOptimization = 'requesting_campaign_optimization',
-    UnknownExperimentName = 'unknown_experiement_name'
+    UnknownExperimentName = 'unknown_experiment_name',
+    UnknownCategoryProvided = 'unknown_automated_experiment_category_provided'
 }
 
 export enum GeneralTimingMetric {
@@ -159,7 +172,10 @@ export enum MediationMetric {
     MediaCount = 'media_count',
     AuctionRequest = 'auction_request_time',
     AdCaching = 'ad_caching_time',
-    AuctionRequestStarted = 'auction_request_start'
+    AuctionRequestStarted = 'auction_request_start',
+    FillLatencyByPlacements = 'fill_latency_by_placements',
+    NofillLatencyByPlacements = 'nofill_latency_by_placements',
+    InitCompleteByPlacements = 'mediation_init_complete_by_placements'
 }
 
 export enum LoadV5 {
@@ -185,16 +201,18 @@ export enum AuctionV6 {
     FailedToParse = 'v6_failed_to_parse',
     AuctionIdMissing = 'v6_auction_id_missing',
     PlacementsMissing = 'v6_placements_missing',
-    MediaIdMissing = 'v6_media_id_missing',
-    TrackingMissing = 'v6_tracking_missing',
     TrackingIndicesOutOfBounds = 'v6_tracking_indices_out_of_bounds',
-    BannerPlacementNotRemoved = 'v6_banner_placement_not_removed',
     FailedCreatingAuctionResponse = 'v6_failed_creating_auction_response'
+}
+
+export enum ChinaAucionEndpoint {
+    AuctionRequest = 'china_user_auction_request',
+    AuctionResponse = 'china_user_auction_response'
 }
 
 export type TimingEvent = InitializationMetric | MediationMetric | GeneralTimingMetric;
 
-export type PTSEvent = TimingEvent | AuctionV6 | AdmobMetric | BannerMetric | CachingMetric | ChinaMetric | VastMetric | MraidMetric | MiscellaneousMetric | LoadMetric | ErrorMetric | OMMetric | AUIMetric | LoadV5;
+export type PTSEvent = VideoMetric | TimingEvent | AuctionV6 | AdmobMetric | BannerMetric | CachingMetric | ChinaMetric | VastMetric | MraidMetric | MiscellaneousMetric | LoadMetric | ErrorMetric | OMMetric | AUIMetric | LoadV5 | ChinaAucionEndpoint;
 
 export class SDKMetrics {
 

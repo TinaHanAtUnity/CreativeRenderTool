@@ -1,6 +1,6 @@
 import { assert } from 'chai';
 import 'mocha';
-import { IExperimentDeclaration, IExperimentActionChoice, AutomatedExperiment } from 'Ads/Models/AutomatedExperiment';
+import { IExperimentDeclaration, IExperimentActionChoice, AutomatedExperiment } from 'MabExperimentation/Models/AutomatedExperiment';
 
 describe('AutomatedExperimentTest', () => {
     const FooExperimentDeclaration: IExperimentDeclaration = {
@@ -27,22 +27,22 @@ describe('AutomatedExperimentTest', () => {
     });
 
     it('should validate experiment action choices', () => {
-        assert.isTrue(ButtonAnimationsExperiment.isValid({bar: 'bar1', baz: 'baz1'}));
-        assert.isTrue(ButtonAnimationsExperiment.isValid({bar: 'bar1', baz: 'baz2'}));
-        assert.isTrue(ButtonAnimationsExperiment.isValid({bar: 'bar2', baz: 'baz1'}));
-        assert.isTrue(ButtonAnimationsExperiment.isValid({bar: 'bar2', baz: 'baz2'}));
+        assert.isTrue(ButtonAnimationsExperiment.isValid({ bar: 'bar1', baz: 'baz1' }));
+        assert.isTrue(ButtonAnimationsExperiment.isValid({ bar: 'bar1', baz: 'baz2' }));
+        assert.isTrue(ButtonAnimationsExperiment.isValid({ bar: 'bar2', baz: 'baz1' }));
+        assert.isTrue(ButtonAnimationsExperiment.isValid({ bar: 'bar2', baz: 'baz2' }));
     });
 
     it('should fail validation on invalid experiment action choices', () => {
         assert.isFalse(ButtonAnimationsExperiment.isValid({}));
-        assert.isFalse(ButtonAnimationsExperiment.isValid({bar: 'bar1'}));
-        assert.isFalse(ButtonAnimationsExperiment.isValid({baz: 'baz1'}));
-        assert.isFalse(ButtonAnimationsExperiment.isValid({baz: 'invalid'}));
-        assert.isFalse(ButtonAnimationsExperiment.isValid({someOtherField: 'sad'}));
-        assert.isFalse(ButtonAnimationsExperiment.isValid({bar: 'bar1', baz: 'invalid', someOtherField: 'baz1'}));
+        assert.isFalse(ButtonAnimationsExperiment.isValid({ bar: 'bar1' }));
+        assert.isFalse(ButtonAnimationsExperiment.isValid({ baz: 'baz1' }));
+        assert.isFalse(ButtonAnimationsExperiment.isValid({ baz: 'invalid' }));
+        assert.isFalse(ButtonAnimationsExperiment.isValid({ someOtherField: 'sad' }));
+        assert.isFalse(ButtonAnimationsExperiment.isValid({ bar: 'bar1', baz: 'invalid', someOtherField: 'baz1' }));
     });
 
     it('should validate experiment action choices with extra fields', () => {
-        assert.isTrue(ButtonAnimationsExperiment.isValid({bar: 'bar1', baz: 'baz1', extra: 'sad'}));
+        assert.isTrue(ButtonAnimationsExperiment.isValid({ bar: 'bar1', baz: 'baz1', extra: 'sad' }));
     });
 });

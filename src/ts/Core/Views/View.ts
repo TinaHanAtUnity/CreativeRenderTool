@@ -100,4 +100,17 @@ export abstract class View<T extends object> {
             this._container.style.visibility = 'hidden';
         }
     }
+
+    public tap(selector: string): Tap | undefined {
+        for (const binding of this._bindings) {
+            if (!binding.selector) {
+                continue;
+            }
+            if (binding.selector !== selector) {
+                continue;
+            }
+            return binding.tap;
+        }
+        return undefined;
+    }
 }

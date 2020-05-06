@@ -51,7 +51,7 @@ describe('PrivacyParserTest', () => {
                 gdprEnabled: false,
                 optOutRecorded: false,
                 optOutEnabled: false,
-                gamePrivacy: {method: PrivacyMethod.DEFAULT}
+                gamePrivacy: { method: PrivacyMethod.DEFAULT }
             };
         });
 
@@ -118,10 +118,10 @@ describe('PrivacyParserTest', () => {
                     gdprEnabled: true,
                     optOutRecorded: false,
                     optOutEnabled: false,
-                    gamePrivacy: {method: privacyMethod}
+                    gamePrivacy: { method: privacyMethod }
                 };
             });
-            const unityConsentUserPrivacy = {method: PrivacyMethod.UNITY_CONSENT, version: 0, permissions: UserPrivacy.PERM_ALL_TRUE};
+            const unityConsentUserPrivacy = { method: PrivacyMethod.UNITY_CONSENT, version: 0, permissions: UserPrivacy.PERM_ALL_TRUE };
             [undefined, unityConsentUserPrivacy].forEach((configUserPrivacy) => {
                 it ('sets default userPrivacy when optoutRecroded=false and configuration has userPrivacy=' + JSON.stringify(configUserPrivacy), () => {
                     privacyPartsConfig.userPrivacy = configUserPrivacy;
@@ -135,15 +135,15 @@ describe('PrivacyParserTest', () => {
 
             [true, false].forEach((consent) => {
                 it ('set userPrivacy as provided when compatible, consent = ' + consent, () => {
-                    privacyPartsConfig.userPrivacy = {method: privacyMethod, version: 0,
-                        permissions: {ads: consent, external: consent, gameExp: false}};
+                    privacyPartsConfig.userPrivacy = { method: privacyMethod, version: 0,
+                        permissions: { ads: consent, external: consent, gameExp: false } };
                     const privacySDK = PrivacyParser.parse(<IRawAdsConfiguration>privacyPartsConfig, clientInfo, deviceInfo);
                     const gamePrivacy = privacySDK.getGamePrivacy();
                     const userPrivacy = privacySDK.getUserPrivacy();
                     assert.equal(gamePrivacy.getMethod(), privacyMethod);
                     assert.equal(userPrivacy.getMethod(), privacyMethod);
                     assert.equal(userPrivacy.getVersion(), 0);
-                    assert.deepEqual(userPrivacy.getPermissions(), {ads: consent, external: consent, gameExp: false});
+                    assert.deepEqual(userPrivacy.getPermissions(), { ads: consent, external: consent, gameExp: false });
                     assert.equal(privacySDK.isOptOutRecorded(), true);
                     assert.equal(privacySDK.isOptOutEnabled(), !consent);
                     assert.equal(privacySDK.isGDPREnabled(), privacyPartsConfig.gdprEnabled);
@@ -159,11 +159,11 @@ describe('PrivacyParserTest', () => {
                 gdprEnabled: true,
                 optOutRecorded: false,
                 optOutEnabled: false,
-                gamePrivacy: {method: PrivacyMethod.UNITY_CONSENT}
+                gamePrivacy: { method: PrivacyMethod.UNITY_CONSENT }
             };
         });
-        const legitimateInterestuserPrivacy = {method: PrivacyMethod.LEGITIMATE_INTEREST, version: 0,
-            permissions: {ads: true, external: true, gameExp: false}};
+        const legitimateInterestuserPrivacy = { method: PrivacyMethod.LEGITIMATE_INTEREST, version: 0,
+            permissions: { ads: true, external: true, gameExp: false } };
 
         [undefined, legitimateInterestuserPrivacy].forEach((configUserPrivacy) => {
             it ('sets default userPrivacy method when userPrivacy = ' + JSON.stringify(configUserPrivacy), () => {
@@ -180,15 +180,15 @@ describe('PrivacyParserTest', () => {
             [true, false].forEach((consent) => {
                 it (`set userPrivacy as provided when compatible and ${consentVersionModifier} version, consent = ${consent}`, () => {
                     const consentVersion = CurrentUnityConsentVersion - (consentVersionModifier === 'old' ? -1 : 0);
-                    privacyPartsConfig.userPrivacy = {method: PrivacyMethod.UNITY_CONSENT, version: consentVersion,
-                        permissions: {ads: consent, external: consent, gameExp: consent}};
+                    privacyPartsConfig.userPrivacy = { method: PrivacyMethod.UNITY_CONSENT, version: consentVersion,
+                        permissions: { ads: consent, external: consent, gameExp: consent } };
                     const privacySDK = PrivacyParser.parse(<IRawAdsConfiguration>privacyPartsConfig, clientInfo, deviceInfo);
                     const gamePrivacy = privacySDK.getGamePrivacy();
                     const userPrivacy = privacySDK.getUserPrivacy();
                     assert.equal(gamePrivacy.getMethod(), PrivacyMethod.UNITY_CONSENT);
                     assert.equal(userPrivacy.getMethod(), PrivacyMethod.UNITY_CONSENT);
                     assert.equal(userPrivacy.getVersion(), consentVersion);
-                    assert.deepEqual(userPrivacy.getPermissions(), {ads: consent, external: consent, gameExp: consent});
+                    assert.deepEqual(userPrivacy.getPermissions(), { ads: consent, external: consent, gameExp: consent });
                     assert.equal(privacySDK.isOptOutRecorded(), true);
                     assert.equal(privacySDK.isOptOutEnabled(), !consent);
                     assert.equal(privacySDK.isGDPREnabled(), privacyPartsConfig.gdprEnabled);
@@ -205,7 +205,7 @@ describe('PrivacyParserTest', () => {
                 gdprEnabled: true,
                 optOutRecorded: false,
                 optOutEnabled: false,
-                gamePrivacy: {method: PrivacyMethod.UNITY_CONSENT}
+                gamePrivacy: { method: PrivacyMethod.UNITY_CONSENT }
             };
             (<sinon.SinonStub>deviceInfo.getLimitAdTracking).returns(true);
         });
@@ -214,7 +214,7 @@ describe('PrivacyParserTest', () => {
             privacyMethods.forEach((privacyMethod) => {
                 it (`sets default privacy method with gdprEnabled=${gdprEnabled} and privacyMethod=${privacyMethod}`, () => {
                     privacyPartsConfig.gdprEnabled = gdprEnabled;
-                    privacyPartsConfig.gamePrivacy = {method: privacyMethod};
+                    privacyPartsConfig.gamePrivacy = { method: privacyMethod };
                     let expectedGamePrivacyMethod = privacyMethod || PrivacyMethod.DEFAULT;
                     if (gdprEnabled === true && !privacyMethod) {
                         expectedGamePrivacyMethod = PrivacyMethod.LEGITIMATE_INTEREST;
@@ -247,15 +247,15 @@ describe('PrivacyParserTest', () => {
                 gdprEnabled: true,
                 optOutRecorded: false,
                 optOutEnabled: false,
-                gamePrivacy: {method: PrivacyMethod.UNITY_CONSENT},
-                userPrivacy: {method: PrivacyMethod.DEVELOPER_CONSENT, version: 0, permissions: UserPrivacy.PERM_DEVELOPER_CONSENTED}
+                gamePrivacy: { method: PrivacyMethod.UNITY_CONSENT },
+                userPrivacy: { method: PrivacyMethod.DEVELOPER_CONSENT, version: 0, permissions: UserPrivacy.PERM_DEVELOPER_CONSENTED }
             };
             (<sinon.SinonStub>deviceInfo.getLimitAdTracking).returns(false);
         });
 
         otherPrivacyMethods.forEach((gamePrivacyMethod) => {
             it (`and gamePrivacy.method is ${gamePrivacyMethod}, gamePrivacy.method should be updated to DEVELOPER_CONSENT`, () => {
-                privacyPartsConfig.gamePrivacy = {method: gamePrivacyMethod};
+                privacyPartsConfig.gamePrivacy = { method: gamePrivacyMethod };
                 const expectedGamePrivacyMethod = PrivacyMethod.DEVELOPER_CONSENT;
                 const privacySDK = PrivacyParser.parse(<IRawAdsConfiguration>privacyPartsConfig, clientInfo, deviceInfo);
                 const gamePrivacy = privacySDK.getGamePrivacy();

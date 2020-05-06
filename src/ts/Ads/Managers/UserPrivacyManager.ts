@@ -16,13 +16,12 @@ import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { PrivacyEvent, PrivacyMetrics } from 'Privacy/PrivacyMetrics';
 import { PrivacyConfig } from 'Privacy/PrivacyConfig';
-import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { PrivacySDKTest } from 'Core/Models/ABGroup';
-import { CachedUserSummary } from 'Privacy/CachedUserSummary';
 
 import PrivacySDKFlow from 'json/privacy/PrivacySDKFlow.json';
 import PrivacyWebUI from 'html/PrivacyWebUI.html';
+import { PrivacyTestEnvironment } from 'Privacy/PrivacyTestEnvironment';
 
 export interface IUserSummary extends ITemplateData {
     deviceModel: string;
@@ -108,8 +107,6 @@ export class UserPrivacyManager {
     private static AgeGateChoiceStorageKey = 'privacy.agegateunderagelimit';
     private static AgeGateSourceStorageKey = 'privacy.agegatesource';
 
-    public _forcedConsentUnit: boolean;
-
     private readonly _platform: Platform;
     private readonly _core: ICoreApi;
     private readonly _coreConfig: CoreConfiguration;
@@ -127,9 +124,7 @@ export class UserPrivacyManager {
     private _developerAgeGateChoice: boolean;
     private _privacyFormatMetadataSeenInSession: boolean;
 
-    private _privacySDKMetricsUrl = 'https://sdk-metrics.privacy.unity3d.com/api/v1/metrics';
-
-    constructor(platform: Platform, core: ICoreApi, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, clientInfo: ClientInfo, deviceInfo: DeviceInfo, request: RequestManager, privacy: PrivacySDK, forcedConsentUnit?: boolean) {
+    constructor(platform: Platform, core: ICoreApi, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, clientInfo: ClientInfo, deviceInfo: DeviceInfo, request: RequestManager, privacy: PrivacySDK) {
         this._platform = platform;
         this._core = core;
         this._coreConfig = coreConfig;
@@ -140,62 +135,57 @@ export class UserPrivacyManager {
         this._clientInfo = clientInfo;
         this._deviceInfo = deviceInfo;
         this._request = request;
-        this._forcedConsentUnit = forcedConsentUnit || false;
         this._developerAgeGateActive = false;
         this._developerAgeGateChoice = false;
         this._privacyFormatMetadataSeenInSession = false;
         this._core.Storage.onSet.subscribe((eventType, data) => this.onStorageSet(eventType, <IUserPrivacyStorageData><unknown>data));
-
-        if (TestEnvironment.get('privacySDKMetricsUrl')) {
-            this._privacySDKMetricsUrl = TestEnvironment.get('privacySDKMetricsUrl');
-        }
     }
 
     public getPrivacyConfig(): PrivacyConfig {
-        let agreedOverAgeLimit = false;
-        switch (this.getAgeGateChoice()) {
-            case AgeGateChoice.YES:
-                agreedOverAgeLimit = true;
-                break;
-            case AgeGateChoice.NO:
-            case AgeGateChoice.MISSING:
-                agreedOverAgeLimit = false;
-                break;
-            default:
-                agreedOverAgeLimit = false;
-        }
+        const ageGateChoice = this._userPrivacy.isRecorded() ? this.getAgeGateChoice() : AgeGateChoice.MISSING;
 
-        const userSummary = CachedUserSummary.get();
         const { ads, external, gameExp } = this._userPrivacy.getPermissions();
+        const userSummaryUrl = 'https://ads-privacy-api.prd.mz.internal.unity3d.com/api/v1/summary?' +
+          `gameId=${this._clientInfo.getGameId()}&` +
+          `projectId=${this._coreConfig.getUnityProjectId()}&` +
+          `adid=${this._deviceInfo.getAdvertisingIdentifier()}&` +
+          `storeId=${this._deviceInfo.getStores()}`;
 
         return new PrivacyConfig(PrivacySDKFlow,
             {
                 ads,
                 external,
                 gameExp,
-                agreedOverAgeLimit,
+                ageGateChoice,
                 agreementMethod: ''
             },
             {
                 buildOsVersion: this._deviceInfo.getOsVersion(),
+                deviceModel: this._deviceInfo.getModel(),
                 platform: Platform[this._platform],
-                userLocale: this._deviceInfo.getLanguage() ? this._deviceInfo.getLanguage().replace('_', '-') : undefined,
+                userLocale: this._deviceInfo.getLanguage() ? this.resolveLanguageForPrivacyConfig(this._deviceInfo.getLanguage()) : undefined,
                 country: this._coreConfig.getCountry(),
                 subCountry: this._coreConfig.getSubdivision(),
                 privacyMethod: this._gamePrivacy.getMethod(),
                 ageGateLimit: this._privacy.getAgeGateLimit(),
+                ageGateLimitMinusOne: this._privacy.getAgeGateLimit() - 1,
                 legalFramework: this._privacy.getLegalFramework(),
                 isCoppa: this._coreConfig.isCoppaCompliant(),
                 apiLevel: this._platform === Platform.ANDROID ? (<AndroidDeviceInfo> this._deviceInfo).getApiLevel() : undefined,
-                userSummary: {
-                    deviceModel: userSummary ? userSummary.deviceModel : '-',
-                    country: userSummary ? userSummary.country : '-',
-                    gamePlaysThisWeek: userSummary ? userSummary.gamePlaysThisWeek.toString() : '-',
-                    adsSeenInGameThisWeek: userSummary ? userSummary.adsSeenInGameThisWeek.toString() : '-',
-                    installsFromAds: userSummary ? userSummary.installsFromAds.toString() : '-'
-                }
+                developerAgeGate: this.isDeveloperAgeGateActive(),
+                userSummaryUrl
             },
             PrivacyWebUI);
+    }
+
+    private resolveLanguageForPrivacyConfig(deviceLanguage: string): string {
+        if (deviceLanguage.match('zh(((_#?Hans)?(_\\D\\D)?)|((_\\D\\D)?(_#?Hans)?))$')) {
+            return 'zh-Hans';
+        } else if (deviceLanguage.match('zh(_TW|_HK|_MO|_#?Hant)?(_TW|_HK|_MO|_#?Hant)+$')) {
+            return 'zh-Hant';
+        } else {
+            return deviceLanguage.replace('_', '-');
+        }
     }
 
     public updateUserPrivacy(permissions: IPrivacyPermissions, source: GDPREventSource, action: GDPREventAction, layout? : ConsentPage): Promise<INativeResponse | void> {
@@ -255,7 +245,7 @@ export class UserPrivacyManager {
 
     private sendPrivacyEvent(permissions: IPrivacyPermissions, source: GDPREventSource, action: GDPREventAction, layout = '', firstRequest: boolean): Promise<INativeResponse> {
         const infoJson: unknown = {
-            'v': 2,
+            'v': 3,
             advertisingId: this._deviceInfo.getAdvertisingIdentifier(),
             abGroup: this._coreConfig.getAbGroup(),
             layout: layout,
@@ -273,7 +263,8 @@ export class UserPrivacyManager {
             bundleId: this._clientInfo.getApplicationName(),
             permissions: permissions,
             legalFramework: this._privacy.getLegalFramework(),
-            agreedOverAgeLimit: this._ageGateChoice
+            agreedOverAgeLimit: this._ageGateChoice,
+            ageGateSource: this._ageGateSource
         };
 
         if (CustomFeatures.sampleAtGivenPercent(1)) {
@@ -325,7 +316,7 @@ export class UserPrivacyManager {
             Diagnostics.trigger('gdpr_request_failed', {
                 url: url
             });
-            this._core.Sdk.logError('Gdpr request failed' + error);
+            this._core.Sdk.logError('User summary request failed' + error);
             throw error;
         });
     }
@@ -370,8 +361,8 @@ export class UserPrivacyManager {
     }
 
     public isPrivacyShowRequired(): boolean {
-        if (this._forcedConsentUnit) {
-            return true;
+        if (PrivacyTestEnvironment.isSet('showPrivacy')) {
+            return PrivacyTestEnvironment.get<boolean>('showPrivacy');
         }
 
         if (this.isAgeGateShowRequired()) {
@@ -408,10 +399,6 @@ export class UserPrivacyManager {
         return this._developerAgeGateChoice;
     }
 
-    public getPrivacyMetricsUrl(): string {
-        return this._privacySDKMetricsUrl;
-    }
-
     public applyDeveloperAgeGate() {
         if (this._privacy.isAgeGateEnabled() && this.isDeveloperAgeGateActive() && !this._privacy.isOptOutRecorded() && (this._gamePrivacy.getMethod() === PrivacyMethod.LEGITIMATE_INTEREST || this._gamePrivacy.getMethod() === PrivacyMethod.UNITY_CONSENT)) {
             if (this.getDeveloperAgeGateChoice()) {
@@ -434,7 +421,11 @@ export class UserPrivacyManager {
             return false;
         }
 
-        return TestEnvironment.get('forceprivacysdk') || (PrivacySDKTest.isValid(this._coreConfig.getAbGroup()) && this._coreConfig.getCountry() === 'FI');
+        if (PrivacyTestEnvironment.isSet('usePrivacySDK')) {
+            return PrivacyTestEnvironment.get<boolean>('usePrivacySDK');
+        }
+
+        return PrivacySDKTest.isValid(this._coreConfig.getAbGroup());
     }
 
     private pushConsent(consent: boolean): Promise<INativeResponse | void> {

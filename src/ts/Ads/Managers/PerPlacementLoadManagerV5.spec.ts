@@ -12,6 +12,8 @@ import { PlacementState } from 'Ads/Models/Placement';
 import { Campaign, CampaignMock } from 'Ads/Models/__mocks__/Campaign';
 import { AbstractAdUnitMock, AbstractAdUnit } from 'Ads/AdUnits/__mocks__/AbstractAdUnit';
 import { ObservableMock } from 'Core/Utilities/__mocks__/Observable';
+import { PerformanceAdUnitFactory } from 'Performance/AdUnits/PerformanceAdUnitFactory';
+import { ProgrammaticMraidParser } from 'MRAID/Parsers/ProgrammaticMraidParser';
 
 [Platform.IOS, Platform.ANDROID].forEach((platform) => {
     describe(`PerPlacementLoadManagerV5(${Platform[platform]})`, () => {
@@ -262,12 +264,13 @@ import { ObservableMock } from 'Core/Utilities/__mocks__/Observable';
             });
         });
 
-        describe('trigger on no fill', () => {
+        describe('trigger on no fill programmatic', () => {
             let placement: PlacementMock;
 
             beforeEach(async () => {
                 placement = Placement();
 
+                placement.getCurrentCampaign.mockReturnValue(Campaign(ProgrammaticMraidParser.ContentType));
                 adsConfiguration.getPlacement.mockReturnValue(placement);
 
                 await refreshManager.initialize();
@@ -276,18 +279,52 @@ import { ObservableMock } from 'Core/Utilities/__mocks__/Observable';
             });
 
             it('should reset campaign', () => {
-                expect(placement.setCurrentCampaign).toBeCalledTimes(1);
-                expect(placement.setCurrentCampaign).toBeCalledWith(undefined);
+                expect(placement.setCurrentCampaign).toBeCalledTimes(0);
             });
 
             it('should reset tracking urls', () => {
-                expect(placement.setCurrentTrackingUrls).toBeCalledTimes(1);
-                expect(placement.setCurrentTrackingUrls).toBeCalledWith(undefined);
+                expect(placement.setCurrentTrackingUrls).toBeCalledTimes(0);
             });
 
             it('should reset invalidation pending', () => {
                 expect(placement.setInvalidationPending).toBeCalledTimes(1);
                 expect(placement.setInvalidationPending).toHaveBeenNthCalledWith(1, false);
+            });
+        });
+
+        [
+            PerformanceAdUnitFactory.ContentType,
+            PerformanceAdUnitFactory.ContentTypeMRAID,
+            PerformanceAdUnitFactory.ContentTypeVideo
+        ].forEach(contentType => {
+            describe(`trigger on no fill with performance campaign with ${contentType}`, () => {
+                let placement: PlacementMock;
+
+                beforeEach(async () => {
+                    placement = Placement();
+
+                    placement.getCurrentCampaign.mockReturnValue(Campaign(contentType));
+                    adsConfiguration.getPlacement.mockReturnValue(placement);
+
+                    await refreshManager.initialize();
+
+                    adRequestManager.onNoFill.subscribe.mock.calls[0][0]('video');
+                });
+
+                it('should reset campaign', () => {
+                    expect(placement.setCurrentCampaign).toBeCalledTimes(1);
+                    expect(placement.setCurrentCampaign).toBeCalledWith(undefined);
+                });
+
+                it('should reset tracking urls', () => {
+                    expect(placement.setCurrentTrackingUrls).toBeCalledTimes(1);
+                    expect(placement.setCurrentTrackingUrls).toBeCalledWith(undefined);
+                });
+
+                it('should reset invalidation pending', () => {
+                    expect(placement.setInvalidationPending).toBeCalledTimes(1);
+                    expect(placement.setInvalidationPending).toHaveBeenNthCalledWith(1, false);
+                });
             });
         });
 
@@ -475,7 +512,7 @@ import { ObservableMock } from 'Core/Utilities/__mocks__/Observable';
             ['video_1', 'video_5', 'video_6'].forEach(placement => {
                 it(`should set invalidation state for ${placement}`, () => {
                     expect(placements[placement].setInvalidationPending).toBeCalledTimes(1);
-                    expect(placements[placement].setInvalidationPending).toBeCalledWith(true)
+                    expect(placements[placement].setInvalidationPending).toBeCalledWith(true);
                 });
             });
 

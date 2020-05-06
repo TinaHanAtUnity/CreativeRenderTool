@@ -1,6 +1,6 @@
-import {Platform} from 'Core/Constants/Platform';
-import {ICoreApi} from 'Core/ICore';
-import {ISchema, Model} from 'Core/Models/Model';
+import { Platform } from 'Core/Constants/Platform';
+import { ICoreApi } from 'Core/ICore';
+import { ISchema, Model } from 'Core/Models/Model';
 
 export interface ISdkDetectionInfo {
     // AdMob: boolean | undefined;

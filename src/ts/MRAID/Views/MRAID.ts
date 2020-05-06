@@ -84,7 +84,7 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
         const backgroundTime = this._backgroundTime / 1000;
         const timeFromPlayableStart = this._playableStartTimestamp ? (Date.now() - this._playableStartTimestamp - this._backgroundTime) / 1000 : 0;
 
-        if (this.isKPIDataValid({timeFromShow, backgroundTime, timeFromPlayableStart}, 'mraid_' + eventName)) {
+        if (this.isKPIDataValid({ timeFromShow, backgroundTime, timeFromPlayableStart }, 'mraid_' + eventName)) {
             this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(timeFromShow, timeFromPlayableStart, backgroundTime, eventName, eventData));
         }
     }
@@ -112,7 +112,7 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
             originalUrl = htmlResource.getOriginalUrl();
         }
         this.createMRAID(
-            this._gameSessionId % 1000 === 999 ? MRAIDPerfContainer : MacroUtil.replaceMacro(MRAIDContainer, {'{{ CREATIVE_URL }}': originalUrl})
+            this._gameSessionId % 1000 === 999 ? MRAIDPerfContainer : MacroUtil.replaceMacro(MRAIDContainer, { '{{ CREATIVE_URL }}': originalUrl })
         ).then(mraid => {
             this._core.Sdk.logDebug('setting iframe srcdoc (' + mraid.length + ')');
             SdkStats.setFrameSetStartTimestamp(this._placement.getId());
@@ -138,7 +138,7 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
         const frameLoadDuration = (Date.now() - SdkStats.getFrameSetStartTimestamp(this._placement.getId())) / 1000;
         this._core.Sdk.logDebug('Unity Ads placement ' + this._placement.getId() + ' iframe load duration ' + frameLoadDuration + ' s');
 
-        if (this.isKPIDataValid({frameLoadDuration}, 'mraid_playable_loading_time')) {
+        if (this.isKPIDataValid({ frameLoadDuration }, 'mraid_playable_loading_time')) {
             this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(frameLoadDuration, 0, 0, 'playable_loading_time', {}));
         }
 

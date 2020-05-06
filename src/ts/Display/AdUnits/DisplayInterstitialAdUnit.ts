@@ -261,6 +261,9 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit implements IAdUnit
         this._operativeEventManager.sendStart(this.getOperativeEventParams()).then(() => {
             this.onStartProcessed.trigger();
         });
+
+        // Temporary for PTS Migration Investigation
+        this.sendTrackingEvent(TrackingEvent.START);
     }
 
     private setWebPlayerViews(): Promise<void> {
@@ -286,7 +289,7 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit implements IAdUnit
     private setWebPlayerData(data: string, mimeType: string, encoding: string): Promise<void> {
         return this._webPlayerContainer.setData(data, mimeType, encoding).catch((error) => {
             this._core.Sdk.logError(JSON.stringify(error));
-            Diagnostics.trigger('webplayer_set_data_error', new DiagnosticError(error, {data: data, mimeType: mimeType, encoding: encoding}));
+            Diagnostics.trigger('webplayer_set_data_error', new DiagnosticError(error, { data: data, mimeType: mimeType, encoding: encoding }));
             this.setFinishState(FinishState.ERROR);
             this.hide();
         });
@@ -346,7 +349,7 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit implements IAdUnit
         }
     }
 
-    private sendTrackingEvent(event: TrackingEvent) {
+    public sendTrackingEvent(event: TrackingEvent) {
         this._thirdPartyEventManager.sendTrackingEvents(this._campaign, event, 'display', this._campaign.getUseWebViewUserAgentForTracking());
     }
 }

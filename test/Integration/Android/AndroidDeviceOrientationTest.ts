@@ -65,7 +65,7 @@ describe('AndroidDeviceOrientationTest', () => {
     const sandbox = sinon.createSandbox();
     const deviceOrientationTestCampaign = 'https://fake-ads-backend.unityads.unity3d.com/get_file/mraids/deviceorientation/deviceorientation_test.html';
 
-    const orientationTestData: IDeviceOrientationData = {alpha: 12, beta: 42, gamma: -4, absolute: true};
+    const orientationTestData: IDeviceOrientationData = { alpha: 12, beta: 42, gamma: -4, absolute: true };
     let orientationTestResponse: IDeviceOrientationData;
 
     let listener: TestListener;
@@ -90,7 +90,6 @@ describe('AndroidDeviceOrientationTest', () => {
     const initialize = async () => {
         // We must reset these parameters manually because the webview does not get completely reset between runs.
         // The way metadata is read during initialization prevents false value from updating it to the respective systems.
-        AbstractAdUnitParametersFactory.setForcedGDPRBanner(false);
         MRAIDAdUnitParametersFactory.setForcedExtendedMRAID(false);
         MRAIDAdUnitParametersFactory.setForcedARMRAID(false);
         MRAIDView.setDebugJsConsole(false);
@@ -134,7 +133,7 @@ describe('AndroidDeviceOrientationTest', () => {
                     const devOrientationResponseListener = (event: any) => {
                     if (event.data.type === 'deviceorientation_received') {
                         if (event.data.data.alpha && event.data.data.beta && event.data.data.gamma) {
-                            orientationTestResponse = {alpha: event.data.data.alpha, beta: event.data.data.beta, gamma: event.data.data.gamma, absolute: event.data.data.absolute};
+                            orientationTestResponse = { alpha: event.data.data.alpha, beta: event.data.data.beta, gamma: event.data.data.gamma, absolute: event.data.data.absolute };
                             window.removeEventListener('message', devOrientationResponseListener);
                             UnityAds.getBackend().Api.AdUnit.close();
                         }

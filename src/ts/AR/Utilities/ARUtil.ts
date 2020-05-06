@@ -47,7 +47,7 @@ export class ARUtil {
     private static readonly ANDROID_AR_SUPPORTED_RETRY_WAIT = 300;
 
     public static calculateVideoScale(frameInfo: IARFrameInfo): IARFrameScale {
-        let videoRect: IARRect = {x: 0, y: 0, width: frameInfo.videoSize.width, height: frameInfo.videoSize.height};
+        let videoRect: IARRect = { x: 0, y: 0, width: frameInfo.videoSize.width, height: frameInfo.videoSize.height };
         videoRect = ARUtil.transformRect(videoRect, ARUtil.invertTransform(frameInfo.transform));
 
         // Calculate scaling for aspect fill
@@ -111,10 +111,10 @@ export class ARUtil {
         const right = rect.x + rect.width;
         const bottom = rect.y + rect.height;
 
-        const topLeft = ARUtil.transformPoint({x: left, y: top}, t);
-        const topRight = ARUtil.transformPoint({x: right, y: top}, t);
-        const bottomLeft = ARUtil.transformPoint({x: left, y: bottom}, t);
-        const bottomRight = ARUtil.transformPoint({x: right, y: bottom}, t);
+        const topLeft = ARUtil.transformPoint({ x: left, y: top }, t);
+        const topRight = ARUtil.transformPoint({ x: right, y: top }, t);
+        const bottomLeft = ARUtil.transformPoint({ x: left, y: bottom }, t);
+        const bottomRight = ARUtil.transformPoint({ x: right, y: bottom }, t);
 
         const minX = Math.min(Math.min(topLeft.x, topRight.x), Math.min(bottomLeft.x, bottomRight.x));
         const maxX = Math.max(Math.max(topLeft.x, topRight.x), Math.max(bottomLeft.x, bottomRight.x));

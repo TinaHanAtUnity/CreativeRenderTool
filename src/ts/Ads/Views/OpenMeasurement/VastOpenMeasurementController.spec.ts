@@ -28,7 +28,7 @@ import { Platform } from 'Core/Constants/Platform';
           let openMeasurement1: OpenMeasurementMockVast;
           let openMeasurement2: OpenMeasurementMockVast;
           let vastAdVerificton1: VastAdVerificationMock;
-          let vastAdVerificton2:  VastAdVerificationMock;
+          let vastAdVerificton2: VastAdVerificationMock;
 
           beforeEach(() => {
 

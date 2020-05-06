@@ -13,6 +13,7 @@ export type VastCampaignMock = Base & {
     hasStaticEndscreen: jest.Mock<boolean>;
     hasIframeEndscreen: jest.Mock<boolean>;
     hasHtmlEndscreen: jest.Mock<boolean>;
+    getUseWebViewUserAgentForTracking: jest.Mock;
 };
 
 export const VastCampaign = jest.fn(() => {
@@ -26,6 +27,7 @@ export const VastCampaign = jest.fn(() => {
         hasStaticEndscreen: jest.fn().mockImplementation(() => false),
         hasIframeEndscreen: jest.fn().mockImplementation(() => false),
         hasHtmlEndscreen: jest.fn().mockImplementation(() => false),
-        getVast: jest.fn().mockImplementation(() => new Vast())
+        getVast: jest.fn().mockReturnValue(new Vast()),
+        getUseWebViewUserAgentForTracking: jest.fn()
     };
 });

@@ -128,6 +128,26 @@ describe('SessionManagerTest', () => {
         });
     });
 
+    it('Retry failed pts event', () => {
+        const url: string = 'https://www.example.net/retry_event';
+        const sessionId: string = 'abcd-1234';
+        const eventId: string = '5678-efgh';
+
+        const sessionTsKey: string = 'session.' + sessionId + '.ts';
+
+        const ptsUrlKey: string = 'session.' + sessionId + '.ptsevent.' + eventId + '.url';
+
+        backend.Api.Storage.set(StorageType.PRIVATE, sessionTsKey, Date.now() - 100);
+        backend.Api.Storage.set(StorageType.PRIVATE, ptsUrlKey, url);
+
+        const requestGetSpy = sinon.spy(request, 'get');
+
+        return sessionManager.sendUnsentSessions().then(() => {
+            assert(requestGetSpy.calledOnce, 'Retry failed event did not send POST request');
+            assert.equal(url, requestGetSpy.getCall(0).args[0], 'PTS retry failed event url does not match');
+        });
+    });
+
     it('Start new session', () => {
         const sessionId: string = 'new-12345';
         const sessionTsKey: string = 'session.' + sessionId + '.ts';

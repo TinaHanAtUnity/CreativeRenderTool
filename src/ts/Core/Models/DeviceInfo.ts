@@ -189,7 +189,7 @@ export abstract class DeviceInfo<T extends IDeviceInfo = IDeviceInfo> extends Mo
     }
 
     public getDeviceVolume(streamType: StreamType = StreamType.STREAM_SYSTEM): Promise<number> {
-        if (this._platform  === Platform.IOS) {
+        if (this._platform === Platform.IOS) {
             return this._core.DeviceInfo.Ios!.getDeviceVolume().then(volume => {
                 this.set('volume', volume);
                 return this.get('volume');
@@ -205,7 +205,7 @@ export abstract class DeviceInfo<T extends IDeviceInfo = IDeviceInfo> extends Mo
     }
 
     public checkIsMuted(): Promise<void> {
-        if (this._platform  === Platform.IOS) {
+        if (this._platform === Platform.IOS) {
             return this._core.DeviceInfo.Ios!.checkIsMuted().then(finished => {
                 // Return nothing, as the value is collected through sendEvent API
             });
