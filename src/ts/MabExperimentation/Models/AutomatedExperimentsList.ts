@@ -71,7 +71,6 @@ export const VideoOverlayDownloadExperimentDeclaration: IExperimentDeclaration =
 };
 
 export const VideoOverlayDownloadExperiment = new AutomatedExperiment({
-    name: 'wbvw-overlay-v1',
     actions: VideoOverlayDownloadExperimentDeclaration,
     defaultActions: {
         mode: VideoOverlayDownloadExperimentDeclaration.mode.CLICK
