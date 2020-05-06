@@ -137,7 +137,7 @@ export class SwipeUpVideoOverlay extends VideoOverlay {
         this._automatedExperimentManager.endSelectedExperiment(this._campaign, AutomatedExperimentsCategories.VIDEO_OVERLAY);
     }
 
-    private getRemainingVideoTime() {
+    private callRewardOnVideoEnd() {
         if (Number(this._timerElement.innerText) <= 1) {
         this._automatedExperimentManager.endSelectedExperiment(this._campaign, AutomatedExperimentsCategories.VIDEO_OVERLAY);
         }
@@ -145,6 +145,6 @@ export class SwipeUpVideoOverlay extends VideoOverlay {
 
     public hide(): void {
         super.hide();
-        this.getRemainingVideoTime();
+        this.callRewardOnVideoEnd();
     }
 }
