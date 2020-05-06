@@ -33,7 +33,8 @@ export class Color {
     }
 
     public static hexToColor(hex: string | undefined): Color {
-        if (hex === undefined || !this.isValidHex(hex)) {
+        const hexRegex = /^#?(([a-f0-9]{3,4})|([a-f0-9]{6}([a-f0-9]{2})?))$/i;
+        if (hex === undefined || !hexRegex.test(hex)) {
             return new Color(0, 0, 0, 0);
         }
 
@@ -50,9 +51,5 @@ export class Color {
             parseInt(hex.slice(2, 4), 16),
             parseInt(hex.slice(4, 6), 16),
             hex.length === 8 ? parseInt(hex.slice(6, 8), 16) : 255);
-    }
-
-    private static isValidHex(hex: string | undefined): boolean {
-        return hex !== undefined && /^#?(([a-f0-9]{3,4})|([a-f0-9]{6}([a-f0-9]{2})?))$/i.test(hex);
     }
 }
