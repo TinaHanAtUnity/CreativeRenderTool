@@ -60,6 +60,6 @@ export class PerformanceAdUnitWithAutomatedExperimentParametersFactory extends P
     protected createVideoOverlay(baseParams: IAdUnitParameters<Campaign>, privacy: AbstractPrivacy, showGDPRBanner: boolean, showPrivacyDuringVideo: boolean): VideoOverlay {
         const videoCombination = this._automatedExperimentManager.activateSelectedExperiment(baseParams.campaign, AutomatedExperimentsCategories.VIDEO_OVERLAY);
 
-        return new SwipeUpVideoOverlay(baseParams, privacy, showGDPRBanner, showPrivacyDuringVideo, videoCombination);
+        return new SwipeUpVideoOverlay(baseParams, privacy, showGDPRBanner, showPrivacyDuringVideo, videoCombination, this._automatedExperimentManager);
     }
 }
