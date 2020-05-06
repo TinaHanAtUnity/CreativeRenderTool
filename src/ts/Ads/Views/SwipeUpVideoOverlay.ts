@@ -46,25 +46,18 @@ export class SwipeUpVideoOverlay extends VideoOverlay {
                 SDKMetrics.reportMetricEvent(AUIMetric.InvalidVideoOverlayMode);
             }
 
-            switch (combination.mode) {
-                case VideoOverlayDownloadExperimentDeclaration.mode.SWIPEUP:
-                    this._ctaMode = 'swipeup';
-                    break;
-                case VideoOverlayDownloadExperimentDeclaration.mode.CLICK:
-                    this._ctaMode = 'click';
-                    break;
-                default:
+            if (combination.mode) {
+                this._ctaMode = combination.mode;
+                if (this._ctaMode === 'swipeup') {
+                        this._bindings.push({
+                            event: 'swipeup',
+                            listener: (event: Event) => this.onSwipeUpEvent(event),
+                            selector: '.swipe-up-zone'
+                        });
+                    }
             }
         } else {
             this._ctaMode = 'click';
-        }
-
-        if (this._ctaMode === 'swipeup') {
-            this._bindings.push({
-                event: 'swipeup',
-                listener: (event: Event) => this.onSwipeUpEvent(event),
-                selector: '.swipe-up-zone'
-            });
         }
     }
 
