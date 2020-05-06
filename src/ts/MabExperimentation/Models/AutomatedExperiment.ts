@@ -2,21 +2,20 @@ import { ISchema, Model } from 'Core/Models/Model';
 
 // The choices made for an experiment, indexed by action name
 export interface IExperimentActionChoice {
-    [actionName: string]: string;
+    [actionName: string]: string | undefined;
 }
 
 // The possible values available for an experiment, indexed by action name
 export interface IExperimentActionsPossibleValues {
-    [actionName: string]: string[];
+    [actionName: string]: (string | undefined)[];
 }
 
 // The declaration of available actions and their respective values for an experiment
 export interface IExperimentDeclaration {
-    [actionName: string]: {[descriptiveName: string]: string};
+    [actionName: string]: {[descriptiveName: string]: string | undefined};
 }
 
 export interface IAutomatedExperiment {
-    name: string;
     actions: IExperimentDeclaration;
     defaultActions: IExperimentActionChoice;
     cacheDisabled?: boolean;
@@ -24,7 +23,6 @@ export interface IAutomatedExperiment {
 
 export class AutomatedExperiment extends Model<IAutomatedExperiment> {
     public static Schema: ISchema<IAutomatedExperiment> = {
-        name: ['string'],
         actions: ['object'],
         defaultActions: ['object'],
         cacheDisabled: ['boolean', 'undefined']
@@ -32,10 +30,6 @@ export class AutomatedExperiment extends Model<IAutomatedExperiment> {
 
     constructor(data: IAutomatedExperiment) {
         super('AutomatedExperiment', AutomatedExperiment.Schema, data);
-    }
-
-    public getName(): string {
-        return this.get('name');
     }
 
     public getActions(): IExperimentDeclaration {
@@ -52,7 +46,6 @@ export class AutomatedExperiment extends Model<IAutomatedExperiment> {
 
     public getDTO(): { [key: string]: unknown } {
         return {
-            'name': this.getName(),
             'actions': this.getActions(),
             'defaultAction': this.getDefaultActions(),
             'cacheDisabled': this.isCacheDisabled()

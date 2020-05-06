@@ -21,12 +21,12 @@ export const ButtonExperimentDeclaration = {
       BLUE: '167dfb',
       GREEN: '33cc00',
       PINK: 'cc0099',
-      RED: 'c31e25'
+      RED: 'c31e25',
+      UNDEFINED: undefined
   }
 };
 
 export const ButtonAnimationsExperiment = new AutomatedExperiment({
-    name: 'wbvw-endcard-v2',
     actions: ButtonExperimentDeclaration,
     defaultActions: {
         scheme: ButtonExperimentDeclaration.scheme.LIGHT,
@@ -52,7 +52,6 @@ export const ArAvailableButtonExperimentDeclaration = {
 };
 
 export const ArAvailableButtonExperiment = new AutomatedExperiment({
-    name: 'wbvw-ar-v1',
     actions: ArAvailableButtonExperimentDeclaration,
     defaultActions: {
         color: ArAvailableButtonExperimentDeclaration.color.BLACK,
