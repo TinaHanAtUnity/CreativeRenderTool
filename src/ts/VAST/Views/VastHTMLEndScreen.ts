@@ -27,7 +27,7 @@ export class VastHTMLEndScreen extends VastEndScreen implements IPrivacyHandlerV
     private _core: ICoreApi;
     private _screenWidth: number;
     private _screenHeight: number;
-    // this control bar is a small webview window in the bottom includes privacy and close button
+    // this control bar is a small webview window on the top includes privacy and close button
     private _controlBarHeight: number;
 
     constructor(parameters: IAdUnitParameters<VastCampaign>, webPlayerContainer: WebPlayerContainer) {

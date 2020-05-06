@@ -18,7 +18,6 @@ import { CampaignContentTypes } from 'Ads/Utilities/CampaignContentTypes';
 import { VastCompanionAdStaticResource } from 'VAST/Models/VastCompanionAdStaticResource';
 import { VastCompanionAdHTMLResource } from 'VAST/Models/VastCompanionAdHTMLResource';
 import { VastCompanionAdIframeResource } from 'VAST/Models/VastCompanionAdIframeResource';
-import { IframeEndcardTest, HtmlEndcardTest, OpenMeasurementTest } from 'Core/Models/ABGroup';
 import { DEFAULT_VENDOR_KEY } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
@@ -376,7 +375,7 @@ export class VastParserStrict {
             }
 
             if (iframeResourceElement) {
-                if (this._coreConfig && IframeEndcardTest.isValid(this._coreConfig.getAbGroup())) {
+                if (this._coreConfig) {
                     const companionAd = this.parseCompanionAdIframeResourceElement(element, urlProtocol);
                     const companionAdErrors = new VastCompanionAdIframeResourceValidator(companionAd).getErrors();
                     let isWarningLevel = true;
@@ -401,7 +400,7 @@ export class VastParserStrict {
             }
 
             if (htmlResourceElement) {
-                if (this._coreConfig && HtmlEndcardTest.isValid(this._coreConfig.getAbGroup())) {
+                if (this._coreConfig) {
                     const companionAd = this.parseCompanionAdHTMLResourceElement(element, urlProtocol);
                     const companionAdErrors = new VastCompanionAdHTMLResourceValidator(companionAd).getErrors();
                     let isWarningLevel = true;
