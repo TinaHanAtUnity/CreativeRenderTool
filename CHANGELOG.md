@@ -1,5 +1,17 @@
-# Pending
+# Wed May 6 17:55:34 UTC 2020
 
+* [AUI] Remove ExperimentId and made color optional for MAB experiments  [#15066](https://github.com/Applifier/unity-ads-webview/pull/15066)
+* [AUI] Remove explicit types from experiment declarations [#15094](https://github.com/Applifier/unity-ads-webview/pull/15094)
+
+# Tue May  5 22:52:34 UTC 2020
+
+* [Load V5] Include another 20 game ids for the test [#15103](https://github.com/Applifier/unity-ads-webview/pull/15103)
+* [Load V5] Include groups 14 and 15 groups for test [#15104](https://github.com/Applifier/unity-ads-webview/pull/15104)
+
+# Mon May  4 21:33:27 UTC 2020
+
+* [Auction V6] Remove AB Test and Release Feature [#15092](https://github.com/Applifier/unity-ads-webview/pull/15092)
+* [Chore] Update lint rules and auto fix existing issues (Part 1) [#15093](https://github.com/Applifier/unity-ads-webview/pull/15093)
 * [Load V5, Ad Unit] Update mocks [#15039](https://github.com/Applifier/unity-ads-webview/pull/15039)
 * [PTS Migration] Align MRAID Complete Event with Comet View Event [#15033](https://github.com/Applifier/unity-ads-webview/pull/15033)
 * [AUI] Add Performance Campaign Info to Payload [#14910](https://github.com/Applifier/unity-ads-webview/pull/14910)

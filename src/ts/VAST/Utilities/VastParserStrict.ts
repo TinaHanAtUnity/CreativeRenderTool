@@ -20,7 +20,7 @@ import { VastCompanionAdHTMLResource } from 'VAST/Models/VastCompanionAdHTMLReso
 import { VastCompanionAdIframeResource } from 'VAST/Models/VastCompanionAdIframeResource';
 import { IframeEndcardTest, HtmlEndcardTest, OpenMeasurementTest } from 'Core/Models/ABGroup';
 import { DEFAULT_VENDOR_KEY } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
-import { CoreConfiguration} from 'Core/Models/CoreConfiguration';
+import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { SDKMetrics, OMMetric } from 'Ads/Utilities/SDKMetrics';
 import { MacroUtil } from 'Ads/Utilities/MacroUtil';
@@ -50,7 +50,7 @@ enum VastNodeName {
     VAST = 'VAST',
     EXTENSION = 'Extension',
     VERIFICATION = 'Verification',
-    AD_VERIFICATIONS = 'AdVerifications',   // for VAST 4.1
+    AD_VERIFICATIONS = 'AdVerifications', // for VAST 4.1
     JS_RESOURCE = 'JavaScriptResource',
     EX_RESOURCE = 'ExecutableResource',
     VERIFICATION_PARAMETERS = 'VerificationParameters'
@@ -75,7 +75,7 @@ enum VastAttributeNames {
 }
 
 enum VastAttributeValues {
-    VERIFICATION_NOT_EXECUTED = 'verificationNotExecuted'   // for VAST 3.x and under
+    VERIFICATION_NOT_EXECUTED = 'verificationNotExecuted' // for VAST 3.x and under
 }
 
 enum VastExtensionType {
@@ -218,13 +218,13 @@ export class VastParserStrict {
             isPublica = true;
         }
 
-        return request.get(wrapperURL, headers, {retries: 2, retryDelay: 10000, followRedirects: true, retryWithConnectionEvents: false}).then(response => {
+        return request.get(wrapperURL, headers, { retries: 2, retryDelay: 10000, followRedirects: true, retryWithConnectionEvents: false }).then(response => {
             return this.retrieveVast(response.response, core, request, bundleId, isPublica, parsedVast, depth + 1, wrapperUrlProtocol);
         });
     }
 
     private setIASURLHack(wrapperURL: string, bundleId?: string) {
-        let url = MacroUtil.replaceMacro(wrapperURL, {'vast.adsafeprotected.com': 'vastpixel3.adsafeprotected.com', '%5BOMIDPARTNER%5D': OMID_P});
+        let url = MacroUtil.replaceMacro(wrapperURL, { 'vast.adsafeprotected.com': 'vastpixel3.adsafeprotected.com', '%5BOMIDPARTNER%5D': OMID_P });
         const stringSplice = (str1: string, start: number, delCount: number, newSubStr: string) => str1.slice(0, start) + newSubStr + str1.slice(start + Math.abs(delCount));
 
         if (bundleId && /^https?:\/\/vastpixel3\.adsafeprotected\.com/.test(url) && url.includes('?')) {

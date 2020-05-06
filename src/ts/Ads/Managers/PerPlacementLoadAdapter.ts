@@ -73,7 +73,7 @@ export class PerPlacementLoadAdapter extends CampaignRefreshManager {
         } else if (this._activePlacements[placementId]) {
             if (placement.getPlacementStateChanged() && placement.getState() === PlacementState.NOT_AVAILABLE) {
                 delete this._activePlacements[placementId];
-            } else if (placement.getPlacementStateChanged() && placement.getPreviousState() ===  PlacementState.WAITING && placement.getState() === PlacementState.NO_FILL) {
+            } else if (placement.getPlacementStateChanged() && placement.getPreviousState() === PlacementState.WAITING && placement.getState() === PlacementState.NO_FILL) {
                 this.sendPlacementStateChangesLoadAdapter(placementId, PlacementState.WAITING, PlacementState.NO_FILL);
                 delete this._activePlacements[placementId];
             }

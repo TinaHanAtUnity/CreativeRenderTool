@@ -100,7 +100,7 @@ export class Privacy extends View<IPrivacyViewHandler> implements IPrivacyRowIte
                 event: 'click',
                 listener: (event: Event) => this.onDataLinkEvent(event),
                 selector: '.data-link'
-            },            {
+            }, {
                 event: 'click',
                 listener: (event: Event) => this.onDemographicInfoLinkEvent(event),
                 selector: '.demographic-link'

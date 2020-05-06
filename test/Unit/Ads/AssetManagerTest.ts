@@ -123,7 +123,7 @@ describe('AssetManagerTest', () => {
     });
 
     it('should swallow optional errors when cache mode is allowed', () => {
-        const cache = new CacheManager(core, wakeUpManager, request, cacheBookkeeping, {retries: 0, retryDelay: 1});
+        const cache = new CacheManager(core, wakeUpManager, request, cacheBookkeeping, { retries: 0, retryDelay: 1 });
         const assetManager = new AssetManager(platform, core, cache, CacheMode.ALLOWED, deviceInfo, cacheBookkeeping);
         const asset = new HTML('https://www.google.fi', TestFixtures.getSession());
         const campaign = new TestCampaign([], [asset]);
@@ -134,7 +134,7 @@ describe('AssetManagerTest', () => {
     });
 
     it('should not swallow errors when cache mode is forced', () => {
-        const cache = new CacheManager(core, wakeUpManager, request, cacheBookkeeping, {retries: 0, retryDelay: 1});
+        const cache = new CacheManager(core, wakeUpManager, request, cacheBookkeeping, { retries: 0, retryDelay: 1 });
         const assetManager = new AssetManager(platform, core, cache, CacheMode.FORCED, deviceInfo, cacheBookkeeping);
         const asset = new HTML('https://www.google.fi', TestFixtures.getSession());
         const campaign = new TestCampaign([asset], []);

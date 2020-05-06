@@ -1,4 +1,4 @@
-import { AutomatedExperiment, IExperimentDeclaration, IExperimentActionChoice } from 'MabExperimentation/Models/AutomatedExperiment';
+import { AutomatedExperiment, IExperimentActionChoice } from 'MabExperimentation/Models/AutomatedExperiment';
 
 export enum AutomatedExperimentsCategories {
     PERFORMANCE_ENDCARD = 'webview-perf-ad-endcard',
@@ -6,7 +6,7 @@ export enum AutomatedExperimentsCategories {
     VIDEO_OVERLAY = 'webview-video-overlay'
 }
 
-export const ButtonExperimentDeclaration: IExperimentDeclaration = {
+export const ButtonExperimentDeclaration = {
   scheme: {
       DARK: 'dark',
       LIGHT: 'light',
@@ -22,12 +22,12 @@ export const ButtonExperimentDeclaration: IExperimentDeclaration = {
       BLUE: '167dfb',
       GREEN: '33cc00',
       PINK: 'cc0099',
-      RED: 'c31e25'
+      RED: 'c31e25',
+      UNDEFINED: undefined
   }
 };
 
 export const ButtonAnimationsExperiment = new AutomatedExperiment({
-    name: 'wbvw-endcard-v2',
     actions: ButtonExperimentDeclaration,
     defaultActions: {
         scheme: ButtonExperimentDeclaration.scheme.LIGHT,
@@ -39,7 +39,7 @@ export const ButtonAnimationsExperiment = new AutomatedExperiment({
 
 // AR Ads
 
-export const ArAvailableButtonExperimentDeclaration: IExperimentDeclaration = {
+export const ArAvailableButtonExperimentDeclaration = {
     skip: {
         YES: 'true',
         NO: 'false'
@@ -53,7 +53,6 @@ export const ArAvailableButtonExperimentDeclaration: IExperimentDeclaration = {
 };
 
 export const ArAvailableButtonExperiment = new AutomatedExperiment({
-    name: 'wbvw-ar-v1',
     actions: ArAvailableButtonExperimentDeclaration,
     defaultActions: {
         color: ArAvailableButtonExperimentDeclaration.color.BLACK,

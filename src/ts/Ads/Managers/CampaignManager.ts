@@ -150,7 +150,7 @@ export abstract class CampaignManager {
         }
 
         if (coreConfig.getTestMode()) {
-            url = Url.addParameters(url, {test: true});
+            url = Url.addParameters(url, { test: true });
         }
 
         if (CampaignManager.CampaignId) {

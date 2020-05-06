@@ -28,7 +28,7 @@ export class PrivacyParser {
         const gamePrivacy = this.parseGamePrivacy(configJson.gamePrivacy, configJson.gdprEnabled);
         const userPrivacy = this.parseUserPrivacy(configJson.userPrivacy, gamePrivacy, optOutRecorded, optOutEnabled, limitAdTracking);
         const legalFramework = configJson.legalFramework ? configJson.legalFramework : LegalFramework.NONE;
-        const ageGateLimit =  this.parseAgeGateLimit(configJson.ageGateLimit, gamePrivacy, configJson, limitAdTracking);
+        const ageGateLimit = this.parseAgeGateLimit(configJson.ageGateLimit, gamePrivacy, configJson, limitAdTracking);
 
         return new PrivacySDK(gamePrivacy, userPrivacy, gdprEnabled, ageGateLimit, legalFramework);
     }
@@ -43,7 +43,7 @@ export class PrivacyParser {
             gamePrivacy.getMethod() !== PrivacyMethod.UNITY_CONSENT) {
             ageGateLimit = 0;
 
-            Diagnostics.trigger('age_gate_wrong_privacy_method', {config: JSON.stringify(configJson)});
+            Diagnostics.trigger('age_gate_wrong_privacy_method', { config: JSON.stringify(configJson) });
         }
 
         if (limitAdTracking) {
@@ -61,7 +61,7 @@ export class PrivacyParser {
         if (gdprEnabled === true) {
             Diagnostics.trigger('ads_configuration_game_privacy_missing', {
                 userPrivacy: JSON.stringify('NA'),
-                gamePrivacy: JSON.stringify(rawGamePrivacy)});
+                gamePrivacy: JSON.stringify(rawGamePrivacy) });
             // TODO: Remove when all games have a correct method in dashboard and configuration always contains correct method
             return new GamePrivacy({ method: PrivacyMethod.LEGITIMATE_INTEREST });
         }

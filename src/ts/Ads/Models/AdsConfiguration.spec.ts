@@ -67,10 +67,10 @@ describe('AdsConfigurationTest', () => {
 
     describe('normal behavior of getPlacementsForAdunit', () => {
         [
-            {adUnitId: 'adUnitId_1', expectedPlacements: ['placement_1', 'placement_2', 'placement_3']},
-            {adUnitId: 'adUnitId_2', expectedPlacements: ['placement_4', 'placement_6']},
-            {adUnitId: 'unknown_adUnitId', expectedPlacements: []}
-        ].forEach(({adUnitId, expectedPlacements}) => {
+            { adUnitId: 'adUnitId_1', expectedPlacements: ['placement_1', 'placement_2', 'placement_3'] },
+            { adUnitId: 'adUnitId_2', expectedPlacements: ['placement_4', 'placement_6'] },
+            { adUnitId: 'unknown_adUnitId', expectedPlacements: [] }
+        ].forEach(({ adUnitId, expectedPlacements }) => {
             it(`should return valid placements for ${adUnitId}`, () => {
                 expect(adsConfiguration.getPlacementsForAdunit(adUnitId)).toEqual(expectedPlacements);
             });

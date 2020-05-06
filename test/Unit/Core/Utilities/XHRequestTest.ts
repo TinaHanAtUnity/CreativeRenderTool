@@ -56,7 +56,7 @@ describe('XHRequestTest', () => {
         );
 
         it('should fail from bad response with correct headers and response', async () => {
-            server.respondWith('GET', 'https://api.unity3d.com/test', [500, {'test-header': 'test-value'}, 'Status code 500']);
+            server.respondWith('GET', 'https://api.unity3d.com/test', [500, { 'test-header': 'test-value' }, 'Status code 500']);
 
             try {
                 await XHRequest.get('https://api.unity3d.com/test');

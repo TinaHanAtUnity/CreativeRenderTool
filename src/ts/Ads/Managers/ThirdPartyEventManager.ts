@@ -199,7 +199,7 @@ export class ThirdPartyEventManager {
                 url = MacroUtil.replaceMacro(url, additionalMacros);
             }
 
-            url = MacroUtil.replaceMacro(url, {'[TIMESTAMP]': (new Date()).toISOString()});
+            url = MacroUtil.replaceMacro(url, { '[TIMESTAMP]': (new Date()).toISOString() });
         }
 
         return Url.encode(url);

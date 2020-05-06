@@ -108,7 +108,7 @@ export class RequestManager {
         this._wakeUpManager.onNetworkConnected.subscribe(() => this.onNetworkConnected());
     }
 
-    public static configureAuctionProtocol(testMode: boolean, auctionV6Test?: boolean) {
+    public static configureAuctionProtocol(testMode: boolean) {
         if (!RequestManager._auctionProtocol) {
             const forceProtocol = TestEnvironment.get('forceAuctionProtocol');
             switch (forceProtocol) {
@@ -131,11 +131,7 @@ export class RequestManager {
                 return;
             }
 
-            if (auctionV6Test) {
-                RequestManager._auctionProtocol = AuctionProtocol.V6;
-            } else {
-                RequestManager._auctionProtocol = AuctionProtocol.V5;
-            }
+            RequestManager._auctionProtocol = AuctionProtocol.V6;
         }
     }
 

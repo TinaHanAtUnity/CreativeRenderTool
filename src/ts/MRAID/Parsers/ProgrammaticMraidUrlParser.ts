@@ -24,7 +24,7 @@ export class ProgrammaticMraidUrlParser extends CampaignParser {
         if (!jsonMraidUrl.inlinedUrl) {
             const MRAIDError = new DiagnosticError(
                 new Error('MRAID Campaign missing inlinedUrl'),
-                {mraid: jsonMraidUrl}
+                { mraid: jsonMraidUrl }
             );
             throw MRAIDError;
         }

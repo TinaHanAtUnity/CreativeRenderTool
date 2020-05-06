@@ -65,7 +65,7 @@ export class OpenMeasurementAdViewBuilder {
     }
 
     public buildAdmobImpressionView(om: AdmobOpenMeasurementController, screenWidth: number, screenHeight: number) {
-        const videoView =  om.getAdmobVideoElementBounds();
+        const videoView = om.getAdmobVideoElementBounds();
         this.setVideoView(videoView);
         let screenView;
         let percentageInView = 100;
@@ -86,7 +86,7 @@ export class OpenMeasurementAdViewBuilder {
     public buildAdmobAdView(obstructionReasons: ObstructionReasons[], om: AdmobOpenMeasurementController, obstructionRect: IRectangle): Promise<IAdView> {
         return Promise.all([this._deviceInfo.getScreenWidth(), this._deviceInfo.getScreenHeight()]).then(([screenWidth, screenHeight]) => {
 
-            const videoView =  om.getAdmobVideoElementBounds();
+            const videoView = om.getAdmobVideoElementBounds();
             this.setVideoView(videoView);
             let screenView;
             let percentInView = 100;

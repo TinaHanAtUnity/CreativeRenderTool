@@ -13,7 +13,7 @@ import { CacheManager } from 'Core/Managers/CacheManager';
 import { ContentTypeHandlerManager } from 'Ads/Managers/ContentTypeHandlerManager';
 import { PerformanceAdUnitParametersFactory } from 'Performance/AdUnits/PerformanceAdUnitParametersFactory';
 import { AbstractAdUnitParametersFactory } from 'Ads/AdUnits/AdUnitParametersFactory';
-import { PerformanceAdUnitFactory} from 'Performance/AdUnits/PerformanceAdUnitFactory';
+import { PerformanceAdUnitFactory } from 'Performance/AdUnits/PerformanceAdUnitFactory';
 import { CacheMode } from 'Core/Models/CoreConfiguration';
 import { CoreConfigurationParser } from 'Core/Parsers/CoreConfigurationParser';
 import { AdsConfigurationParser } from 'Ads/Parsers/AdsConfigurationParser';
@@ -193,10 +193,10 @@ describe('AutomatedExperimentManagerTests', () => {
     }
 
     [
-        {action1: FooExperimentDeclaration.action1.choiceA, action2: FooExperimentDeclaration.action2.choiceA},
-        {action1: FooExperimentDeclaration.action1.choiceA, action2: FooExperimentDeclaration.action2.choiceB},
-        {action1: FooExperimentDeclaration.action1.choiceB, action2: FooExperimentDeclaration.action2.choiceA},
-        {action1: FooExperimentDeclaration.action1.choiceB, action2: FooExperimentDeclaration.action2.choiceB}
+        { action1: FooExperimentDeclaration.action1.choiceA, action2: FooExperimentDeclaration.action2.choiceA },
+        { action1: FooExperimentDeclaration.action1.choiceA, action2: FooExperimentDeclaration.action2.choiceB },
+        { action1: FooExperimentDeclaration.action1.choiceB, action2: FooExperimentDeclaration.action2.choiceA },
+        { action1: FooExperimentDeclaration.action1.choiceB, action2: FooExperimentDeclaration.action2.choiceB }
     ].forEach((action) => {
         it(`initialize with request ok, use received action ${JSON.stringify(action)}`, () => {
             const postUrl = AutomatedExperimentManager.BaseUrl + AutomatedExperimentManager.CreateEndPoint;
@@ -297,7 +297,7 @@ describe('AutomatedExperimentManagerTests', () => {
 
             const rewardPostUrl = AutomatedExperimentManager.BaseUrl + AutomatedExperimentManager.RewardEndPoint;
             const rewardRequestBodyText = JSON.stringify({
-                user_info: {ab_group: 99, auction_id: '12345'},
+                user_info: { ab_group: 99, auction_id: '12345' },
                 reward: rewarded,
                 experiments:
                 [
@@ -311,7 +311,7 @@ describe('AutomatedExperimentManagerTests', () => {
 
             const postStubReward = postStub.onSecondCall().resolves(<INativeResponse>{
                 responseCode: 200,
-                response: JSON.stringify({success: true})
+                response: JSON.stringify({ success: true })
             });
 
             aem.initialize(core, campaignSource);
