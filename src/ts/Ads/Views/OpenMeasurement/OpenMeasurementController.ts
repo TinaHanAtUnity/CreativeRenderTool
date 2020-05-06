@@ -70,7 +70,7 @@ export abstract class OpenMeasurementController implements IOMController {
             const payload = {
                 ...vastProperties,
                 skippable: vastProperties.isSkippable
-            }
+            };
             om.triggerVideoEvent(OMID3pEvents.OMID_LOADED, { payload });
         });
     }

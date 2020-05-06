@@ -227,7 +227,7 @@ export class OpenMeasurement<T extends Campaign> extends View<T> {
         const payload = {
             ...vastProperties,
             skippable: vastProperties.isSkippable
-        }
+        };
         this._omBridge.triggerVideoEvent(OMID3pEvents.OMID_LOADED, { payload });
     }
 
