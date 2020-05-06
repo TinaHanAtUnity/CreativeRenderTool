@@ -375,52 +375,44 @@ export class VastParserStrict {
             }
 
             if (iframeResourceElement) {
-                if (this._coreConfig) {
-                    const companionAd = this.parseCompanionAdIframeResourceElement(element, urlProtocol);
-                    const companionAdErrors = new VastCompanionAdIframeResourceValidator(companionAd).getErrors();
-                    let isWarningLevel = true;
-                    for (const adError of companionAdErrors) {
-                        if (adError.errorLevel !== CampaignErrorLevel.LOW) {
-                            if (adError.errorTrackingUrls.length === 0) {
-                                adError.errorTrackingUrls = vastAd.getErrorURLTemplates();
-                            }
-                            this._compiledCampaignErrors.push(adError);
-                            isWarningLevel = false;
-                            break;
+                const companionAd = this.parseCompanionAdIframeResourceElement(element, urlProtocol);
+                const companionAdErrors = new VastCompanionAdIframeResourceValidator(companionAd).getErrors();
+                let isWarningLevel = true;
+                for (const adError of companionAdErrors) {
+                    if (adError.errorLevel !== CampaignErrorLevel.LOW) {
+                        if (adError.errorTrackingUrls.length === 0) {
+                            adError.errorTrackingUrls = vastAd.getErrorURLTemplates();
                         }
+                        this._compiledCampaignErrors.push(adError);
+                        isWarningLevel = false;
+                        break;
                     }
-                    if (isWarningLevel) {
-                        vastAd.addIframeCompanionAd(companionAd);
-                    } else {
-                        vastAd.addUnsupportedCompanionAd(`reason: ${companionAdErrors.join(' ')} ${element.outerHTML}`);
-                    }
+                }
+                if (isWarningLevel) {
+                    vastAd.addIframeCompanionAd(companionAd);
                 } else {
-                    vastAd.addUnsupportedCompanionAd(`reason: IFrameResource unsupported ${element.outerHTML}`);
+                    vastAd.addUnsupportedCompanionAd(`reason: ${companionAdErrors.join(' ')} ${element.outerHTML}`);
                 }
             }
 
             if (htmlResourceElement) {
-                if (this._coreConfig) {
-                    const companionAd = this.parseCompanionAdHTMLResourceElement(element, urlProtocol);
-                    const companionAdErrors = new VastCompanionAdHTMLResourceValidator(companionAd).getErrors();
-                    let isWarningLevel = true;
-                    for (const adError of companionAdErrors) {
-                        if (adError.errorLevel !== CampaignErrorLevel.LOW) {
-                            if (adError.errorTrackingUrls.length === 0) {
-                                adError.errorTrackingUrls = vastAd.getErrorURLTemplates();
-                            }
-                            this._compiledCampaignErrors.push(adError);
-                            isWarningLevel = false;
-                            break;
+                const companionAd = this.parseCompanionAdHTMLResourceElement(element, urlProtocol);
+                const companionAdErrors = new VastCompanionAdHTMLResourceValidator(companionAd).getErrors();
+                let isWarningLevel = true;
+                for (const adError of companionAdErrors) {
+                    if (adError.errorLevel !== CampaignErrorLevel.LOW) {
+                        if (adError.errorTrackingUrls.length === 0) {
+                            adError.errorTrackingUrls = vastAd.getErrorURLTemplates();
                         }
+                        this._compiledCampaignErrors.push(adError);
+                        isWarningLevel = false;
+                        break;
                     }
-                    if (isWarningLevel) {
-                        vastAd.addHtmlCompanionAd(companionAd);
-                    } else {
-                        vastAd.addUnsupportedCompanionAd(`reason: ${companionAdErrors.join(' ')} ${element.outerHTML}`);
-                    }
+                }
+                if (isWarningLevel) {
+                    vastAd.addHtmlCompanionAd(companionAd);
                 } else {
-                    vastAd.addUnsupportedCompanionAd(`reason: HTMLResource unsupported ${element.outerHTML}`);
+                    vastAd.addUnsupportedCompanionAd(`reason: ${companionAdErrors.join(' ')} ${element.outerHTML}`);
                 }
             }
         });

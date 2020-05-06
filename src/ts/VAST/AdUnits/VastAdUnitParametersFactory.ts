@@ -39,7 +39,7 @@ export class VastAdUnitParametersFactory extends AbstractAdUnitParametersFactory
         if (baseParams.campaign.hasStaticEndscreen()) {
             vastAdUnitParameters.endScreen = new VastStaticEndScreen(baseParams, attachTapForTencentVast ? true : undefined);
         } else if (baseParams.campaign.hasHtmlEndscreen() && HtmlEndcardTest.isValid(baseParams.coreConfig.getAbGroup())) {
-                vastAdUnitParameters.endScreen = new VastHTMLEndScreen(baseParams, this._webPlayerContainer);
+            vastAdUnitParameters.endScreen = new VastHTMLEndScreen(baseParams, this._webPlayerContainer);
         }
 
         const adVerifications: VastAdVerification[] = baseParams.campaign.getVast().getAdVerifications();
