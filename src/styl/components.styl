@@ -533,26 +533,13 @@ $consent-privacy-close-button-default() {
   font-size: $privacy-heading-font-size;
 }
 
-$ripple-button-default() {
-  .ripple-button {
+$ripple-square-default() {
+  .ripple-square {
     position: relative;
     overflow: hidden;
 
-    &::after {
-      content: "";
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      top: 0;
-      left: 0;
-      background: radial-gradient(circle, $privacy-light-gray 11%, transparent 11%);
-      transform: scale(7.8, 7.8);
-      opacity: 0;
-      transition: transform 0.8s, opacity 0.8s;
-    }
-
     &:hover:active {
-      box-shadow: inset 0 0 0 1000px rgba(0,0,0,.2);
+      box-shadow: inset 0 0 0 1000px rgba(211, 211, 211, .22);
     }
   }
 }
@@ -568,37 +555,12 @@ $ripple-circle-default() {
       height: 100%;
       top: 0;
       left: 0;
-      background: radial-gradient(circle, $privacy-light-gray 22%, transparent 12%);
+      background: radial-gradient(circle, $privacy-light-gray 22%, transparent 22%);
       border-radius: 50%
       opacity: 0.4;
       margin-top: 0.45rem
       margin-left: -0.67rem;
       z-index: -1;
-    }
-  }
-}
-$ripple-accordion-default() {
-  .ripple-accordion {
-    position: relative;
-    overflow: hidden;
-
-    &::after {
-      content: "";
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      top: 0;
-      left: 0;
-      background: radial-gradient(circle, $privacy-light-gray 10%, transparent 10%) no-repeat 50%;
-      transform: scale(10, 10);
-      opacity: 0;
-      transition: transform 0.3s, opacity 0.3s;
-    }
-
-    &:hover:active::after {
-      transform: scale(0, 0);
-      opacity: 0.4;
-      transition: background 0s;
     }
   }
 }
