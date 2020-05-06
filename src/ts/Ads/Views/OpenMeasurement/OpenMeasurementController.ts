@@ -206,10 +206,10 @@ export abstract class OpenMeasurementController implements IOMController {
      * Current Calculation Locations: VastAdUnit onContainerBackground, onContainerForeground
      * TODO: Calculate Geometry change for Privacy coverage
      */
-    public geometryChange(viewPort: IViewPort, adView: IAdView) {
+    public geometryChange(viewport: IViewPort, adView: IAdView) {
         if (this.getState() !== OMState.STOPPED && (this.getState() === OMState.PAUSED || this.getState() === OMState.PLAYING)) {
             this._omInstances.forEach((om) => {
-                om.triggerAdEvent(OMID3pEvents.OMID_GEOMETRY_CHANGE, { viewPort, adView });
+                om.triggerAdEvent(OMID3pEvents.OMID_GEOMETRY_CHANGE, { viewport, adView });
             });
         }
     }
