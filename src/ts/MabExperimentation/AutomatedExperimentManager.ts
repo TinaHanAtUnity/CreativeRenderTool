@@ -156,7 +156,6 @@ export class AutomatedExperimentManager {
                 return Promise.resolve();
             }
 
-
             return this.publishCampaignOutcomes(campaign, categorizedExp, CategorizedExperimentStage.ENDED);
      }
 
