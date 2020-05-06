@@ -52,7 +52,7 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
     private _muteButtonElement: HTMLElement;
     private _debugMessageElement: HTMLElement;
     protected _callButtonElement: HTMLElement;
-    private _timerElement: HTMLElement;
+    protected _timerElement: HTMLElement;
     private _chinaAdvertisementElement: HTMLElement;
 
     private _fadeTimer?: number;
@@ -297,7 +297,7 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
         }
     }
 
-    private onSkipEvent(event: Event): void {
+    protected onSkipEvent(event: Event): void {
         event.preventDefault();
         event.stopPropagation();
         if (this._skipEnabled && this._videoProgress > this._skipDuration) {
@@ -319,7 +319,7 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
         this._handlers.forEach(handler => handler.onOverlayMute(this._muted));
     }
 
-    private onCallButtonEvent(event: Event): void {
+    protected onCallButtonEvent(event: Event): void {
         if (!this._callButtonEnabled) {
             return;
         }
