@@ -63,7 +63,7 @@ export const ArAvailableButtonExperiment = new AutomatedExperiment({
 
 // Video Overlay Download
 
-export const VideoOverlayDownloadExperimentDeclaration: IExperimentDeclaration = {
+export const VideoOverlayDownloadExperimentDeclaration = {
     mode: {
         SWIPEUP: 'swipeup',
         CLICK: 'click'
