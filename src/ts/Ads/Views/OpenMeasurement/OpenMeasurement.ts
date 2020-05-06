@@ -224,7 +224,11 @@ export class OpenMeasurement<T extends Campaign> extends View<T> {
      * to play the media. Corresponds to the VAST  loaded  event.
      */
     public loaded(vastProperties: IVastProperties) {
-        this._omBridge.triggerVideoEvent(OMID3pEvents.OMID_LOADED, { vastProperties });
+        const payload = {
+            ...vastProperties,
+            skippable: vastProperties.isSkippable
+        }
+        this._omBridge.triggerVideoEvent(OMID3pEvents.OMID_LOADED, { payload });
     }
 
     /**
