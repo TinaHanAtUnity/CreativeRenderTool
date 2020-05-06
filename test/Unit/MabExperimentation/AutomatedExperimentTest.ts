@@ -30,11 +30,11 @@ describe('AutomatedExperimentTest', () => {
     });
 
     it('should validate experiment action choices', () => {
-        assert.isTrue(ButtonAnimationsExperiment.isValid({bar: 'bar1', baz: 'baz1'}));
-        assert.isTrue(ButtonAnimationsExperiment.isValid({bar: 'bar1', baz: 'baz2'}));
-        assert.isTrue(ButtonAnimationsExperiment.isValid({bar: 'bar2', baz: 'baz1'}));
-        assert.isTrue(ButtonAnimationsExperiment.isValid({bar: 'bar2', baz: 'baz2'}));
-        assert.isTrue(ButtonAnimationsExperiment.isValid({bar: 'bar2', baz: 'baz2', optional: 'defined'}));
+        assert.isTrue(ButtonAnimationsExperiment.isValid({ bar: 'bar1', baz: 'baz1' }));
+        assert.isTrue(ButtonAnimationsExperiment.isValid({ bar: 'bar1', baz: 'baz2' }));
+        assert.isTrue(ButtonAnimationsExperiment.isValid({ bar: 'bar2', baz: 'baz1' }));
+        assert.isTrue(ButtonAnimationsExperiment.isValid({ bar: 'bar2', baz: 'baz2' }));
+        assert.isTrue(ButtonAnimationsExperiment.isValid({ bar: 'bar2', baz: 'baz2', optional: 'defined' }));
     });
 
     it('should fail validation on invalid experiment action choices', () => {

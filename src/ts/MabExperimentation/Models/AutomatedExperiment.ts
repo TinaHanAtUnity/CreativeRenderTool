@@ -2,17 +2,17 @@ import { ISchema, Model } from 'Core/Models/Model';
 
 // The choices made for an experiment, indexed by action name
 export interface IExperimentActionChoice {
-    [actionName: string]: string|undefined;
+    [actionName: string]: string | undefined;
 }
 
 // The possible values available for an experiment, indexed by action name
 export interface IExperimentActionsPossibleValues {
-    [actionName: string]: (string|undefined)[];
+    [actionName: string]: (string | undefined)[];
 }
 
 // The declaration of available actions and their respective values for an experiment
 export interface IExperimentDeclaration {
-    [actionName: string]: {[descriptiveName: string]: string|undefined};
+    [actionName: string]: {[descriptiveName: string]: string | undefined};
 }
 
 export interface IAutomatedExperiment {
