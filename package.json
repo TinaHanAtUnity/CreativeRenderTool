@@ -14,11 +14,13 @@
     "build:release": "rimraf ./dist && NODE_ENV=production webpack --config tools/webpack/config.release.js",
     "test": "jest",
     "lint-code": "git diff-index --name-only HEAD | grep -E \"(.*)\\.(ts)\" | xargs eslint",
-    "lint-styles": "git diff-index --name-only HEAD | grep -E \"(.*)\\.(styl)\" | xargs stylint -c stylintrc.json"
+    "lint-styles": "git diff-index --name-only HEAD | grep -E \"(.*)\\.(styl)\" | xargs stylint -c stylintrc.json",
+    "purge-tags": "git tag -d $(git tag -l) >/dev/null"
   },
   "pre-commit": [
     "lint-code",
-    "lint-styles"
+    "lint-styles",
+    "purge-tags"
   ],
   "license": "Apache-2.0",
   "dependencies": {
