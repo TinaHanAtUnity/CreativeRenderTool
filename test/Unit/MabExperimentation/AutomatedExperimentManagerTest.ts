@@ -475,7 +475,6 @@ describe('AutomatedExperimentManagerTests', () => {
                 aem.registerExperimentCategory(testCategory, campaignType);
                 return aem.onNewCampaign(campaign)
                     .then(() => {
-                        assert.equal(aem.getSelectedExperimentName(campaign, testCategory), experimentID);
                         const variant = aem.activateSelectedExperiment(campaign, testCategory);
                         assert.equal(JSON.stringify(variant), JSON.stringify(FooExperimentDefaultActions), 'Wrong variant name');
 
@@ -521,7 +520,6 @@ describe('AutomatedExperimentManagerTests', () => {
 
                                 return aem.onNewCampaign(campaign)
                                     .then(() => {
-                                        assert.equal(aem.getSelectedExperimentName(campaign, testCategory), experimentID);
                                         const variant = aem.activateSelectedExperiment(campaign, testCategory);
                                         assert.equal(JSON.stringify(variant), JSON.stringify(FooExperimentDefaultActions), 'Wrong variant name');
                     
