@@ -1,3 +1,8 @@
+# Staged
+
+* [Privacy] Ripple effect for Privacy flow components [#15132](https://github.com/Applifier/unity-ads-webview/pull/15132)
+* [Privacy] A hotfix to address the issue with the Privacy metrics [#15100](https://github.com/Applifier/unity-ads-webview/pull/15100)
+
 # Wed May 6 17:55:34 UTC 2020
 
 * [AUI] Remove ExperimentId and made color optional for MAB experiments  [#15066](https://github.com/Applifier/unity-ads-webview/pull/15066)
