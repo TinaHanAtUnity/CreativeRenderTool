@@ -1,5 +1,6 @@
 # Pending
 
+* [Latency] Blacklist Games out of CacheMode Test [#15217](https://github.com/Applifier/unity-ads-webview/pull/15217)
 * [Load V5] Allow enabling load v5 in browser tester [#15102](https://github.com/Applifier/unity-ads-webview/pull/15102)
 * Add manual test support for end screen url [#15133](https://github.com/Applifier/unity-ads-webview/pull/15133)
 * [China Auction]Increase China auction endpoint traffic to 20% [#15191](https://github.com/Applifier/unity-ads-webview/pull/15191)
