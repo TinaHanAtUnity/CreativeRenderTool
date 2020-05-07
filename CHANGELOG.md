@@ -1,5 +1,6 @@
 # Pending
 
+* Add initial codeowners file [#15038](https://github.com/Applifier/unity-ads-webview/pull/15038)
 * [Chore] Update Dependencies [#15161](https://github.com/Applifier/unity-ads-webview/pull/15161)
 * [Load V5] Add test to verify tracking urls [#15036](https://github.com/Applifier/unity-ads-webview/pull/15036)
 
