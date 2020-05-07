@@ -1,5 +1,6 @@
 # Pending
 
+* [Chore] Update Dependencies [#15161](https://github.com/Applifier/unity-ads-webview/pull/15161)
 * [Load V5] Add test to verify tracking urls [#15036](https://github.com/Applifier/unity-ads-webview/pull/15036)
 
 # Thu May  7 10:40:07 UTC 2020
