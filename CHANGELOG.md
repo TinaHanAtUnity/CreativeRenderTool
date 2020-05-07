@@ -1,3 +1,7 @@
+# Pending
+
+* [Add Vast HTML endcard] PR2: add VastHTMLEndcard class and disabled it in AB testing (#13480)
+
 # Thu May  7 10:40:07 UTC 2020
 
 * [Privacy] Ripple effect for Privacy flow components [#15132](https://github.com/Applifier/unity-ads-webview/pull/15132)
