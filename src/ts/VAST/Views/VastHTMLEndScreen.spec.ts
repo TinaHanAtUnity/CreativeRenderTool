@@ -1,4 +1,3 @@
-import { VastStaticEndScreen } from 'VAST/Views/VastStaticEndScreen';
 import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
 import { VastCampaign } from 'VAST/Models/__mocks__/VastCampaign';
 import { VastCampaign as VastCampaignBase } from 'VAST/Models/VastCampaign';
@@ -20,20 +19,29 @@ import { AbstractPrivacy } from 'Ads/Views/__mocks__/AbstractPrivacy';
 import { PrivacySDK } from 'Privacy/__mocks__/PrivacySDK';
 import { Store } from 'Store/__mocks__/Store';
 import { Core } from 'Core/__mocks__/Core';
+import { VastHTMLEndScreen } from 'VAST/Views/VastHTMLEndScreen';
+import { InterstitialWebPlayerContainer } from 'Ads/Utilities/__mocks__/InterstitialWebPlayerContainer';
 
-jest.mock('html/VastStaticEndScreen.html', () => {
+jest.mock('html/VastEndcardHTMLContent.html', () => {
     return {
-        'default': 'HTMLRenderTest'
+        'default': 'HTML content test'
+    };
+});
+
+jest.mock('html/VastHTMLEndScreen.html', () => {
+    return {
+        'default': 'HTML render test'
     };
 });
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
-    describe('VastStaticEndScreen', () => {
+    describe('VastHTMLEndScreen', () => {
+        const adUnitContainer = new AdUnitContainer();
         const privacy = new AbstractPrivacy();
         const baseParams: IAdUnitParameters<VastCampaignBase> = {
             forceOrientation: Orientation.LANDSCAPE,
             focusManager: new FocusManager(),
-            container: new AdUnitContainer(),
+            container: adUnitContainer,
             deviceInfo: new DeviceInfo(),
             clientInfo: new ClientInfo(),
             thirdPartyEventManager: new ThirdPartyEventManager(),
@@ -53,30 +61,44 @@ jest.mock('html/VastStaticEndScreen.html', () => {
             privacy: privacy,
             privacySDK: new PrivacySDK()
         };
-        let staticEndScreen: VastStaticEndScreen;
+        let htmlEndScreen: VastHTMLEndScreen;
+        const webPlayer = new InterstitialWebPlayerContainer();
 
         beforeEach(() => {
-            staticEndScreen = new VastStaticEndScreen(baseParams);
+            htmlEndScreen = new VastHTMLEndScreen(baseParams, webPlayer);
         });
 
         describe('when endcard is rendered', () => {
             it('the inner HTML should not be null', () => {
-                staticEndScreen.render();
-                expect(staticEndScreen.container().innerHTML).toEqual('HTMLRenderTest');
+                htmlEndScreen.render();
+                expect(htmlEndScreen.container().innerHTML).toEqual('HTML render test');
             });
         });
 
-        describe('when endcard is removed', () => {
+        describe('when endcard is showing', () => {
+            it('it should show endcard overlay and reconfigure webplayer', () => {
+                htmlEndScreen.show();
+                expect(adUnitContainer.reconfigure).toHaveBeenCalled();
+            });
+        });
+
+        describe('when privacy is closed', () => {
             it('the privacy should hide', () => {
-                staticEndScreen.remove();
+                htmlEndScreen.onPrivacyClose();
                 expect(privacy.hide).toHaveBeenCalled();
             });
-
         });
 
-        describe('on privacy closed', () => {
-            it('the privacy should hide', () => {
-                staticEndScreen.onPrivacyClose();
+        describe('when privacy is closed', () => {
+            it('the webiview frames should change back', () => {
+                htmlEndScreen.onPrivacyClose();
+                expect(adUnitContainer.setViewFrame).toHaveBeenCalled();
+            });
+        });
+
+        describe('when end card is closed', () => {
+            it('the privacy hide should be called', () => {
+                htmlEndScreen.remove();
                 expect(privacy.hide).toHaveBeenCalled();
             });
         });
