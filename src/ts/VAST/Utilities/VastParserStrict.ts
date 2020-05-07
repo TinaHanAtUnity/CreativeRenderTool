@@ -88,13 +88,11 @@ export class VastParserStrict {
     private _domParser: DOMParser;
     private _maxWrapperDepth: number;
     private _compiledCampaignErrors: CampaignError[];
-    private _coreConfig: CoreConfiguration | undefined;
 
-    constructor(domParser?: DOMParser, maxWrapperDepth: number = VastParserStrict.DEFAULT_MAX_WRAPPER_DEPTH, coreConfig?: CoreConfiguration) {
+    constructor(domParser?: DOMParser, maxWrapperDepth: number = VastParserStrict.DEFAULT_MAX_WRAPPER_DEPTH) {
         this._domParser = domParser || new DOMParser();
         this._maxWrapperDepth = maxWrapperDepth;
         this._compiledCampaignErrors = [];
-        this._coreConfig = coreConfig;
     }
 
     public setMaxWrapperDepth(maxWrapperDepth: number) {
