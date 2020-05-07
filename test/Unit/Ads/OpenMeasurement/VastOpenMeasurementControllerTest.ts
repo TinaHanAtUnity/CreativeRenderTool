@@ -136,6 +136,7 @@ import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
                     supports: ['vlid', 'clid']
                 };
                 const event1: ISessionEvent = {
+                    adSessionType: AdSessionType.HTML,
                     adSessionId: '456',
                     timestamp: 123,
                     type: 'sessionStart',
@@ -146,6 +147,7 @@ import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
                     }
                 };
                 const event2: ISessionEvent = {
+                    adSessionType: AdSessionType.HTML,
                     adSessionId: '456',
                     timestamp: 123,
                     type: 'sessionStart',

@@ -2,16 +2,19 @@ import { AdMobCampaign, AdMobCampaignMock } from 'AdMob/Models/__mocks__/AdMobCa
 import { ThirdPartyEventManager, ThirdPartyEventManagerMock } from 'Ads/Managers/__mocks__/ThirdPartyEventManager';
 import { Placement, PlacementMock } from 'Ads/Models/__mocks__/Placement';
 import { OpenMeasurementAdmob, OpenMeasurementMockAdmob } from 'Ads/Views/OpenMeasurement/__mocks__/OpenMeasurement';
-import { OpenMeasurementAdViewBuilder, OpenMeasurementAdViewBuilderMock } from 'Ads/Views/OpenMeasurement/__mocks__/OpenMeasurementAdViewBuilder';
+import {
+    OpenMeasurementAdViewBuilder,
+    OpenMeasurementAdViewBuilderMock
+} from 'Ads/Views/OpenMeasurement/__mocks__/OpenMeasurementAdViewBuilder';
 import { RequestManager, RequestManagerMock } from 'Core/Managers/__mocks__/RequestManager';
 import { ClientInfo, ClientInfoMock } from 'Core/Models/__mocks__/ClientInfo';
 import { DeviceInfo, DeviceInfoMock } from 'Core/Models/__mocks__/DeviceInfo';
 import { Core } from 'Core/__mocks__/Core';
 
 import { AdmobOpenMeasurementController } from 'Ads/Views/OpenMeasurement/AdmobOpenMeasurementController';
-import { ISessionEvent, VideoPosition } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
+import { AdSessionType, ISessionEvent, VideoPosition } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
 import { Platform } from 'Core/Constants/Platform';
-import { SDKMetrics, AdmobMetric } from 'Ads/Utilities/SDKMetrics';
+import { AdmobMetric, SDKMetrics } from 'Ads/Utilities/SDKMetrics';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe(`${platform} AdmobOpenMeasurementContoller`, () => {
@@ -50,6 +53,7 @@ import { SDKMetrics, AdmobMetric } from 'Ads/Utilities/SDKMetrics';
 
             it('sessionStart should be called with correct data', () => {
                 const sessionInterfaceEvent: ISessionEvent = {
+                    adSessionType: AdSessionType.HTML,
                     adSessionId: '456',
                     timestamp: 123,
                     type: 'sessionStart',
@@ -59,6 +63,7 @@ import { SDKMetrics, AdmobMetric } from 'Ads/Utilities/SDKMetrics';
                 };
 
                 const event0: ISessionEvent = {
+                    adSessionType: AdSessionType.HTML,
                     adSessionId: '456',
                     timestamp: 123,
                     type: 'sessionStart',
@@ -70,6 +75,7 @@ import { SDKMetrics, AdmobMetric } from 'Ads/Utilities/SDKMetrics';
                 };
 
                 const event1: ISessionEvent = {
+                    adSessionType: AdSessionType.HTML,
                     adSessionId: '456',
                     timestamp: 123,
                     type: 'sessionStart',
