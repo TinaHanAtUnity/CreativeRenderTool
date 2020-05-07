@@ -15,7 +15,7 @@
     "test": "jest",
     "lint-code": "git diff-index --name-only HEAD | grep -E \"(.*)\\.(ts)\" | xargs eslint",
     "lint-styles": "git diff-index --name-only HEAD | grep -E \"(.*)\\.(styl)\" | xargs stylint -c stylintrc.json",
-    "purge-tags": "git tag -d $(git tag -l)"
+    "purge-tags": "git tag -d $(git tag -l) >/dev/null"
   },
   "pre-commit": [
     "lint-code",
