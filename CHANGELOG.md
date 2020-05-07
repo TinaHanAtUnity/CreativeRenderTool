@@ -1,5 +1,6 @@
 # Pending
 
+* Add manual test support for end screen url [#15133](https://github.com/Applifier/unity-ads-webview/pull/15133)
 * [China Auction]Increase China auction endpoint traffic to 20% [#15191](https://github.com/Applifier/unity-ads-webview/pull/15191)
 * [Metrics Refactoring] Use buffered metric instance [#14410](https://github.com/Applifier/unity-ads-webview/pull/14410)
 * [Tech Debt] Temporarily Force Purge of Tags on Pre-Commit [#15188](https://github.com/Applifier/unity-ads-webview/pull/15188)
