@@ -1,4 +1,5 @@
 import { IMetricInstance } from 'Ads/Networking/MetricInstance';
+import { BufferedMetricInstance } from 'Ads/Networking/BufferedMetricInstance';
 
 export enum ErrorMetric {
     TooLargeFile = 'too_large_file', // a file 20mb and over are considered too large
@@ -216,16 +217,18 @@ export type PTSEvent = VideoMetric | TimingEvent | AuctionV6 | AdmobMetric | Ban
 
 export class SDKMetrics {
 
-    private static _metricInstance: IMetricInstance;
+    // Setting a default value since legacy tests are relying on it.
+    private static _metricInstance: IMetricInstance = new BufferedMetricInstance();
 
-    public static initialize(metricInstance: IMetricInstance): void {
-        if (!this._metricInstance) {
-            this._metricInstance = metricInstance;
-        }
+    public static initialize(): void {
+        this._metricInstance = new BufferedMetricInstance();
     }
 
-    public static isMetricInstanceInitialized(): boolean {
-        return !!this._metricInstance;
+    public static setMetricInstance(metricInstance: IMetricInstance): void {
+        if (this._metricInstance instanceof BufferedMetricInstance) {
+            this._metricInstance.forwardTo(metricInstance);
+        }
+        this._metricInstance = metricInstance;
     }
 
     public static reportMetricEvent(event: PTSEvent): void {
