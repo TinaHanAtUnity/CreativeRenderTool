@@ -427,6 +427,7 @@ describe('AutomatedExperimentManagerTests', () => {
         aem.registerExperimentCategory(testCategory, campaignType);
 
         return aem.onNewCampaign(campaign)
+
             .then(() => {
                 assert.equal(aem.activateSelectedExperiment(campaign, 'fooBar'), undefined);
 
@@ -478,9 +479,8 @@ describe('AutomatedExperimentManagerTests', () => {
                         const variant = aem.activateSelectedExperiment(campaign, testCategory);
                         assert.equal(JSON.stringify(variant), JSON.stringify(FooExperimentDefaultActions), 'Wrong variant name');
 
-                        if (rewarded) {
-                            return aem.rewardSelectedExperiment(campaign, testCategory);
-                        }
+                        return aem.rewardSelectedExperiment(campaign, testCategory);
+
                     }).then(() => {
                         return aem.endSelectedExperiment(campaign, testCategory);
                     }).then(() => {
@@ -488,26 +488,33 @@ describe('AutomatedExperimentManagerTests', () => {
                         assert(postStubReward.calledWith(rewardPostUrl, rewardRequestBodyText));
                     }).then(() => {
                         [0, 1].forEach((secondReward) => {
-                            it(`experiment, secondReward(${secondReward})`, () => {
 
-                                sandbox.stub(SDKMetrics, 'reportMetricEvent')
-                                .returns(true);
-
-                                return aem.onNewCampaign(campaign)
-                                    .then(() => {
-                                        const secondExperiment = aem.activateSelectedExperiment(campaign, testCategory);
-                                        assert.equal(JSON.stringify(secondExperiment), JSON.stringify(FooExperimentDefaultActions), 'Wrong variant name');
-
-                                        if (secondReward) {
-                                            return aem.rewardSelectedExperiment(campaign, testCategory);
-                                        }
-                                    }).then(() => {
-                                        return aem.endSelectedExperiment(campaign, testCategory);
-                                    }).then(() => {
-                                        assert(postStub.calledTwice);
-                                        assert(postStubReward.calledWith(rewardPostUrl, rewardRequestBodyText));
-                                    });
+                            const secondRewardRequestBodyText = JSON.stringify({
+                                user_info: { ab_group: 99, auction_id: '12345' },
+                                reward: secondReward,
+                                experiments:
+                                [
+                                    {
+                                        experiment: testCategory + '-' + experimentID,
+                                        actions: FooExperimentDefaultActions,
+                                        metadata: 'booh'
+                                    }
+                                ]
                             });
+
+                            return aem.onNewCampaign(campaign)
+                                .then(() => {
+                                    const secondExperiment = aem.activateSelectedExperiment(campaign, testCategory);
+                                    assert.equal(JSON.stringify(secondExperiment), JSON.stringify(FooExperimentDefaultActions), 'Wrong variant name');
+
+                                        return aem.rewardSelectedExperiment(campaign, testCategory);
+
+                                }).then(() => {
+                                    return aem.endSelectedExperiment(campaign, testCategory);
+                                }).then(() => {
+                                    assert(postStub.calledTwice);
+                                    assert(postStubReward.calledWith(rewardPostUrl, secondRewardRequestBodyText));
+                                });
                         });
                     });
             });
