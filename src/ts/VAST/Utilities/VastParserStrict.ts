@@ -18,6 +18,7 @@ import { CampaignContentTypes } from 'Ads/Utilities/CampaignContentTypes';
 import { VastCompanionAdStaticResource } from 'VAST/Models/VastCompanionAdStaticResource';
 import { VastCompanionAdHTMLResource } from 'VAST/Models/VastCompanionAdHTMLResource';
 import { VastCompanionAdIframeResource } from 'VAST/Models/VastCompanionAdIframeResource';
+import { IframeEndcardTest, HtmlEndcardTest, OpenMeasurementTest } from 'Core/Models/ABGroup';
 import { DEFAULT_VENDOR_KEY } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
@@ -88,11 +89,13 @@ export class VastParserStrict {
     private _domParser: DOMParser;
     private _maxWrapperDepth: number;
     private _compiledCampaignErrors: CampaignError[];
+    private _coreConfig: CoreConfiguration | undefined;
 
-    constructor(domParser?: DOMParser, maxWrapperDepth: number = VastParserStrict.DEFAULT_MAX_WRAPPER_DEPTH) {
+    constructor(domParser?: DOMParser, maxWrapperDepth: number = VastParserStrict.DEFAULT_MAX_WRAPPER_DEPTH, coreConfig?: CoreConfiguration) {
         this._domParser = domParser || new DOMParser();
         this._maxWrapperDepth = maxWrapperDepth;
         this._compiledCampaignErrors = [];
+        this._coreConfig = coreConfig;
     }
 
     public setMaxWrapperDepth(maxWrapperDepth: number) {
@@ -373,44 +376,52 @@ export class VastParserStrict {
             }
 
             if (iframeResourceElement) {
-                const companionAd = this.parseCompanionAdIframeResourceElement(element, urlProtocol);
-                const companionAdErrors = new VastCompanionAdIframeResourceValidator(companionAd).getErrors();
-                let isWarningLevel = true;
-                for (const adError of companionAdErrors) {
-                    if (adError.errorLevel !== CampaignErrorLevel.LOW) {
-                        if (adError.errorTrackingUrls.length === 0) {
-                            adError.errorTrackingUrls = vastAd.getErrorURLTemplates();
+                if (this._coreConfig && IframeEndcardTest.isValid(this._coreConfig.getAbGroup())) {
+                    const companionAd = this.parseCompanionAdIframeResourceElement(element, urlProtocol);
+                    const companionAdErrors = new VastCompanionAdIframeResourceValidator(companionAd).getErrors();
+                    let isWarningLevel = true;
+                    for (const adError of companionAdErrors) {
+                        if (adError.errorLevel !== CampaignErrorLevel.LOW) {
+                            if (adError.errorTrackingUrls.length === 0) {
+                                adError.errorTrackingUrls = vastAd.getErrorURLTemplates();
+                            }
+                            this._compiledCampaignErrors.push(adError);
+                            isWarningLevel = false;
+                            break;
                         }
-                        this._compiledCampaignErrors.push(adError);
-                        isWarningLevel = false;
-                        break;
                     }
-                }
-                if (isWarningLevel) {
-                    vastAd.addIframeCompanionAd(companionAd);
+                    if (isWarningLevel) {
+                        vastAd.addIframeCompanionAd(companionAd);
+                    } else {
+                        vastAd.addUnsupportedCompanionAd(`reason: ${companionAdErrors.join(' ')} ${element.outerHTML}`);
+                    }
                 } else {
-                    vastAd.addUnsupportedCompanionAd(`reason: ${companionAdErrors.join(' ')} ${element.outerHTML}`);
+                    vastAd.addUnsupportedCompanionAd(`reason: IFrameResource unsupported ${element.outerHTML}`);
                 }
             }
 
             if (htmlResourceElement) {
-                const companionAd = this.parseCompanionAdHTMLResourceElement(element, urlProtocol);
-                const companionAdErrors = new VastCompanionAdHTMLResourceValidator(companionAd).getErrors();
-                let isWarningLevel = true;
-                for (const adError of companionAdErrors) {
-                    if (adError.errorLevel !== CampaignErrorLevel.LOW) {
-                        if (adError.errorTrackingUrls.length === 0) {
-                            adError.errorTrackingUrls = vastAd.getErrorURLTemplates();
+                if (this._coreConfig && HtmlEndcardTest.isValid(this._coreConfig.getAbGroup())) {
+                    const companionAd = this.parseCompanionAdHTMLResourceElement(element, urlProtocol);
+                    const companionAdErrors = new VastCompanionAdHTMLResourceValidator(companionAd).getErrors();
+                    let isWarningLevel = true;
+                    for (const adError of companionAdErrors) {
+                        if (adError.errorLevel !== CampaignErrorLevel.LOW) {
+                            if (adError.errorTrackingUrls.length === 0) {
+                                adError.errorTrackingUrls = vastAd.getErrorURLTemplates();
+                            }
+                            this._compiledCampaignErrors.push(adError);
+                            isWarningLevel = false;
+                            break;
                         }
-                        this._compiledCampaignErrors.push(adError);
-                        isWarningLevel = false;
-                        break;
                     }
-                }
-                if (isWarningLevel) {
-                    vastAd.addHtmlCompanionAd(companionAd);
+                    if (isWarningLevel) {
+                        vastAd.addHtmlCompanionAd(companionAd);
+                    } else {
+                        vastAd.addUnsupportedCompanionAd(`reason: ${companionAdErrors.join(' ')} ${element.outerHTML}`);
+                    }
                 } else {
-                    vastAd.addUnsupportedCompanionAd(`reason: ${companionAdErrors.join(' ')} ${element.outerHTML}`);
+                    vastAd.addUnsupportedCompanionAd(`reason: HTMLResource unsupported ${element.outerHTML}`);
                 }
             }
         });

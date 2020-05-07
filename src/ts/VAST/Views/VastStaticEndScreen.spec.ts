@@ -30,33 +30,36 @@ jest.mock('html/VastStaticEndScreen.html', () => {
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe('VastStaticEndScreen', () => {
         const privacy = new AbstractPrivacy();
-        const baseParams: IAdUnitParameters<VastCampaignBase> = {
-            forceOrientation: Orientation.LANDSCAPE,
-            focusManager: new FocusManager(),
-            container: new AdUnitContainer(),
-            deviceInfo: new DeviceInfo(),
-            clientInfo: new ClientInfo(),
-            thirdPartyEventManager: new ThirdPartyEventManager(),
-            operativeEventManager: new OperativeEventManager(),
-            placement: new Placement(),
-            campaign: new VastCampaign(),
-            platform: platform,
-            core: new Core().Api,
-            ads: new Ads().Api,
-            store: new Store().Api,
-            coreConfig: new CoreConfiguration(),
-            adsConfig: new AdsConfiguration(),
-            request: new RequestManager(),
-            options: undefined,
-            privacyManager: new UserPrivacyManager(),
-            gameSessionId: 0,
-            privacy: privacy,
-            privacySDK: new PrivacySDK()
-        };
+        const baseParams = jest.fn(() => {
+
+            return <IAdUnitParameters<VastCampaignBase>>{
+                forceOrientation: Orientation.LANDSCAPE,
+                focusManager: new FocusManager(),
+                container: new AdUnitContainer(),
+                deviceInfo: new DeviceInfo(),
+                clientInfo: new ClientInfo(),
+                thirdPartyEventManager: new ThirdPartyEventManager(),
+                operativeEventManager: new OperativeEventManager(),
+                placement: new Placement(),
+                campaign: new VastCampaign(),
+                platform: Platform.IOS,
+                core: new Core().Api,
+                ads: new Ads().Api,
+                store: new Store().Api,
+                coreConfig: new CoreConfiguration(),
+                adsConfig: new AdsConfiguration(),
+                request: new RequestManager(),
+                options: undefined,
+                privacyManager: new UserPrivacyManager(),
+                gameSessionId: 0,
+                privacy: privacy,
+                privacySDK: new PrivacySDK()
+            };
+        });
         let staticEndScreen: VastStaticEndScreen;
 
         beforeEach(() => {
-            staticEndScreen = new VastStaticEndScreen(baseParams);
+            staticEndScreen = new VastStaticEndScreen(baseParams());
         });
 
         describe('when endcard is rendered', () => {
