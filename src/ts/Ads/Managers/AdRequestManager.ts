@@ -43,7 +43,7 @@ interface ILoadV5BodyExtra {
     preloadData: { [key: string]: IParsedPlacementPreloadData };
 }
 
-interface IParsedMediaAndTrackinIds {
+interface IParsedMediaAndTrackingIds {
     mediaId: string | undefined;
     trackingId: string | undefined;
 }
@@ -498,7 +498,7 @@ export class AdRequestManager extends CampaignManager {
         });
     }
 
-    private parseMediaAndTrackingUrls(response: IRawAuctionV5Response, placement: Placement, auctionStatusCode: AuctionStatusCode): Promise<IParsedMediaAndTrackinIds> {
+    private parseMediaAndTrackingUrls(response: IRawAuctionV5Response, placement: Placement, auctionStatusCode: AuctionStatusCode): Promise<IParsedMediaAndTrackingIds> {
         const placementId = placement.getId();
         let mediaId: string | undefined;
         let trackingId: string | undefined;
