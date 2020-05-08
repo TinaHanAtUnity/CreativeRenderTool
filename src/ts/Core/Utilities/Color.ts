@@ -1,30 +1,31 @@
+export interface IRGBAValue {
+    r: number;
+    g: number;
+    b: number;
+    a: number;
+}
+
 export class Color {
-    public r: number;
-    public g: number;
-    public b: number;
-    public a: number;
+    public value: IRGBAValue;
 
     constructor(r: number, g: number, b: number, a: number = 255) {
-        this.r = r;
-        this.g = g;
-        this.b = b;
-        this.a = a;
+        this.value = { r, g, b, a };
     }
 
     public toCssRgba(): string {
-        return `rgba(${this.r}, ${this.g}, ${this.b}, ${parseFloat((this.a / 255).toFixed(3))})`;
+        return `rgba(${this.value.r}, ${this.value.g}, ${this.value.b}, ${parseFloat((this.value.a / 255).toFixed(3))})`;
     }
 
     public toCssRgb(): string {
-        return `rgb(${this.r}, ${this.g}, ${this.b})`;
+        return `rgb(${this.value.r}, ${this.value.g}, ${this.value.b})`;
     }
 
     public static lerp(c1: Color, c2: Color, t: number): Color {
         return new Color(
-            Math.round(c1.r + (c2.r - c1.r) * t),
-            Math.round(c1.g + (c2.g - c1.g) * t),
-            Math.round(c1.b + (c2.b - c1.b) * t),
-            Math.round(c1.a + (c2.a - c1.a) * t));
+            Math.round(c1.value.r + (c2.value.r - c1.value.r) * t),
+            Math.round(c1.value.g + (c2.value.g - c1.value.g) * t),
+            Math.round(c1.value.b + (c2.value.b - c1.value.b) * t),
+            Math.round(c1.value.a + (c2.value.a - c1.value.a) * t));
     }
 
     public static hexToCssRgba(hex: string | undefined): string {
