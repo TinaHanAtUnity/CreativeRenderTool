@@ -1,5 +1,6 @@
 # Pending
 
+* Fix additional color test comment [#15245](https://github.com/Applifier/unity-ads-webview/pull/15245)
 * [Load V5] Refactor parse campaign method [#15037](https://github.com/Applifier/unity-ads-webview/pull/15037)
 * [Cleanup] Refactor Color Utility Tests [#15219](https://github.com/Applifier/unity-ads-webview/pull/15219)
 * [AUI] Bug fix to enable running experiments in parallel [#15160](https://github.com/Applifier/unity-ads-webview/pull/15160)
