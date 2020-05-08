@@ -1,3 +1,7 @@
+# Pending
+
+* [AUI] Bug fix to enable running experiments in parallel [#15160](https://github.com/Applifier/unity-ads-webview/pull/15160)
+
 # Fri May  8 00:22:57 UTC 2020
 
 * [Latency] Blacklist Games out of CacheMode Test [#15217](https://github.com/Applifier/unity-ads-webview/pull/15217)
