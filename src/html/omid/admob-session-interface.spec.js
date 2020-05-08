@@ -110,7 +110,7 @@ describe('AdmobSessionInterface', () => {
                             'adId': undefined,
                             'appId': 'com.unity.ads',
                             'libraryVersion': '1.2.10',
-                            'omidImplementor': '{{ OMID_IMPLEMENTOR }}'
+                            'omidImplementer': '{{ OMID_IMPLEMENTOR }}'
                         },
                         'customReferenceIdentifier': undefined,
                         'environment': 'app',
@@ -122,7 +122,7 @@ describe('AdmobSessionInterface', () => {
                     'timestamp': 1577836800000,
                     'type': 'sessionStart',
                   }
-            }, '*')
+            }, '*');
         });
 
         // register session observer is not required to be called
@@ -163,12 +163,12 @@ describe('AdmobSessionInterface', () => {
                             'adId': undefined,
                             'appId': 'com.unity.ads',
                             'libraryVersion': '1.2.10',
-                            'omidImplementor': '{{ OMID_IMPLEMENTOR }}'
+                            'omidImplementer': '{{ OMID_IMPLEMENTOR }}'
                         },
                         'customReferenceIdentifier': undefined,
                         'environment': 'app',
                         'omidJsInfo': {
-                            'omidImplementor': '{{ OMID_IMPLEMENTOR }}',
+                            'omidImplementer': '{{ OMID_IMPLEMENTOR }}',
                             'partnerName': 'google',
                             'partnerVersion': '1.1',
                             'serviceVersion': '1.2.10',

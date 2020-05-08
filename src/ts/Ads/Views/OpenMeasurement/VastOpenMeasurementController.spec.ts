@@ -60,7 +60,7 @@ import { Platform } from 'Core/Constants/Platform';
                       partnerVersion: ''
                   },
                   omidJsInfo: {
-                      omidImplementor: PARTNER_NAME,
+                      omidImplementer: PARTNER_NAME,
                       serviceVersion: '1.2.10',
                       sessionClientVersion: '1.2.10',
                       partnerName: PARTNER_NAME,

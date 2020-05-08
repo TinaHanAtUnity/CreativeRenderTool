@@ -67,7 +67,7 @@
                 return '{{ OMID_API_VERSION }}';
             }
 
-            var getOmidImplementor = function() {
+            var getOmidImplementer = function() {
                 return '{{ OMID_IMPLEMENTOR }}';
             }
 
@@ -100,7 +100,7 @@
             };
 
             var omidJSInfo = {
-                omidImplementor: getOmidImplementor(),
+                omidImplementer: getOmidImplementer(),
                 serviceVersion: '1.2.10',
                 sessionClientVersion: '1.2.10',
                 partnerName: undefined,
@@ -108,7 +108,7 @@
             }
 
             var App = {
-                omidImplementor: getOmidImplementor(),
+                omidImplementer: getOmidImplementer(),
                 libraryVersion: '1.2.10',                 // First version of unity's implementation of OMID for Web
                 appId: 'com.unity.ads',                   // The host app's identifier - unity sdk name
                 adId: undefined,                          // The iOS or Android advertising identifier - set by unity?

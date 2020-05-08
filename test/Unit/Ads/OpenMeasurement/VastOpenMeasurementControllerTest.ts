@@ -118,7 +118,7 @@ import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
                         partnerVersion: '2.0.0-alpha2'
                     },
                     omidJsInfo: {
-                        omidImplementor: PARTNER_NAME,
+                        omidImplementer: PARTNER_NAME,
                         serviceVersion: '1.2.10',
                         sessionClientVersion: '1.2.10',
                         partnerName: PARTNER_NAME,
