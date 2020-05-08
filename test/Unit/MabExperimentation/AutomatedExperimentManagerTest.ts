@@ -453,8 +453,8 @@ describe('AutomatedExperimentManagerTests', () => {
     });
 
     [[0, 0], [0, 1], [1, 0], [1, 1]].forEach(value => {
-        const [reward, secondReward] = value;
-        it(`Works with multiple experiments in parallel [${reward}, ${secondReward}]`, () => {
+        const [firstReward, secondReward] = value;
+        it(`Works with multiple experiments in parallel [${firstReward}, ${secondReward}]`, () => {
 
             sandbox.stub(SDKMetrics, 'reportMetricEvent')
             .returns(true);
@@ -469,7 +469,7 @@ describe('AutomatedExperimentManagerTests', () => {
             const rewardPostUrl = AutomatedExperimentManager.BaseUrl + AutomatedExperimentManager.RewardEndPoint;
             const rewardRequestBodyText = JSON.stringify({
                 user_info: { ab_group: 99, auction_id: '12345' },
-                reward: reward,
+                reward: firstReward,
                 experiments:
                 [
                     {
@@ -496,13 +496,13 @@ describe('AutomatedExperimentManagerTests', () => {
                     assert.deepEqual(secondVariant, FooExperimentDefaultActions, 'Wrong variant name');
 
                 }).then(() => {
-                    if (reward) {
+                    if (firstReward) {
                         return aem.rewardSelectedExperiment(campaign, testCategory);
                     } else {
                         return aem.endSelectedExperiment(campaign, testCategory);
                     }
                 }).then(() => {
-                    if (reward) {
+                    if (firstReward) {
                         assert(postStubReward.calledWith(rewardPostUrl, rewardRequestBodyText));
                     }
                 }).then(() => {
