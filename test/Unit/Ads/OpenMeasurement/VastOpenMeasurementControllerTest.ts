@@ -119,8 +119,8 @@ import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
                     },
                     omidJsInfo: {
                         omidImplementor: PARTNER_NAME,
-                        serviceVersion: TestFixtures.getClientInfo().getSdkVersionName(),
-                        sessionClientVersion: OMID_P,
+                        serviceVersion: '1.2.10',
+                        sessionClientVersion: '1.2.10',
                         partnerName: PARTNER_NAME,
                         partnerVersion: TestFixtures.getClientInfo().getSdkVersionName()
                     },
