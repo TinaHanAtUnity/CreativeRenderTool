@@ -26,7 +26,7 @@ export class Swatch {
     }
 
     public getColorTheme(): IColorTheme {
-        const hsl = ColorConversion.RGBToHSL(this.color.value.r, this.color.value.g, this.color.value.b);
+        const hsl = ColorConversion.RGBToHSL(this.color.r, this.color.g, this.color.b);
         const lightColor = ColorConversion.HSLToRGB(hsl[0], hsl[1], Math.max(hsl[2], BACKGROUND_MIN_BRIGHTNESS));
         const mediumColor = ColorConversion.HSLToRGB(hsl[0], hsl[1], BUTTON_BRIGHTNESS);
         const darkColor = ColorConversion.HSLToRGB(hsl[0], hsl[1], GAME_NAME_BRIGHTNESS);

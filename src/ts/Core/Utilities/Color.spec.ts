@@ -1,10 +1,10 @@
-import { Color, IRGBAValue } from 'Core/Utilities/Color';
+import { Color, IRGBA } from 'Core/Utilities/Color';
 
 describe('Color Test', () => {
 
     const toColorTests: {
         hex: string | undefined;
-        expectedColor: IRGBAValue;
+        expectedColor: IRGBA;
     }[] = [
             {
                 hex: '#df80b8',
@@ -50,7 +50,7 @@ describe('Color Test', () => {
 
     toColorTests.forEach((test) => {
         it(`should parse hex: ${test.hex} into expectedColor: ${test.expectedColor}`, () => {
-            expect(Color.hexToColor(test.hex).value).toStrictEqual(test.expectedColor);
+            expect(Color.hexToColor(test.hex).getRGBA()).toStrictEqual(test.expectedColor);
         });
     });
 
@@ -107,8 +107,8 @@ describe('Color Test', () => {
     });
 
     const lerpTests: {
-        c1: IRGBAValue;
-        c2: IRGBAValue;
+        c1: IRGBA;
+        c2: IRGBA;
         t: number;
         expectedColor: Color;
     }[] = [{

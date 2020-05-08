@@ -22,7 +22,7 @@ describe('ImageAnalysisTest', () => {
                             // For that reason, we check if the output color is really close to the expected color.
                             const ex = value.expectedColor;
                             const c = swatches[0].color;
-                            const colorDiff = Math.abs(ex.value.r - c.value.r) + Math.abs(ex.value.g - c.value.g) + Math.abs(ex.value.b - c.value.b);
+                            const colorDiff = Math.abs(ex.r - c.r) + Math.abs(ex.g - c.g) + Math.abs(ex.b - c.b);
                             expect(colorDiff).toBeLessThanOrEqual(3);
                             resolve();
                         });
