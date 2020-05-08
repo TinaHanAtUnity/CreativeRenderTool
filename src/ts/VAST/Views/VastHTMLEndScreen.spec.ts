@@ -90,7 +90,7 @@ jest.mock('html/VastHTMLEndScreen.html', () => {
         });
 
         describe('when privacy is closed', () => {
-            it('the webiview frames should change back', () => {
+            it('the webview frames should change back', () => {
                 htmlEndScreen.onPrivacyClose();
                 expect(adUnitContainer.setViewFrame).toHaveBeenCalled();
             });
