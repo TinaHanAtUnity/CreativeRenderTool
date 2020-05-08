@@ -1,4 +1,4 @@
-# Pending
+# Fri May  8 00:22:57 UTC 2020
 
 * [Latency] Blacklist Games out of CacheMode Test [#15217](https://github.com/Applifier/unity-ads-webview/pull/15217)
 * [Load V5] Allow enabling load v5 in browser tester [#15102](https://github.com/Applifier/unity-ads-webview/pull/15102)
