@@ -452,8 +452,9 @@ describe('AutomatedExperimentManagerTests', () => {
         assert.equal(AutomatedExperimentManager.BaseUrl, AutomatedExperimentManager.BaseUrlProduction);
     });
 
-    [0, 1].forEach((reward) => {
-        it(`Works with multiple experiments in parallel when trying to call reward ${reward}`, () => {
+    [[0, 0], [0, 1], [1, 0], [1, 1]].forEach(value => {
+        const [reward, secondReward] = value;
+        it(`Works with multiple experiments in parallel [${reward}, ${secondReward}]`, () => {
 
             sandbox.stub(SDKMetrics, 'reportMetricEvent')
             .returns(true);
@@ -505,13 +506,11 @@ describe('AutomatedExperimentManagerTests', () => {
                         assert(postStubReward.calledWith(rewardPostUrl, rewardRequestBodyText));
                     }
                 }).then(() => {
-                    [0, 1].forEach((secondReward) => {
-                        if (secondReward) {
-                            assert((aem.rewardSelectedExperiment(campaign, testCategory2)));
-                        } else {
-                            assert((aem.endSelectedExperiment(campaign, testCategory2)));
-                        }
-                    });
+                    if (secondReward) {
+                        assert((aem.rewardSelectedExperiment(campaign, testCategory2)));
+                    } else {
+                        assert((aem.endSelectedExperiment(campaign, testCategory2)));
+                    }
                 });
         });
     });
