@@ -1,3 +1,24 @@
+# Pending
+
+* [AUI] Bug fix to enable running experiments in parallel [#15160](https://github.com/Applifier/unity-ads-webview/pull/15160)
+
+# Fri May  8 00:22:57 UTC 2020
+
+* [Latency] Blacklist Games out of CacheMode Test [#15217](https://github.com/Applifier/unity-ads-webview/pull/15217)
+* [Load V5] Allow enabling load v5 in browser tester [#15102](https://github.com/Applifier/unity-ads-webview/pull/15102)
+* Add manual test support for end screen url [#15133](https://github.com/Applifier/unity-ads-webview/pull/15133)
+* [China Auction]Increase China auction endpoint traffic to 20% [#15191](https://github.com/Applifier/unity-ads-webview/pull/15191)
+* [Metrics Refactoring] Use buffered metric instance [#14410](https://github.com/Applifier/unity-ads-webview/pull/14410)
+* [Tech Debt] Temporarily Force Purge of Tags on Pre-Commit [#15188](https://github.com/Applifier/unity-ads-webview/pull/15188)
+* Add initial codeowners file [#15038](https://github.com/Applifier/unity-ads-webview/pull/15038)
+* [Chore] Update Dependencies [#15161](https://github.com/Applifier/unity-ads-webview/pull/15161)
+* [Load V5] Add test to verify tracking urls [#15036](https://github.com/Applifier/unity-ads-webview/pull/15036)
+
+# Thu May  7 10:40:07 UTC 2020
+
+* [Privacy] Ripple effect for Privacy flow components [#15132](https://github.com/Applifier/unity-ads-webview/pull/15132)
+* [Privacy] A hotfix to address the issue with the Privacy metrics [#15100](https://github.com/Applifier/unity-ads-webview/pull/15100)
+
 # Wed May 6 17:55:34 UTC 2020
 
 * [AUI] Remove ExperimentId and made color optional for MAB experiments  [#15066](https://github.com/Applifier/unity-ads-webview/pull/15066)

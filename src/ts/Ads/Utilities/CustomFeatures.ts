@@ -9,6 +9,10 @@ import CacheModeAllowedExperimentGames from 'json/custom_features/CacheModeAllow
 
 export class CustomFeatures {
 
+    public static isExcludedGameFromCacheModeTest(gameId: string) {
+        return gameId === '1365102' || gameId === '3254102';
+    }
+
     public static isTencentSeat(seatId: number | undefined): boolean {
         return seatId === 9107 ||
                seatId === 9258;
