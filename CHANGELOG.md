@@ -1,4 +1,4 @@
-# Pending
+# Fri May  8 21:51:10 UTC 2020
 
 * Fix additional color test comment [#15245](https://github.com/Applifier/unity-ads-webview/pull/15245)
 * [Load V5] Refactor parse campaign method [#15037](https://github.com/Applifier/unity-ads-webview/pull/15037)
