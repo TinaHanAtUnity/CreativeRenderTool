@@ -103,10 +103,10 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         }
 
         const ctaButtonColor = this._adUnitStyle && this._adUnitStyle.getCTAButtonColor() ? this._adUnitStyle.getCTAButtonColor() : undefined;
-        const downloadContainer = <HTMLElement> this._container.querySelector('.download-container')
+        const downloadContainer = <HTMLElement> this._container.querySelector('.download-container');
 
         if (ctaButtonColor) {
-            if(downloadContainer) {
+            if (downloadContainer) {
                 downloadContainer.style.background = ctaButtonColor;
             }
         }
