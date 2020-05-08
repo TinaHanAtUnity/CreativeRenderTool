@@ -50,12 +50,12 @@ export class VastHTMLEndScreen extends VastEndScreen implements IPrivacyHandlerV
             {
                 event: 'click',
                 listener: (event: Event) => this.onCloseEvent(event),
-                selector: '.btn-close-region-bottom'
+                selector: '.btn-close-region-endcard'
             },
             {
                 event: 'click',
                 listener: (event: Event) => this.onPrivacyEvent(event),
-                selector: '.privacy-button'
+                selector: '.privacy-button-endcard'
             }
         ];
         this._privacy.addEventHandler(this);

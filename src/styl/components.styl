@@ -96,6 +96,17 @@ $close-button-default($scale-size, $with-styles = true) {
   }
 }
 
+$close-button-endcard($scale-size, $with-styles = true) {
+  if($with-styles) {
+    position: absolute;
+    right: 0;
+    z-index: 100;
+    color: $white;
+    text-align: center;
+    text-shadow: $close-button-shadow;
+  }
+}
+
 $download-container-default($scale-size, $with-styles = true) {
   padding: $scale-size * $default-size * .75 0;
   width: $scale-size * $default-size * 14;

@@ -331,12 +331,20 @@ $iphone-x-styles() {
       right: env(safe-area-inset-right);
     }
 
-    .btn-close-region-bottom {
+    .btn-close-region-endcard {
+      top: constant(safe-area-inset-top);
       right: constant(safe-area-inset-right);
-      bottom: constant(safe-area-inset-bottom);
 
+      top: env(safe-area-inset-top);
       right: env(safe-area-inset-right);
-      bottom: env(safe-area-inset-bottom);
+    }
+
+    .privacy-button-endcard {
+      top: constant(safe-area-inset-top);
+      left: constant(safe-area-inset-left);
+
+      top: env(safe-area-inset-top);
+      left: env(safe-area-inset-left);
     }
   }
 
