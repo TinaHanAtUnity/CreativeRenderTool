@@ -102,7 +102,7 @@ body.alternative-layout #end-screen {
     }
 
     .download-text {
-      font-size: .85rem;
+      font-size: .85em;
     }
   }
 
@@ -395,5 +395,61 @@ $iphone-x-performance-end-screen-styles() {
 @media only screen and (orientation: landscape) and (min-width: 800px) {
   body.alternative-layout.landscape #end-screen .end-screen-info { //@stylint ignore
     font-size: 1.2em;
+  }
+}
+
+@media only screen and (orientation: portrait) and (min-width: 768px) {
+  body.alternative-layout #end-screen {
+    .end-screen-image-container {
+      padding: 0 4em;
+    }
+
+    .end-screen-info {
+      font-size: 0.9em;
+    }
+
+    .game-info-container {
+      margin: .5rem 4rem;
+    }
+
+    .install-container {
+      margin: .5rem 4rem 0;
+
+      .download-text {
+        font-size: .85em;  
+      }
+    }
+
+    .unityads-logo {
+      margin: 0 4rem;
+    }
+  }
+}
+
+@media only screen and (orientation: landscape) and (max-width: 1024px) {
+  body.alternative-layout.landscape #end-screen { //@stylint ignore
+    .end-screen-image-container .end-screen-image {
+      max-height: unset;
+      height: 45vw;
+    }
+
+    .end-screen-info {
+      min-width: 550px;
+      font-size: .8em;
+    }
+  }
+}
+
+@media only screen and (orientation: landscape) and (min-width: 1025px) {
+  body.alternative-layout.landscape #end-screen { //@stylint ignore
+    .end-screen-image-container .end-screen-image {
+      max-height: unset;
+      height: 40vw;
+    }
+
+    .end-screen-info {
+      font-size: .8em;
+      min-width: 700px;
+    }
   }
 }
