@@ -1,5 +1,6 @@
 # Pending
 
+* [Cleanup] Refactor Color Utility Tests [#15219](https://github.com/Applifier/unity-ads-webview/pull/15219)
 * [AUI] Bug fix to enable running experiments in parallel [#15160](https://github.com/Applifier/unity-ads-webview/pull/15160)
 
 # Fri May  8 00:22:57 UTC 2020
