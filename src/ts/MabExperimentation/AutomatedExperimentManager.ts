@@ -150,20 +150,13 @@ export class AutomatedExperimentManager {
             return Promise.resolve();
         }
 
-        try {
-            const categorizedExp = this._campaign.CategorizedExperiments[category];
+        const categorizedExp = this._campaign.CategorizedExperiments[category];
 
-            if (categorizedExp.Stage !== CategorizedExperimentStage.RUNNING) {
-                return Promise.resolve();
-            }
-
-            return this.publishCampaignOutcomes(campaign, categorizedExp, CategorizedExperimentStage.ENDED);
+        if (categorizedExp.Stage !== CategorizedExperimentStage.RUNNING) {
+            return Promise.resolve();
         }
-        finally {
-            this._campaign = new OptimizedCampaign();
-        }
-
-     }
+        return this.publishCampaignOutcomes(campaign, categorizedExp, CategorizedExperimentStage.ENDED);
+    }
 
      public rewardSelectedExperiment(campaign: Campaign, category: string): Promise<void> {
 
