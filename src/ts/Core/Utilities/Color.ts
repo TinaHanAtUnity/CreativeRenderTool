@@ -1,10 +1,3 @@
-export interface IRGBA {
-    r: number;
-    g: number;
-    b: number;
-    a: number;
-}
-
 export class Color {
     public r: number;
     public g: number;
@@ -16,15 +9,6 @@ export class Color {
         this.g = g;
         this.b = b;
         this.a = a;
-    }
-
-    public getRGBA(): IRGBA {
-        return {
-            r: this.r,
-            g: this.g,
-            b: this.b,
-            a: this.a
-        };
     }
 
     public toCssRgba(): string {

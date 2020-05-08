@@ -1,56 +1,56 @@
-import { Color, IRGBA } from 'Core/Utilities/Color';
+import { Color } from 'Core/Utilities/Color';
 
 describe('Color Test', () => {
 
     const toColorTests: {
         hex: string | undefined;
-        expectedColor: IRGBA;
+        expectedColor: Color;
     }[] = [
             {
                 hex: '#df80b8',
-                expectedColor: { r: 223, g: 128, b: 184, a: 255 }
+                expectedColor: new Color(223, 128, 184, 255)
             },
             {
                 hex: '#0c36d4',
-                expectedColor: { r: 12, g: 54, b: 212, a: 255 }
+                expectedColor: new Color(12, 54, 212, 255)
             },
             {
                 hex: 'a6ca5c',
-                expectedColor: { r: 166, g: 202, b: 92, a: 255 }
+                expectedColor: new Color(166, 202, 92, 255)
             },
             {
                 hex: '#9d72a9ca',
-                expectedColor: { r: 157, g: 114, b: 169, a: 202 }
+                expectedColor: new Color(157, 114, 169, 202)
             },
             {
                 hex: '6d4488e2',
-                expectedColor: { r: 109, g: 68, b: 136, a: 226 }
+                expectedColor: new Color(109, 68, 136, 226)
             },
             {
                 hex: '789',
-                expectedColor: { r: 119, g: 136, b: 153, a: 255 }
+                expectedColor: new Color(119, 136, 153, 255)
             },
             {
                 hex: '36d4',
-                expectedColor: { r: 51, g: 102, b: 221, a: 68 }
+                expectedColor: new Color(51, 102, 221, 68)
             },
             {
                 hex: '##0c36d4',
-                expectedColor: { r: 0, g: 0, b: 0, a: 0 }
+                expectedColor: new Color(0, 0, 0, 0)
             },
             {
                 hex: '48F4c8x',
-                expectedColor: { r: 0, g: 0, b: 0, a: 0 }
+                expectedColor: new Color(0, 0, 0, 0)
             },
             {
                 hex: undefined,
-                expectedColor: { r: 0, g: 0, b: 0, a: 0 }
+                expectedColor: new Color(0, 0, 0, 0)
             }
         ];
 
     toColorTests.forEach((test) => {
         it(`should parse hex: ${test.hex} into expectedColor: ${test.expectedColor}`, () => {
-            expect(Color.hexToColor(test.hex).getRGBA()).toStrictEqual(test.expectedColor);
+            expect(Color.hexToColor(test.hex)).toStrictEqual(test.expectedColor);
         });
     });
 
@@ -107,23 +107,23 @@ describe('Color Test', () => {
     });
 
     const lerpTests: {
-        c1: IRGBA;
-        c2: IRGBA;
+        c1: Color;
+        c2: Color;
         t: number;
         expectedColor: Color;
     }[] = [{
-        c1: { r: 109, g: 68, b: 136, a: 226 },
-        c2: { r: 223, g: 128, b: 184, a: 255 },
+        c1: new Color(109, 68, 136, 226),
+        c2: new Color(223, 128, 184, 255),
         t: 0.78,
         expectedColor: new Color(198, 115, 173, 249)
     }, {
-        c1: { r: 119, g: 136, b: 153, a: 50 },
-        c2: { r: 51, g: 102, b: 221, a: 68 },
+        c1: new Color(119, 136, 153, 50),
+        c2: new Color(51, 102, 221, 68),
         t: 0.5,
         expectedColor: new Color(85, 119, 187, 59)
     }, {
-        c1: { r: 157, g: 114, b: 169, a: 202 },
-        c2: { r: 200, g: 0, b: 5, a: 255 },
+        c1: new Color(157, 114, 169, 202),
+        c2: new Color(200, 0, 5, 255),
         t: 0.01,
         expectedColor: new Color(157, 113, 167, 203)
     }];
