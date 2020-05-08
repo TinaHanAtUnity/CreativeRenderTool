@@ -130,7 +130,7 @@ describe('Color Test', () => {
 
     lerpTests.forEach((test) => {
         it('should lerp colors correctly', () => {
-            const lerpedColor = Color.lerp(new Color(test.c1.r, test.c1.g, test.c1.b, test.c1.a), new Color(test.c2.r, test.c2.g, test.c2.b, test.c2.a), test.t);
+            const lerpedColor = Color.lerp(test.c1, test.c2, test.t);
             expect(lerpedColor).toStrictEqual(test.expectedColor);
         });
     });
