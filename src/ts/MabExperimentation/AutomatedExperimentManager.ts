@@ -351,15 +351,17 @@ export class AutomatedExperimentManager {
         if (url) {
             const splitUrl = url.slice(0, - 4).split('/');
             const urlLength = splitUrl.length;
-            const creativeId = splitUrl[urlLength - 2];
-            const uuid = splitUrl[urlLength - 1];
-            if (gameIcon) {
-            return `${uuid}`;
+
+            if (urlLength >= 2) {
+                const creativeId = splitUrl[urlLength - 2];
+                const uuid = splitUrl[urlLength - 1];
+                if (gameIcon) {
+                    return `${uuid}`;
+                }
+                return `${creativeId}/${uuid}`;
             }
-            return `${creativeId}/${uuid}`;
-        } else {
-            return "";
         }
+            return '';
     }
 
     private async collectAdSpecificFeatures(campaign: Campaign): Promise<{ [key: string]: ContextualFeature }> {
