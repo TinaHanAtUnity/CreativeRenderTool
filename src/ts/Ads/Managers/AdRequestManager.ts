@@ -360,7 +360,7 @@ export class AdRequestManager extends CampaignManager {
         return this.requestPreload();
     }
 
-    public loadCampaign(placement: Placement): Promise<ILoadedCampaign | undefined> {
+    public loadCampaignWithAdditionalPlacement(placement: Placement): Promise<ILoadedCampaign | undefined> {
         let additionalPlacements: string[] = [];
 
         if (placement.hasAdUnitId()) {
@@ -369,6 +369,10 @@ export class AdRequestManager extends CampaignManager {
         }
 
         return this.requestLoad(placement.getId(), additionalPlacements);
+    }
+
+    public loadCampaign(placement: Placement): Promise<ILoadedCampaign | undefined> {
+        return this.requestLoad(placement.getId(), []);
     }
 
     public isPreloadDataExpired(): boolean {
