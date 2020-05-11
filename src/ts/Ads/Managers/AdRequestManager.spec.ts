@@ -545,8 +545,9 @@ class SatisfiesMatcher {
                 }), [], {
                     followRedirects: false,
                     retries: 0,
-                    retryDelay: 10000,
-                    retryWithConnectionEvents: false
+                    retryDelay: 0,
+                    retryWithConnectionEvents: false,
+                    timeout: 10000
                 });
             });
 
