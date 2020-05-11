@@ -1,3 +1,7 @@
+# Pending
+
+* [Load V5] Introduce connection timeout for Load V5 [#15101](https://github.com/Applifier/unity-ads-webview/pull/15101)
+
 # Fri May  8 21:51:10 UTC 2020
 
 * Fix additional color test comment [#15245](https://github.com/Applifier/unity-ads-webview/pull/15245)
