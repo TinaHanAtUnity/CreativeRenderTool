@@ -347,6 +347,12 @@ export class AutomatedExperimentManager {
             });
     }
 
+    private trimImageUrl(url: string): string {
+        const splitUrl = url.split('/');
+        const urlLength = splitUrl.length;
+        return(`${splitUrl[urlLength -2]}/${splitUrl[urlLength -1]}`);
+    }
+
     private async collectAdSpecificFeatures(campaign: Campaign): Promise<{ [key: string]: ContextualFeature }> {
         const features: { [key: string]: ContextualFeature } = {};
         const gameSessionCounters = GameSessionCounters.getCurrentCounters();
@@ -370,8 +376,8 @@ export class AutomatedExperimentManager {
             features.target_game_name = campaign.getGameName();
             features.portrait_creative_id = campaign.getPortraitVideo() ? campaign.getPortraitVideo()!.getCreativeId() : undefined;
             features.landscape_creative_id = campaign.getVideo() ? campaign.getVideo()!.getCreativeId() : undefined;
-            features.endcard_portrait_image_url = campaign.getPortrait() ? campaign.getPortrait()!.getUrl() : undefined;
-            features.endcard_landscape_image_url = campaign.getLandscape() ? campaign.getLandscape()!.getUrl() : undefined;
+            features.endcard_portrait_image_url = campaign.getPortrait() ? this.trimImageUrl(campaign.getPortrait()!.getUrl()) : undefined;
+            features.endcard_landscape_image_url = campaign.getLandscape() ? this.trimImageUrl(campaign.getLandscape()!.getUrl()) : undefined;
         }
         // Extract game session counters: targetted game centric
         let ids: string[] = [];
