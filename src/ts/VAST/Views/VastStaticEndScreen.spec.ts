@@ -31,6 +31,7 @@ jest.mock('html/VastStaticEndScreen.html', () => {
     describe('VastStaticEndScreen', () => {
         const privacy = new AbstractPrivacy();
         const baseParams = jest.fn(() => {
+
             return <IAdUnitParameters<VastCampaignBase>>{
                 forceOrientation: Orientation.LANDSCAPE,
                 focusManager: new FocusManager(),
