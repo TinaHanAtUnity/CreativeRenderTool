@@ -347,12 +347,14 @@ export class AutomatedExperimentManager {
             });
     }
 
-    private trimImageUrl(url: string): string {
-        const splitUrl = url.split('/');
+    private trimImageUrl(url: string, gameIcon?: boolean): string {
+        const splitUrl = url.slice(0, - 4).split('/');
         const urlLength = splitUrl.length;
         const creativeId = splitUrl[urlLength - 2];
         const uuid = splitUrl[urlLength - 1];
-
+        if (gameIcon) {
+        return `${uuid}`;
+        }
         return `${creativeId}/${uuid}`;
     }
 
@@ -370,12 +372,13 @@ export class AutomatedExperimentManager {
         features.day_of_week = ts.getDay();
         features.local_day_time = ts.getHours() + ts.getMinutes() / 60;
 
+        // The fields are called *_url for historical reasons, but we actually only send the relevant parts of the URL
         if (campaign && campaign instanceof PerformanceCampaign) {
             features.target_game_id = campaign.getGameId();
             features.rating = campaign.getRating();
             features.rating_count = campaign.getRatingCount();
             features.target_store_id = campaign.getAppStoreId();
-            features.game_icon_url = campaign.getGameIcon().getUrl();
+            features.game_icon_url = this.trimImageUrl(campaign.getGameIcon().getUrl(), true);
             features.target_game_name = campaign.getGameName();
             features.portrait_creative_id = campaign.getPortraitVideo() ? campaign.getPortraitVideo()!.getCreativeId() : undefined;
             features.landscape_creative_id = campaign.getVideo() ? campaign.getVideo()!.getCreativeId() : undefined;
