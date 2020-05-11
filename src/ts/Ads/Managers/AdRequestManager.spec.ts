@@ -22,7 +22,7 @@ import { CometCampaignParser } from 'Performance/Parsers/CometCampaignParser';
 import { INativeResponse } from 'Core/Managers/RequestManager';
 import { Campaign, ICampaignTrackingUrls } from 'Ads/Models/Campaign';
 import { SDKMetrics, LoadV5 } from 'Ads/Utilities/SDKMetrics';
-import { IPlacementIdMap } from './PlacementManager';
+import { IPlacementIdMap } from 'Ads/Managers/PlacementManager';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const LoadV5PreloadResponse = require('json/LoadV5PreloadResponse.json');
@@ -33,7 +33,7 @@ const LoadV5LoadResponse = require('json/LoadV5LoadResponse.json');
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const LoadV5LoadResponse_2 = require('json/LoadV5LoadResponse_2.json');
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const LoadV5LoadResponseWithAdditinalPlacements = require('json/LoadV5LoadResponseWithAdditinalPlacements.json');
+const LoadV5LoadResponseWithAdditionalPlacements = require('json/LoadV5LoadResponseWithAdditionalPlacements.json');
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const LoadV5LoadResponse_NoFill = require('json/LoadV5LoadResponse_NoFill.json');
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -455,7 +455,7 @@ class SatisfiesMatcher {
                     headers: {}
                 }).mockResolvedValueOnce({
                     url: '',
-                    response: JSON.stringify(LoadV5LoadResponseWithAdditinalPlacements),
+                    response: JSON.stringify(LoadV5LoadResponseWithAdditionalPlacements),
                     responseCode: 200,
                     headers: {}
                 });
