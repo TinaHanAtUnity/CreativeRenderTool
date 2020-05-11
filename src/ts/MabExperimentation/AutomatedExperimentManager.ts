@@ -350,7 +350,7 @@ export class AutomatedExperimentManager {
     private trimImageUrl(url: string): string {
         const splitUrl = url.split('/');
         const urlLength = splitUrl.length;
-        return(`${splitUrl[urlLength -2]}/${splitUrl[urlLength -1]}`);
+        return (`${splitUrl[urlLength - 2]}/${splitUrl[urlLength - 1]}`);
     }
 
     private async collectAdSpecificFeatures(campaign: Campaign): Promise<{ [key: string]: ContextualFeature }> {
