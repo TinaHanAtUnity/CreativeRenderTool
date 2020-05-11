@@ -443,6 +443,20 @@ $switch-group-container() {
     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2);
   }
 
+  [type="checkbox"]:checked + label:after,
+  [type="checkbox"]:not(:checked) + label:after {
+    position: absolute;
+    content: "";
+    width: 46px;
+    height: 28px;
+    margin: -2px;
+    background: $privacy-light-gray;
+    border-radius: 34px;
+    transform:scale(1.4);
+    opacity: 0;
+    transition: .15s ease-in-out;
+  }
+
   [type="checkbox"]:checked + label {
     background-color: $consent-blue;
     border: 2px solid $consent-blue;
@@ -450,6 +464,10 @@ $switch-group-container() {
 
   [type="checkbox"]:focus + label {
     box-shadow: 0 0 1px $consent-blue;
+  }
+
+  [type="checkbox"]:hover:active + label:after {
+    opacity: 0.3;
   }
 
   [type="checkbox"]:checked + label:before {
@@ -513,3 +531,35 @@ $consent-privacy-close-button-default() {
   font-weight: $privacy-title-font-weight;
   font-size: $privacy-heading-font-size;
 }
+
+$ripple-square-default() {
+  .ripple-square {
+    position: relative;
+    overflow: hidden;
+
+    &:hover:active {
+      box-shadow: inset 0 0 0 1000px rgba(211, 211, 211, .22);
+    }
+  }
+}
+$ripple-circle-default() {
+  .ripple-circle {
+    position: relative;
+    overflow: hidden;
+
+    &:hover:active::after {
+      position: absolute;
+      top: 0;
+      left: 0;
+      margin-top: .45rem;
+      margin-left: -.67rem;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: radial-gradient(circle, $privacy-light-gray 22%, transparent 22%);
+      content: "";
+      opacity: .4;
+    }
+  }
+}
+

@@ -27,13 +27,17 @@ export class Color {
             Math.round(c1.a + (c2.a - c1.a) * t));
     }
 
-    public static hexToCssRgba(hex: string): string {
+    public static hexToCssRgba(hex: string | undefined): string {
         const color = this.hexToColor(hex);
         return color.toCssRgba();
     }
 
-    public static hexToColor(hex: string): Color {
-        if (!/^#?(([a-f0-9]{3,4})|([a-f0-9]{6}([a-f0-9]{2})?))$/i.test(hex)) { return new Color(0, 0, 0, 0); }
+    public static hexToColor(hex: string | undefined): Color {
+        const hexRegex = /^#?(([a-f0-9]{3,4})|([a-f0-9]{6}([a-f0-9]{2})?))$/i;
+        if (hex === undefined || !hexRegex.test(hex)) {
+            return new Color(0, 0, 0, 0);
+        }
+
         hex = hex.replace('#', '');
         if (hex.length < 6) {
             return new Color (

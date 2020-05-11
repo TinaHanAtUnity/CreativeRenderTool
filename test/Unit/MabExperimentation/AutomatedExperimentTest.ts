@@ -11,6 +11,10 @@ describe('AutomatedExperimentTest', () => {
         baz: {
             ACTION1: 'baz1',
             ACTION2: 'baz2'
+        },
+        optional: {
+            ACTION1: undefined,
+            ACTION2: 'defined'
         }
     };
 
@@ -20,7 +24,6 @@ describe('AutomatedExperimentTest', () => {
     };
 
     const ButtonAnimationsExperiment = new AutomatedExperiment({
-        name: 'foo-experiment',
         actions: FooExperimentDeclaration,
         defaultActions: FooExperimentDefaultActions,
         cacheDisabled: true
@@ -31,6 +34,7 @@ describe('AutomatedExperimentTest', () => {
         assert.isTrue(ButtonAnimationsExperiment.isValid({ bar: 'bar1', baz: 'baz2' }));
         assert.isTrue(ButtonAnimationsExperiment.isValid({ bar: 'bar2', baz: 'baz1' }));
         assert.isTrue(ButtonAnimationsExperiment.isValid({ bar: 'bar2', baz: 'baz2' }));
+        assert.isTrue(ButtonAnimationsExperiment.isValid({ bar: 'bar2', baz: 'baz2', optional: 'defined' }));
     });
 
     it('should fail validation on invalid experiment action choices', () => {

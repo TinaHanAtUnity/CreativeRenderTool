@@ -3,7 +3,7 @@ import { SDKMetrics as Base } from 'Ads/Utilities/SDKMetrics';
 // Called from test_utils/jest.setup.js to mock before every test
 export function MockMetrics(): void {
     Base.initialize = jest.fn();
-    Base.isMetricInstanceInitialized = jest.fn().mockImplementation(() => true);
+    Base.setMetricInstance = jest.fn();
     Base.reportMetricEvent = jest.fn();
     Base.reportMetricEventWithTags = jest.fn();
     Base.reportTimingEvent = jest.fn();
