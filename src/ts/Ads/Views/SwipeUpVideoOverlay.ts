@@ -53,10 +53,16 @@ export class SwipeUpVideoOverlay extends VideoOverlay {
             if (combination.mode) {
                 this._ctaMode = combination.mode;
                 if (this._ctaMode === 'swipeup') {
-                        this._bindings.push({
+                        this._bindings.push(
+                        {
                             event: 'swipeup',
                             listener: (event: Event) => this.onSwipeUpEvent(event),
                             selector: '.swipe-up-zone'
+                        },
+                        {
+                            event: 'click',
+                            listener: (event: Event) => this.onSwipeUpEvent(event),
+                            selector: '.swipe-up-button'
                         });
                     }
             }
@@ -98,12 +104,6 @@ export class SwipeUpVideoOverlay extends VideoOverlay {
 
     protected showSwipeUpButton() {
         this._swipeUpButtonElement.classList.add('show-swipe-up-button');
-    }
-
-    protected onClick(event: Event) {
-        if (event.type !== 'swipeup') {
-            super.onClick(event);
-        }
     }
 
     protected setupElementReferences(): void {
