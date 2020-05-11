@@ -143,7 +143,7 @@ describe('AdmobSessionInterface', () => {
                 verificationParameters: 'have-you-eva'
             };
 
-            window.omidSessionInterface.setClientInfo('1.2.10', 'google', '1.1')
+            window.omidSessionInterface.setClientInfo('1.0', 'google', '1.1')
             window.omidSessionInterface.registerSessionObserver(() => void 0);
 
             window.omidSessionInterface.injectVerificationScriptResources([theData1, theData2]);
@@ -172,7 +172,7 @@ describe('AdmobSessionInterface', () => {
                             'partnerName': 'google',
                             'partnerVersion': '1.1',
                             'serviceVersion': '1.2.10',
-                            'sessionClientVersion': '1.2.10',
+                            'sessionClientVersion': '1.0',
                         },
                         'omidNativeInfo': {
                             'partnerName': 'Unity3d',
