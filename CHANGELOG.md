@@ -1,5 +1,6 @@
 # Pending
 
+* [Load V5] Increase timeouts for preload and reload requests [#15301](https://github.com/Applifier/unity-ads-webview/pull/15301)
 * [Add Vast HTML endcard support] PR2: add VastHTMLEndcard class and disabled it in AB testing [#15190](https://github.com/Applifier/unity-ads-webview/pull/15190)
 
 # Tue May 12 15:11:30 UTC 2020
