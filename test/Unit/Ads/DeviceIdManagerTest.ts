@@ -9,7 +9,7 @@ import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { StorageType } from 'Core/Native/Storage';
 import { PermissionsUtil, CurrentPermission, PermissionTypes } from 'Core/Utilities/Permissions';
-import { ICoreApi} from 'Core/ICore';
+import { ICoreApi } from 'Core/ICore';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { Platform } from 'Core/Constants/Platform';
 import { BuildVerionCode } from 'Core/Constants/Android/BuildVerionCode';

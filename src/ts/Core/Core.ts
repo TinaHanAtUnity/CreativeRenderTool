@@ -122,6 +122,8 @@ export class Core implements ICore {
     }
 
     public initialize(): Promise<void> {
+        SDKMetrics.initialize();
+
         let loadTime: number;
         if (performance && performance.now) {
             loadTime = performance.now();
@@ -217,7 +219,7 @@ export class Core implements ICore {
             return Promise.all([<Promise<[unknown, CoreConfiguration]>>configPromise, cachePromise]);
         }).then(([[configJson, coreConfig]]) => {
             this.Config = coreConfig;
-            SDKMetrics.initialize(createMetricInstance(this.NativeBridge.getPlatform(), this.RequestManager, this.ClientInfo, this.DeviceInfo, this.Config.getCountry()));
+            SDKMetrics.setMetricInstance(createMetricInstance(this.NativeBridge.getPlatform(), this.RequestManager, this.ClientInfo, this.DeviceInfo, this.Config.getCountry()));
 
             // tslint:disable-next-line:no-any
             const nativeInitTime = (<number>(<any>window).initTimestamp) - this.ClientInfo.getInitTimestamp();

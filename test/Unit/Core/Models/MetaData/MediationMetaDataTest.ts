@@ -33,9 +33,9 @@ import { StorageType } from 'Core/Native/Storage';
         it('should fetch correctly', () => {
             backend.Api.Storage.setStorageContents(<any>{
                 mediation: {
-                    name: {value: 'test_name'},
-                    version: {value: 'test_version'},
-                    adapter_version: {value: 'test_adapter_version'}
+                    name: { value: 'test_name' },
+                    version: { value: 'test_version' },
+                    adapter_version: { value: 'test_adapter_version' }
                 }
             });
 
@@ -60,9 +60,9 @@ import { StorageType } from 'Core/Native/Storage';
         it('should update correctly', () => {
             backend.Api.Storage.setStorageContents(<any>{
                 mediation: {
-                    name: {value: 'test_name'},
-                    version: {value: 'test_version'},
-                    ordinal: {value: 42}
+                    name: { value: 'test_name' },
+                    version: { value: 'test_version' },
+                    ordinal: { value: 42 }
                 }
             });
 
@@ -113,7 +113,7 @@ import { StorageType } from 'Core/Native/Storage';
         it('should fetch correctly when data is partially undefined', () => {
             backend.Api.Storage.setStorageContents(<any>{
                 mediation: {
-                    name: {value: 'test_name'}
+                    name: { value: 'test_name' }
                 }
             });
 
@@ -133,8 +133,8 @@ import { StorageType } from 'Core/Native/Storage';
             it('should return true when the mediation metadata is found', () => {
                 backend.Api.Storage.setStorageContents(<any>{
                     mediation: {
-                        name: {value: 'test_name'},
-                        enable_metadata_load: {value: true}
+                        name: { value: 'test_name' },
+                        enable_metadata_load: { value: true }
                     }
                 });
 

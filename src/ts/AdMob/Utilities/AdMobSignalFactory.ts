@@ -43,8 +43,8 @@ export class AdMobSignalFactory {
         signal.setIsJailbroken(this._deviceInfo.isRooted());
         signal.setDeviceIncapabilities(this.checkDeviceIncapabilities());
         signal.setDeviceSubModel(this._deviceInfo.getModel());
-        signal.setSDKApis(OMID_P);    // TODO: Add to Request DTO once auction handles parameter
-        signal.setOMIDP(SDK_APIS);    // TODO: Add to Request DTO once auction handles parameter
+        signal.setSDKApis(OMID_P); // TODO: Add to Request DTO once auction handles parameter
+        signal.setOMIDP(SDK_APIS); // TODO: Add to Request DTO once auction handles parameter
 
         const promises = [];
         promises.push(this._deviceInfo.getBatteryLevel().then(batteryLevel => {

@@ -61,7 +61,7 @@ export class LegacyCampaignManager extends CampaignManager {
     protected _adsConfig: AdsConfiguration;
     protected _clientInfo: ClientInfo;
     protected _cacheBookkeeping: CacheBookkeepingManager;
-    protected  _privacy: PrivacySDK;
+    protected _privacy: PrivacySDK;
     private _contentTypeHandlerManager: ContentTypeHandlerManager;
     private _adMobSignalFactory: AdMobSignalFactory;
     private _sessionManager: SessionManager;
@@ -97,7 +97,7 @@ export class LegacyCampaignManager extends CampaignManager {
         this._privacy = privacySDK;
         this._userPrivacyManager = userPrivacyManager;
         this._mediationLoadTracking = mediationLoadTracking;
-        this._useChinaAuctionEndpoint = (CustomFeatures.sampleAtGivenPercent(10) && coreConfig.getCountry() === 'CN');
+        this._useChinaAuctionEndpoint = (CustomFeatures.sampleAtGivenPercent(20) && coreConfig.getCountry() === 'CN');
     }
 
     public request(nofillRetry?: boolean): Promise<INativeResponse | void> {

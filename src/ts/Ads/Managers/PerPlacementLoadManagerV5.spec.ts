@@ -512,7 +512,7 @@ import { ProgrammaticMraidParser } from 'MRAID/Parsers/ProgrammaticMraidParser';
             ['video_1', 'video_5', 'video_6'].forEach(placement => {
                 it(`should set invalidation state for ${placement}`, () => {
                     expect(placements[placement].setInvalidationPending).toBeCalledTimes(1);
-                    expect(placements[placement].setInvalidationPending).toBeCalledWith(true)
+                    expect(placements[placement].setInvalidationPending).toBeCalledWith(true);
                 });
             });
 

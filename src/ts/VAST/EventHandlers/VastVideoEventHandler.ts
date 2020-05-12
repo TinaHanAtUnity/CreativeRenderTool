@@ -124,8 +124,8 @@ export class VastVideoEventHandler extends VideoEventHandler {
             this._om.loaded({
                 isSkippable: this._placement.allowSkip(),
                 skipOffset: this._placement.allowSkipInSeconds(),
-                isAutoplay: true,                   // Always autoplay for video
-                position: VideoPosition.STANDALONE  // Always standalone video
+                isAutoplay: true, // Always autoplay for video
+                position: VideoPosition.STANDALONE // Always standalone video
             });
             this._om.start(this._vastCampaign.getVideo().getDuration());
             this._om.playerStateChanged(VideoPlayerState.FULLSCREEN);

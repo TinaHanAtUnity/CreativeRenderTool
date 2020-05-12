@@ -171,7 +171,7 @@ export class VideoEventHandler extends BaseVideoEventHandler implements IVideoEv
     }
 
     public onPrepareTimeout(url: string): void {
-        this._core.Sdk.logError('Unity Ads video player prepare timeout '  + url);
+        this._core.Sdk.logError('Unity Ads video player prepare timeout ' + url);
         this.handleVideoError(VideoMetric.PrepareTimeout);
     }
 

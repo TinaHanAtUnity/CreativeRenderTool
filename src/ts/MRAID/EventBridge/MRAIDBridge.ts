@@ -2,7 +2,7 @@ import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { ICoreApi } from 'Core/ICore';
 
 export enum MRAIDEvents {
-    ORIENTATION         = 'orientation'
+    ORIENTATION = 'orientation'
     // OPEN                = 'open',
     // LOADED              = 'loaded',
     // ANALYTICS_EVENT     = 'analyticsEvent',
