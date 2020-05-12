@@ -7,6 +7,10 @@ import { AnimatedDownloadButtonEndScreen } from 'MabExperimentation/Performance/
 import { AutomatedExperimentManager } from 'MabExperimentation/AutomatedExperimentManager';
 import { AutomatedExperimentsCategories } from 'MabExperimentation/Models/AutomatedExperimentsList';
 import { PerformanceAdUnitParametersFactory } from 'Performance/AdUnits/PerformanceAdUnitParametersFactory';
+import { Campaign } from 'Ads/Models/Campaign';
+import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
+import { VideoOverlay } from 'Ads/Views/VideoOverlay';
+import { SwipeUpVideoOverlay } from 'Ads/Views/SwipeUpVideoOverlay';
 import { IExperimentActionChoice } from 'MabExperimentation/Models/AutomatedExperiment';
 
 export class PerformanceAdUnitWithAutomatedExperimentParametersFactory extends PerformanceAdUnitParametersFactory {
@@ -17,6 +21,7 @@ export class PerformanceAdUnitWithAutomatedExperimentParametersFactory extends P
         super(core, core.Ads);
         this._automatedExperimentManager = aem;
         this._automatedExperimentManager.registerExperimentCategory(AutomatedExperimentsCategories.PERFORMANCE_ENDCARD, 'PerformanceCampaign');
+        this._automatedExperimentManager.registerExperimentCategory(AutomatedExperimentsCategories.VIDEO_OVERLAY, 'PerformanceCampaign');
     }
 
     protected createParameters(baseParams: IAdUnitParameters<PerformanceCampaign>) {
@@ -45,5 +50,11 @@ export class PerformanceAdUnitWithAutomatedExperimentParametersFactory extends P
             adUnitStyle: adUnitStyle,
             automatedExperimentManager: this._automatedExperimentManager
         };
+    }
+
+    protected createVideoOverlay(baseParams: IAdUnitParameters<Campaign>, privacy: AbstractPrivacy, showGDPRBanner: boolean, showPrivacyDuringVideo: boolean): VideoOverlay {
+        const videoCombination = this._automatedExperimentManager.activateSelectedExperiment(baseParams.campaign, AutomatedExperimentsCategories.VIDEO_OVERLAY);
+
+        return new SwipeUpVideoOverlay(baseParams, privacy, showGDPRBanner, showPrivacyDuringVideo, videoCombination, this._automatedExperimentManager);
     }
 }

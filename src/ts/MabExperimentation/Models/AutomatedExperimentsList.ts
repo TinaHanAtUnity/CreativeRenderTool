@@ -2,7 +2,8 @@ import { AutomatedExperiment, IExperimentActionChoice } from 'MabExperimentation
 
 export enum AutomatedExperimentsCategories {
     PERFORMANCE_ENDCARD = 'webview-perf-ad-endcard',
-    MRAID_AR = 'webview-ar-mraid'
+    MRAID_AR = 'webview-ar-mraid',
+    VIDEO_OVERLAY = 'webview-video-overlay'
 }
 
 export const ButtonExperimentDeclaration = {
@@ -56,6 +57,23 @@ export const ArAvailableButtonExperiment = new AutomatedExperiment({
     defaultActions: {
         color: ArAvailableButtonExperimentDeclaration.color.BLACK,
         skip: ArAvailableButtonExperimentDeclaration.skip.NO
+    },
+    cacheDisabled: true
+});
+
+// Video Overlay Download
+
+export const VideoOverlayDownloadExperimentDeclaration = {
+    mode: {
+        SWIPEUP: 'swipeup',
+        CLICK: 'click'
+    }
+};
+
+export const VideoOverlayDownloadExperiment = new AutomatedExperiment({
+    actions: VideoOverlayDownloadExperimentDeclaration,
+    defaultActions: {
+        mode: VideoOverlayDownloadExperimentDeclaration.mode.CLICK
     },
     cacheDisabled: true
 });
