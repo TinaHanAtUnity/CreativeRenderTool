@@ -20,9 +20,9 @@ import { ILoadedCampaign } from 'Ads/Managers/CampaignManager';
 import { Placement, PlacementMock, withAdUnit } from 'Ads/Models/__mocks__/Placement';
 import { CometCampaignParser } from 'Performance/Parsers/CometCampaignParser';
 import { INativeResponse } from 'Core/Managers/RequestManager';
-import { Campaign } from 'Ads/Models/Campaign';
+import { Campaign, ICampaignTrackingUrls } from 'Ads/Models/Campaign';
 import { SDKMetrics, LoadV5 } from 'Ads/Utilities/SDKMetrics';
-import { IPlacementIdMap } from './PlacementManager';
+import { IPlacementIdMap } from 'Ads/Managers/PlacementManager';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const LoadV5PreloadResponse = require('json/LoadV5PreloadResponse.json');
@@ -33,7 +33,7 @@ const LoadV5LoadResponse = require('json/LoadV5LoadResponse.json');
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const LoadV5LoadResponse_2 = require('json/LoadV5LoadResponse_2.json');
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const LoadV5LoadResponseWithAdditinalPlacements = require('json/LoadV5LoadResponseWithAdditinalPlacements.json');
+const LoadV5LoadResponseWithAdditionalPlacements = require('json/LoadV5LoadResponseWithAdditionalPlacements.json');
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const LoadV5LoadResponse_NoFill = require('json/LoadV5LoadResponse_NoFill.json');
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -138,8 +138,9 @@ class SatisfiesMatcher {
                 }), [], {
                     followRedirects: false,
                     retries: 0,
-                    retryDelay: 10000,
-                    retryWithConnectionEvents: false
+                    retryDelay: 0,
+                    retryWithConnectionEvents: false,
+                    timeout: 20000
                 });
             });
 
@@ -207,7 +208,7 @@ class SatisfiesMatcher {
                     new Error()
                 );
 
-                adsConfig.getPlacement.mockReturnValue(Placement());
+                adsConfig.getPlacement.mockImplementation(Placement);
 
                 contentTypeHandlerManager.getParser.mockReturnValue(new CometCampaignParser(core));
 
@@ -245,7 +246,7 @@ class SatisfiesMatcher {
                     headers: {}
                 });
 
-                adsConfig.getPlacement.mockReturnValue(Placement());
+                adsConfig.getPlacement.mockImplementation(Placement);
 
                 contentTypeHandlerManager.getParser.mockReturnValue(new CometCampaignParser(core));
 
@@ -283,8 +284,92 @@ class SatisfiesMatcher {
                 expect(loadedCampaign1!.campaign.getId()).toEqual('5be40c5f602f4510ec583881');
             });
 
+            it('should have correct tracking url in loadedCampaign1', () => {
+                expect(loadedCampaign1!.trackingUrls).toEqual({
+                    click: [
+                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=click&test=0&5be40c5f602f4510ec583881'
+                    ],
+                    complete: [
+                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=complete&test=0&5be40c5f602f4510ec583881'
+                    ],
+                    error: [
+                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=error&test=0&5be40c5f602f4510ec583881'
+                    ],
+                    firstQuartile: [
+                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=firstQuartile&test=0&5be40c5f602f4510ec583881'
+                    ],
+                    loaded: [
+                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=loaded&test=0&5be40c5f602f4510ec583881'
+                    ],
+                    midpoint: [
+                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=midpoint&test=0&5be40c5f602f4510ec583881'
+                    ],
+                    show: [
+                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=skip&test=0&5be40c5f602f4510ec583881'
+                    ],
+                    skip: [
+                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=skip&test=0&5be40c5f602f4510ec583881'
+                    ],
+                    stalled: [
+                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=stalled&test=0&5be40c5f602f4510ec583881'
+                    ],
+                    start: [
+                        'https://tracking.prd.mz.internal.unity3d.com/impression/%ZONE%?data=randomData&test=0&5be40c5f602f4510ec583881',
+                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=start&test=0&5be40c5f602f4510ec583881'
+                    ],
+                    thirdQuartile: [
+                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=thirdQuartile&test=0&5be40c5f602f4510ec583881'
+                    ],
+                    videoEndCardClick: [
+                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=videoEndCardClick&test=0&5be40c5f602f4510ec583881'
+                    ]
+                });
+            });
+
             it('should have correct in loadedCampaign2', () => {
                 expect(loadedCampaign2!.campaign.getId()).toEqual('load_v5_2');
+            });
+
+            it('should have correct tracking url in loadedCampaign2', () => {
+                expect(loadedCampaign2!.trackingUrls).toEqual({
+                    click: [
+                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=click&test=0&load_v5_2_rewardedVideo'
+                    ],
+                    complete: [
+                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=complete&test=0&load_v5_2_rewardedVideo'
+                    ],
+                    error: [
+                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=error&test=0&load_v5_2_rewardedVideo'
+                    ],
+                    firstQuartile: [
+                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=firstQuartile&test=0&load_v5_2_rewardedVideo'
+                    ],
+                    loaded: [
+                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=loaded&test=0&load_v5_2_rewardedVideo'
+                    ],
+                    midpoint: [
+                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=midpoint&test=0&load_v5_2_rewardedVideo'
+                    ],
+                    show: [
+                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=skip&test=0&load_v5_2_rewardedVideo'
+                    ],
+                    skip: [
+                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=skip&test=0&load_v5_2_rewardedVideo'
+                    ],
+                    stalled: [
+                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=stalled&test=0&load_v5_2_rewardedVideo'
+                    ],
+                    start: [
+                        'https://tracking.prd.mz.internal.unity3d.com/impression/%ZONE%?data=randomData&test=0&load_v5_2_rewardedVideo',
+                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=start&test=0&load_v5_2_rewardedVideo'
+                    ],
+                    thirdQuartile: [
+                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=thirdQuartile&test=0&load_v5_2_rewardedVideo'
+                    ],
+                    videoEndCardClick: [
+                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=videoEndCardClick&test=0&load_v5_2_rewardedVideo'
+                    ]
+                });
             });
 
             it('should sessions have id from preload response', () => {
@@ -326,15 +411,16 @@ class SatisfiesMatcher {
                 }), [], {
                     followRedirects: false,
                     retries: 0,
-                    retryDelay: 10000,
-                    retryWithConnectionEvents: false
+                    retryDelay: 0,
+                    retryWithConnectionEvents: false,
+                    timeout: 10000
                 });
                 expect(request.post).toHaveBeenNthCalledWith(3, expect.anything(), new SatisfiesMatcher({
                     preload: false,
                     load: true,
                     preloadPlacements: {},
                     placements: {
-                        video: {
+                        rewardedVideo: {
                             adTypes: ['VIDEO'],
                             allowSkip: false,
                             auctionType: 'cpm'
@@ -350,8 +436,9 @@ class SatisfiesMatcher {
                 }), [], {
                     followRedirects: false,
                     retries: 0,
-                    retryDelay: 10000,
-                    retryWithConnectionEvents: false
+                    retryDelay: 0,
+                    retryWithConnectionEvents: false,
+                    timeout: 10000
                 });
             });
         });
@@ -368,7 +455,7 @@ class SatisfiesMatcher {
                     headers: {}
                 }).mockResolvedValueOnce({
                     url: '',
-                    response: JSON.stringify(LoadV5LoadResponseWithAdditinalPlacements),
+                    response: JSON.stringify(LoadV5LoadResponseWithAdditionalPlacements),
                     responseCode: 200,
                     headers: {}
                 });
@@ -389,7 +476,7 @@ class SatisfiesMatcher {
                 adRequestManager.onAdditionalPlacementsReady.subscribe(onAdditionalPlacementsReady);
 
                 await adRequestManager.requestPreload();
-                loadedCampaign = await adRequestManager.loadCampaign(placements.video);
+                loadedCampaign = await adRequestManager.loadCampaignWithAdditionalPlacement(placements.video);
             });
 
             it('should getPlacementsForAdunit be called with correct ad unit id', () => {
@@ -458,8 +545,9 @@ class SatisfiesMatcher {
                 }), [], {
                     followRedirects: false,
                     retries: 0,
-                    retryDelay: 10000,
-                    retryWithConnectionEvents: false
+                    retryDelay: 0,
+                    retryWithConnectionEvents: false,
+                    timeout: 10000
                 });
             });
 
@@ -543,7 +631,7 @@ class SatisfiesMatcher {
 
                 assetManager.setup.mockRejectedValue(new Error());
 
-                adsConfig.getPlacement.mockReturnValue(Placement());
+                adsConfig.getPlacement.mockImplementation(Placement);
 
                 contentTypeHandlerManager.getParser.mockReturnValue(new CometCampaignParser(core));
 
@@ -572,7 +660,7 @@ class SatisfiesMatcher {
                     headers: {}
                 });
 
-                adsConfig.getPlacement.mockReturnValue(Placement());
+                adsConfig.getPlacement.mockImplementation(Placement);
 
                 contentTypeHandlerManager.getParser.mockReturnValue(new CometCampaignParser(core));
 
@@ -611,8 +699,9 @@ class SatisfiesMatcher {
                 }), [], {
                     followRedirects: false,
                     retries: 0,
-                    retryDelay: 10000,
-                    retryWithConnectionEvents: false
+                    retryDelay: 0,
+                    retryWithConnectionEvents: false,
+                    timeout: 10000
                 });
             });
         });
@@ -633,7 +722,7 @@ class SatisfiesMatcher {
                     headers: {}
                 });
 
-                adsConfig.getPlacement.mockReturnValue(Placement());
+                adsConfig.getPlacement.mockImplementation(Placement);
 
                 contentTypeHandlerManager.getParser.mockReturnValue(new CometCampaignParser(core));
 
@@ -670,7 +759,7 @@ class SatisfiesMatcher {
                     headers: {}
                 });
 
-                adsConfig.getPlacement.mockReturnValue(Placement());
+                adsConfig.getPlacement.mockImplementation(Placement);
 
                 contentTypeHandlerManager.getParser.mockReturnValue(new CometCampaignParser(core));
 
@@ -705,8 +794,9 @@ class SatisfiesMatcher {
                 }), [], {
                     followRedirects: false,
                     retries: 0,
-                    retryDelay: 10000,
-                    retryWithConnectionEvents: false
+                    retryDelay: 0,
+                    retryWithConnectionEvents: false,
+                    timeout: 10000
                 });
             });
         });
@@ -724,7 +814,7 @@ class SatisfiesMatcher {
                         headers: {}
                     });
 
-                adsConfig.getPlacement.mockReturnValue(Placement());
+                adsConfig.getPlacement.mockImplementation(Placement);
 
                 await adRequestManager.requestPreload();
                 loadedCampaign = await adRequestManager.requestLoad('video');
@@ -755,7 +845,7 @@ class SatisfiesMatcher {
                     headers: {}
                 });
 
-                adsConfig.getPlacement.mockReturnValue(Placement());
+                adsConfig.getPlacement.mockImplementation(Placement);
 
                 await adRequestManager.requestPreload();
 
@@ -794,7 +884,7 @@ class SatisfiesMatcher {
                     headers: {}
                 });
 
-                adsConfig.getPlacement.mockReturnValue(Placement());
+                adsConfig.getPlacement.mockImplementation(Placement);
 
                 contentTypeHandlerManager.getParser.mockReturnValue(new CometCampaignParser(core));
 
@@ -808,7 +898,7 @@ class SatisfiesMatcher {
             });
 
             it('should have correct in loadedCampaign2', () => {
-                expect(loadedCampaign2!.campaign.getId()).toEqual('5be40c5f602f4510ec583881');
+                expect(loadedCampaign2!.campaign.getId()).toEqual('load_v5_1');
             });
 
             it('should have no fill', () => {
@@ -832,7 +922,7 @@ class SatisfiesMatcher {
                     headers: {}
                 });
 
-                adsConfig.getPlacement.mockReturnValue(Placement());
+                adsConfig.getPlacement.mockImplementation(Placement);
 
                 contentTypeHandlerManager.getParser.mockReturnValue(new CometCampaignParser(core));
 
@@ -877,7 +967,7 @@ class SatisfiesMatcher {
                     headers: []
                 });
 
-                adsConfig.getPlacement.mockReturnValue(Placement());
+                adsConfig.getPlacement.mockImplementation(Placement);
 
                 contentTypeHandlerManager.getParser.mockReturnValue(new CometCampaignParser(core));
 
@@ -907,7 +997,7 @@ class SatisfiesMatcher {
             });
 
             it('should have correct in loadedCampaign2', () => {
-                expect(loadedCampaign2!.campaign.getId()).toEqual('5be40c5f602f4510ec583881');
+                expect(loadedCampaign2!.campaign.getId()).toEqual('load_v5_1');
             });
 
             it('should sessions have id from preload response', () => {
@@ -938,7 +1028,7 @@ class SatisfiesMatcher {
                     headers: []
                 });
 
-                adsConfig.getPlacement.mockReturnValue(Placement());
+                adsConfig.getPlacement.mockImplementation(Placement);
 
                 contentTypeHandlerManager.getParser.mockReturnValue(new CometCampaignParser(core));
 
@@ -991,7 +1081,7 @@ class SatisfiesMatcher {
                     headers: []
                 });
 
-                adsConfig.getPlacement.mockReturnValue(Placement());
+                adsConfig.getPlacement.mockImplementation(Placement);
 
                 contentTypeHandlerManager.getParser.mockReturnValue(new CometCampaignParser(core));
 
@@ -1144,10 +1234,54 @@ class SatisfiesMatcher {
 
                 const campaign: Campaign = <Campaign>onCampaign.mock.calls[0][1];
 
-                expect(campaign.getId()).toEqual('reload_v5');
+                expect(campaign.getId()).toEqual('reload_v5_2');
 
                 expect(campaign.getSession()).toBeDefined();
                 expect(campaign.getSession().getId()).toEqual('d301fd4c-4a9e-48e4-82aa-ad8b07977ca7');
+            });
+
+            it('should get correct tracking urls campaigns', () => {
+                const trackingUrls: ICampaignTrackingUrls = <ICampaignTrackingUrls>onCampaign.mock.calls[0][2];
+
+                expect(trackingUrls).toEqual({
+                    click: [
+                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=click&test=0&reload_v5_rewardedVideo'
+                    ],
+                    complete: [
+                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=complete&test=0&reload_v5_rewardedVideo'
+                    ],
+                    error: [
+                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=error&test=0&reload_v5_rewardedVideo'
+                    ],
+                    firstQuartile: [
+                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=firstQuartile&test=0&reload_v5_rewardedVideo'
+                    ],
+                    loaded: [
+                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=loaded&test=0&reload_v5_rewardedVideo'
+                    ],
+                    midpoint: [
+                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=midpoint&test=0&reload_v5_rewardedVideo'
+                    ],
+                    show: [
+                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=skip&test=0&reload_v5_rewardedVideo'
+                    ],
+                    skip: [
+                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=skip&test=0&reload_v5_rewardedVideo'
+                    ],
+                    stalled: [
+                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=stalled&test=0&reload_v5_rewardedVideo'
+                    ],
+                    start: [
+                        'https://tracking.prd.mz.internal.unity3d.com/impression/%ZONE%?data=randomData&test=0&reload_v5_rewardedVideo',
+                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=start&test=0&reload_v5_rewardedVideo'
+                    ],
+                    thirdQuartile: [
+                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=thirdQuartile&test=0&reload_v5_rewardedVideo'
+                    ],
+                    videoEndCardClick: [
+                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=videoEndCardClick&test=0&reload_v5_rewardedVideo'
+                    ]
+                });
             });
 
             it('should isLoadEnabled flag be set to true', () => {
@@ -1184,8 +1318,9 @@ class SatisfiesMatcher {
                 }), [], {
                     followRedirects: false,
                     retries: 0,
-                    retryDelay: 10000,
-                    retryWithConnectionEvents: false
+                    retryDelay: 0,
+                    retryWithConnectionEvents: false,
+                    timeout: 20000
                 });
             });
         });
@@ -1304,8 +1439,9 @@ class SatisfiesMatcher {
                 }), [], {
                     followRedirects: false,
                     retries: 0,
-                    retryDelay: 10000,
-                    retryWithConnectionEvents: false
+                    retryDelay: 0,
+                    retryWithConnectionEvents: false,
+                    timeout: 10000
                 });
             });
 
