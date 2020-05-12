@@ -1,4 +1,4 @@
-# Pending
+# Tue May 12 15:11:30 UTC 2020
 
 * [AUI] Make URL parsing safer when collecting MAB features [#15275](https://github.com/Applifier/unity-ads-webview/pull/15275)
 * [AUI] Remove superfluous parts from URLs sent from webview [#15271](https://github.com/Applifier/unity-ads-webview/pull/15271)
