@@ -356,7 +356,7 @@ export class AutomatedExperimentManager {
         const splitUrl = url.slice(0, - 4).split('/');
         const urlLength = splitUrl.length;
 
-        if (urlLength < 2) {
+        if (urlLength < 4) {
             return '';
         }
 
