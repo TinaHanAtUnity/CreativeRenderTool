@@ -1,3 +1,7 @@
+# Pending
+
+* [Add Vast HTML endcard support] PR2: add VastHTMLEndcard class and disabled it in AB testing [#15190](https://github.com/Applifier/unity-ads-webview/pull/15190)
+
 # Tue May 12 15:11:30 UTC 2020
 
 * [AUI] Make URL parsing safer when collecting MAB features [#15275](https://github.com/Applifier/unity-ads-webview/pull/15275)
