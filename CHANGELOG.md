@@ -1,3 +1,7 @@
+# Pending
+
+* [AUI] Add Swipe Up to Download on Video Overlay to Automated Experiment [#14630](https://github.com/Applifier/unity-ads-webview/pull/14630)
+
 # Mon May 11 17:59:11 UTC 2020
 
 * [Load V5] Introduce connection timeout for Load V5 [#15101](https://github.com/Applifier/unity-ads-webview/pull/15101)
