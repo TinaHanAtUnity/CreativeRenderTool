@@ -115,11 +115,6 @@ export class CometCampaignParser extends CampaignParser {
             }
             return Promise.resolve(mraidCampaign);
         } else {
-            // For testing purposes
-            // if (json.endScreenUrl === undefined) {
-            //     json.endScreenUrl = 'http://endscreen.unityads.unity3d.com/index.html';
-            // }
-
             const parameters: IPerformanceCampaign = {
                 ... baseCampaignParams,
                 appStoreId: json.appStoreId,
