@@ -240,6 +240,13 @@ describe('AutomatedExperimentManagerTests', () => {
         });
     });
 
+    it(`Trims the image URL properly`, () => {
+        assert.equal(aem.trimImageUrl('http://mycdn.com/unity/monetization/creative-id/uuid.png', false), 'creative-id/uuid');
+        assert.equal(aem.trimImageUrl('http://mycdn.com/unity/monetization/creative-id/uuid.png', true), 'uuid');
+        assert.equal(aem.trimImageUrl('http://foo.com', false), '');
+        assert.equal(aem.trimImageUrl('http://foo.com', true), '');
+    });
+
     it(`send proper request, receive garbage, returns undefined actions`, () => {
         const postUrl = AutomatedExperimentManager.BaseUrl + AutomatedExperimentManager.CreateEndPoint;
         const responseText = 'not json';
