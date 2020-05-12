@@ -1,4 +1,4 @@
-# Pending
+# Tue May 12 23:17:32 UTC 2020
 
 * [Load V5, Ad Unit] Support for additional placements in load requests [#15097](https://github.com/Applifier/unity-ads-webview/pull/15097)
 * [Load V5] Increase timeouts for preload and reload requests [#15301](https://github.com/Applifier/unity-ads-webview/pull/15301)
