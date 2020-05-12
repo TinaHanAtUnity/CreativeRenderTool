@@ -1,5 +1,6 @@
 # Pending
 
+* [AUI] Make URL parsing safer when collecting MAB features [#15275](https://github.com/Applifier/unity-ads-webview/pull/15275)
 * [AUI] Remove superfluous parts from URLs sent from webview [#15271](https://github.com/Applifier/unity-ads-webview/pull/15271)
 * [AUI] Add Swipe Up to Download on Video Overlay to Automated Experiment [#14630](https://github.com/Applifier/unity-ads-webview/pull/14630)
 
