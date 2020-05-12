@@ -96,6 +96,33 @@ $close-button-default($scale-size, $with-styles = true) {
   }
 }
 
+$close-button-vast-html-endcard($scale-size, $with-styles = true) {
+  width: $scale-size * $default-font-size * $close-button-width * 1.75;
+  font-size: $scale-size * $default-font-size * $close-button-width;
+  line-height: @width;
+  if($with-styles) {
+    position: absolute;
+    top:0;
+    right: @width;
+    z-index: 100;
+    color: $white;
+    text-align: center;
+    text-shadow: $close-button-shadow;
+  }
+}
+
+$privacy-button-vast-html-endcard($scale-size, $with-styles = true) {
+  width: $scale-size * $default-font-size * 1.25 * 1.75;
+  line-height: @width;
+  if($with-styles) {
+    position: absolute;
+    top: 0;
+    left:@width;
+    z-index: 10;
+    color: $end-screen-info-gray;
+  }
+}
+
 $download-container-default($scale-size, $with-styles = true) {
   padding: $scale-size * $default-size * .75 0;
   width: $scale-size * $default-size * 14;
