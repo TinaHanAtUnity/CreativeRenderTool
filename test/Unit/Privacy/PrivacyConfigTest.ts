@@ -5,7 +5,7 @@ import { AgeGateChoice } from 'Ads/Managers/UserPrivacyManager';
 
 describe('PrivacyConfigTest', () => {
     let privacyConfig: PrivacyConfig;
-    const flow = { testFlowValue: 'testFlowValue' };
+    const nodes = { testNode: 'testNode' };
     const userSettings = {
         ads: false,
         external: false,
@@ -17,12 +17,12 @@ describe('PrivacyConfigTest', () => {
     const html = '<html></html>';
 
     beforeEach(() => {
-        privacyConfig = new PrivacyConfig(flow, userSettings, env, html);
+        privacyConfig = new PrivacyConfig(env, userSettings, '', html, nodes, {});
     });
 
     context('Created as expected', () => {
         it ('Flow', () => {
-           assert.deepEqual(privacyConfig.getFlow(), flow);
+           assert.deepEqual(privacyConfig.getFlow(), nodes);
         });
 
         it ('UserSettings', () => {

@@ -21,6 +21,7 @@ import { PrivacySDKTest } from 'Core/Models/ABGroup';
 
 import PrivacySDKFlow from 'json/privacy/PrivacySDKFlow.json';
 import PrivacyWebUI from 'html/PrivacyWebUI.html';
+import PrivacySDKLocale from 'json/privacy/PrivacySDKLocale.json';
 import { PrivacyTestEnvironment } from 'Privacy/PrivacyTestEnvironment';
 
 export interface IUserSummary extends ITemplateData {
@@ -145,37 +146,45 @@ export class UserPrivacyManager {
         const ageGateChoice = this._userPrivacy.isRecorded() ? this.getAgeGateChoice() : AgeGateChoice.MISSING;
 
         const { ads, external, gameExp } = this._userPrivacy.getPermissions();
+        const userSettings = {
+            ads,
+            external,
+            gameExp,
+            ageGateChoice,
+            agreementMethod: ''
+        };
+
         const userSummaryUrl = 'https://ads-privacy-api.prd.mz.internal.unity3d.com/api/v1/summary?' +
           `gameId=${this._clientInfo.getGameId()}&` +
           `projectId=${this._coreConfig.getUnityProjectId()}&` +
           `adid=${this._deviceInfo.getAdvertisingIdentifier()}&` +
           `storeId=${this._deviceInfo.getStores()}`;
 
-        return new PrivacyConfig(PrivacySDKFlow,
-            {
-                ads,
-                external,
-                gameExp,
-                ageGateChoice,
-                agreementMethod: ''
-            },
-            {
-                buildOsVersion: this._deviceInfo.getOsVersion(),
-                deviceModel: this._deviceInfo.getModel(),
-                platform: Platform[this._platform],
-                userLocale: this._deviceInfo.getLanguage() ? this.resolveLanguageForPrivacyConfig(this._deviceInfo.getLanguage()) : undefined,
-                country: this._coreConfig.getCountry(),
-                subCountry: this._coreConfig.getSubdivision(),
-                privacyMethod: this._gamePrivacy.getMethod(),
-                ageGateLimit: this._privacy.getAgeGateLimit(),
-                ageGateLimitMinusOne: this._privacy.getAgeGateLimit() - 1,
-                legalFramework: this._privacy.getLegalFramework(),
-                isCoppa: this._coreConfig.isCoppaCompliant(),
-                apiLevel: this._platform === Platform.ANDROID ? (<AndroidDeviceInfo> this._deviceInfo).getApiLevel() : undefined,
-                developerAgeGate: this.isDeveloperAgeGateActive(),
-                userSummaryUrl
-            },
-            PrivacyWebUI);
+        const env = {
+            buildOsVersion: this._deviceInfo.getOsVersion(),
+            deviceModel: this._deviceInfo.getModel(),
+            platform: Platform[this._platform],
+            userLocale: this._deviceInfo.getLanguage() ? this.resolveLanguageForPrivacyConfig(this._deviceInfo.getLanguage()) : undefined,
+            country: this._coreConfig.getCountry(),
+            subCountry: this._coreConfig.getSubdivision(),
+            privacyMethod: this._gamePrivacy.getMethod(),
+            ageGateLimit: this._privacy.getAgeGateLimit(),
+            ageGateLimitMinusOne: this._privacy.getAgeGateLimit() - 1,
+            legalFramework: this._privacy.getLegalFramework(),
+            isCoppa: this._coreConfig.isCoppaCompliant(),
+            apiLevel: this._platform === Platform.ANDROID ? (<AndroidDeviceInfo> this._deviceInfo).getApiLevel() : undefined,
+            developerAgeGate: this.isDeveloperAgeGateActive(),
+            userSummaryUrl
+        };
+
+        const startNode = 'ageGateDecision';
+
+        return new PrivacyConfig(env,
+          userSettings,
+          startNode,
+          PrivacyWebUI,
+          PrivacySDKFlow,
+          PrivacySDKLocale);
     }
 
     private resolveLanguageForPrivacyConfig(deviceLanguage: string): string {
