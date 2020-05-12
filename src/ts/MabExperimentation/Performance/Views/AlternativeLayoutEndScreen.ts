@@ -70,10 +70,10 @@ export class AlternativeLayoutEndScreen extends PerformanceEndScreen {
         return actions;
     }
 
-    public static experimentSupported(experimentID: string): boolean {
-        // This is a temp implementation. simple implementation works for now as there is only on experiment supported.
-        return experimentID === ButtonAnimationsExperiment.getName();
-    }
+    // public static experimentSupported(experimentID: string): boolean {
+    //     // This is a temp implementation. simple implementation works for now as there is only on experiment supported.
+    //     return experimentID === ButtonAnimationsExperiment.getName();
+    // }
 
     public render(): void {
         super.render();
