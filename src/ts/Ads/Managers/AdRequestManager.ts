@@ -168,7 +168,7 @@ export class AdRequestManager extends CampaignManager {
             retryDelay: 0,
             followRedirects: false,
             retryWithConnectionEvents: false,
-            timeout: 10000
+            timeout: 20000
         })).then((response) => {
             if (response) {
                 SdkStats.increaseAdRequestOrdinal();
@@ -328,7 +328,7 @@ export class AdRequestManager extends CampaignManager {
             retryDelay: 0,
             followRedirects: false,
             retryWithConnectionEvents: false,
-            timeout: 10000
+            timeout: 20000
         })).then((response) => {
             if (response) {
                 SdkStats.increaseAdRequestOrdinal();

@@ -137,7 +137,7 @@ class SatisfiesMatcher {
                     retries: 0,
                     retryDelay: 0,
                     retryWithConnectionEvents: false,
-                    timeout: 10000
+                    timeout: 20000
                 });
             });
 
@@ -1147,7 +1147,7 @@ class SatisfiesMatcher {
                     retries: 0,
                     retryDelay: 0,
                     retryWithConnectionEvents: false,
-                    timeout: 10000
+                    timeout: 20000
                 });
             });
         });
