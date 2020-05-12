@@ -347,21 +347,29 @@ export class AutomatedExperimentManager {
             });
     }
 
-    private trimImageUrl(url: string, gameIcon?: boolean): string {
-        if (url) {
-            const splitUrl = url.slice(0, - 4).split('/');
-            const urlLength = splitUrl.length;
-
-            if (urlLength >= 2) {
-                const creativeId = splitUrl[urlLength - 2];
-                const uuid = splitUrl[urlLength - 1];
-                if (gameIcon) {
-                    return `${uuid}`;
-                }
-                return `${creativeId}/${uuid}`;
-            }
-        }
+    public trimImageUrl(url: string, gameIcon?: boolean): string {
+        if (!url) {
             return '';
+        }
+
+        // Remove the extension ('.jpg' or '.png') and split it by '/' to remove the initial part, containing the CDN URL
+        const splitUrl = url.slice(0, - 4).split('/');
+        const urlLength = splitUrl.length;
+
+        if (urlLength < 2) {
+            return '';
+        }
+
+        const creativeId = splitUrl[urlLength - 2];
+        const uuid = splitUrl[urlLength - 1];
+
+        // If the URL is for a game icon, we only want the UUID (last part of the URL)
+        if (gameIcon) {
+            return `${uuid}`;
+        }
+
+        // Whereas if not, we want the last 2 parts, the creative ID & the UUID
+        return `${creativeId}/${uuid}`;
     }
 
     private async collectAdSpecificFeatures(campaign: Campaign): Promise<{ [key: string]: ContextualFeature }> {
@@ -378,16 +386,18 @@ export class AutomatedExperimentManager {
         features.day_of_week = ts.getDay();
         features.local_day_time = ts.getHours() + ts.getMinutes() / 60;
 
-        // The fields are called *_url for historical reasons, but we actually only send the relevant parts of the URL
         if (campaign && campaign instanceof PerformanceCampaign) {
             features.target_game_id = campaign.getGameId();
             features.rating = campaign.getRating();
             features.rating_count = campaign.getRatingCount();
             features.target_store_id = campaign.getAppStoreId();
-            features.game_icon_url = this.trimImageUrl(campaign.getGameIcon().getUrl(), true);
             features.target_game_name = campaign.getGameName();
             features.portrait_creative_id = campaign.getPortraitVideo() ? campaign.getPortraitVideo()!.getCreativeId() : undefined;
             features.landscape_creative_id = campaign.getVideo() ? campaign.getVideo()!.getCreativeId() : undefined;
+
+            // The fields are called *_url for historical reasons, but we actually only send the relevant parts of the URL
+            // and remove redundant parts such as the CDN & the file extension.
+            features.game_icon_url = this.trimImageUrl(campaign.getGameIcon().getUrl(), true);
             features.endcard_portrait_image_url = campaign.getPortrait() ? this.trimImageUrl(campaign.getPortrait()!.getUrl()) : undefined;
             features.endcard_landscape_image_url = campaign.getLandscape() ? this.trimImageUrl(campaign.getLandscape()!.getUrl()) : undefined;
         }
