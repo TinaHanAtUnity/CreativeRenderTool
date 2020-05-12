@@ -353,7 +353,7 @@ export class AutomatedExperimentManager {
         }
 
         // Remove the extension ('.jpg' or '.png') and split it by '/' to remove the initial part, containing the CDN URL
-        const splitUrl = url.slice(0, - 4).split('/');
+        const splitUrl = url.slice(0, url.lastIndexOf('.')).split('/');
         const urlLength = splitUrl.length;
 
         if (urlLength < 4) {
