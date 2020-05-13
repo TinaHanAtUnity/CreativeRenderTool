@@ -23,6 +23,15 @@ import { Platform } from 'Core/Constants/Platform';
           return new VastOpenMeasurementController(platform, placement, om, adViewBuilder, clientInfo, deviceInfo);
       };
 
+      describe('when controller triggers video start event', () => {
+          it('the duration time in event data should be integer', () => {
+              const openMeasurementInstance = new OpenMeasurementVast();
+              const omController = initOMManager([openMeasurementInstance]);
+              omController.start(5120);
+              expect(openMeasurementInstance.triggerVideoEvent).toHaveBeenCalledWith('omidStart', { duration: 5, videoPlayerVolume: 1, deviceVolume: undefined });
+          });
+      });
+
       describe('session start', () => {
           let omManager: VastOpenMeasurementController;
           let openMeasurement1: OpenMeasurementMockVast;

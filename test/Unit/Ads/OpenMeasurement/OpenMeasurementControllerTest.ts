@@ -83,17 +83,13 @@ import { VastCampaign } from 'VAST/Models/VastCampaign';
 
             it('should fire multiple loaded events regardless of state', () => {
                 const vastProperties: IVastProperties = {
-                    isSkippable: false,
+                    skippable: false,
                     skipOffset: 10,
                     isAutoplay: true, // Always autoplay for video
                     position: VideoPosition.STANDALONE // Always standalone video
                 };
-                const payload = {
-                    ...vastProperties,
-                    skippable: vastProperties.isSkippable
-                };
                 omManager.loaded(vastProperties);
-                sinon.assert.calledWith(<sinon.SinonStub>openMeasurement.triggerVideoEvent, 'omidLoaded', { payload });
+                sinon.assert.calledWith(<sinon.SinonStub>openMeasurement.triggerVideoEvent, 'omidLoaded', { vastProperties });
                 sinon.assert.calledTwice(<sinon.SinonStub>openMeasurement.triggerVideoEvent);
             });
 
