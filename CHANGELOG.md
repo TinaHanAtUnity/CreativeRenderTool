@@ -1,5 +1,6 @@
 # Pending
 
+* [Add Vast HTML endcard support] PR3: Enable HTML endcard in AB group 17 [#15273](https://github.com/Applifier/unity-ads-webview/pull/15273)
 * [Load V5, Ad Unit] Add Ad Unit Aware Ad Request Manager [#15327](https://github.com/Applifier/unity-ads-webview/pull/15327)
 
 # Tue May 12 23:17:32 UTC 2020
