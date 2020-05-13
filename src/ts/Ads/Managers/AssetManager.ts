@@ -2,7 +2,7 @@ import { Asset } from 'Ads/Models/Assets/Asset';
 import { Video } from 'Ads/Models/Assets/Video';
 import { Campaign } from 'Ads/Models/Campaign';
 import { CacheDiagnostics, ICacheDiagnostics } from 'Ads/Utilities/CacheDiagnostics';
-import { ErrorMetric, SDKMetrics, CachingMetric } from 'Ads/Utilities/SDKMetrics';
+import { ErrorMetric, SDKMetrics, CachingMetric, GeneralTimingMetric } from 'Ads/Utilities/SDKMetrics';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { VideoFileInfo } from 'Ads/Utilities/VideoFileInfo';
 import { Platform } from 'Core/Constants/Platform';
@@ -16,10 +16,22 @@ import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 import { CreativeBlocking, BlockingReason } from 'Core/Utilities/CreativeBlocking';
+import { createMeasurementsInstance } from 'Core/Utilities/TimeMeasurements';
+import { GameSessionCounters } from 'Ads/Utilities/GameSessionCounters';
 
 enum CacheType {
     REQUIRED,
     OPTIONAL
+}
+
+type ICampaignQueueResolveFunction = (campaign: Campaign) => void;
+type ICampaignQueueRejectFunction = (reason?: unknown) => void;
+
+interface ICampaignQueueObject {
+    campaign: Campaign;
+    resolved: boolean;
+    resolve: ICampaignQueueResolveFunction;
+    reject: ICampaignQueueRejectFunction;
 }
 
 type IAssetQueueResolveFunction = (value: string[]) => void;
@@ -42,8 +54,11 @@ export class AssetManager {
     private _deviceInfo: DeviceInfo;
     private _stopped: boolean;
     private _caching: boolean;
+    private _fastConnectionDetected: boolean;
     private _requiredQueue: IAssetQueueObject[];
     private _optionalQueue: IAssetQueueObject[];
+    private _campaignQueue: { [id: number]: ICampaignQueueObject };
+    private _queueId: number;
 
     private _sendCacheDiagnostics = false;
 
@@ -56,8 +71,11 @@ export class AssetManager {
         this._deviceInfo = deviceInfo;
         this._stopped = false;
         this._caching = false;
+        this._fastConnectionDetected = false;
         this._requiredQueue = [];
         this._optionalQueue = [];
+        this._campaignQueue = {};
+        this._queueId = 0;
     }
 
     public overrideCacheMode(cacheMode: CacheMode) {
@@ -117,6 +135,7 @@ export class AssetManager {
 
     public stopCaching(): void {
         this._stopped = true;
+        this._fastConnectionDetected = false;
         this._cache.stop();
 
         this._requiredQueue.forEach(o => o.reject(CacheStatus.STOPPED));
@@ -139,7 +158,7 @@ export class AssetManager {
             }
 
             return;
-        }).catch(() => {
+        }).catch(error => {
             Diagnostics.trigger('cache_space_check_failed', {});
         });
     }
@@ -267,6 +286,18 @@ export class AssetManager {
             }
 
             throw new WebViewError('Unable to select oriented video for caching');
+        });
+    }
+
+    private registerCampaign(campaign: Campaign, id: number): Promise<Campaign> {
+        return new Promise<Campaign>((resolve, reject) => {
+            const queueObject: ICampaignQueueObject = {
+                campaign: campaign,
+                resolved: false,
+                resolve: resolve,
+                reject: reject
+            };
+            this._campaignQueue[id] = queueObject;
         });
     }
 

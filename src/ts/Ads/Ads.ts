@@ -385,7 +385,7 @@ export class Ads implements IAds {
                         experimentType = MediationExperimentType.LoadV5;
                     } else if (!CustomFeatures.isExcludedGameFromCacheModeTest(this._core.ClientInfo.getGameId()) && MediationCacheModeAllowedTest.isValid(this._core.Config.getAbGroup())) {
                         this.Config.set('cacheMode', CacheMode.ALLOWED);
-                        experimentType = MediationExperimentType.CacheModeAllowed;
+                        experimentType = MediationExperimentType.DynamicCacheMode;
                     }
 
                     this._mediationName = mediation.getName()!;
@@ -542,6 +542,13 @@ export class Ads implements IAds {
 
         if (this.Config.getCacheMode() !== CacheMode.DISABLED) {
             this.AssetManager.stopCaching();
+        }
+
+        if (this.MediationLoadTrackingManager && this.MediationLoadTrackingManager.getCurrentExperiment() === MediationExperimentType.DynamicCacheMode) {
+            this.AssetManager.overrideCacheMode(CacheMode.FORCED);
+
+            // This change is not necessary for the experiment, but it aligns the field for anything which accesses it after this point
+            this.Config.set('cacheMode', CacheMode.FORCED);
         }
 
         Promise.all([
