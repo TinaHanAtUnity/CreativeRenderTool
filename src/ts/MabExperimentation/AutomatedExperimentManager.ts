@@ -60,7 +60,7 @@ export class AutomatedExperimentManager {
     public static readonly BaseUrlStaging = 'https://auiopt.staging.unityads.unity3d.com';
     public static readonly BaseUrlLocal = 'http://127.0.0.1:3001';
 
-    public static readonly BaseUrl = AutomatedExperimentManager.BaseUrlProduction;
+    public static readonly BaseUrl = AutomatedExperimentManager.BaseUrlLocal;
     public static readonly CreateEndPoint = '/v1/category/experiment';
     public static readonly RewardEndPoint = '/v1/category/reward';
 
