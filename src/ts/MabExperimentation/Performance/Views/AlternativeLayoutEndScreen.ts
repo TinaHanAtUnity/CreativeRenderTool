@@ -1,54 +1,29 @@
 import { IEndScreenParameters } from 'Ads/Views/EndScreen';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
-import { PerformanceEndScreen, SQUARE_END_SCREEN } from 'Performance/Views/PerformanceEndScreen';
+import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
 import EndScreenAlternativeLayout from 'html/mabexperimentation/EndScreenAlternativeLayout.html';
-import SquareEndScreenAnimatedDownloadButtonTemplate from 'html/SquareEndScreenAnimatedDownloadButton.html';
-import { IExperimentActionChoice } from 'MabExperimentation/Models/AutomatedExperiment';
-import { ButtonExperimentDeclaration, ButtonAnimationsExperiment } from 'MabExperimentation/Models/AutomatedExperimentsList';
 import { AUIMetric, SDKMetrics } from 'Ads/Utilities/SDKMetrics';
 import { Color } from 'Core/Utilities/Color';
 import { ImageAnalysis } from 'Performance/Utilities/ImageAnalysis';
 import { IColorTheme } from 'Performance/Utilities/Swatch';
 
 export class AlternativeLayoutEndScreen extends PerformanceEndScreen {
-    private _animation: string;
-    private _downloadButtonColor: string;
-    private _darkMode: boolean;
-    private _tintColor: boolean;
     private _alternativeLayout: boolean;
 
     constructor(
-        combination: IExperimentActionChoice | undefined,
+        // combination: IExperimentActionChoice | undefined,
         parameters: IEndScreenParameters,
         campaign: PerformanceCampaign,
         country?: string
     ) {
         super(parameters, campaign, country);
 
-        combination = this.fixupExperimentChoices(combination);
-
-        // switch (combination.scheme) {
-        //     case ButtonExperimentDeclaration.scheme.LIGHT:
-        //         this._downloadButtonColor = Color.hexToCssRgba(combination.color);
-        //         break;
-        //     case ButtonExperimentDeclaration.scheme.DARK:
-        //         // This is "pastel blue", to be cohesive with dark mode
-        //         this._downloadButtonColor = Color.hexToCssRgba('#2ba3ff');
-        //         this._darkMode = true;
-        //         break;
-        //     case ButtonExperimentDeclaration.scheme.COLORMATCHING:
-        //         this._tintColor = true;
-        //         break;
-        //     default:
-        // }
+        // combination = this.fixupExperimentChoices(combination);
         const simpleRating = campaign.getRating().toFixed(1);
         this._templateData = {
             ...this._templateData,
             simpleRating: simpleRating
         };
-        this._animation = 'static';
-        this._darkMode = false;
-        this._tintColor = false;
         this._alternativeLayout = true;
         this._bindings.push({
             event: 'click',
@@ -56,24 +31,6 @@ export class AlternativeLayoutEndScreen extends PerformanceEndScreen {
             selector: '.end-screen-image, .install-container'
         });
     }
-
-    private fixupExperimentChoices(actions: IExperimentActionChoice | undefined): IExperimentActionChoice {
-        if (actions === undefined) {
-            return ButtonAnimationsExperiment.getDefaultActions();
-        }
-
-        if (!ButtonAnimationsExperiment.isValid(actions)) {
-            SDKMetrics.reportMetricEvent(AUIMetric.InvalidEndscreenAnimation);
-            return ButtonAnimationsExperiment.getDefaultActions();
-        }
-
-        return actions;
-    }
-
-    // public static experimentSupported(experimentID: string): boolean {
-    //     // This is a temp implementation. simple implementation works for now as there is only on experiment supported.
-    //     return experimentID === ButtonAnimationsExperiment.getName();
-    // }
 
     public render(): void {
         super.render();
@@ -166,9 +123,6 @@ export class AlternativeLayoutEndScreen extends PerformanceEndScreen {
     }
 
     protected getTemplate() {
-        // if (this.getEndscreenAlt() === SQUARE_END_SCREEN) {
-        //     return SquareEndScreenAnimatedDownloadButtonTemplate;
-        // }
         return EndScreenAlternativeLayout;
     }
 

@@ -46,7 +46,7 @@ export class PerformanceAdUnitWithAutomatedExperimentParametersFactory extends P
         // if (AlternativeLayoutEndScreen.experimentSupported(experimentID)) {
             endScreenCombination = this._automatedExperimentManager.activateSelectedExperiment(baseParams.campaign, AutomatedExperimentsCategories.PERFORMANCE_ENDCARD);
         // }
-        const endScreen = new AlternativeLayoutEndScreen(endScreenCombination, endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
+        const endScreen = new AlternativeLayoutEndScreen(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
 
         return {
             ... baseParams,
