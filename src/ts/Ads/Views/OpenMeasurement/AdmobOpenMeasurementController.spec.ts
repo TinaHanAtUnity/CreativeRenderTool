@@ -12,7 +12,7 @@ import { DeviceInfo, DeviceInfoMock } from 'Core/Models/__mocks__/DeviceInfo';
 import { Core } from 'Core/__mocks__/Core';
 
 import { AdmobOpenMeasurementController } from 'Ads/Views/OpenMeasurement/AdmobOpenMeasurementController';
-import { AdSessionType, ISessionEvent, VideoPosition } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
+import { ISessionEvent, VideoPosition } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
 import { Platform } from 'Core/Constants/Platform';
 import { AdmobMetric, SDKMetrics } from 'Ads/Utilities/SDKMetrics';
 
