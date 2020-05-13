@@ -63,7 +63,7 @@ import { Platform } from 'Core/Constants/Platform';
                   apiVersion: OMID_P,
                   environment: 'app',
                   accessMode: AccessMode.LIMITED,
-                  adSessionType: AdSessionType.HTML,
+                  adSessionType: AdSessionType.NATIVE,
                   omidNativeInfo: {
                       partnerName: PARTNER_NAME,
                       partnerVersion: ''
