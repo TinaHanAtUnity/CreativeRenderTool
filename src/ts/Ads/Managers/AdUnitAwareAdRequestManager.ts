@@ -58,10 +58,4 @@ export class AdUnitAwareAdRequestManager extends CampaignManager {
 
         this._adUnitPlacements[adUnitId] = additionalPlacements;
     }
-
-    protected reportMetricEvent(metric: LoadV5) {
-        SDKMetrics.reportMetricEventWithTags(metric, {
-            experiment: 'adunit'
-        });
-    }
 }

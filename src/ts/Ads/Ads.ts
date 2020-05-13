@@ -98,7 +98,7 @@ import { PrivacyTestEnvironment } from 'Privacy/PrivacyTestEnvironment';
 import { MetaData } from 'Core/Utilities/MetaData';
 import { AutomatedExperimentManager } from 'MabExperimentation/AutomatedExperimentManager';
 import { CampaignAssetInfo } from 'Ads/Utilities/CampaignAssetInfo';
-import { AdRequestManager } from 'Ads/Managers/AdRequestManager';
+import { AdRequestManager, LoadV5ExperimentType } from 'Ads/Managers/AdRequestManager';
 import { PerPlacementLoadManagerV5 } from 'Ads/Managers/PerPlacementLoadManagerV5';
 
 export class Ads implements IAds {
@@ -322,7 +322,7 @@ export class Ads implements IAds {
     private configureCampaignManager() {
         if (this._loadApiEnabled && this._webViewEnabledLoad) {
             if (this.isLoadV5Enabled()) {
-                this.AdRequestManager = new AdRequestManager(this._core.NativeBridge.getPlatform(), this._core, this._core.Config, this.Config, this.AssetManager, this.SessionManager, this.AdMobSignalFactory, this._core.RequestManager, this._core.ClientInfo, this._core.DeviceInfo, this._core.MetaDataManager, this._core.CacheBookkeeping, this.ContentTypeHandlerManager, this.PrivacySDK, this.PrivacyManager);
+                this.AdRequestManager = new AdRequestManager(this._core.NativeBridge.getPlatform(), this._core, this._core.Config, this.Config, this.AssetManager, this.SessionManager, this.AdMobSignalFactory, this._core.RequestManager, this._core.ClientInfo, this._core.DeviceInfo, this._core.MetaDataManager, this._core.CacheBookkeeping, this.ContentTypeHandlerManager, this.PrivacySDK, this.PrivacyManager, LoadV5ExperimentType.None);
                 this.CampaignManager = this.AdRequestManager;
                 return;
             }

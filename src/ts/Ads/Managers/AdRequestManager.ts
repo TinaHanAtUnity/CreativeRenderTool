@@ -63,6 +63,10 @@ class AdRequestManagerError extends Error {
     }
 }
 
+export enum LoadV5ExperimentType {
+    None = 'none'
+}
+
 export class AdRequestManager extends CampaignManager {
     protected static LoadV5BaseUrl: string = 'https://auction-load.unityads.unity3d.com/v5/games';
 
@@ -76,6 +80,7 @@ export class AdRequestManager extends CampaignManager {
     private _reloadResults: { [key: string]: ILoadedCampaign };
     private _preloadFailed: boolean;
     private _activePreload: boolean;
+    private _currentExperiment: LoadV5ExperimentType;
 
     protected _platform: Platform;
     protected _core: ICoreApi;
@@ -98,7 +103,7 @@ export class AdRequestManager extends CampaignManager {
 
     public readonly onAdditionalPlacementsReady = new Observable2<string | undefined, IPlacementIdMap<INotCachedLoadedCampaign | undefined>>();
 
-    constructor(platform: Platform, core: ICore, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, assetManager: AssetManager, sessionManager: SessionManager, adMobSignalFactory: AdMobSignalFactory, request: RequestManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager, cacheBookkeeping: CacheBookkeepingManager, contentTypeHandlerManager: ContentTypeHandlerManager, privacySDK: PrivacySDK, userPrivacyManager: UserPrivacyManager) {
+    constructor(platform: Platform, core: ICore, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, assetManager: AssetManager, sessionManager: SessionManager, adMobSignalFactory: AdMobSignalFactory, request: RequestManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager, cacheBookkeeping: CacheBookkeepingManager, contentTypeHandlerManager: ContentTypeHandlerManager, privacySDK: PrivacySDK, userPrivacyManager: UserPrivacyManager, experiment: LoadV5ExperimentType) {
         super();
 
         this._platform = platform;
@@ -123,6 +128,7 @@ export class AdRequestManager extends CampaignManager {
         this._preloadFailed = false;
         this._ongoingPreloadRequest = new Promise((resolve) => { this._ongoingPreloadRequestResolve = resolve; });
         this._activePreload = false;
+        this._currentExperiment = experiment;
     }
 
     public requestPreload(): Promise<void> {
@@ -755,7 +761,7 @@ export class AdRequestManager extends CampaignManager {
     protected reportMetricEvent(metric: LoadV5, tags: { [key: string]: string } = {}) {
         SDKMetrics.reportMetricEventWithTags(metric, {
             ...tags,
-            experiment: 'none'
+            'exp': this._currentExperiment
         });
     }
 }
