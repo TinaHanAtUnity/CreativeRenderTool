@@ -57,7 +57,6 @@ export class VastOpenMeasurementController extends OpenMeasurementController {
 
         this._omInstances.forEach((om) => {
             const event: ISessionEvent = {
-                adSessionType: contextData.adSessionType,
                 adSessionId: '',
                 timestamp: date,
                 type: 'sessionStart',

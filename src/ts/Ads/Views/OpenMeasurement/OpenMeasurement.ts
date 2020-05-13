@@ -96,7 +96,6 @@ export class OpenMeasurement<T extends Campaign> extends View<T> {
     private _omAdViewBuilder: OpenMeasurementAdViewBuilder;
     private _verificationResource: IVerificationScriptResource;
     private _thirdPartyEventManager: ThirdPartyEventManager;
-    private _adSessionType: AdSessionType;
 
     // GUID for running all current omid3p with same sessionid as session interface
     private _admobOMSessionId: string;
@@ -226,10 +225,6 @@ export class OpenMeasurement<T extends Campaign> extends View<T> {
      * Current Calculation Locations: VastAdUnit onContainerBackground, onContainerForeground
      */
     public geometryChange(viewport: IViewPort, adView: IAdView) {
-        if (this._adSessionType === AdSessionType.NATIVE) {
-            delete adView.containerGeometry;
-            delete adView.onScreenContainerGeometry;
-        }
         this._omBridge.triggerAdEvent(OMID3pEvents.OMID_GEOMETRY_CHANGE, { viewport, adView });
     }
 
@@ -244,7 +239,6 @@ export class OpenMeasurement<T extends Campaign> extends View<T> {
     * If this is not fired prior to lifecycle events the lifecycle events will not be logged
     */
     public sessionStart(sessionEvent: ISessionEvent) {
-        this._adSessionType = sessionEvent.adSessionType;
         this._sessionStartEventData = sessionEvent;
         this._omBridge.triggerSessionEvent(sessionEvent);
     }
@@ -254,7 +248,6 @@ export class OpenMeasurement<T extends Campaign> extends View<T> {
     */
     public sessionFinish() {
         const event: ISessionEvent = {
-            adSessionType: this._adSessionType,
             adSessionId: this.getOMAdSessionId(),
             timestamp: Date.now(),
             type: 'sessionFinish',

@@ -87,7 +87,6 @@ import { Platform } from 'Core/Constants/Platform';
                   supports: ['vlid', 'clid']
               };
               const event1: ISessionEvent = {
-                  adSessionType: AdSessionType.HTML,
                   adSessionId: '456',
                   timestamp: 123,
                   type: 'sessionStart',
@@ -98,7 +97,6 @@ import { Platform } from 'Core/Constants/Platform';
                   }
               };
               const event2: ISessionEvent = {
-                  adSessionType: AdSessionType.HTML,
                   adSessionId: '456',
                   timestamp: 123,
                   type: 'sessionStart',

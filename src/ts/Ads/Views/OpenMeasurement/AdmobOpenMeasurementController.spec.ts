@@ -53,7 +53,6 @@ import { AdmobMetric, SDKMetrics } from 'Ads/Utilities/SDKMetrics';
 
             it('sessionStart should be called with correct data', () => {
                 const sessionInterfaceEvent: ISessionEvent = {
-                    adSessionType: AdSessionType.HTML,
                     adSessionId: '456',
                     timestamp: 123,
                     type: 'sessionStart',
@@ -63,7 +62,6 @@ import { AdmobMetric, SDKMetrics } from 'Ads/Utilities/SDKMetrics';
                 };
 
                 const event0: ISessionEvent = {
-                    adSessionType: AdSessionType.HTML,
                     adSessionId: '456',
                     timestamp: 123,
                     type: 'sessionStart',
@@ -75,7 +73,6 @@ import { AdmobMetric, SDKMetrics } from 'Ads/Utilities/SDKMetrics';
                 };
 
                 const event1: ISessionEvent = {
-                    adSessionType: AdSessionType.HTML,
                     adSessionId: '456',
                     timestamp: 123,
                     type: 'sessionStart',

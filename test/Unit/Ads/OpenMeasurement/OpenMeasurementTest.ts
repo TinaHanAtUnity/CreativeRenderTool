@@ -174,7 +174,6 @@ import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 
                     it('should use session event admob path when data is passed', () => {
                         const sessionEvent: ISessionEvent = {
-                            adSessionType: AdSessionType.HTML,
                             adSessionId: 'ID',
                             timestamp: 111,
                             type: 'sessionStart',

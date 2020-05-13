@@ -119,7 +119,6 @@ export interface IVastProperties {
 }
 
 export interface ISessionEvent {
-    adSessionType: AdSessionType;
     adSessionId: string;
     timestamp: number;
     type: string;

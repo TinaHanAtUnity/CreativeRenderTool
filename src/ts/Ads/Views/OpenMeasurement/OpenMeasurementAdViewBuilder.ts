@@ -231,7 +231,7 @@ export class OpenMeasurementAdViewBuilder {
             videoHeight = 0;
         }
 
-        const adView: IAdView = {
+        return {
             percentageInView: Math.trunc(percentInView),
             geometry: {
                 x: topLeftX,
@@ -249,27 +249,5 @@ export class OpenMeasurementAdViewBuilder {
             measuringElement: measuringElementAvailable,
             reasons: obstructionReasons
         };
-
-        /*
-        * Only provided if both the native-layer ad view and web-layer
-        * ad element exist and are available for measurement
-        */
-        if (measuringElementAvailable) {
-            adView.containerGeometry = {
-                x: 0,
-                y: 0,
-                width: screenWidth,
-                height: screenHeight
-            };
-            adView.onScreenContainerGeometry = {
-                x: 0,
-                y: 0,
-                width: screenWidth,
-                height: screenHeight,
-                obstructions: obstructionRectangles
-            };
-        }
-
-        return adView;
     }
 }
