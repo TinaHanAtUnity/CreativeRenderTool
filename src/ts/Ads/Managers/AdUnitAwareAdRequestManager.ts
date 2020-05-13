@@ -3,7 +3,6 @@ import { AdRequestManager, INotCachedLoadedCampaign } from 'Ads/Managers/AdReque
 import { IPlacementIdMap } from 'Ads/Managers/PlacementManager';
 import { INativeResponse } from 'Core/Managers/RequestManager';
 import { Placement } from 'Ads/Models/Placement';
-import { LoadV5, SDKMetrics } from 'Ads/Utilities/SDKMetrics';
 
 export class AdUnitAwareAdRequestManager extends CampaignManager {
     private _adRequestManager: AdRequestManager;
