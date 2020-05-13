@@ -8,23 +8,19 @@ import { ImageAnalysis } from 'Performance/Utilities/ImageAnalysis';
 import { IColorTheme } from 'Performance/Utilities/Swatch';
 
 export class ColorBlurEndScreen extends PerformanceEndScreen {
-    private _colorBlur: boolean;
 
     constructor(
-        // combination: IExperimentActionChoice | undefined,
         parameters: IEndScreenParameters,
         campaign: PerformanceCampaign,
         country?: string
     ) {
         super(parameters, campaign, country);
 
-        // combination = this.fixupExperimentChoices(combination);
         const simpleRating = campaign.getRating().toFixed(1);
         this._templateData = {
             ...this._templateData,
             simpleRating: simpleRating
         };
-        this._colorBlur = true;
         this._bindings.push({
             event: 'click',
             listener: (event: Event) => this.onDownloadEvent(event),
@@ -35,10 +31,6 @@ export class ColorBlurEndScreen extends PerformanceEndScreen {
     public render(): void {
         super.render();
         this.renderColorTheme();
-    }
-
-    private applyAlternativeLayout() {
-        document.body.classList.add('alternative-layout');
     }
 
     private renderColorTheme() {
@@ -109,17 +101,13 @@ export class ColorBlurEndScreen extends PerformanceEndScreen {
     public show(): void {
         super.show();
         window.addEventListener('resize', this.handleResize, false);
-        if (this._colorBlur) {
-            this.applyAlternativeLayout();
-        }
+        document.body.classList.add('alternative-layout');
     }
 
     public hide(): void {
         super.hide();
         window.removeEventListener('resize', this.handleResize);
-        if (this._colorBlur) {
             document.body.classList.remove('alternative-layout');
-        }
     }
 
     protected getTemplate() {
