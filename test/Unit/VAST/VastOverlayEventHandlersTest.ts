@@ -182,7 +182,7 @@ import { SDKMetrics } from 'Ads/Utilities/SDKMetrics';
             sandbox.stub(MoatViewabilityService, 'getMoat').returns(moat);
             sandbox.stub(vastAdUnit, 'getOpenMeasurementController').returns(vastAdUnitParameters.om);
             om = vastAdUnitParameters.om;
-            SDKMetrics.initialize();
+            sandbox.stub(SDKMetrics, 'reportMetricEvent').returns(Promise.resolve());
         });
 
         afterEach(() => {
