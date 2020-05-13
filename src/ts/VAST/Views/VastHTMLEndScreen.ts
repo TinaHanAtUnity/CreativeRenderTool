@@ -13,6 +13,7 @@ import { Platform } from 'Core/Constants/Platform';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { IObserver1, IObserver2 } from 'Core/Utilities/IObserver';
 import { ICoreApi } from 'Core/ICore';
+import { SDKMetrics, VastMetric } from 'Ads/Utilities/SDKMetrics';
 
 export class VastHTMLEndScreen extends VastEndScreen implements IPrivacyHandlerView {
 
@@ -66,14 +67,20 @@ export class VastHTMLEndScreen extends VastEndScreen implements IPrivacyHandlerV
         if (this._htmlContentTemplateData) {
             super.show();
             this.setUpWebPlayers().then(() => {
-                this._webPlayerContainer.setData(this._htmlContentTemplate.render(this._htmlContentTemplateData), 'text/html', 'UTF-8').catch(() => {
-                    this.onCloseEvent(new Event('click'));
+                this._webPlayerContainer.setData(this._htmlContentTemplate.render(this._htmlContentTemplateData), 'text/html', 'UTF-8')
+                    .then(() => {
+                        SDKMetrics.reportMetricEvent(VastMetric.VastHTMLEndcardShown);
+                    }).catch(() => {
+                        SDKMetrics.reportMetricEvent(VastMetric.VastHTMLEndcardShownFailed);
+                        this.onCloseEvent(new Event('click'));
                 });
             }).catch(() => {
                 this.onCloseEvent(new Event('click'));
+                SDKMetrics.reportMetricEvent(VastMetric.VastHTMLEndcardShownFailed);
             });
         } else {
             this.onCloseEvent(new Event('click'));
+            SDKMetrics.reportMetricEvent(VastMetric.VastHTMLEndcardShownFailed);
         }
     }
 
