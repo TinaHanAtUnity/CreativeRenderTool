@@ -1,4 +1,4 @@
-# Pending
+# Wed May 13 21:58:11 UTC 2020
 
 * [Add Vast HTML endcard support] PR4: Added metrics to track the showing number of HTML endcard and static endcard [#15335](https://github.com/Applifier/unity-ads-webview/pull/15335)
 * [Latency] Adapt CacheMode Test into DynamicCacheMode Test [#15332](https://github.com/Applifier/unity-ads-webview/pull/15332)
