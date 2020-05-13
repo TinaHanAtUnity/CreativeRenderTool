@@ -1,5 +1,6 @@
 # Pending
 
+* [Add Vast HTML endcard support] PR4: Added metrics to track the showing number of HTML endcard and static endcard [#15335](https://github.com/Applifier/unity-ads-webview/pull/15335)
 * [Latency] Adapt CacheMode Test into DynamicCacheMode Test [#15332](https://github.com/Applifier/unity-ads-webview/pull/15332)
 * [Latency] Add Override for CacheMode in AssetManager [#15331](https://github.com/Applifier/unity-ads-webview/pull/15331)
 * [Add Vast HTML endcard support] PR3: Enable HTML endcard in AB group 17 [#15273](https://github.com/Applifier/unity-ads-webview/pull/15273)
