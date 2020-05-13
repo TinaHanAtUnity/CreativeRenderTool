@@ -6,13 +6,14 @@ import { ICore } from 'Core/ICore';
 import { AlternativeLayoutEndScreen } from 'MabExperimentation/Performance/Views/AlternativeLayoutEndScreen';
 import { AnimatedDownloadButtonEndScreen } from 'MabExperimentation/Performance/Views/AnimatedDownloadButtonEndScreen';
 import { AutomatedExperimentManager } from 'MabExperimentation/AutomatedExperimentManager';
-import { AutomatedExperimentsCategories } from 'MabExperimentation/Models/AutomatedExperimentsList';
+import { AutomatedExperimentsCategories, ButtonExperimentDeclaration } from 'MabExperimentation/Models/AutomatedExperimentsList';
 import { PerformanceAdUnitParametersFactory } from 'Performance/AdUnits/PerformanceAdUnitParametersFactory';
 import { Campaign } from 'Ads/Models/Campaign';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { VideoOverlay } from 'Ads/Views/VideoOverlay';
 import { SwipeUpVideoOverlay } from 'Ads/Views/SwipeUpVideoOverlay';
 import { IExperimentActionChoice } from 'MabExperimentation/Models/AutomatedExperiment';
+import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
 
 export class PerformanceAdUnitWithAutomatedExperimentParametersFactory extends PerformanceAdUnitParametersFactory {
 
@@ -39,14 +40,17 @@ export class PerformanceAdUnitWithAutomatedExperimentParametersFactory extends P
 
         const video = this.getVideo(baseParams.campaign, baseParams.forceOrientation);
 
-        // const endScreenCombination: IExperimentActionChoice | undefined = this._automatedExperimentManager.activateSelectedExperiment(baseParams.campaign, AutomatedExperimentsCategories.PERFORMANCE_ENDCARD);
-
         let endScreenCombination: IExperimentActionChoice | undefined;
 
-        // if (AlternativeLayoutEndScreen.experimentSupported(experimentID)) {
-            endScreenCombination = this._automatedExperimentManager.activateSelectedExperiment(baseParams.campaign, AutomatedExperimentsCategories.PERFORMANCE_ENDCARD);
-        // }
-        const endScreen = new AlternativeLayoutEndScreen(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
+        endScreenCombination = this._automatedExperimentManager.activateSelectedExperiment(baseParams.campaign, AutomatedExperimentsCategories.PERFORMANCE_ENDCARD);
+
+        let endScreen: PerformanceEndScreen;
+
+        if (endScreenCombination && endScreenCombination.scheme === ButtonExperimentDeclaration.scheme.COLOR_BLUR) {
+            endScreen = new AlternativeLayoutEndScreen(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
+        } else {
+            endScreen = new AnimatedDownloadButtonEndScreen(endScreenCombination, endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
+        }
 
         return {
             ... baseParams,

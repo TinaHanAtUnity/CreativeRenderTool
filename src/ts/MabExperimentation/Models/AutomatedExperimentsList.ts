@@ -10,7 +10,8 @@ export const ButtonExperimentDeclaration = {
   scheme: {
       DARK: 'dark',
       LIGHT: 'light',
-      COLORMATCHING: 'color_matching'
+      COLORMATCHING: 'color_matching',
+      COLOR_BLUR: 'color_blur_v1'
   },
   animation: {
       STATIC: 'static',
