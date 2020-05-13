@@ -83,6 +83,5 @@ jest.mock('html/VastStaticEndScreen.html', () => {
                 expect(privacy.hide).toHaveBeenCalled();
             });
         });
-
     });
 });
