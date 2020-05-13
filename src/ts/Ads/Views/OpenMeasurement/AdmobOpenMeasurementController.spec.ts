@@ -121,7 +121,7 @@ import { AdmobMetric, SDKMetrics } from 'Ads/Utilities/SDKMetrics';
                 beforeEach(() => {
                     omManager.start(10);
                     omManager.loaded({
-                        isSkippable: false,
+                        skippable: false,
                         skipOffset: 1,
                         isAutoplay: false,
                         position: VideoPosition.STANDALONE
@@ -146,7 +146,7 @@ import { AdmobMetric, SDKMetrics } from 'Ads/Utilities/SDKMetrics';
             describe('load called first', () => {
                 beforeEach(() => {
                     omManager.loaded({
-                        isSkippable: false,
+                        skippable: false,
                         skipOffset: 1,
                         isAutoplay: false,
                         position: VideoPosition.STANDALONE

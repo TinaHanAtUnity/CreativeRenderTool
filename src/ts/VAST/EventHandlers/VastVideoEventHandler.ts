@@ -122,7 +122,7 @@ export class VastVideoEventHandler extends VideoEventHandler {
             this._om.resume();
             this._om.setDeviceVolume(this._vastAdUnit.getVolume());
             this._om.loaded({
-                isSkippable: this._placement.allowSkip(),
+                skippable: this._placement.allowSkip(),
                 skipOffset: this._placement.allowSkipInSeconds(),
                 isAutoplay: true, // Always autoplay for video
                 position: VideoPosition.STANDALONE // Always standalone video
