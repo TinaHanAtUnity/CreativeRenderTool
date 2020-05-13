@@ -14,7 +14,6 @@ import { AbstractAdUnitMock, AbstractAdUnit } from 'Ads/AdUnits/__mocks__/Abstra
 import { ObservableMock } from 'Core/Utilities/__mocks__/Observable';
 import { PerformanceAdUnitFactory } from 'Performance/AdUnits/PerformanceAdUnitFactory';
 import { ProgrammaticMraidParser } from 'MRAID/Parsers/ProgrammaticMraidParser';
-import { ILoadedCampaign } from './CampaignManager';
 
 [Platform.IOS, Platform.ANDROID].forEach((platform) => {
     describe(`PerPlacementLoadManagerV5(${Platform[platform]})`, () => {
