@@ -20,6 +20,7 @@ import { AbstractPrivacy } from 'Ads/Views/__mocks__/AbstractPrivacy';
 import { PrivacySDK } from 'Privacy/__mocks__/PrivacySDK';
 import { Store } from 'Store/__mocks__/Store';
 import { Core } from 'Core/__mocks__/Core';
+import { SDKMetrics, VastMetric } from 'Ads/Utilities/SDKMetrics';
 
 jest.mock('html/VastStaticEndScreen.html', () => {
     return {
@@ -81,6 +82,19 @@ jest.mock('html/VastStaticEndScreen.html', () => {
             it('the privacy should hide', () => {
                 staticEndScreen.onPrivacyClose();
                 expect(privacy.hide).toHaveBeenCalled();
+            });
+        });
+
+        describe('when endcard is showing', () => {
+            beforeEach(() => {
+                staticEndScreen.show();
+            });
+
+            it('the SDKMetrics should be called', () => {
+                expect(SDKMetrics.reportMetricEvent).toHaveBeenCalled();
+            });
+            it('the SDKMetrics should be called with VastMetric.VastStaticEndcardShown', () => {
+                expect(SDKMetrics.reportMetricEvent).toHaveBeenCalledWith(VastMetric.VastStaticEndcardShown);
             });
         });
     });

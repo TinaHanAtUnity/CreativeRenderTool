@@ -5,6 +5,7 @@ import VastStaticEndScreenTemplate from 'html/VastStaticEndScreen.html';
 import { VastEndScreen } from 'VAST/Views/VastEndScreen';
 import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
+import { SDKMetrics, VastMetric } from 'Ads/Utilities/SDKMetrics';
 
 export class VastStaticEndScreen extends VastEndScreen implements IPrivacyHandlerView {
 
@@ -50,6 +51,11 @@ export class VastStaticEndScreen extends VastEndScreen implements IPrivacyHandle
                 selector: '.campaign-container, .game-background'
             });
         }
+    }
+
+    public show(): void {
+        super.show();
+        SDKMetrics.reportMetricEvent(VastMetric.VastStaticEndcardShown);
     }
 
     public remove(): void {

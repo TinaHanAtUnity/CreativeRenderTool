@@ -72,7 +72,10 @@ export enum ChinaMetric {
 }
 
 export enum VastMetric {
-    VastVideoImpressionFailed = 'vast_video_impression_failed'
+    VastVideoImpressionFailed = 'vast_video_impression_failed',
+    VastStaticEndcardShown = 'vast_static_endcard_shown',
+    VastHTMLEndcardShown = 'vast_html_endcard_shown',
+    VastHTMLEndcardShownFailed = 'vast_html_endcard_shown_failed'
 }
 
 export enum MiscellaneousMetric {

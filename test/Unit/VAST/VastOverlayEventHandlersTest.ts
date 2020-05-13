@@ -39,6 +39,7 @@ import { OpenMeasurementAdViewBuilder } from 'Ads/Views/OpenMeasurement/OpenMeas
 import { ObstructionReasons } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
 import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurementUtilities';
 import { VastStaticEndScreen } from 'VAST/Views/VastStaticEndScreen';
+import { SDKMetrics } from 'Ads/Utilities/SDKMetrics';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe('VastOverlayEventHandlersTest', () => {
@@ -181,6 +182,7 @@ import { VastStaticEndScreen } from 'VAST/Views/VastStaticEndScreen';
             sandbox.stub(MoatViewabilityService, 'getMoat').returns(moat);
             sandbox.stub(vastAdUnit, 'getOpenMeasurementController').returns(vastAdUnitParameters.om);
             om = vastAdUnitParameters.om;
+            SDKMetrics.initialize();
         });
 
         afterEach(() => {
