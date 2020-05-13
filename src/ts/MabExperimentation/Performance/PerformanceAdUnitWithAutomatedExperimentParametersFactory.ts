@@ -3,7 +3,7 @@ import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
 import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
 import { IEndScreenParameters } from 'Ads/Views/EndScreen';
 import { ICore } from 'Core/ICore';
-import { AlternativeLayoutEndScreen } from 'MabExperimentation/Performance/Views/AlternativeLayoutEndScreen';
+import { ColorBlurEndScreen } from 'MabExperimentation/Performance/Views/ColorBlurEndScreen';
 import { AnimatedDownloadButtonEndScreen } from 'MabExperimentation/Performance/Views/AnimatedDownloadButtonEndScreen';
 import { AutomatedExperimentManager } from 'MabExperimentation/AutomatedExperimentManager';
 import { AutomatedExperimentsCategories, ButtonExperimentDeclaration } from 'MabExperimentation/Models/AutomatedExperimentsList';
@@ -47,7 +47,7 @@ export class PerformanceAdUnitWithAutomatedExperimentParametersFactory extends P
         let endScreen: PerformanceEndScreen;
 
         if (endScreenCombination && endScreenCombination.scheme === ButtonExperimentDeclaration.scheme.COLOR_BLUR) {
-            endScreen = new AlternativeLayoutEndScreen(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
+            endScreen = new ColorBlurEndScreen(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
         } else {
             endScreen = new AnimatedDownloadButtonEndScreen(endScreenCombination, endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
         }

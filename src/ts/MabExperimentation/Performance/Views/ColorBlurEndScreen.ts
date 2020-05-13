@@ -7,8 +7,8 @@ import { Color } from 'Core/Utilities/Color';
 import { ImageAnalysis } from 'Performance/Utilities/ImageAnalysis';
 import { IColorTheme } from 'Performance/Utilities/Swatch';
 
-export class AlternativeLayoutEndScreen extends PerformanceEndScreen {
-    private _alternativeLayout: boolean;
+export class ColorBlurEndScreen extends PerformanceEndScreen {
+    private _colorBlur: boolean;
 
     constructor(
         // combination: IExperimentActionChoice | undefined,
@@ -24,7 +24,7 @@ export class AlternativeLayoutEndScreen extends PerformanceEndScreen {
             ...this._templateData,
             simpleRating: simpleRating
         };
-        this._alternativeLayout = true;
+        this._colorBlur = true;
         this._bindings.push({
             event: 'click',
             listener: (event: Event) => this.onDownloadEvent(event),
@@ -109,7 +109,7 @@ export class AlternativeLayoutEndScreen extends PerformanceEndScreen {
     public show(): void {
         super.show();
         window.addEventListener('resize', this.handleResize, false);
-        if (this._alternativeLayout) {
+        if (this._colorBlur) {
             this.applyAlternativeLayout();
         }
     }
@@ -117,7 +117,7 @@ export class AlternativeLayoutEndScreen extends PerformanceEndScreen {
     public hide(): void {
         super.hide();
         window.removeEventListener('resize', this.handleResize);
-        if (this._alternativeLayout) {
+        if (this._colorBlur) {
             document.body.classList.remove('alternative-layout');
         }
     }
