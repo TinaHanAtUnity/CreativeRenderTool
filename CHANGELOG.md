@@ -1,3 +1,7 @@
+# Pending
+
+* [Load V5, Ad Unit] Add Ad Unit Aware Ad Request Manager [#15327](https://github.com/Applifier/unity-ads-webview/pull/15327)
+
 # Tue May 12 23:17:32 UTC 2020
 
 * [Load V5, Ad Unit] Support for additional placements in load requests [#15097](https://github.com/Applifier/unity-ads-webview/pull/15097)
