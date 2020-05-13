@@ -256,7 +256,7 @@ class SatisfiesMatcher {
             });
 
             it('should send fill metric', () => {
-                expect(SDKMetrics.reportMetricEvent).toBeCalledWith(LoadV5.LoadRequestFill);
+                expect(SDKMetrics.reportMetricEventWithTags).toBeCalledWith(LoadV5.LoadRequestFill, expect.anything());
             });
 
             it('should not increase request count in game session counter', () => {
@@ -484,7 +484,7 @@ class SatisfiesMatcher {
             });
 
             it('should send fill metric', () => {
-                expect(SDKMetrics.reportMetricEvent).toBeCalledWith(LoadV5.LoadRequestFill);
+                expect(SDKMetrics.reportMetricEventWithTags).toBeCalledWith(LoadV5.LoadRequestFill, expect.anything());
             });
 
             it('should not increase request count in game session counter', () => {

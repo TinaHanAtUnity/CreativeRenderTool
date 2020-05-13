@@ -133,7 +133,7 @@ export class AdRequestManager extends CampaignManager {
         }
 
         if (this._activePreload) {
-            SDKMetrics.reportMetricEvent(LoadV5.PreloadRequestAlreadyActive);
+            this.reportMetricEvent(LoadV5.PreloadRequestAlreadyActive);
 
             let promiseResolve: () => void;
             const promise = new Promise<void>((resolve) => { promiseResolve = resolve; });
@@ -147,7 +147,7 @@ export class AdRequestManager extends CampaignManager {
         let requestPrivacy: IRequestPrivacy;
         let legacyRequestPrivacy: ILegacyRequestPrivacy;
 
-        SDKMetrics.reportMetricEvent(LoadV5.PreloadRequestStarted);
+        this.reportMetricEvent(LoadV5.PreloadRequestStarted);
 
         this._preloadData = null;
         this._currentSession = null;
@@ -182,7 +182,7 @@ export class AdRequestManager extends CampaignManager {
                 SdkStats.increaseAdRequestOrdinal();
             }
 
-            SDKMetrics.reportMetricEvent(LoadV5.PreloadRequestParsingResponse);
+            this.reportMetricEvent(LoadV5.PreloadRequestParsingResponse);
             return this.parsePreloadResponse(response, countersForOperativeEvents, requestPrivacy, legacyRequestPrivacy);
         }).catch((err) => {
             this._preloadFailed = true;
@@ -226,7 +226,7 @@ export class AdRequestManager extends CampaignManager {
         let requestPrivacy: IRequestPrivacy;
         let legacyRequestPrivacy: ILegacyRequestPrivacy;
 
-        SDKMetrics.reportMetricEvent(LoadV5.LoadRequestStarted);
+        this.reportMetricEvent(LoadV5.LoadRequestStarted);
 
         return Promise.resolve().then(() => {
             if (this.hasPreloadFailed()) {
@@ -273,15 +273,15 @@ export class AdRequestManager extends CampaignManager {
                 if (this._reloadResults[placementId] !== undefined) {
                     return Promise.resolve(this._reloadResults[placementId]);
                 }
-                SDKMetrics.reportMetricEvent(LoadV5.LoadRequestWasCanceled);
+                this.reportMetricEvent(LoadV5.LoadRequestWasCanceled);
                 return this.requestLoad(placementId);
             }
-            SDKMetrics.reportMetricEvent(LoadV5.LoadRequestParsingResponse);
+            this.reportMetricEvent(LoadV5.LoadRequestParsingResponse);
             return this.parseLoadResponse(response, this._adsConfig.getPlacement(placementId), additionalPlacements);
         }).then((campaign) => {
             delete this._ongoingLoadRequests[placementId];
             if (campaign) {
-                SDKMetrics.reportMetricEvent(LoadV5.LoadRequestFill);
+                this.reportMetricEvent(LoadV5.LoadRequestFill);
             }
             return campaign;
         }).catch((err) => {
@@ -300,7 +300,7 @@ export class AdRequestManager extends CampaignManager {
         let requestPrivacy: IRequestPrivacy;
         let legacyRequestPrivacy: ILegacyRequestPrivacy;
 
-        SDKMetrics.reportMetricEvent(LoadV5.ReloadRequestStarted);
+        this.reportMetricEvent(LoadV5.ReloadRequestStarted);
 
         let promiseResolve: () => void;
         this._ongoingReloadRequest = new Promise((resolve) => { promiseResolve = resolve; });
@@ -342,7 +342,7 @@ export class AdRequestManager extends CampaignManager {
                 SdkStats.increaseAdRequestOrdinal();
             }
 
-            SDKMetrics.reportMetricEvent(LoadV5.ReloadRequestParsingResponse);
+            this.reportMetricEvent(LoadV5.ReloadRequestParsingResponse);
             return this.parseReloadResponse(response, placementsToLoad.map((placementId) => this._adsConfig.getPlacement(placementId)), countersForOperativeEvents, requestPrivacy, legacyRequestPrivacy);
         }).catch((err) => {
             this._preloadFailed = true;
@@ -749,6 +749,13 @@ export class AdRequestManager extends CampaignManager {
             }
         }
 
-        SDKMetrics.reportMetricEventWithTags(event, { 'rsn': reason });
+        this.reportMetricEvent(event, { 'rsn': reason });
+    }
+
+    protected reportMetricEvent(metric: LoadV5, tags: { [key: string]: string } = {}) {
+        SDKMetrics.reportMetricEventWithTags(metric, {
+            ...tags,
+            experiment: 'none'
+        });
     }
 }
