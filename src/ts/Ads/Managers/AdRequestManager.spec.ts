@@ -476,7 +476,7 @@ class SatisfiesMatcher {
                 adRequestManager.onAdditionalPlacementsReady.subscribe(onAdditionalPlacementsReady);
 
                 await adRequestManager.requestPreload();
-                loadedCampaign = await adRequestManager.loadCampaign(placements.video);
+                loadedCampaign = await adRequestManager.loadCampaignWithAdditionalPlacement(placements.video);
             });
 
             it('should getPlacementsForAdunit be called with correct ad unit id', () => {
