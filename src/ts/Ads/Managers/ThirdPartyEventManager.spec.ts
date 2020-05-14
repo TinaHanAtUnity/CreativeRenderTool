@@ -72,7 +72,7 @@ describe('ThirdPartyEventManagerTest', () => {
                     {
                         name: 'impression_duplicate_non_batching',
                         value: 1,
-                        tags: []
+                        tags: ['ads_sdk2_tst:true']
                     }
                 ]
             });
