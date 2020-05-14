@@ -13,6 +13,7 @@ import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { SDKMetrics } from 'Ads/Utilities/SDKMetrics';
 import { ColorBlurEndScreen } from 'MabExperimentation/Performance/Views/ColorBlurEndScreen';
+import { ImageAnalysis } from 'Performance/Utilities/ImageAnalysis';
 
 describe('ColorBlurEndScreenTest', () => {
     let platform: Platform;
@@ -134,29 +135,65 @@ describe('ColorBlurEndScreenTest', () => {
             validateTranslation(createColorBlurEndScreen('zh_Hant'), '立即下载', '免费');
         });
     });
+    describe('Testing the color matching for the game info container and the install container', () => {
+        it('should render with the same color for game info container background and install container text', () => {
+            const getColorTheme = () => {
+                const campaign = TestFixtures.getCampaign();
 
-    it('should render with the same color applied to downloadButton, installText, and freeTextColor', () => {
-        const validateExperimentAttributes = (endScreen: ColorBlurEndScreen) => {
-            endScreen.render();
-            const gameInfoContainer = <HTMLElement>endScreen.container().querySelector('.game-info-container');
-            const gameInfoContainerColor = gameInfoContainer.style.backgroundColor;
+                const portraitImage = campaign.getPortrait();
+                const landscapeImage = campaign.getLandscape();
+                const squareImage = campaign.getSquare();
 
-            const installContainer = <HTMLElement>endScreen.container().querySelector('.install-container');
-            const installContainerColor = installContainer.style.color;
+                const deviceInfo = core.DeviceInfo;
+                Promise.all([deviceInfo.getScreenWidth(), deviceInfo.getScreenHeight()]).then(([screenWidth, screenHeight]) => {
+                    const isLandscape = screenWidth > screenHeight;
+                    let image;
+                    if (squareImage) {
+                        image = squareImage;
+                    } else if (isLandscape && portraitImage) {
+                        image = portraitImage; // when the device is in landscape mode, we are showing a portrait image
+                    } else if (landscapeImage) {
+                        image = landscapeImage;
+                    } else {
+                        image = portraitImage;
+                    }
 
-            if (!gameInfoContainerColor || !installContainerColor) {
-                assert.fail('Couldnt render all the colors');
-            } else {
-                assert.equal(gameInfoContainerColor, installContainerColor);
-            }
+                    if (image) {
+                        ImageAnalysis.getImageSrc(core.Cache, image)
+                            .then(ImageAnalysis.analyseImage)
+                            .then((swatches) => {
+                                if (!swatches || !swatches.length) {
+                                    return;
+                                }
+                            });
+                    }
+                });
+                return 'rgb(22, 125, 251)';
+            };
 
-            const container = privacy.container();
-            if (container && container.parentElement) {
-                container.parentElement.removeChild(container);
-            }
-        };
+            const validateExperimentAttributes = (endScreen: ColorBlurEndScreen) => {
+                endScreen.render();
+                const gameInfoContainer = <HTMLElement>endScreen.container().querySelector('.game-info-container');
+                gameInfoContainer.style.backgroundColor = getColorTheme();
+                const gameInfoContainerColor = gameInfoContainer.style.backgroundColor;
 
-        //Color Blur should have the same color for all three elements
-        validateExperimentAttributes(createColorBlurEndScreen('en'));
+                const installContainer = <HTMLElement>endScreen.container().querySelector('.install-container');
+                installContainer.style.color = getColorTheme();
+                const installContainerColor = installContainer.style.color;
+
+                if (!gameInfoContainerColor || !installContainerColor) {
+                    assert.fail('Couldnt render all the colors');
+                } else {
+                    assert.equal(gameInfoContainerColor, installContainerColor);
+                }
+
+                const container = privacy.container();
+                if (container && container.parentElement) {
+                    container.parentElement.removeChild(container);
+                }
+            };
+
+            validateExperimentAttributes(createColorBlurEndScreen('en'));
+        });
     });
 });
