@@ -7,7 +7,7 @@ import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
 import { Url } from 'Core/Utilities/Url';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { MacroUtil } from 'Ads/Utilities/MacroUtil';
-import { MiscellaneousMetric } from 'Ads/Utilities/SDKMetrics';
+import { SDKMetrics, MiscellaneousMetric } from 'Ads/Utilities/SDKMetrics';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { FailedPTSEventManager } from 'Ads/Managers/FailedPTSEventManager';
 import { StorageBridge } from 'Core/Utilities/StorageBridge';
@@ -81,6 +81,11 @@ export class ThirdPartyEventManager {
 
         // For the investigation of the batching implementation of metrics in the SDK
         if (event === TrackingEvent.IMPRESSION) {
+
+            // Keep original metric and sampling as it was
+            if (CustomFeatures.sampleAtGivenPercent(50)) {
+                SDKMetrics.reportMetricEvent(MiscellaneousMetric.ImpressionDuplicate);
+            }
 
             const metricData = JSON.stringify({
                 metrics: [

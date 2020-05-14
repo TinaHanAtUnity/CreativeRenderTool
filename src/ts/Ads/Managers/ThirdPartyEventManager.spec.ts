@@ -83,7 +83,7 @@ describe('ThirdPartyEventManagerTest', () => {
                 retryWithConnectionEvents: false,
                 followRedirects: false
             };
-            expect(request.post).toBeCalledWith('https://sdk-diagnostics.stg.mz.internal.unity3d.com/v1/metrics', metricData, ptsHeaders, requestOptions);
+            expect(request.post).toBeCalledWith('https://sdk-diagnostics.prd.mz.internal.unity3d.com/v1/metrics', metricData, ptsHeaders, requestOptions);
         });
     });
 });

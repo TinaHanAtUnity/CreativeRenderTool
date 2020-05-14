@@ -78,6 +78,7 @@ export enum VastMetric {
 }
 
 export enum MiscellaneousMetric {
+    ImpressionDuplicate = 'impression_duplicate',
     ImpressionDuplicateNonBatching = 'impression_duplicate_non_batching',
     CampaignNotFound = 'campaign_not_found',
     ConsentParagraphLinkClicked = 'consent_paragraph_link_clicked',
