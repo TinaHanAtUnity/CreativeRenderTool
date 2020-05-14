@@ -7,7 +7,7 @@ import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
 import { Url } from 'Core/Utilities/Url';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { MacroUtil } from 'Ads/Utilities/MacroUtil';
-import { SDKMetrics, MiscellaneousMetric } from 'Ads/Utilities/SDKMetrics';
+import { MiscellaneousMetric } from 'Ads/Utilities/SDKMetrics';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { FailedPTSEventManager } from 'Ads/Managers/FailedPTSEventManager';
 import { StorageBridge } from 'Core/Utilities/StorageBridge';
@@ -79,8 +79,26 @@ export class ThirdPartyEventManager {
         const sessionId = campaign.getSession().getId();
         const events = [];
 
-        if (event === TrackingEvent.IMPRESSION && CustomFeatures.sampleAtGivenPercent(50)) {
-            SDKMetrics.reportMetricEvent(MiscellaneousMetric.ImpressionDuplicate);
+        // For the investigation of the batching implementation of metrics in the SDK
+        if (event === TrackingEvent.IMPRESSION) {
+            const metricData = JSON.stringify({
+                metrics: [
+                    {
+                        name: MiscellaneousMetric.ImpressionDuplicateNonBatching,
+                        value: 1,
+                        tags: []
+                    }
+                ]
+            });
+
+            const requestOptions = {
+                retries: 2,
+                retryDelay: 0,
+                retryWithConnectionEvents: false,
+                followRedirects: false
+            };
+            const ptsHeaders: [string, string][] = [['Content-Type', 'application/json']];
+            events.push(this._request.post('https://sdk-diagnostics.stg.mz.internal.unity3d.com/v1/metrics', metricData, ptsHeaders, requestOptions));
         }
 
         for (const url of urls) {
