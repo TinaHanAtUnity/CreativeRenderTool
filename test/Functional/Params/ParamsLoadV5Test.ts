@@ -72,7 +72,7 @@ describe('Event parameters should match specifications (Load V5)', () => {
             sandbox.stub(sessionManager, 'startNewSession').returns(Promise.resolve(new Session('abdce-12345')));
             sandbox.stub(RequestPrivacyFactory, 'create').returns(<IRequestPrivacy>{});
             sessionManager.setGameSessionId(1234);
-            const campaignManager: AdRequestManager = new AdRequestManager(platform, coreModule, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, privacySDK, privacyManager);
+            const campaignManager: AdRequestManager = new AdRequestManager(platform, coreModule, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, privacySDK, privacyManager, LoadV5ExperimentType.None);
             return campaignManager.request().then(() => {
                 const url: string = requestSpy.getCall(0).args[0];
                 const body: string = requestSpy.getCall(0).args[1];
