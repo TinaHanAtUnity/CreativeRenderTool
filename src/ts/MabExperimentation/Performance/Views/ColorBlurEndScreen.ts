@@ -1,9 +1,9 @@
-import { IEndScreenParameters } from 'Ads/Views/EndScreen';
+import { IEndScreenParameters, EndScreen } from 'Ads/Views/EndScreen';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
 import EndScreenAlternativeLayout from 'html/mabexperimentation/EndScreenAlternativeLayout.html';
 import { AUIMetric, SDKMetrics } from 'Ads/Utilities/SDKMetrics';
-import { Color } from 'Core/Utilities/Color';
+import { ColorTheme } from 'Core/Utilities/ColorTheme';
 import { ImageAnalysis } from 'Performance/Utilities/ImageAnalysis';
 import { IColorTheme } from 'Performance/Utilities/Swatch';
 
@@ -30,48 +30,9 @@ export class ColorBlurEndScreen extends PerformanceEndScreen {
 
     public render(): void {
         super.render();
-        this.renderColorTheme();
-    }
-
-    private renderColorTheme() {
-        const portraitImage = this._campaign.getPortrait();
-        const landscapeImage = this._campaign.getLandscape();
-        const squareImage = this._campaign.getSquare();
-
-        const deviceInfo = this._core.DeviceInfo;
-        Promise.all([deviceInfo.getScreenWidth(), deviceInfo.getScreenHeight()]).then(([screenWidth, screenHeight]) => {
-            const isLandscape = screenWidth > screenHeight;
-            let image;
-            if (squareImage) {
-                image = squareImage;
-            } else if (isLandscape && portraitImage) {
-                image = portraitImage; // when the device is in landscape mode, we are showing a portrait image
-            } else if (landscapeImage) {
-                image = landscapeImage;
-            } else {
-                image = portraitImage;
-            }
-
-            if (image) {
-                ImageAnalysis.getImageSrc(this._core.Cache, image)
-                    .then(ImageAnalysis.analyseImage)
-                    .then((swatches) => {
-                        if (!swatches || !swatches.length) {
-                            SDKMetrics.reportMetricEvent(AUIMetric.InvalidEndscreenColorTintSwitches);
-                            return;
-                        }
-
-                        const baseColorTheme = swatches[0].getColorTheme();
-                        const secondaryColorTheme = (swatches.length > 1 ? swatches[1] : swatches[0]).getColorTheme();
-                        this.applyColorTheme(baseColorTheme, secondaryColorTheme);
-                    })
-                    .catch((msg: string) => {
-                        SDKMetrics.reportMetricEventWithTags(AUIMetric.EndscreenColorTintError, {
-                            msg: msg
-                        });
-                    });
-            }
-        });
+        ColorTheme.renderColorTheme(this._campaign, this._core);
+        console.log('????????????????????', ColorTheme.renderColorTheme(this._campaign, this._core))
+        // this.applyColorTheme(colorTheme.baseColorTheme, colorTheme.secondaryColorTheme)
     }
 
     private applyColorTheme(baseColorTheme: IColorTheme, secondaryColorTheme: IColorTheme): void {
