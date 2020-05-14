@@ -21,21 +21,21 @@ export class AdUnitAwareAdRequestManager extends CampaignManager {
 
     public loadCampaign(placement: Placement): Promise<ILoadedCampaign | undefined> {
         if (!placement.hasAdUnitId()) {
-             return this._adRequestManager.loadCampaign(placement);
+             return this._adRequestManager.loadCampaignWithAdditionalPlacement(placement);
         }
 
         const adUnitId = placement.getAdUnitId();
         if (adUnitId === undefined) {
-             return this._adRequestManager.loadCampaign(placement);
+             return this._adRequestManager.loadCampaignWithAdditionalPlacement(placement);
         }
 
         if (!(adUnitId in this._adUnitPlacements)) {
-             return this._adRequestManager.loadCampaign(placement);
+             return this._adRequestManager.loadCampaignWithAdditionalPlacement(placement);
         }
 
         const additionalPlacements = this._adUnitPlacements[adUnitId];
         if (!(placement.getId() in additionalPlacements)) {
-             return this._adRequestManager.loadCampaign(placement);
+             return this._adRequestManager.loadCampaignWithAdditionalPlacement(placement);
         }
 
         const notCachedLoadedCampaign = additionalPlacements[placement.getId()];
