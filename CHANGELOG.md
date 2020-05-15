@@ -1,3 +1,17 @@
+# Wed May 13 21:58:11 UTC 2020
+
+* [Add Vast HTML endcard support] PR4: Added metrics to track the showing number of HTML endcard and static endcard [#15335](https://github.com/Applifier/unity-ads-webview/pull/15335)
+* [Latency] Adapt CacheMode Test into DynamicCacheMode Test [#15332](https://github.com/Applifier/unity-ads-webview/pull/15332)
+* [Latency] Add Override for CacheMode in AssetManager [#15331](https://github.com/Applifier/unity-ads-webview/pull/15331)
+* [Add Vast HTML endcard support] PR3: Enable HTML endcard in AB group 17 [#15273](https://github.com/Applifier/unity-ads-webview/pull/15273)
+* [Load V5, Ad Unit] Add Ad Unit Aware Ad Request Manager [#15327](https://github.com/Applifier/unity-ads-webview/pull/15327)
+
+# Tue May 12 23:17:32 UTC 2020
+
+* [Load V5, Ad Unit] Support for additional placements in load requests [#15097](https://github.com/Applifier/unity-ads-webview/pull/15097)
+* [Load V5] Increase timeouts for preload and reload requests [#15301](https://github.com/Applifier/unity-ads-webview/pull/15301)
+* [Add Vast HTML endcard support] PR2: add VastHTMLEndcard class and disabled it in AB testing [#15190](https://github.com/Applifier/unity-ads-webview/pull/15190)
+
 # Tue May 12 15:11:30 UTC 2020
 
 * [AUI] Make URL parsing safer when collecting MAB features [#15275](https://github.com/Applifier/unity-ads-webview/pull/15275)

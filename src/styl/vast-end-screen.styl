@@ -9,6 +9,16 @@ $end-screen-mixin($scale-size = $default-scale-size) {
       padding: $default-size * $scale-size * .25;
     }
 
+    .btn-close-html-endcard {
+      $close-button-vast-html-endcard($scale-size);
+      margin: 0 $default-size * $scale-size * .25 0 0;
+    }
+
+    .privacy-button-html-endcard {
+      $privacy-button-vast-html-endcard($scale-size);
+      margin: 0 0 0 $default-size * $scale-size * .25;
+    }
+
     .privacy-button {
       $privacy-button-default($scale-size);
       margin: 0 0 0 $default-size * $scale-size * .25;
