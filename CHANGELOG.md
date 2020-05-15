@@ -1,4 +1,4 @@
-# Pending
+# Fri May 15 22:02:48 UTC 2020
 
 * replace window.inner* with document.documentElement.client* [#14941](https://github.com/Applifier/unity-ads-webview/pull/14941)
 * [Metrics] Investigate Non-Batched Discrepancy of Impression Duplicate [#15363](https://github.com/Applifier/unity-ads-webview/pull/15363)
