@@ -4,15 +4,18 @@ import { ImageAnalysis } from 'Performance/Utilities/ImageAnalysis';
 import { SDKMetrics, AUIMetric } from 'Ads/Utilities/SDKMetrics';
 import { IColorTheme } from 'Performance/Utilities/Swatch';
 
+interface ITheme {
+    baseColorTheme: IColorTheme;
+    secondaryColorTheme: IColorTheme;
+}
 export class ColorTheme {
-
-    public renderColorTheme(campaign: PerformanceCampaign, core: ICoreApi) {
+    public static renderColorTheme(campaign: PerformanceCampaign, core: ICoreApi): Promise<ITheme | undefined> {
         const portraitImage = campaign.getPortrait();
         const landscapeImage = campaign.getLandscape();
         const squareImage = campaign.getSquare();
         const deviceInfo = core.DeviceInfo;
 
-        Promise.all([deviceInfo.getScreenWidth(), deviceInfo.getScreenHeight()]).then(([screenWidth, screenHeight]) => {
+        return Promise.all([deviceInfo.getScreenWidth(), deviceInfo.getScreenHeight()]).then(([screenWidth, screenHeight]) => {
             const isLandscape = screenWidth > screenHeight;
             let image;
             if (squareImage) {
@@ -24,31 +27,22 @@ export class ColorTheme {
             } else {
                 image = portraitImage;
             }
-
-            if (image) {
-                ImageAnalysis.getImageSrc(core.Cache, image)
-                    .then(ImageAnalysis.analyseImage)
-                    .then((swatches) => {
-                        if (!swatches || !swatches.length) {
-                            SDKMetrics.reportMetricEvent(AUIMetric.InvalidEndscreenColorTintSwitches);
-                            return;
-                        }
-
-                        const baseColorTheme = swatches[0].getColorTheme();
-                        const secondaryColorTheme = (swatches.length > 1 ? swatches[1] : swatches[0]).getColorTheme();
-                        this.returnColors(baseColorTheme, secondaryColorTheme)
-                    })
-                    .catch((msg: string) => {
-                        SDKMetrics.reportMetricEventWithTags(AUIMetric.EndscreenColorTintError, {
-                            msg: msg
-                        });
-                    });
+            if (!image) {
+                return;
             }
-        });
-    }
 
-    private returnColors(baseColorTheme: IColorTheme, secondaryColorTheme: IColorTheme) {
-        const colors = { baseColorTheme, secondaryColorTheme };
-        return colors;
+            return ImageAnalysis.getImageSrc(core.Cache, image)
+                .then(ImageAnalysis.analyseImage)
+                .then((swatches) => {
+                    if (!swatches || !swatches.length) {
+                        SDKMetrics.reportMetricEvent(AUIMetric.InvalidEndscreenColorTintSwitches);
+                        return;
+                    }
+
+                    const baseColorTheme = swatches[0].getColorTheme();
+                    const secondaryColorTheme = (swatches.length > 1 ? swatches[1] : swatches[0]).getColorTheme();
+                    return { baseColorTheme, secondaryColorTheme };
+                });
+        });
     }
 }

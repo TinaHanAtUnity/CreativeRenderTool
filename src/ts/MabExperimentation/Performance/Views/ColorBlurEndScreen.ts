@@ -4,17 +4,11 @@ import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
 import EndScreenAlternativeLayout from 'html/mabexperimentation/EndScreenAlternativeLayout.html';
 import { AUIMetric, SDKMetrics } from 'Ads/Utilities/SDKMetrics';
 import { ColorTheme } from 'Core/Utilities/ColorTheme';
-import { ImageAnalysis } from 'Performance/Utilities/ImageAnalysis';
 import { IColorTheme } from 'Performance/Utilities/Swatch';
 import { Color } from 'Core/Utilities/Color';
 
 export class ColorBlurEndScreen extends PerformanceEndScreen {
-
-    constructor(
-        parameters: IEndScreenParameters,
-        campaign: PerformanceCampaign,
-        country?: string
-    ) {
+    constructor(parameters: IEndScreenParameters, campaign: PerformanceCampaign, country?: string) {
         super(parameters, campaign, country);
 
         const simpleRating = campaign.getRating().toFixed(1);
@@ -31,9 +25,21 @@ export class ColorBlurEndScreen extends PerformanceEndScreen {
 
     public render(): void {
         super.render();
-        const colorTheme = new ColorTheme().renderColorTheme(this._campaign, this._core);
-        console.log(colorTheme);
-        // this.applyColorTheme(colorTheme.baseColorTheme, colorTheme.secondaryColorTheme)
+        const colorTheme = ColorTheme.renderColorTheme(this._campaign, this._core);
+
+        if (colorTheme) {
+            colorTheme
+                .then((theme) => {
+                    if (theme) {
+                        this.applyColorTheme(theme.baseColorTheme, theme.secondaryColorTheme);
+                    }
+                })
+                .catch((msg: string) => {
+                    SDKMetrics.reportMetricEventWithTags(AUIMetric.EndscreenColorTintError, {
+                        msg: msg
+                    });
+                });
+        }
     }
 
     private applyColorTheme(baseColorTheme: IColorTheme, secondaryColorTheme: IColorTheme): void {
@@ -69,7 +75,7 @@ export class ColorBlurEndScreen extends PerformanceEndScreen {
     public hide(): void {
         super.hide();
         window.removeEventListener('resize', this.handleResize);
-            document.body.classList.remove('alternative-layout');
+        document.body.classList.remove('alternative-layout');
     }
 
     protected getTemplate() {
