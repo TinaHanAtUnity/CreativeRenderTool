@@ -4,12 +4,12 @@ import { ImageAnalysis } from 'Performance/Utilities/ImageAnalysis';
 import { SDKMetrics, AUIMetric } from 'Ads/Utilities/SDKMetrics';
 import { IColorTheme } from 'Performance/Utilities/Swatch';
 
-interface ITheme {
+interface IEndcardColorTheme {
     baseColorTheme: IColorTheme;
     secondaryColorTheme: IColorTheme;
 }
 export class ColorTheme {
-    public static renderColorTheme(campaign: PerformanceCampaign, core: ICoreApi): Promise<ITheme | undefined> {
+    public static renderColorTheme(campaign: PerformanceCampaign, core: ICoreApi): Promise<IEndcardColorTheme | undefined> {
         const portraitImage = campaign.getPortrait();
         const landscapeImage = campaign.getLandscape();
         const squareImage = campaign.getSquare();
