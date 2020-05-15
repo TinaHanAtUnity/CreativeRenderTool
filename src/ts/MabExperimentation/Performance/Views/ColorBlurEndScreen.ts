@@ -6,6 +6,7 @@ import { AUIMetric, SDKMetrics } from 'Ads/Utilities/SDKMetrics';
 import { ColorTheme } from 'Core/Utilities/ColorTheme';
 import { ImageAnalysis } from 'Performance/Utilities/ImageAnalysis';
 import { IColorTheme } from 'Performance/Utilities/Swatch';
+import { Color } from 'Core/Utilities/Color';
 
 export class ColorBlurEndScreen extends PerformanceEndScreen {
 
@@ -30,8 +31,8 @@ export class ColorBlurEndScreen extends PerformanceEndScreen {
 
     public render(): void {
         super.render();
-        ColorTheme.renderColorTheme(this._campaign, this._core);
-        console.log('????????????????????', ColorTheme.renderColorTheme(this._campaign, this._core))
+        const colorTheme = new ColorTheme().renderColorTheme(this._campaign, this._core);
+        console.log(colorTheme);
         // this.applyColorTheme(colorTheme.baseColorTheme, colorTheme.secondaryColorTheme)
     }
 

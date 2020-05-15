@@ -46,7 +46,7 @@ export class PerformanceAdUnitWithAutomatedExperimentParametersFactory extends P
 
         let endScreen: PerformanceEndScreen;
 
-        if (endScreenCombination && endScreenCombination.scheme === ButtonExperimentDeclaration.scheme.COLOR_BLUR) {
+        if (true) {
             endScreen = new ColorBlurEndScreen(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
         } else {
             endScreen = new AnimatedDownloadButtonEndScreen(endScreenCombination, endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());

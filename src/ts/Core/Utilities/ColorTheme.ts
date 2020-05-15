@@ -2,9 +2,11 @@ import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { ICoreApi } from 'Core/ICore';
 import { ImageAnalysis } from 'Performance/Utilities/ImageAnalysis';
 import { SDKMetrics, AUIMetric } from 'Ads/Utilities/SDKMetrics';
+import { IColorTheme } from 'Performance/Utilities/Swatch';
 
 export class ColorTheme {
-    public static renderColorTheme(campaign: PerformanceCampaign, core: ICoreApi) {
+
+    public renderColorTheme(campaign: PerformanceCampaign, core: ICoreApi) {
         const portraitImage = campaign.getPortrait();
         const landscapeImage = campaign.getLandscape();
         const squareImage = campaign.getSquare();
@@ -34,10 +36,7 @@ export class ColorTheme {
 
                         const baseColorTheme = swatches[0].getColorTheme();
                         const secondaryColorTheme = (swatches.length > 1 ? swatches[1] : swatches[0]).getColorTheme();
-                        const colorTheme = {
-                            baseColorTheme,
-                            secondaryColorTheme
-                        };
+                        this.returnColors(baseColorTheme, secondaryColorTheme)
                     })
                     .catch((msg: string) => {
                         SDKMetrics.reportMetricEventWithTags(AUIMetric.EndscreenColorTintError, {
@@ -46,5 +45,10 @@ export class ColorTheme {
                     });
             }
         });
+    }
+
+    private returnColors(baseColorTheme: IColorTheme, secondaryColorTheme: IColorTheme) {
+        const colors = { baseColorTheme, secondaryColorTheme };
+        return colors;
     }
 }
