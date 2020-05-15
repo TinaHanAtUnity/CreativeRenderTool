@@ -27,19 +27,17 @@ export class ColorBlurEndScreen extends PerformanceEndScreen {
         super.render();
         const colorTheme = ColorTheme.renderColorTheme(this._campaign, this._core);
 
-        if (colorTheme) {
-            colorTheme
-                .then((theme) => {
-                    if (theme) {
-                        this.applyColorTheme(theme.baseColorTheme, theme.secondaryColorTheme);
-                    }
-                })
-                .catch((msg: string) => {
-                    SDKMetrics.reportMetricEventWithTags(AUIMetric.EndscreenColorTintError, {
-                        msg: msg
-                    });
+        colorTheme
+            .then((theme) => {
+                if (theme) {
+                    this.applyColorTheme(theme.baseColorTheme, theme.secondaryColorTheme);
+                }
+            })
+            .catch((msg: string) => {
+                SDKMetrics.reportMetricEventWithTags(AUIMetric.EndscreenColorTintError, {
+                    msg: msg
                 });
-        }
+            });
     }
 
     private applyColorTheme(baseColorTheme: IColorTheme, secondaryColorTheme: IColorTheme): void {
