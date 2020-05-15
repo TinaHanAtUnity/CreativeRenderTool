@@ -187,7 +187,7 @@ describe(`AdUnitAwareAdRequestManager`, () => {
 
             adRequestManager.onAdditionalPlacementsReady.subscribe.mock.calls[0][0]('test', {
                 video: notCachedCampaign
-            })
+            });
 
             adUnitAwareAdRequestManager.invalidate();
 
