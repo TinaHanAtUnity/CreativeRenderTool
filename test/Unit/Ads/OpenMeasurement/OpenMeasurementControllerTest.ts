@@ -185,7 +185,7 @@ import { VastCampaign } from 'VAST/Models/VastCampaign';
             });
             it('adUserInteraction', () => {
                 omManager.adUserInteraction(InteractionType.CLICK);
-                sinon.assert.calledWith(<sinon.SinonStub>openMeasurement.triggerVideoEvent, 'omidAdUserInteraction', 'click');
+                sinon.assert.calledWith(<sinon.SinonStub>openMeasurement.triggerVideoEvent, 'omidAdUserInteraction', { interactionType: InteractionType.CLICK });
                 sinon.assert.calledTwice(<sinon.SinonStub>openMeasurement.triggerVideoEvent);
             });
             it('should fire multiple bufferStart regardless of state', () => {
