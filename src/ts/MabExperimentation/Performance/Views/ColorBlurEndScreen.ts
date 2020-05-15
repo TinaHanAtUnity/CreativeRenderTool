@@ -1,7 +1,7 @@
 import { IEndScreenParameters, EndScreen } from 'Ads/Views/EndScreen';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
-import EndScreenAlternativeLayout from 'html/mabexperimentation/EndScreenAlternativeLayout.html';
+import EndScreenColorBlur from 'html/mabexperimentation/EndScreenColorBlur.html';
 import { AUIMetric, SDKMetrics } from 'Ads/Utilities/SDKMetrics';
 import { ColorTheme } from 'Core/Utilities/ColorTheme';
 import { IColorTheme } from 'Performance/Utilities/Swatch';
@@ -67,17 +67,17 @@ export class ColorBlurEndScreen extends PerformanceEndScreen {
     public show(): void {
         super.show();
         window.addEventListener('resize', this.handleResize, false);
-        document.body.classList.add('alternative-layout');
+        document.body.classList.add('color-blur');
     }
 
     public hide(): void {
         super.hide();
         window.removeEventListener('resize', this.handleResize);
-        document.body.classList.remove('alternative-layout');
+        document.body.classList.remove('color-blur');
     }
 
     protected getTemplate() {
-        return EndScreenAlternativeLayout;
+        return EndScreenColorBlur;
     }
 
     private handleResize() {

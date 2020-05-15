@@ -1,7 +1,7 @@
 @import "vars.styl";
 @import "iphone-x-series.styl";
 
-body.alternative-layout #end-screen {
+body.color-blur #end-screen {
   .btn-close-region {
     display: inline-block;
     width: unset;
@@ -212,7 +212,7 @@ body.alternative-layout #end-screen {
   }
 }
 
-body.alternative-layout.landscape #end-screen {  //@stylint ignore
+body.color-blur.landscape #end-screen {  //@stylint ignore
   .campaign-container {
     background-color: $black;
   }
@@ -263,7 +263,7 @@ body.alternative-layout.landscape #end-screen {  //@stylint ignore
 }
 
 @media only screen and (-webkit-device-pixel-ratio: 3) and (device-height: 812px) and (device-width: 375px) {
-  .performance-end-screen .alternative-layout.portrait #end-screen .bottom-container {
+  .performance-end-screen .color-blur.portrait #end-screen .bottom-container {
     margin: .5em 0;
   }
 }
@@ -392,13 +392,13 @@ $iphone-x-performance-end-screen-styles() {
 }
 
 @media only screen and (orientation: landscape) and (min-width: 800px) {
-  body.alternative-layout.landscape #end-screen .end-screen-info { //@stylint ignore
+  body.color-blur.landscape #end-screen .end-screen-info { //@stylint ignore
     font-size: 1.2em;
   }
 }
 
 @media only screen and (orientation: portrait) and (min-width: 768px) {
-  body.alternative-layout #end-screen {
+  body.color-blur #end-screen {
     .end-screen-image-container {
       padding: 0 4em;
     }
@@ -426,7 +426,7 @@ $iphone-x-performance-end-screen-styles() {
 }
 
 @media only screen and (orientation: landscape) and (min-width: 925px) and (max-width: 1024px) {
-  body.alternative-layout.landscape #end-screen { //@stylint ignore
+  body.color-blur.landscape #end-screen { //@stylint ignore
     .end-screen-image-container .end-screen-image {
       max-height: unset;
       height: 45vw;
@@ -440,7 +440,7 @@ $iphone-x-performance-end-screen-styles() {
 }
 
 @media only screen and (orientation: landscape) and (min-width: 1025px) {
-  body.alternative-layout.landscape #end-screen { //@stylint ignore
+  body.color-blur.landscape #end-screen { //@stylint ignore
     .end-screen-image-container .end-screen-image {
       max-height: unset;
       height: 40vw;
