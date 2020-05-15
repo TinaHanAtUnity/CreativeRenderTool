@@ -1,5 +1,6 @@
 # Pending
 
+* [Metrics] Investigate Non-Batched Discrepancy of Impression Duplicate [#15363](https://github.com/Applifier/unity-ads-webview/pull/15363)
 * [Release 3.5.0] Add Webview Release Support [#15364](https://github.com/Applifier/unity-ads-webview/pull/15364)
 
 # Wed May 13 21:58:11 UTC 2020
