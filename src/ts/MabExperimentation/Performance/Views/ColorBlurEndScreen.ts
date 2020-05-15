@@ -1,11 +1,10 @@
-import { IEndScreenParameters, EndScreen } from 'Ads/Views/EndScreen';
+import { IEndScreenParameters } from 'Ads/Views/EndScreen';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
 import EndScreenColorBlur from 'html/mabexperimentation/EndScreenColorBlur.html';
 import { AUIMetric, SDKMetrics } from 'Ads/Utilities/SDKMetrics';
 import { ColorTheme } from 'Core/Utilities/ColorTheme';
 import { IColorTheme } from 'Performance/Utilities/Swatch';
-import { Color } from 'Core/Utilities/Color';
 
 export class ColorBlurEndScreen extends PerformanceEndScreen {
     constructor(parameters: IEndScreenParameters, campaign: PerformanceCampaign, country?: string) {
