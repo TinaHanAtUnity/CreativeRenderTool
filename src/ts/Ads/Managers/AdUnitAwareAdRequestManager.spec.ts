@@ -20,6 +20,11 @@ describe(`AdUnitAwareAdRequestManager`, () => {
             campaign: Campaign('', 'original'),
             trackingUrl: {}
         });
+
+        adRequestManager.loadCampaign.mockResolvedValue({
+            campaign: Campaign('', 'original'),
+            trackingUrl: {}
+        });
     });
 
     describe('initial state', () => {
@@ -37,7 +42,6 @@ describe(`AdUnitAwareAdRequestManager`, () => {
         });
     });
 
-
     describe('load campaign with placement without ad unit', () => {
         beforeEach(async () => {
             loadedCampaign = await adUnitAwareAdRequestManager.loadCampaign(placement);
@@ -52,8 +56,8 @@ describe(`AdUnitAwareAdRequestManager`, () => {
         });
 
         it('should forward call to AdRequestManager', () => {
-            expect(adRequestManager.loadCampaignWithAdditionalPlacement).toBeCalledTimes(1);
-            expect(adRequestManager.loadCampaignWithAdditionalPlacement).toBeCalledWith(placement);
+            expect(adRequestManager.loadCampaign).toBeCalledTimes(1);
+            expect(adRequestManager.loadCampaign).toBeCalledWith(placement);
         });
     });
 
