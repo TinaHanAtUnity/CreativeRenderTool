@@ -177,7 +177,7 @@ export abstract class OpenMeasurementController implements IOMController {
      */
     public adUserInteraction(interactionType: InteractionType) {
         this._omInstances.forEach((om) => {
-            om.triggerVideoEvent(OMID3pEvents.OMID_AD_USER_INTERACTION, interactionType);
+            om.triggerVideoEvent(OMID3pEvents.OMID_AD_USER_INTERACTION, { interactionType: interactionType });
         });
     }
 
