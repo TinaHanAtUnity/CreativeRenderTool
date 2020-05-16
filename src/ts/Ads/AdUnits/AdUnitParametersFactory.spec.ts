@@ -17,7 +17,12 @@ import { VastCampaign, VastCampaignMock } from 'VAST/Models/__mocks__/VastCampai
 import { Vast, VastMock } from 'VAST/Models/__mocks__/Vast';
 import { VastAdVerification, VastAdVerificationMock } from 'VAST/Models/__mocks__/VastAdVerification';
 import { VastVerificationResource } from 'VAST/Models/VastVerificationResource';
+import { VastHTMLEndScreen } from 'VAST/Views/VastHTMLEndScreen';
+import { VastStaticEndScreen } from 'VAST/Views/VastStaticEndScreen';
+import { HtmlEndcardTest } from 'Core/Models/ABGroup';
 
+jest.mock('VAST/Views/VastHTMLEndScreen');
+jest.mock('VAST/Views/VastStaticEndScreen');
 jest.mock('Ads/Views/Privacy.ts');
 jest.mock('AdMob/Views/AdMobView.ts');
 jest.mock('Ads/Views/VastVideoOverlay');
@@ -75,13 +80,43 @@ describe('AdUnitParametersFactoryTest', () => {
         });
 
         describe('when creating parameters', () => {
-            it('it should not set om tracking if an adverification does not exist in the adVerifications array', () => {
-
+            it('it should create HTML endscreen if bot static and html endscreen exist', () => {
                 const vast: VastMock = new Vast();
                 campaign.getVast.mockReturnValue(vast);
-
                 vast.getAdVerifications.mockReturnValue([]);
-
+                campaign.hasStaticEndscreen.mockReturnValue(true);
+                campaign.hasHtmlEndscreen.mockReturnValue(true);
+                const isValid = jest.spyOn(HtmlEndcardTest, 'isValid');
+                isValid.mockReturnValue(true);
+                const parameters = adUnitParametersFactory.create(campaign, placement, Orientation.NONE, '123', 'option');
+                expect(parameters.endScreen).toBeInstanceOf(VastHTMLEndScreen);
+                isValid.mockRestore();
+            });
+            it('it should create HTML endscreen if only html endscreen exists', () => {
+                const vast: VastMock = new Vast();
+                campaign.getVast.mockReturnValue(vast);
+                vast.getAdVerifications.mockReturnValue([]);
+                campaign.hasStaticEndscreen.mockReturnValue(false);
+                campaign.hasHtmlEndscreen.mockReturnValue(true);
+                const isValid = jest.spyOn(HtmlEndcardTest, 'isValid');
+                isValid.mockReturnValue(true);
+                const parameters = adUnitParametersFactory.create(campaign, placement, Orientation.NONE, '123', 'option');
+                expect(parameters.endScreen).toBeInstanceOf(VastHTMLEndScreen);
+                isValid.mockRestore();
+            });
+            it('it should create static endscreen if only static endscreen exists', () => {
+                const vast: VastMock = new Vast();
+                campaign.getVast.mockReturnValue(vast);
+                vast.getAdVerifications.mockReturnValue([]);
+                campaign.hasStaticEndscreen.mockReturnValue(true);
+                campaign.hasHtmlEndscreen.mockReturnValue(false);
+                const parameters = adUnitParametersFactory.create(campaign, placement, Orientation.NONE, '123', 'option');
+                expect(parameters.endScreen).toBeInstanceOf(VastStaticEndScreen);
+            });
+            it('it should not set om tracking if an adverification does not exist in the adVerifications array', () => {
+                const vast: VastMock = new Vast();
+                campaign.getVast.mockReturnValue(vast);
+                vast.getAdVerifications.mockReturnValue([]);
                 adUnitParametersFactory.create(campaign, placement, Orientation.NONE, '123', 'option');
                 expect(campaign.setOmEnabled).toHaveBeenCalledTimes(0);
                 expect(campaign.setOMVendors).toHaveBeenCalledTimes(0);
