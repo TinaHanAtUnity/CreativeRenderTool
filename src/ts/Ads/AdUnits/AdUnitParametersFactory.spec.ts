@@ -89,23 +89,38 @@ describe('AdUnitParametersFactoryTest', () => {
                     vast.getAdVerifications.mockReturnValue([]);
                     isValid.mockReturnValue(true);
                 });
-                it('it should create HTML endscreen if both static and html endscreen exist', () => {
-                    campaign.hasStaticEndscreen.mockReturnValue(true);
-                    campaign.hasHtmlEndscreen.mockReturnValue(true);
-                    const parameters = adUnitParametersFactory.create(campaign, placement, Orientation.NONE, '123', 'option');
-                    expect(parameters.endScreen).toBeInstanceOf(VastHTMLEndScreen);
+                describe('when static endscreen exists and html endscreen exists', () => {
+                    let parameters: IVastAdUnitParameters;
+                    beforeEach(() => {
+                        campaign.hasStaticEndscreen.mockReturnValue(true);
+                        campaign.hasHtmlEndscreen.mockReturnValue(true);
+                        parameters = adUnitParametersFactory.create(campaign, placement, Orientation.NONE, '123', 'option');
+                    });
+                    it('vast endscreen will be html endscreen', () => {
+                        expect(parameters.endScreen).toBeInstanceOf(VastHTMLEndScreen);
+                    });
                 });
-                it('it should create HTML endscreen if only html endscreen exists', () => {
-                    campaign.hasStaticEndscreen.mockReturnValue(false);
-                    campaign.hasHtmlEndscreen.mockReturnValue(true);
-                    const parameters = adUnitParametersFactory.create(campaign, placement, Orientation.NONE, '123', 'option');
-                    expect(parameters.endScreen).toBeInstanceOf(VastHTMLEndScreen);
+                describe('when static endscreen does not exist and html endscreen exists', () => {
+                    let parameters: IVastAdUnitParameters;
+                    beforeEach(() => {
+                        campaign.hasStaticEndscreen.mockReturnValue(false);
+                        campaign.hasHtmlEndscreen.mockReturnValue(true);
+                        parameters = adUnitParametersFactory.create(campaign, placement, Orientation.NONE, '123', 'option');
+                    });
+                    it('vast endscreen will be html endscreen', () => {
+                        expect(parameters.endScreen).toBeInstanceOf(VastHTMLEndScreen);
+                    });
                 });
-                it('it should create static endscreen if only static endscreen exists', () => {
-                    campaign.hasStaticEndscreen.mockReturnValue(true);
-                    campaign.hasHtmlEndscreen.mockReturnValue(false);
-                    const parameters = adUnitParametersFactory.create(campaign, placement, Orientation.NONE, '123', 'option');
-                    expect(parameters.endScreen).toBeInstanceOf(VastStaticEndScreen);
+                describe('when static endscreen exists and html endscreen does not exist', () => {
+                    let parameters: IVastAdUnitParameters;
+                    beforeEach(() => {
+                        campaign.hasStaticEndscreen.mockReturnValue(false);
+                        campaign.hasHtmlEndscreen.mockReturnValue(true);
+                        parameters = adUnitParametersFactory.create(campaign, placement, Orientation.NONE, '123', 'option');
+                    });
+                    it('vast endscreen will be html endscreen', () => {
+                        expect(parameters.endScreen).toBeInstanceOf(VastHTMLEndScreen);
+                    });
                 });
             });
 
