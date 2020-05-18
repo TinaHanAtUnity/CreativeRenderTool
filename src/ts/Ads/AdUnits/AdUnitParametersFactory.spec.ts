@@ -90,9 +90,9 @@ describe('AdUnitParametersFactoryTest', () => {
                     isValid.mockReturnValue(true);
                 });
                 [
-                { hasStaticEndscreen: true, hasHtmlEndscreen: true, expectedType: VastHTMLEndScreen, description: 'when static and html endscreen both exist', expectedResult: 'vast endscreen should be html endscreen' },
-                { hasStaticEndscreen: false, hasHtmlEndscreen: true, expectedType: VastHTMLEndScreen, description: 'when static endscreen does not exist and html endscreen exists', expectedResult: 'vast endscreen should be html endscreen' },
-                { hasStaticEndscreen: true, hasHtmlEndscreen: false, expectedType: VastStaticEndScreen, description: 'when static endscreen exists and html endscreen does not exist', expectedResult: 'vast endscreen should be static endscreen' }
+                    { hasStaticEndscreen: true, hasHtmlEndscreen: true, expectedType: VastHTMLEndScreen, description: 'when static and html endscreen both exist', expectedResult: 'vast endscreen should be html endscreen' },
+                    { hasStaticEndscreen: false, hasHtmlEndscreen: true, expectedType: VastHTMLEndScreen, description: 'when static endscreen does not exist and html endscreen exists', expectedResult: 'vast endscreen should be html endscreen' },
+                    { hasStaticEndscreen: true, hasHtmlEndscreen: false, expectedType: VastStaticEndScreen, description: 'when static endscreen exists and html endscreen does not exist', expectedResult: 'vast endscreen should be static endscreen' }
                 ].forEach(({ hasStaticEndscreen, hasHtmlEndscreen, expectedType, description, expectedResult }) => {
                     describe(description, () => {
                         let parameters: IVastAdUnitParameters;
