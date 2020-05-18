@@ -70,52 +70,46 @@ describe('AdUnitParametersFactoryTest', () => {
     describe('VastParametersFactory', () => {
         let campaign: VastCampaignMock;
         let adUnitParametersFactory: AbstractAdUnitParametersFactory<Campaign, IVastAdUnitParameters>;
+        let vast: VastMock;
 
         beforeEach(() => {
             const core = new Core();
             const ads = new Ads();
+            vast = new Vast();
             campaign = new VastCampaign();
             placement = new Placement();
             adUnitParametersFactory = new VastAdUnitParametersFactory(core, ads);
+            campaign.getVast.mockReturnValue(vast);
         });
 
         describe('when creating parameters', () => {
-            it('it should create HTML endscreen if bot static and html endscreen exist', () => {
-                const vast: VastMock = new Vast();
-                campaign.getVast.mockReturnValue(vast);
-                vast.getAdVerifications.mockReturnValue([]);
-                campaign.hasStaticEndscreen.mockReturnValue(true);
-                campaign.hasHtmlEndscreen.mockReturnValue(true);
-                const isValid = jest.spyOn(HtmlEndcardTest, 'isValid');
-                isValid.mockReturnValue(true);
-                const parameters = adUnitParametersFactory.create(campaign, placement, Orientation.NONE, '123', 'option');
-                expect(parameters.endScreen).toBeInstanceOf(VastHTMLEndScreen);
-                isValid.mockRestore();
+            describe('when creating endscreen parameters', () => {
+                beforeEach(() => {
+                    const isValid = jest.spyOn(HtmlEndcardTest, 'isValid');
+                    vast.getAdVerifications.mockReturnValue([]);
+                    isValid.mockReturnValue(true);
+                });
+                it('it should create HTML endscreen if both static and html endscreen exist', () => {
+                    campaign.hasStaticEndscreen.mockReturnValue(true);
+                    campaign.hasHtmlEndscreen.mockReturnValue(true);
+                    const parameters = adUnitParametersFactory.create(campaign, placement, Orientation.NONE, '123', 'option');
+                    expect(parameters.endScreen).toBeInstanceOf(VastHTMLEndScreen);
+                });
+                it('it should create HTML endscreen if only html endscreen exists', () => {
+                    campaign.hasStaticEndscreen.mockReturnValue(false);
+                    campaign.hasHtmlEndscreen.mockReturnValue(true);
+                    const parameters = adUnitParametersFactory.create(campaign, placement, Orientation.NONE, '123', 'option');
+                    expect(parameters.endScreen).toBeInstanceOf(VastHTMLEndScreen);
+                });
+                it('it should create static endscreen if only static endscreen exists', () => {
+                    campaign.hasStaticEndscreen.mockReturnValue(true);
+                    campaign.hasHtmlEndscreen.mockReturnValue(false);
+                    const parameters = adUnitParametersFactory.create(campaign, placement, Orientation.NONE, '123', 'option');
+                    expect(parameters.endScreen).toBeInstanceOf(VastStaticEndScreen);
+                });
             });
-            it('it should create HTML endscreen if only html endscreen exists', () => {
-                const vast: VastMock = new Vast();
-                campaign.getVast.mockReturnValue(vast);
-                vast.getAdVerifications.mockReturnValue([]);
-                campaign.hasStaticEndscreen.mockReturnValue(false);
-                campaign.hasHtmlEndscreen.mockReturnValue(true);
-                const isValid = jest.spyOn(HtmlEndcardTest, 'isValid');
-                isValid.mockReturnValue(true);
-                const parameters = adUnitParametersFactory.create(campaign, placement, Orientation.NONE, '123', 'option');
-                expect(parameters.endScreen).toBeInstanceOf(VastHTMLEndScreen);
-                isValid.mockRestore();
-            });
-            it('it should create static endscreen if only static endscreen exists', () => {
-                const vast: VastMock = new Vast();
-                campaign.getVast.mockReturnValue(vast);
-                vast.getAdVerifications.mockReturnValue([]);
-                campaign.hasStaticEndscreen.mockReturnValue(true);
-                campaign.hasHtmlEndscreen.mockReturnValue(false);
-                const parameters = adUnitParametersFactory.create(campaign, placement, Orientation.NONE, '123', 'option');
-                expect(parameters.endScreen).toBeInstanceOf(VastStaticEndScreen);
-            });
+
             it('it should not set om tracking if an adverification does not exist in the adVerifications array', () => {
-                const vast: VastMock = new Vast();
-                campaign.getVast.mockReturnValue(vast);
                 vast.getAdVerifications.mockReturnValue([]);
                 adUnitParametersFactory.create(campaign, placement, Orientation.NONE, '123', 'option');
                 expect(campaign.setOmEnabled).toHaveBeenCalledTimes(0);
@@ -124,15 +118,11 @@ describe('AdUnitParametersFactoryTest', () => {
 
             it('it should set om tracking if an adverification exists in the adVerifications array', () => {
 
-                const vast: VastMock = new Vast();
                 const vastAdVerificton1: VastAdVerificationMock = new VastAdVerification();
                 vastAdVerificton1.getVerificationVendor.mockReturnValue('notIAS');
                 const verificationResource = new VastVerificationResource('https://scootmcdoot.com', 'omid');
                 vastAdVerificton1.getVerficationResources.mockReturnValue([verificationResource]);
-
                 vast.getAdVerifications.mockReturnValue([vastAdVerificton1]);
-                campaign.getVast.mockReturnValue(vast);
-
                 adUnitParametersFactory.create(campaign, placement, Orientation.NONE, '123', 'option');
                 expect(campaign.setOmEnabled).toHaveBeenCalled();
                 expect(campaign.setOMVendors).toHaveBeenCalled();
