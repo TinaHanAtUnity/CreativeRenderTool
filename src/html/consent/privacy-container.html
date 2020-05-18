@@ -96,6 +96,10 @@
                 this.setFetchUrlCallback = function(fetchUrlCallback) {
                     this.fetchUrlCallback = fetchUrlCallback;
                 };
+
+                this.setReadyCallback = function(readyCallback) {
+                    this.readyCallback = readyCallback;
+                }
             };
 
             window.privacyAdapter = new AdsPrivacyAdapter();
