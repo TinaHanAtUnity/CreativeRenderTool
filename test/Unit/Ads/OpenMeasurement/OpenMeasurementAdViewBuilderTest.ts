@@ -235,7 +235,20 @@ import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
                         obstructions: [{ x: 0, y: 0, width: 200, height: 200 }]
                     },
                     measuringElement: true,
-                    reasons: [ObstructionReasons.OBSTRUCTED]
+                    reasons: [ObstructionReasons.OBSTRUCTED],
+                    containerGeometry: {
+                        x: 0,
+                        y: 0,
+                        width: platform === Platform.ANDROID ? 283 : 567,
+                        height: platform === Platform.ANDROID ? 617 : 1234
+                    },
+                    onScreenContainerGeometry: {
+                        x: 0,
+                        y: 0,
+                        width: platform === Platform.ANDROID ? 283 : 567,
+                        height: platform === Platform.ANDROID ? 617 : 1234,
+                        obstructions: [{ x: 0, y: 0, width: 200, height: 200 }]
+                    }
                 };
                 return omAdViewBuilder.buildAdmobAdView([reason], omController, rect).then((adview) => {
                     assert.equal(JSON.stringify(adview), JSON.stringify(testAdView));
