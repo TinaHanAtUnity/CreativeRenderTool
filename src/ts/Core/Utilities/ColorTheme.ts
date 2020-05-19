@@ -1,7 +1,6 @@
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { ICoreApi } from 'Core/ICore';
 import { ImageAnalysis } from 'Performance/Utilities/ImageAnalysis';
-import { SDKMetrics, AUIMetric } from 'Ads/Utilities/SDKMetrics';
 import { IColorTheme } from 'Performance/Utilities/Swatch';
 
 interface IEndcardColorTheme {
@@ -9,7 +8,7 @@ interface IEndcardColorTheme {
     secondaryColorTheme: IColorTheme;
 }
 export class ColorTheme {
-    public static renderColorTheme(campaign: PerformanceCampaign, core: ICoreApi): Promise<IEndcardColorTheme | void> {
+    public static renderColorTheme(campaign: PerformanceCampaign, core: ICoreApi): Promise<IEndcardColorTheme> {
         const portraitImage = campaign.getPortrait();
         const landscapeImage = campaign.getLandscape();
         const squareImage = campaign.getSquare();
@@ -28,10 +27,10 @@ export class ColorTheme {
                 image = portraitImage;
             }
             if (!image) {
-                return;
+                Promise.reject();
             }
 
-            return ImageAnalysis.getImageSrc(core.Cache, image)
+            return ImageAnalysis.getImageSrc(core.Cache, image!)
                 .then(ImageAnalysis.analyseImage)
                 .then((swatches) => {
                     if (!swatches || !swatches.length) {
@@ -41,9 +40,6 @@ export class ColorTheme {
                     const baseColorTheme = swatches[0].getColorTheme();
                     const secondaryColorTheme = (swatches.length > 1 ? swatches[1] : swatches[0]).getColorTheme();
                     return { baseColorTheme, secondaryColorTheme };
-                })
-                .catch(() => {
-                    SDKMetrics.reportMetricEvent(AUIMetric.InvalidEndscreenColorTintSwitches);
                 });
         });
     }
