@@ -1,4 +1,5 @@
 import { IMetricInstance } from 'Ads/Networking/MetricInstance';
+import { BufferedMetricInstance } from 'Ads/Networking/BufferedMetricInstance';
 
 export enum ErrorMetric {
     TooLargeFile = 'too_large_file', // a file 20mb and over are considered too large
@@ -71,11 +72,14 @@ export enum ChinaMetric {
 }
 
 export enum VastMetric {
-    VastVideoImpressionFailed = 'vast_video_impression_failed'
+    VastVideoImpressionFailed = 'vast_video_impression_failed',
+    VastHTMLEndcardShown = 'vast_html_endcard_shown',
+    VastHTMLEndcardShownFailed = 'vast_html_endcard_shown_failed'
 }
 
 export enum MiscellaneousMetric {
     ImpressionDuplicate = 'impression_duplicate',
+    ImpressionDuplicateNonBatching = 'impression_duplicate_non_batching',
     CampaignNotFound = 'campaign_not_found',
     ConsentParagraphLinkClicked = 'consent_paragraph_link_clicked',
     CampaignAttemptedShowInBackground = 'ad_attempted_show_background',
@@ -148,6 +152,7 @@ export enum AUIMetric {
     OptimizationResponseIgnored = 'campaign_optimization_response_ignored',
     RequestingCampaignOptimization = 'requesting_campaign_optimization',
     UnknownExperimentName = 'unknown_experiment_name',
+    InvalidVideoOverlayMode = 'invalid_video_overlay_mode',
     UnknownCategoryProvided = 'unknown_automated_experiment_category_provided'
 }
 
@@ -216,16 +221,18 @@ export type PTSEvent = VideoMetric | TimingEvent | AuctionV6 | AdmobMetric | Ban
 
 export class SDKMetrics {
 
-    private static _metricInstance: IMetricInstance;
+    // Setting a default value since legacy tests are relying on it.
+    private static _metricInstance: IMetricInstance = new BufferedMetricInstance();
 
-    public static initialize(metricInstance: IMetricInstance): void {
-        if (!this._metricInstance) {
-            this._metricInstance = metricInstance;
-        }
+    public static initialize(): void {
+        this._metricInstance = new BufferedMetricInstance();
     }
 
-    public static isMetricInstanceInitialized(): boolean {
-        return !!this._metricInstance;
+    public static setMetricInstance(metricInstance: IMetricInstance): void {
+        if (this._metricInstance instanceof BufferedMetricInstance) {
+            this._metricInstance.forwardTo(metricInstance);
+        }
+        this._metricInstance = metricInstance;
     }
 
     public static reportMetricEvent(event: PTSEvent): void {

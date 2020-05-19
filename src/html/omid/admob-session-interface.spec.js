@@ -122,7 +122,7 @@ describe('AdmobSessionInterface', () => {
                     'timestamp': 1577836800000,
                     'type': 'sessionStart',
                   }
-            }, '*')
+            }, '*');
         });
 
         // register session observer is not required to be called
@@ -184,7 +184,7 @@ describe('AdmobSessionInterface', () => {
                     'timestamp': 1577836800000,
                     'type': 'sessionStart',
                   }
-            }, '*')
+            }, '*');
         });
     });
 });

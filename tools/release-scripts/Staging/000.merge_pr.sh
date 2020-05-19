@@ -79,4 +79,46 @@ sleep 5
 echo "Deleting remote branch..."
 git push origin --delete $branch
 
+echo "Sending slack notification..."
+if [ ! -f ".staginglock" ]; then
+    author=$(git config --get user.name)
+    authorPhrase="\"By: $author\""
+    slackjson=$(cat <<EOF
+{
+	"channel": "GDTR512F2",
+	"text": "WebView staging started, all staged PRs will appear in a thread.",
+	"attachments": [{
+		"color": "good",
+		"author_name": $authorPhrase
+	}]
+}
+EOF
+)
+    # ads-sdk-devs slack channel
+    curl -X POST \
+        -H 'Content-type: application/json' \
+        -H "Authorization: Bearer xoxp-6355312211-143460327904-1105938830800-c62d727b3197062e78ff08fec369fe8b" \
+        --data "$slackjson" \
+        -o .staginglock \
+        https://slack.com/api/chat.postMessage
+fi
+
+
+if [ -f ".staginglock" ]; then
+    ts=$(cat .staginglock | jq '.message.ts')
+    slackjson=$(cat <<EOF
+{
+    "channel": "GDTR512F2",
+    "text": "<${url}|#${pr}> was merged to master and will be staged",
+    "thread_ts": $ts
+}
+EOF
+)
+    # ads-sdk-devs slack channel
+    curl -X POST \
+        -H 'Content-type: application/json' \
+        -H "Authorization: Bearer xoxp-6355312211-143460327904-1105938830800-c62d727b3197062e78ff08fec369fe8b" \
+        --data "$slackjson" \
+        https://slack.com/api/chat.postMessage
+fi
 echo "Done."

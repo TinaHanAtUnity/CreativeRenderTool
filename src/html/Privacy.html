@@ -1,6 +1,6 @@
 <div class="view-container">
     <div class="header">
-        <div class="close-button">
+        <div class="close-button ripple-circle">
             <span class="icon-close"></span>
         </div>
     </div>
@@ -14,10 +14,10 @@
             </div>
             <div class="unityads-logo"></div>
             <div class="tool-button-container">
-                <div class="report-ad-button">
+                <div class="report-ad-button ripple-square">
                     <span><%= data.t("privacy-settings-report-ad") %></span>
                 </div>
-                <div class="build-info-button">
+                <div class="build-info-button ripple-square">
                     <span><%= data.t("privacy-settings-build-info") %></span>
                 </div>
             </div>
@@ -188,7 +188,7 @@
 
                 <div class="radio-group-container">
                     <div class="radio-item-container">
-                        <input id="gdpr-agree-radio" name="gdpr-radio-group" type="radio">
+                        <input class="ripple-circle" id="gdpr-agree-radio" name="gdpr-radio-group" type="radio">
                         <label for="gdpr-agree-radio">
                             <% if(data.isCCPA) { %>
                             <%= data.t("privacy-dialog-text-li-agree-radio-button-ccpa") %>

@@ -9,6 +9,10 @@ import CacheModeAllowedExperimentGames from 'json/custom_features/CacheModeAllow
 
 export class CustomFeatures {
 
+    public static isExcludedGameFromCacheModeTest(gameId: string) {
+        return gameId === '1365102' || gameId === '3254102';
+    }
+
     public static isTencentSeat(seatId: number | undefined): boolean {
         return seatId === 9107 ||
                seatId === 9258;
@@ -143,7 +147,10 @@ export class CustomFeatures {
         const gameIds = [
             '1783252', '1781853', '1781854', // Initial Games
             '1428861', '1428862', // Chimera Game
-            '1434564', '3079031', '3334336', '3211592', '1566453', '3334337' // First batch
+            '1434564', '3079031', '3334336', '3211592', '1566453', '3334337', // First batch
+            '56659', '1514842', '3486364', '3475665', '3334339', '1346246', '1658494', // Second batch
+            '1548038', '3250882', '1783251', '3464560', '1551176', '1565348', '3250883', // Second batch
+            '3334338', '3486365', '3475664', '131622009', '1551177', '3464561' // Second batch
         ];
 
         return this.existsInList(gameIds, gameId);

@@ -43,7 +43,7 @@ export class ProgrammaticVastParser extends CampaignParser {
         this._coreApi = core.Api;
         this._requestManager = core.RequestManager;
         this._coreConfig = core.Config;
-        this._vastParserStrict = new VastParserStrict(undefined, undefined, this._coreConfig);
+        this._vastParserStrict = new VastParserStrict(undefined, undefined);
     }
 
     public parse(response: AuctionResponse, session: Session): Promise<Campaign> {

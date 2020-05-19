@@ -72,10 +72,6 @@ export class VastOpenMeasurementController extends OpenMeasurementController {
 
             event.data.vendorkey = vendorKey;
 
-            if (CustomFeatures.isIASVendor(vendorKey)) {
-                contextData.adSessionType = AdSessionType.NATIVE; // TODO: Adjust. IAS expects native to run properly
-            }
-
             event.data.context = contextData;
 
             om.sessionStart(event);
@@ -88,15 +84,15 @@ export class VastOpenMeasurementController extends OpenMeasurementController {
             apiVersion: OMID_P, // Version code of official OMID JS Verification Client API
             environment: 'app', // OMID JS Verification Client API
             accessMode: AccessMode.LIMITED, // Verification code is executed in a sandbox with only indirect information about ad
-            adSessionType: AdSessionType.HTML,
+            adSessionType: AdSessionType.NATIVE,
             omidNativeInfo: {
                 partnerName: PARTNER_NAME,
                 partnerVersion: this._clientInfo.getSdkVersionName()
             },
             omidJsInfo: {
                 omidImplementer: PARTNER_NAME,
-                serviceVersion: this._clientInfo.getSdkVersionName(),
-                sessionClientVersion: OMID_P,
+                serviceVersion: '1.2.10',
+                sessionClientVersion: '1.2.10',
                 partnerName: PARTNER_NAME,
                 partnerVersion: this._clientInfo.getSdkVersionName()
             },

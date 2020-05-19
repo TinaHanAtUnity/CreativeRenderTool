@@ -98,7 +98,7 @@ import { PrivacyTestEnvironment } from 'Privacy/PrivacyTestEnvironment';
 import { MetaData } from 'Core/Utilities/MetaData';
 import { AutomatedExperimentManager } from 'MabExperimentation/AutomatedExperimentManager';
 import { CampaignAssetInfo } from 'Ads/Utilities/CampaignAssetInfo';
-import { AdRequestManager } from 'Ads/Managers/AdRequestManager';
+import { AdRequestManager, LoadV5ExperimentType } from 'Ads/Managers/AdRequestManager';
 import { PerPlacementLoadManagerV5 } from 'Ads/Managers/PerPlacementLoadManagerV5';
 
 export class Ads implements IAds {
@@ -322,7 +322,7 @@ export class Ads implements IAds {
     private configureCampaignManager() {
         if (this._loadApiEnabled && this._webViewEnabledLoad) {
             if (this.isLoadV5Enabled()) {
-                this.AdRequestManager = new AdRequestManager(this._core.NativeBridge.getPlatform(), this._core, this._core.Config, this.Config, this.AssetManager, this.SessionManager, this.AdMobSignalFactory, this._core.RequestManager, this._core.ClientInfo, this._core.DeviceInfo, this._core.MetaDataManager, this._core.CacheBookkeeping, this.ContentTypeHandlerManager, this.PrivacySDK, this.PrivacyManager);
+                this.AdRequestManager = new AdRequestManager(this._core.NativeBridge.getPlatform(), this._core, this._core.Config, this.Config, this.AssetManager, this.SessionManager, this.AdMobSignalFactory, this._core.RequestManager, this._core.ClientInfo, this._core.DeviceInfo, this._core.MetaDataManager, this._core.CacheBookkeeping, this.ContentTypeHandlerManager, this.PrivacySDK, this.PrivacyManager, LoadV5ExperimentType.None);
                 this.CampaignManager = this.AdRequestManager;
                 return;
             }
@@ -383,9 +383,9 @@ export class Ads implements IAds {
                         }
                     } else if (this.isLoadV5Enabled() && this._webViewEnabledLoad) {
                         experimentType = MediationExperimentType.LoadV5;
-                    } else if (MediationCacheModeAllowedTest.isValid(this._core.Config.getAbGroup())) {
+                    } else if (!CustomFeatures.isExcludedGameFromCacheModeTest(this._core.ClientInfo.getGameId()) && MediationCacheModeAllowedTest.isValid(this._core.Config.getAbGroup())) {
                         this.Config.set('cacheMode', CacheMode.ALLOWED);
-                        experimentType = MediationExperimentType.CacheModeAllowed;
+                        experimentType = MediationExperimentType.DynamicCacheMode;
                     }
 
                     this._mediationName = mediation.getName()!;
@@ -542,6 +542,13 @@ export class Ads implements IAds {
 
         if (this.Config.getCacheMode() !== CacheMode.DISABLED) {
             this.AssetManager.stopCaching();
+        }
+
+        if (this.MediationLoadTrackingManager && this.MediationLoadTrackingManager.getCurrentExperiment() === MediationExperimentType.DynamicCacheMode) {
+            this.AssetManager.overrideCacheMode(CacheMode.FORCED);
+
+            // This change is not necessary for the experiment, but it aligns the field for anything which accesses it after this point
+            this.Config.set('cacheMode', CacheMode.FORCED);
         }
 
         Promise.all([
