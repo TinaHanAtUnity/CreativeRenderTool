@@ -1,5 +1,22 @@
 # Pending
 
+* [Open Measurement] Fix data discrepancy for MOAT and IAS [#15218](https://github.com/Applifier/unity-ads-webview/pull/15218)
+* [VAST HTML Endcard AB Test] Switch to HTML endcard as default to show( SDK 3.0+) [#15395](https://github.com/Applifier/unity-ads-webview/pull/15395)
+* [Deployment script improvement] Terminate notification process when the script failed to update CHANGELOG [#15099](https://github.com/Applifier/unity-ads-webview/pull/15099)
+* [Load V5] Add experiment tag to load v5 metrics [#15360](https://github.com/Applifier/unity-ads-webview/pull/15360)
+* [Deployment Scripts] Sending notification to slack about staging stages [#14938](https://github.com/Applifier/unity-ads-webview/pull/14938)
+* [AUI] Refactor assignment of color to download container background [#15368](https://github.com/Applifier/unity-ads-webview/pull/15368)
+* [Load V5] Increase retries count to 3 with 1 sec interval for Reload request [#15396](https://github.com/Applifier/unity-ads-webview/pull/15396)
+* [Ad Unit] Use loadCampaignWithAdditionalPlacement in AdUnitAwareAdRequestManager [#15361](https://github.com/Applifier/unity-ads-webview/pull/15361)
+
+# Fri May 15 22:02:48 UTC 2020
+
+* replace window.inner* with document.documentElement.client* [#14941](https://github.com/Applifier/unity-ads-webview/pull/14941)
+* [Metrics] Investigate Non-Batched Discrepancy of Impression Duplicate [#15363](https://github.com/Applifier/unity-ads-webview/pull/15363)
+* [Release 3.5.0] Add Webview Release Support [#15364](https://github.com/Applifier/unity-ads-webview/pull/15364)
+
+# Wed May 13 21:58:11 UTC 2020
+
 * [Add Vast HTML endcard support] PR4: Added metrics to track the showing number of HTML endcard and static endcard [#15335](https://github.com/Applifier/unity-ads-webview/pull/15335)
 * [Latency] Adapt CacheMode Test into DynamicCacheMode Test [#15332](https://github.com/Applifier/unity-ads-webview/pull/15332)
 * [Latency] Add Override for CacheMode in AssetManager [#15331](https://github.com/Applifier/unity-ads-webview/pull/15331)

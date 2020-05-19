@@ -219,15 +219,6 @@ export class OpenMeasurement<T extends Campaign> extends View<T> {
     }
 
     /**
-     * Video-only event. The player has loaded and buffered the creative’s
-     * media and assets either fully or to the extent that it is ready
-     * to play the media. Corresponds to the VAST  loaded  event.
-     */
-    public loaded(vastProperties: IVastProperties) {
-        this._omBridge.triggerVideoEvent(OMID3pEvents.OMID_LOADED, { vastProperties });
-    }
-
-    /**
      * Must ensure this is only called once per background and foreground
      * Videos are in the STOPPED state before they begin playing and this gets called during the Foreground event
      * onContainerBackground and Foreground are subscribed to multiple events Activity.ts

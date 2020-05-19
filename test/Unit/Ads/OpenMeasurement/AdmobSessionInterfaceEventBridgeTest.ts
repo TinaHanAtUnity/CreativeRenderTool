@@ -112,7 +112,7 @@ import { VideoPosition, VideoPlayerState, InteractionType, SessionEvents, OMID3p
                 {
                     event: OMEvents.LOADED,
                     data: {
-                        isSkippable: true,
+                        skippable: true,
                         skipOffset: 5,
                         isAutoplay: true,
                         position: VideoPosition.STANDALONE

@@ -23,6 +23,9 @@ if [ "$firstline" == "# Pending" ]; then
     git add CHANGELOG.md
     git commit -m "Update CHANGELOG.md"
     git push
+else
+    echo "There is no peding items in the CHANGELOG.md"
+    exit 1
 fi
 
 # ads-sdk-devs slack channel

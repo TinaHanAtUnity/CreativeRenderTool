@@ -36,3 +36,5 @@ gcs_credentials.json
 
 # Webpack build
 dist/
+
+.staginglock

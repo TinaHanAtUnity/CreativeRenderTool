@@ -251,10 +251,9 @@ export class OpenMeasurementAdViewBuilder {
         };
 
         /*
-        * Only provided if both the native-layer ad view and web-layer
-        * ad element exist and are available for measurement
+        * Only provided if web-layer ad element exists and is available for measurement
         */
-        if (measuringElementAvailable) {
+        if (measuringElementAvailable && this._campaign instanceof AdMobCampaign) {
             adView.containerGeometry = {
                 x: 0,
                 y: 0,
