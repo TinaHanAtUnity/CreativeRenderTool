@@ -1,5 +1,6 @@
 # Pending
 
+* [Load V5] Add experiment tag to load v5 metrics [#15360](https://github.com/Applifier/unity-ads-webview/pull/15360)
 * [Deployment Scripts] Sending notification to slack about staging stages [#14938](https://github.com/Applifier/unity-ads-webview/pull/14938)
 * [AUI] Refactor assignment of color to download container background [#15368](https://github.com/Applifier/unity-ads-webview/pull/15368)
 * [Load V5] Increase retries count to 3 with 1 sec interval for Reload request [#15396](https://github.com/Applifier/unity-ads-webview/pull/15396)
