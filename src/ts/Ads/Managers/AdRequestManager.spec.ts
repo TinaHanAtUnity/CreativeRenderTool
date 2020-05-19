@@ -1317,8 +1317,8 @@ class SatisfiesMatcher {
                     preloadData: {}
                 }), [], {
                     followRedirects: false,
-                    retries: 0,
-                    retryDelay: 0,
+                    retries: 3,
+                    retryDelay: 1000,
                     retryWithConnectionEvents: false,
                     timeout: 20000
                 });
