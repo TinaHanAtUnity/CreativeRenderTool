@@ -36,10 +36,10 @@ export class VastAdUnitParametersFactory extends AbstractAdUnitParametersFactory
             overlay: overlay
         };
 
-        if (baseParams.campaign.hasStaticEndscreen()) {
-            vastAdUnitParameters.endScreen = new VastStaticEndScreen(baseParams, attachTapForTencentVast ? true : undefined);
-        } else if (baseParams.campaign.hasHtmlEndscreen() && HtmlEndcardTest.isValid(baseParams.coreConfig.getAbGroup())) {
+        if (baseParams.campaign.hasHtmlEndscreen() && HtmlEndcardTest.isValid(baseParams.coreConfig.getAbGroup())) {
             vastAdUnitParameters.endScreen = new VastHTMLEndScreen(baseParams, this._webPlayerContainer);
+        } else if (baseParams.campaign.hasStaticEndscreen()) {
+            vastAdUnitParameters.endScreen = new VastStaticEndScreen(baseParams, attachTapForTencentVast ? true : undefined);
         }
 
         const adVerifications: VastAdVerification[] = baseParams.campaign.getVast().getAdVerifications();
