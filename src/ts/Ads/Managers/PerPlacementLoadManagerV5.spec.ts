@@ -562,10 +562,14 @@ import { ProgrammaticMraidParser } from 'MRAID/Parsers/ProgrammaticMraidParser';
                         campaign: campaign,
                         trackingUrls: {}
                     });
+                    adRequestManager.loadCampaignWithAdditionalPlacement.mockResolvedValueOnce({
+                        campaign: campaign,
+                        trackingUrls: {}
+                    });
 
                     (<ObservableMock>adsApi.LoadApi.onLoad).subscribe.mock.calls[0][0]({ 'video_1': 1 });
 
-                    (<ObservableMock>adRequestManager.onAdditionalPlacementsReady).subscribe.mock.calls[0][0]('ad_unit',  {
+                    (<ObservableMock>adRequestManager.onAdditionalPlacementsReady).subscribe.mock.calls[0][0]('ad_unit', {
                         'video_2': {
                         campaign: campaign,
                         trackingUrl: {}
@@ -578,8 +582,8 @@ import { ProgrammaticMraidParser } from 'MRAID/Parsers/ProgrammaticMraidParser';
                 });
 
                 it('should call loadCampaign', () => {
-                    expect(adRequestManager.loadCampaign).toBeCalledTimes(1);
-                    expect(adRequestManager.loadCampaign).toBeCalledWith(placements.video_1);
+                    expect(adRequestManager.loadCampaignWithAdditionalPlacement).toBeCalledTimes(1);
+                    expect(adRequestManager.loadCampaignWithAdditionalPlacement).toBeCalledWith(placements.video_1);
                 });
 
                 it('should not call requestPreload', () => {
@@ -627,18 +631,18 @@ import { ProgrammaticMraidParser } from 'MRAID/Parsers/ProgrammaticMraidParser';
                     adsConfiguration.getPlacement.mockImplementation((x) => placements[x]);
 
                     adRequestManager.hasPreloadFailed.mockReturnValue(false);
-                    adRequestManager.loadCampaign.mockResolvedValueOnce({
+                    adRequestManager.loadCampaignWithAdditionalPlacement.mockResolvedValueOnce({
                         campaign: campaign1,
                         trackingUrls: {}
                     });
-                    adRequestManager.loadCampaign.mockResolvedValueOnce({
+                    adRequestManager.loadCampaignWithAdditionalPlacement.mockResolvedValueOnce({
                         campaign: campaign2,
                         trackingUrls: {}
                     });
 
                     (<ObservableMock>adsApi.LoadApi.onLoad).subscribe.mock.calls[0][0]({ 'video_1': 1 });
 
-                    (<ObservableMock>adRequestManager.onAdditionalPlacementsReady).subscribe.mock.calls[0][0]('ad_unit',  {
+                    (<ObservableMock>adRequestManager.onAdditionalPlacementsReady).subscribe.mock.calls[0][0]('ad_unit', {
                         'video_2': {
                             campaign: campaign1,
                             trackingUrl: {}
@@ -658,9 +662,9 @@ import { ProgrammaticMraidParser } from 'MRAID/Parsers/ProgrammaticMraidParser';
                 });
 
                 it('should call loadCampaign', () => {
-                    expect(adRequestManager.loadCampaign).toBeCalledTimes(2);
-                    expect(adRequestManager.loadCampaign).toBeCalledWith(placements.video_1);
-                    expect(adRequestManager.loadCampaign).toBeCalledWith(placements.video_2);
+                    expect(adRequestManager.loadCampaignWithAdditionalPlacement).toBeCalledTimes(2);
+                    expect(adRequestManager.loadCampaignWithAdditionalPlacement).toBeCalledWith(placements.video_1);
+                    expect(adRequestManager.loadCampaignWithAdditionalPlacement).toBeCalledWith(placements.video_2);
                 });
 
                 it('should make reload request', () => {
