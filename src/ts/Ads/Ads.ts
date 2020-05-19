@@ -83,7 +83,7 @@ import { Analytics } from 'Analytics/Analytics';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { PrivacyParser } from 'Privacy/Parsers/PrivacyParser';
 import { Promises } from 'Core/Utilities/Promises';
-import { MediationCacheModeAllowedTest, AuctionXHR, LoadV5, BaseLineLoadV5 } from 'Core/Models/ABGroup';
+import { MediationCacheModeAllowedTest, AuctionXHR, LoadV5, BaseLineLoadV5, LoadV5AdUnit } from 'Core/Models/ABGroup';
 import { PerPlacementLoadManagerV4 } from 'Ads/Managers/PerPlacementLoadManagerV4';
 import { PrivacyMetrics } from 'Privacy/PrivacyMetrics';
 import { PrivacySDKUnit } from 'Ads/AdUnits/PrivacySDKUnit';
@@ -322,7 +322,9 @@ export class Ads implements IAds {
     private configureCampaignManager() {
         if (this._loadApiEnabled && this._webViewEnabledLoad) {
             if (this.isLoadV5Enabled()) {
-                this.AdRequestManager = new AdRequestManager(this._core.NativeBridge.getPlatform(), this._core, this._core.Config, this.Config, this.AssetManager, this.SessionManager, this.AdMobSignalFactory, this._core.RequestManager, this._core.ClientInfo, this._core.DeviceInfo, this._core.MetaDataManager, this._core.CacheBookkeeping, this.ContentTypeHandlerManager, this.PrivacySDK, this.PrivacyManager, LoadV5ExperimentType.None);
+                const useAdUnits = LoadV5AdUnit.isValid(this._core.Config.getAbGroup());
+
+                this.AdRequestManager = new AdRequestManager(this._core.NativeBridge.getPlatform(), this._core, this._core.Config, this.Config, this.AssetManager, this.SessionManager, this.AdMobSignalFactory, this._core.RequestManager, this._core.ClientInfo, this._core.DeviceInfo, this._core.MetaDataManager, this._core.CacheBookkeeping, this.ContentTypeHandlerManager, this.PrivacySDK, this.PrivacyManager, useAdUnits ? LoadV5ExperimentType.AdUnit : LoadV5ExperimentType.None);
                 this.CampaignManager = this.AdRequestManager;
                 return;
             }
@@ -340,7 +342,8 @@ export class Ads implements IAds {
     private configureRefreshManager(): void {
         // AdRequestManager will be set only if Load V5 is enabled.
         if (this.AdRequestManager) {
-            this.RefreshManager = new PerPlacementLoadManagerV5(this.Api, this.Config, this._core.Config, this.AdRequestManager, this._core.ClientInfo, this._core.FocusManager, false);
+            const useAdUnits = LoadV5AdUnit.isValid(this._core.Config.getAbGroup());
+            this.RefreshManager = new PerPlacementLoadManagerV5(this.Api, this.Config, this._core.Config, this.AdRequestManager, this._core.ClientInfo, this._core.FocusManager, useAdUnits);
             return;
         }
 

@@ -64,7 +64,8 @@ class AdRequestManagerError extends Error {
 }
 
 export enum LoadV5ExperimentType {
-    None = 'none'
+    None = 'none',
+    AdUnit = 'adunit'
 }
 
 export class AdRequestManager extends CampaignManager {
