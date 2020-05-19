@@ -32,6 +32,7 @@ export type OpenMeasurementMockVast = Base<VastCampaignMock> & {
     addToViewHierarchy: jest.Mock;
     injectVerificationResources: jest.Mock;
     getVerificationResource: jest.Mock;
+    triggerVideoEvent: jest.Mock;
 };
 
 export const OpenMeasurementVast = jest.fn(() => {
@@ -42,6 +43,7 @@ export const OpenMeasurementVast = jest.fn(() => {
         setAdmobOMSessionId: jest.fn(),
         addToViewHierarchy: jest.fn(),
         injectVerificationResources: jest.fn(),
-        getVerificationResource: jest.fn()
+        getVerificationResource: jest.fn(),
+        triggerVideoEvent: jest.fn()
     };
 });

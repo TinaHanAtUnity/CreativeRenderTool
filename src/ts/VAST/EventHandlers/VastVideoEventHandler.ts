@@ -17,6 +17,7 @@ export class VastVideoEventHandler extends VideoEventHandler {
     private _vastCampaign: VastCampaign;
     private _om?: VastOpenMeasurementController;
     private _omStartCalled = false;
+    private _userStateChangeHasBeenSent = false;
 
     constructor(params: IVideoEventHandlerParams<VastAdUnit, VastCampaign>) {
         super(params);
@@ -122,13 +123,16 @@ export class VastVideoEventHandler extends VideoEventHandler {
             this._om.resume();
             this._om.setDeviceVolume(this._vastAdUnit.getVolume());
             this._om.loaded({
-                isSkippable: this._placement.allowSkip(),
+                skippable: this._placement.allowSkip(),
                 skipOffset: this._placement.allowSkipInSeconds(),
                 isAutoplay: true, // Always autoplay for video
                 position: VideoPosition.STANDALONE // Always standalone video
             });
             this._om.start(this._vastCampaign.getVideo().getDuration());
-            this._om.playerStateChanged(VideoPlayerState.FULLSCREEN);
+            if (!this._userStateChangeHasBeenSent) {
+                this._om.playerStateChanged(VideoPlayerState.FULLSCREEN);
+                this._userStateChangeHasBeenSent = true;
+            }
         }
 
         const moat = MoatViewabilityService.getMoat();
