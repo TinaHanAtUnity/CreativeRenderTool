@@ -1,5 +1,6 @@
 # Pending
 
+* [AUI] Refactor assignment of color to download container background [#15368](https://github.com/Applifier/unity-ads-webview/pull/15368)
 * [Load V5] Increase retries count to 3 with 1 sec interval for Reload request [#15396](https://github.com/Applifier/unity-ads-webview/pull/15396)
 * [Ad Unit] Use loadCampaignWithAdditionalPlacement in AdUnitAwareAdRequestManager [#15361](https://github.com/Applifier/unity-ads-webview/pull/15361)
 
