@@ -1,5 +1,6 @@
 # Pending
 
+* [Deployment script improvement] Terminate notification process when the script failed to update CHANGELOG [#15099](https://github.com/Applifier/unity-ads-webview/pull/15099)
 * [Load V5] Add experiment tag to load v5 metrics [#15360](https://github.com/Applifier/unity-ads-webview/pull/15360)
 * [Deployment Scripts] Sending notification to slack about staging stages [#14938](https://github.com/Applifier/unity-ads-webview/pull/14938)
 * [AUI] Refactor assignment of color to download container background [#15368](https://github.com/Applifier/unity-ads-webview/pull/15368)
