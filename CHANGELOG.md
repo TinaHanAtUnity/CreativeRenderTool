@@ -1,4 +1,4 @@
-# Pending
+# Tue May 19 18:11:59 UTC 2020
 
 * [Open Measurement] Fix data discrepancy for MOAT and IAS [#15218](https://github.com/Applifier/unity-ads-webview/pull/15218)
 * [VAST HTML Endcard AB Test] Switch to HTML endcard as default to show( SDK 3.0+) [#15395](https://github.com/Applifier/unity-ads-webview/pull/15395)
