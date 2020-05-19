@@ -7,13 +7,13 @@ import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { Localization } from 'Core/Utilities/Localization';
 import 'mocha';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { SDKMetrics } from 'Ads/Utilities/SDKMetrics';
 import { ColorBlurEndScreen } from 'MabExperimentation/Performance/Views/ColorBlurEndScreen';
-import { ImageAnalysis } from 'Performance/Utilities/ImageAnalysis';
+import { ColorTheme } from 'Core/Utilities/ColorTheme';
+import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 
 describe('ColorBlurEndScreenTest', () => {
     let platform: Platform;
@@ -23,6 +23,7 @@ describe('ColorBlurEndScreenTest', () => {
     let configuration: CoreConfiguration;
     let privacy: Privacy;
     let sandbox: sinon.SinonSandbox;
+    let campaign: PerformanceCampaign;
 
     beforeEach(() => {
         sandbox = sinon.createSandbox();
@@ -30,13 +31,7 @@ describe('ColorBlurEndScreenTest', () => {
         backend = TestFixtures.getBackend(platform);
         nativeBridge = TestFixtures.getNativeBridge(platform, backend);
         core = TestFixtures.getCoreApi(nativeBridge);
-        // This hack is necessary, otherwise the 'fi' language renders in English
-        // Note: this behavior is unique to testing, it renders in the proper language
-        // on devices and in browser (have to use 'fin' in browser nuild)
-        Localization.setLanguageMap('fi.*', 'endscreen', {
-            'Install Now': 'Asenna nyt',
-            Free: 'Ilmainen'
-        });
+        campaign = TestFixtures.getCampaign();
         configuration = TestFixtures.getCoreConfiguration();
         sandbox.stub(SDKMetrics, 'reportMetricEvent').returns(Promise.resolve());
         sandbox.stub(SDKMetrics, 'reportMetricEventWithTags').returns(Promise.resolve());
@@ -44,11 +39,14 @@ describe('ColorBlurEndScreenTest', () => {
 
     afterEach(() => {
         sandbox.restore();
+        const container = privacy.container();
+        if (container && container.parentElement) {
+            container.parentElement.removeChild(container);
+        }
     });
 
     const createColorBlurEndScreen = (language: string): ColorBlurEndScreen => {
         const privacyManager = sinon.createStubInstance(UserPrivacyManager);
-        const campaign = TestFixtures.getCampaign();
         privacy = new Privacy(platform, campaign, privacyManager, false, false, 'en');
         const params: IEndScreenParameters = {
             platform,
@@ -65,7 +63,7 @@ describe('ColorBlurEndScreenTest', () => {
         return new ColorBlurEndScreen(params, campaign);
     };
 
-    describe('Testing new locales for Install Now and Free', () => {
+    describe('Locales for Install Now and Free', () => {
         const validateTranslation = (endScreen: ColorBlurEndScreen, downloadText: string, freeText: string) => {
             endScreen.render();
             const downloadElement = <HTMLElement>endScreen.container().querySelectorAll('.download-text')[0];
@@ -135,65 +133,33 @@ describe('ColorBlurEndScreenTest', () => {
             validateTranslation(createColorBlurEndScreen('zh_Hant'), '立即下载', '免费');
         });
     });
-    describe('Testing the color matching for the game info container and the install container', () => {
-        it('should render with the same color for game info container background and install container text', () => {
-            const getColorTheme = () => {
-                const campaign = TestFixtures.getCampaign();
+    describe('Color matching for the game info container and the install container', () => {
+        it('should render with the same color for game info container background and install container text', async () => {
+            // The color medium color returned from ColorTheme is rgb(98, 21, 183)
+            await ColorTheme.renderColorTheme(campaign, core).then((theme) => {
+                if (theme) {
+                    const color = theme.baseColorTheme.medium.toCssRgb();
 
-                const portraitImage = campaign.getPortrait();
-                const landscapeImage = campaign.getLandscape();
-                const squareImage = campaign.getSquare();
+                    const validateColorTheme = (endScreen: ColorBlurEndScreen) => {
+                        endScreen.render();
+                        const gameInfoContainer = <HTMLElement>endScreen.container().querySelector('.game-info-container');
+                        gameInfoContainer.style.backgroundColor = color;
+                        const gameInfoContainerColor = gameInfoContainer.style.backgroundColor;
 
-                const deviceInfo = core.DeviceInfo;
-                Promise.all([deviceInfo.getScreenWidth(), deviceInfo.getScreenHeight()]).then(([screenWidth, screenHeight]) => {
-                    const isLandscape = screenWidth > screenHeight;
-                    let image;
-                    if (squareImage) {
-                        image = squareImage;
-                    } else if (isLandscape && portraitImage) {
-                        image = portraitImage; // when the device is in landscape mode, we are showing a portrait image
-                    } else if (landscapeImage) {
-                        image = landscapeImage;
-                    } else {
-                        image = portraitImage;
-                    }
+                        const installContainer = <HTMLElement>endScreen.container().querySelector('.install-container');
+                        installContainer.style.color = color;
+                        const installContainerColor = installContainer.style.color;
 
-                    if (image) {
-                        ImageAnalysis.getImageSrc(core.Cache, image)
-                            .then(ImageAnalysis.analyseImage)
-                            .then((swatches) => {
-                                if (!swatches || !swatches.length) {
-                                    return;
-                                }
-                            });
-                    }
-                });
-                return 'rgb(22, 125, 251)';
-            };
+                        if (!gameInfoContainerColor || !installContainerColor) {
+                            assert.fail('Couldnt render all the colors');
+                        } else {
+                            assert.equal(gameInfoContainerColor, installContainerColor);
+                        }
+                    };
 
-            const validateExperimentAttributes = (endScreen: ColorBlurEndScreen) => {
-                endScreen.render();
-                const gameInfoContainer = <HTMLElement>endScreen.container().querySelector('.game-info-container');
-                gameInfoContainer.style.backgroundColor = getColorTheme();
-                const gameInfoContainerColor = gameInfoContainer.style.backgroundColor;
-
-                const installContainer = <HTMLElement>endScreen.container().querySelector('.install-container');
-                installContainer.style.color = getColorTheme();
-                const installContainerColor = installContainer.style.color;
-
-                if (!gameInfoContainerColor || !installContainerColor) {
-                    assert.fail('Couldnt render all the colors');
-                } else {
-                    assert.equal(gameInfoContainerColor, installContainerColor);
+                    validateColorTheme(createColorBlurEndScreen('en'));
                 }
-
-                const container = privacy.container();
-                if (container && container.parentElement) {
-                    container.parentElement.removeChild(container);
-                }
-            };
-
-            validateExperimentAttributes(createColorBlurEndScreen('en'));
+            });
         });
     });
 });
