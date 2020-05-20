@@ -29,7 +29,7 @@ export class ColorBlurEndScreen extends PerformanceEndScreen {
         colorTheme
             .then((theme) => {
                 if (theme) {
-                    this.applyColorTheme(theme.baseColorTheme, theme.secondaryColorTheme);
+                    this.applyColorTheme(theme.baseColorTheme);
                 }
             })
             .catch(() => {
@@ -37,15 +37,8 @@ export class ColorBlurEndScreen extends PerformanceEndScreen {
             });
     }
 
-    private applyColorTheme(baseColorTheme: IColorTheme, secondaryColorTheme: IColorTheme): void {
-        if (
-            !baseColorTheme.light ||
-            !baseColorTheme.medium ||
-            !baseColorTheme.dark ||
-            !secondaryColorTheme.light ||
-            !secondaryColorTheme.medium ||
-            !secondaryColorTheme.dark
-        ) {
+    private applyColorTheme(baseColorTheme: IColorTheme): void {
+        if (!baseColorTheme.light || !baseColorTheme.medium || !baseColorTheme.dark) {
             SDKMetrics.reportMetricEvent(AUIMetric.InvalidEndscreenColorTintTheme);
             return;
         }
