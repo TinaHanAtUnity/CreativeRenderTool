@@ -152,7 +152,8 @@ export enum AUIMetric {
     RequestingCampaignOptimization = 'requesting_campaign_optimization',
     UnknownExperimentName = 'unknown_experiment_name',
     InvalidVideoOverlayMode = 'invalid_video_overlay_mode',
-    UnknownCategoryProvided = 'unknown_automated_experiment_category_provided'
+    UnknownCategoryProvided = 'unknown_automated_experiment_category_provided',
+    InvalidImageAssets = 'invalid_image_assets'
 }
 
 export enum GeneralTimingMetric {
