@@ -24,12 +24,12 @@ describe('UrlTest', () => {
     });
 
     it('should add URL parameters correctly with hashbang', () => {
-        const url: string = Url.addParameters('http://www.google.fi', {test: true}, true);
+        const url: string = Url.addParameters('http://www.google.fi', { test: true }, true);
         assert.equal(url, 'http://www.google.fi#test=true');
     });
 
     it('should add URL parameters correctly with hashbang on existing URL with hashbang', () => {
-        const url: string = Url.addParameters('http://www.google.fi#test=true', {secondTest: true}, true);
+        const url: string = Url.addParameters('http://www.google.fi#test=true', { secondTest: true }, true);
         assert.equal(url, 'http://www.google.fi#test=true&secondTest=true');
     });
 
