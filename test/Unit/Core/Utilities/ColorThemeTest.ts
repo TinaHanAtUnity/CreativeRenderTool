@@ -37,6 +37,21 @@ describe('ColorThemeTest', () => {
         return ColorTheme.renderColorTheme(campaign, core);
     };
 
+    it('should render all the variants for the color theme', async () => {
+        await getColorTheme().then((theme) => {
+            if (
+                !theme.baseColorTheme.light ||
+                !theme.baseColorTheme.medium ||
+                !theme.baseColorTheme.dark ||
+                !theme.secondaryColorTheme.light ||
+                !theme.secondaryColorTheme.medium ||
+                !theme.secondaryColorTheme.dark
+            ) {
+                assert.fail('Could not render all the color themes');
+            }
+        });
+    });
+
     it('should successfully converts the 6 variants to their RGB values', async () => {
         await getColorTheme().then((theme) => {
             assert.equal(theme.baseColorTheme.light.toCssRgb(), 'rgb(215, 186, 247)');
