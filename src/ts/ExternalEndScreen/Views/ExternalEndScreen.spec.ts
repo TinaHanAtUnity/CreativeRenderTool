@@ -52,13 +52,6 @@ import { PerformanceCampaign } from 'Performance/Models/__mocks__/PerformanceCam
                 };
             });
 
-            //
-            // campaign.getGameIcon = campaign.getSquare = jest.fn().mockImplementation(() => {
-            //     return {
-            //         getUrl: jest.fn(() => '')
-            //     };
-            // });
-
             privacy.container = jest.fn(() => document.createElement('div'));
 
             endScreenParameters = jest.fn(() => {
