@@ -1,3 +1,7 @@
+# Pending
+
+* [Load V5, Ad Unit] Enable Ad Units for Load V5 [#15359](https://github.com/Applifier/unity-ads-webview/pull/15359)
+
 # Tue May 19 18:11:59 UTC 2020
 
 * [Open Measurement] Fix data discrepancy for MOAT and IAS [#15218](https://github.com/Applifier/unity-ads-webview/pull/15218)
