@@ -156,6 +156,12 @@ export enum AUIMetric {
     UnknownCategoryProvided = 'unknown_automated_experiment_category_provided'
 }
 
+export enum ExternalEndScreenMetric {
+    IframeTimeout = 'external_end_screen_iframe_timeout',
+    GameIconImageMissing = 'external_end_screen_game_icon_missing',
+    ImageMissing = 'external_end_screen_image_missing'
+}
+
 export enum GeneralTimingMetric {
     AuctionRequest = 'auction_request',
     AuctionHealthGood = 'auction_health_good',
@@ -217,7 +223,7 @@ export enum ChinaAucionEndpoint {
 
 export type TimingEvent = InitializationMetric | MediationMetric | GeneralTimingMetric;
 
-export type PTSEvent = VideoMetric | TimingEvent | AuctionV6 | AdmobMetric | BannerMetric | CachingMetric | ChinaMetric | VastMetric | MraidMetric | MiscellaneousMetric | LoadMetric | ErrorMetric | OMMetric | AUIMetric | LoadV5 | ChinaAucionEndpoint;
+export type PTSEvent = VideoMetric | TimingEvent | AuctionV6 | AdmobMetric | BannerMetric | CachingMetric | ChinaMetric | VastMetric | MraidMetric | MiscellaneousMetric | LoadMetric | ErrorMetric | OMMetric | AUIMetric | LoadV5 | ChinaAucionEndpoint | ExternalEndScreenMetric;
 
 export class SDKMetrics {
 

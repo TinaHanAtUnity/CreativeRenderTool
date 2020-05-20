@@ -25,6 +25,7 @@ export class CometCampaignParser extends CampaignParser {
     public static ContentTypeMRAID = 'comet/mraid-url';
 
     private _requestManager: RequestManager;
+    private static _forceEndScreenUrl: string | undefined;
 
     constructor(core: ICore) {
         super(core.NativeBridge.getPlatform());
@@ -115,6 +116,10 @@ export class CometCampaignParser extends CampaignParser {
             }
             return Promise.resolve(mraidCampaign);
         } else {
+            if (CometCampaignParser._forceEndScreenUrl) {
+                json.endScreenUrl = CometCampaignParser._forceEndScreenUrl;
+            }
+
             const parameters: IPerformanceCampaign = {
                 ... baseCampaignParams,
                 appStoreId: json.appStoreId,
@@ -174,5 +179,9 @@ export class CometCampaignParser extends CampaignParser {
             // do nothing
         }
         return adUnitStyle;
+    }
+
+    public static setForceEndScreenUrl(value: string | undefined): void {
+        CometCampaignParser._forceEndScreenUrl = value;
     }
 }
