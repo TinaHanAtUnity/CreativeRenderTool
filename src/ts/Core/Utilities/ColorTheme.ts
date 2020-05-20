@@ -2,6 +2,7 @@ import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { ICoreApi } from 'Core/ICore';
 import { ImageAnalysis } from 'Performance/Utilities/ImageAnalysis';
 import { IColorTheme } from 'Performance/Utilities/Swatch';
+import { AUIMetric } from 'Ads/Utilities/SDKMetrics';
 
 interface IEndcardColorTheme {
     baseColorTheme: IColorTheme;
@@ -34,7 +35,7 @@ export class ColorTheme {
                 .then(ImageAnalysis.analyseImage)
                 .then((swatches) => {
                     if (!swatches || !swatches.length) {
-                        return Promise.reject();
+                        return Promise.reject(AUIMetric.InvalidEndscreenColorTintSwitches);
                     }
 
                     const baseColorTheme = swatches[0].getColorTheme();
