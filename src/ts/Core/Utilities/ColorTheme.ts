@@ -28,7 +28,7 @@ export class ColorTheme {
                 image = portraitImage;
             }
             if (!image) {
-                return Promise.reject();
+                return Promise.reject(AUIMetric.InvalidImageAssets);
             }
 
             return ImageAnalysis.getImageSrc(core.Cache, image)
