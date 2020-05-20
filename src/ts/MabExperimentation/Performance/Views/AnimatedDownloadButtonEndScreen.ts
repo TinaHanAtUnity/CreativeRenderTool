@@ -79,17 +79,15 @@ export class AnimatedDownloadButtonEndScreen extends PerformanceEndScreen {
         if (this._tintColor) {
             const colorTheme = ColorTheme.renderColorTheme(this._campaign, this._core);
 
-            if (colorTheme) {
-                colorTheme
-                    .then((theme) => {
-                        if (theme) {
-                            this.applyColorTheme(theme.baseColorTheme, theme.secondaryColorTheme);
-                        }
-                    })
-                    .catch(() => {
-                        SDKMetrics.reportMetricEvent(AUIMetric.InvalidEndscreenColorTintSwitches);
-                    });
-            }
+            colorTheme
+                .then((theme) => {
+                    if (theme) {
+                        this.applyColorTheme(theme.baseColorTheme, theme.secondaryColorTheme);
+                    }
+                })
+                .catch((metric) => {
+                    SDKMetrics.reportMetricEvent(metric);
+                });
         }
     }
 
