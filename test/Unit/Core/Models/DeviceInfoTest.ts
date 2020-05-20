@@ -265,7 +265,7 @@ describe('DeviceInfoTest catch random reject', () => {
             assert.equal(dto.connectionType, 'wifi');
             assert.equal(dto.networkType, 0);
             assert.equal(dto.trackingEnabled, undefined);
-            assert.isUndefined(dto.advertisingId,  'Stub throws error, should be null');
+            assert.isUndefined(dto.advertisingId, 'Stub throws error, should be null');
             assert.equal(dto.osVersion, 'testVersion');
             assert.equal(dto.deviceModel, 'testModel');
             assert.equal(dto.screenHeight, '1200');

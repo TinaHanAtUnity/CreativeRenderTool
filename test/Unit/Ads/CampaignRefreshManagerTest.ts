@@ -548,7 +548,7 @@ describe('CampaignRefreshManager', () => {
 
             return campaignRefreshManager.refresh().then(() => {
                 diagnosticsStub.restore();
-                assert.equal(receivedErrorType , 'campaign_caching_failed', 'Incorrect error type');
+                assert.equal(receivedErrorType, 'campaign_caching_failed', 'Incorrect error type');
             });
         });
 
@@ -567,8 +567,8 @@ describe('CampaignRefreshManager', () => {
 
             return campaignRefreshManager.refresh().then(() => {
                 diagnosticsStub.restore();
-                assert.equal(receivedErrorType , 'auction_request_failed', 'Incorrect error type');
-                assert.equal(receivedError.error.message , 'test error', 'Incorrect error message');
+                assert.equal(receivedErrorType, 'auction_request_failed', 'Incorrect error type');
+                assert.equal(receivedError.error.message, 'test error', 'Incorrect error message');
             });
         });
 
@@ -595,8 +595,8 @@ describe('CampaignRefreshManager', () => {
 
             return campaignRefreshManager.refresh().then(() => {
                 diagnosticsStub.restore();
-                assert.equal(receivedErrorType , 'parse_campaign_wrong_contentType_error', 'Incorrect error type');
-                assert.equal(receivedError.error.message , 'Unsupported content-type: wrong/contentType', 'Incorrect error message');
+                assert.equal(receivedErrorType, 'parse_campaign_wrong_contentType_error', 'Incorrect error type');
+                assert.equal(receivedError.error.message, 'Unsupported content-type: wrong/contentType', 'Incorrect error message');
             });
         });
 

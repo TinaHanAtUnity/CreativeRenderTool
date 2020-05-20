@@ -14,6 +14,16 @@
   color: $white;
   font-weight: $privacy-settings-font-weight;
   font-size: $privacy-settings-font-size;
+  $ripple-square-default();
+  $ripple-circle-default();
+
+  .ripple-circle {
+    width: 6%;
+    &:hover:active::after {
+      margin: 0;
+      background: radial-gradient(circle, $privacy-light-gray 44%, transparent 12%);
+    }
+  }
 
   h2 {
     margin-top: 1.5 * $default-size;

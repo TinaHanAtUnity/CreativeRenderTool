@@ -13,7 +13,7 @@ describe('BufferedMetricInstance', () => {
     }[] = [
         { metric: InitializationMetric.NativeInitialization, tags: {} },
         { metric: InitializationMetric.WebviewLoad, tags: { 'test': 'm1' } },
-        { metric: InitializationMetric.WebviewInitialization, tags: {  'test': 'm1', 'm1': 'test' } },
+        { metric: InitializationMetric.WebviewInitialization, tags: { 'test': 'm1', 'm1': 'test' } },
         { metric: InitializationMetric.WebviewLoad, tags: {} }
     ];
 
@@ -25,7 +25,7 @@ describe('BufferedMetricInstance', () => {
         { metric: InitializationMetric.WebviewInitialization, time: 0, tags: {} },
         { metric: InitializationMetric.NativeInitialization, time: 100, tags: { 'test': 'm1' } },
         { metric: InitializationMetric.NativeInitialization, time: 120, tags: {} },
-        { metric: InitializationMetric.WebviewLoad, time: 5000, tags: {  'test': 'm1', 'm1': 'test' } }
+        { metric: InitializationMetric.WebviewLoad, time: 5000, tags: { 'test': 'm1', 'm1': 'test' } }
     ];
 
     beforeEach(() => {
@@ -70,7 +70,7 @@ describe('BufferedMetricInstance', () => {
 
         it('should forward in the same order', () => {
             metrics.forEach((x, i) =>
-                expect(mockMetricInstance.reportMetricEventWithTags).toHaveBeenNthCalledWith(i + 1 , x.metric, {})
+                expect(mockMetricInstance.reportMetricEventWithTags).toHaveBeenNthCalledWith(i + 1, x.metric, {})
             );
         });
     });
@@ -106,7 +106,7 @@ describe('BufferedMetricInstance', () => {
 
         it('should forward in the same order', () => {
             metrics.forEach((x, i) =>
-                expect(mockMetricInstance.reportMetricEventWithTags).toHaveBeenNthCalledWith(i + 1 , x.metric, x.tags)
+                expect(mockMetricInstance.reportMetricEventWithTags).toHaveBeenNthCalledWith(i + 1, x.metric, x.tags)
             );
         });
     });
@@ -142,7 +142,7 @@ describe('BufferedMetricInstance', () => {
 
         it('should forward in the same order', () => {
             times.forEach((x, i) =>
-                expect(mockMetricInstance.reportTimingEventWithTags).toHaveBeenNthCalledWith(i + 1 , x.metric, x.time, {})
+                expect(mockMetricInstance.reportTimingEventWithTags).toHaveBeenNthCalledWith(i + 1, x.metric, x.time, {})
             );
         });
     });
@@ -178,7 +178,7 @@ describe('BufferedMetricInstance', () => {
 
         it('should forward in the same order', () => {
             times.forEach((x, i) =>
-                expect(mockMetricInstance.reportTimingEventWithTags).toHaveBeenNthCalledWith(i + 1 , x.metric, x.time, x.tags)
+                expect(mockMetricInstance.reportTimingEventWithTags).toHaveBeenNthCalledWith(i + 1, x.metric, x.time, x.tags)
             );
         });
     });

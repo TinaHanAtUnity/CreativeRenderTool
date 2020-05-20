@@ -67,7 +67,7 @@ describe('PolyfillerTest', () => {
                 }
             }
         },
-        valuesToTest: [{nestedKey: 1}, {nestedKey2: '1'}, {nestedKey3: {'doublyNestedKey': 1}}],
+        valuesToTest: [{ nestedKey: 1 }, { nestedKey2: '1' }, { nestedKey3: { 'doublyNestedKey': 1 } }],
         expectedOutcome: true
     }, {
         testCase: 'With a populated map and multiple values of complex types with a single incorrect field',
@@ -84,7 +84,7 @@ describe('PolyfillerTest', () => {
                 }
             }
         },
-        valuesToTest: [{nestedKey: 1}, {nestedKey2: '1'}, {nestedKey3: {'doublyNestedKey': 'SHOULD FAIL BECAUSE OF THIS'}}],
+        valuesToTest: [{ nestedKey: 1 }, { nestedKey2: '1' }, { nestedKey3: { 'doublyNestedKey': 'SHOULD FAIL BECAUSE OF THIS' } }],
         expectedOutcome: false
     }];
 

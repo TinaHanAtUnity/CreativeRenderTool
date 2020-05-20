@@ -83,10 +83,10 @@ import { VastCampaign } from 'VAST/Models/VastCampaign';
 
             it('should fire multiple loaded events regardless of state', () => {
                 const vastProperties: IVastProperties = {
-                    isSkippable: false,
+                    skippable: false,
                     skipOffset: 10,
-                    isAutoplay: true,                   // Always autoplay for video
-                    position: VideoPosition.STANDALONE  // Always standalone video
+                    isAutoplay: true, // Always autoplay for video
+                    position: VideoPosition.STANDALONE // Always standalone video
                 };
                 omManager.loaded(vastProperties);
                 sinon.assert.calledWith(<sinon.SinonStub>openMeasurement.triggerVideoEvent, 'omidLoaded', { vastProperties });
@@ -185,7 +185,7 @@ import { VastCampaign } from 'VAST/Models/VastCampaign';
             });
             it('adUserInteraction', () => {
                 omManager.adUserInteraction(InteractionType.CLICK);
-                sinon.assert.calledWith(<sinon.SinonStub>openMeasurement.triggerVideoEvent, 'omidAdUserInteraction', 'click');
+                sinon.assert.calledWith(<sinon.SinonStub>openMeasurement.triggerVideoEvent, 'omidAdUserInteraction', { interactionType: InteractionType.CLICK });
                 sinon.assert.calledTwice(<sinon.SinonStub>openMeasurement.triggerVideoEvent);
             });
             it('should fire multiple bufferStart regardless of state', () => {
@@ -202,17 +202,17 @@ import { VastCampaign } from 'VAST/Models/VastCampaign';
                 omManager.start(10);
                 assert.equal(omManager.getState(), OMState.PLAYING);
 
-                const viewport = {width: 1, height: 1};
-                const rect = {x: 1, y: 1, width: 1, height: 1};
-                const rect2 = {x: 1, y: 1, width: 1, height: 1, obstructions: []};
-                const adview: IAdView = {percentageInView: 1, geometry: rect, onScreenGeometry: rect2, measuringElement: false, reasons: []};
+                const viewport = { width: 1, height: 1 };
+                const rect = { x: 1, y: 1, width: 1, height: 1 };
+                const rect2 = { x: 1, y: 1, width: 1, height: 1, obstructions: [] };
+                const adview: IAdView = { percentageInView: 1, geometry: rect, onScreenGeometry: rect2, measuringElement: false, reasons: [] };
 
                 omManager.geometryChange(viewport, adview);
                 assert.equal(omManager.getState(), OMState.PLAYING);
 
                 assert.equal((<sinon.SinonStub>openMeasurement.triggerAdEvent).callCount, 2);
-                (<sinon.SinonStub>openMeasurement.triggerAdEvent).getCall(0).calledWithExactly('omidGeometryChange', {viewport, adview});
-                (<sinon.SinonStub>openMeasurement.triggerAdEvent).getCall(1).calledWithExactly('omidGeometryChange', {viewport, adview});
+                (<sinon.SinonStub>openMeasurement.triggerAdEvent).getCall(0).calledWithExactly('omidGeometryChange', { viewport, adview });
+                (<sinon.SinonStub>openMeasurement.triggerAdEvent).getCall(1).calledWithExactly('omidGeometryChange', { viewport, adview });
             });
         });
     });

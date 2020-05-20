@@ -9,7 +9,7 @@ import { StoreTransaction } from 'Store/Models/StoreTransaction';
 
 export interface IAnalyticsObject<T> {
     type: string;
-    msg:  T;
+    msg: T;
 }
 
 // Ads Analytics classes

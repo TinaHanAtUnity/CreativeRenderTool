@@ -33,20 +33,20 @@ export interface IMRAIDOrientationProperties {
 }
 
 export enum MRAIDEvents {
-    ORIENTATION         = 'orientation',
-    OPEN                = 'open',
-    LOADED              = 'loaded',
-    ANALYTICS_EVENT     = 'analyticsEvent',
-    CLOSE               = 'close',
-    USE_CUSTOM_CLOSE    = 'useCustomClose',
-    STATE_CHANGE        = 'customMraidState',
-    RESIZE_WEBVIEW      = 'resizeWebview',
-    SEND_STATS          = 'sendStats',
-    AR                  = 'ar',
-    AR_READY_SHOW       = 'arReadyShow',
-    AR_BUTTON_HIDE      = 'hideArButton',
-    CONSOLE_LOG         = 'consoleLog',
-    DEVORIENTATION_SUB  = 'deviceorientationSubscribe'
+    ORIENTATION = 'orientation',
+    OPEN = 'open',
+    LOADED = 'loaded',
+    ANALYTICS_EVENT = 'analyticsEvent',
+    CLOSE = 'close',
+    USE_CUSTOM_CLOSE = 'useCustomClose',
+    STATE_CHANGE = 'customMraidState',
+    RESIZE_WEBVIEW = 'resizeWebview',
+    SEND_STATS = 'sendStats',
+    AR = 'ar',
+    AR_READY_SHOW = 'arReadyShow',
+    AR_BUTTON_HIDE = 'hideArButton',
+    CONSOLE_LOG = 'consoleLog',
+    DEVORIENTATION_SUB = 'deviceorientationSubscribe'
 }
 
 export abstract class MRAIDEventAdapter implements IMRAIDAdapter {

@@ -31,7 +31,7 @@ import { AuctionRequest, IAuctionRequestParams } from 'Ads/Networking/AuctionReq
 import { RequestPrivacyFactory, IRequestPrivacy } from 'Ads/Models/RequestPrivacy';
 import { Backend } from 'Backend/Backend';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import {ICore, ICoreApi} from 'Core/ICore';
+import { ICore, ICoreApi } from 'Core/ICore';
 import { IAdsApi } from 'Ads/IAds';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { ClientInfo } from 'Core/Models/ClientInfo';

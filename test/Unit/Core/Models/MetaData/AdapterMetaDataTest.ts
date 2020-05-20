@@ -31,8 +31,8 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
         it('should fetch correctly', () => {
             backend.Api.Storage.setStorageContents(<any>{
                 adapter: {
-                    name: {value: 'test_name'},
-                    version: {value: 'test_version'}
+                    name: { value: 'test_name' },
+                    version: { value: 'test_version' }
                 }
             });
 
@@ -68,7 +68,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
         it('should fetch correctly when data is partially undefined', () => {
             backend.Api.Storage.setStorageContents(<any>{
                 adapter: {
-                    name: {value: 'test_name'}
+                    name: { value: 'test_name' }
                 }
             });
 

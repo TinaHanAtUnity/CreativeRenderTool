@@ -5,7 +5,7 @@ export class WKWebViewBridge implements IWebViewBridge {
     }
 
     public handleCallback(id: string, status: string, parameters?: string) {
-        window.webkit.messageHandlers.handleCallback.postMessage({id: id, status: status, parameters: parameters});
+        window.webkit.messageHandlers.handleCallback.postMessage({ id: id, status: status, parameters: parameters });
     }
 
 }

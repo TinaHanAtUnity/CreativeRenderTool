@@ -36,7 +36,8 @@ export class AnimatedDownloadButtonEndScreen extends PerformanceEndScreen {
             default:
         }
 
-        this._animation = combination.animation;
+        // combination.animation will be defined at this point
+        this._animation = combination.animation!;
         this._templateData = {
             ...this._templateData,
             'hasShadow': this._animation === ButtonExperimentDeclaration.animation.BOUNCING
@@ -48,17 +49,18 @@ export class AnimatedDownloadButtonEndScreen extends PerformanceEndScreen {
             return ButtonAnimationsExperiment.getDefaultActions();
         }
 
+        // light scheme must include a color
+        if (actions.scheme === ButtonExperimentDeclaration.scheme.LIGHT && actions.color === undefined) {
+            SDKMetrics.reportMetricEvent(AUIMetric.InvalidEndscreenAnimation);
+            return ButtonAnimationsExperiment.getDefaultActions();
+        }
+
         if (!ButtonAnimationsExperiment.isValid(actions)) {
             SDKMetrics.reportMetricEvent(AUIMetric.InvalidEndscreenAnimation);
             return ButtonAnimationsExperiment.getDefaultActions();
         }
 
         return actions;
-    }
-
-    public static experimentSupported(experimentID: string): boolean {
-        // This is a temp implementation. simple implementation works for now as there is only on experiment supported.
-        return experimentID === ButtonAnimationsExperiment.getName();
     }
 
     public render(): void {

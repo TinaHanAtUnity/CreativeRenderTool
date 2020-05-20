@@ -150,20 +150,13 @@ export class AutomatedExperimentManager {
             return Promise.resolve();
         }
 
-        try {
-            const categorizedExp = this._campaign.CategorizedExperiments[category];
+        const categorizedExp = this._campaign.CategorizedExperiments[category];
 
-            if (categorizedExp.Stage !== CategorizedExperimentStage.RUNNING) {
-                return Promise.resolve();
-            }
-
-            return this.publishCampaignOutcomes(campaign, categorizedExp, CategorizedExperimentStage.ENDED);
+        if (categorizedExp.Stage !== CategorizedExperimentStage.RUNNING) {
+            return Promise.resolve();
         }
-        finally {
-            this._campaign = new OptimizedCampaign();
-        }
-
-     }
+        return this.publishCampaignOutcomes(campaign, categorizedExp, CategorizedExperimentStage.ENDED);
+    }
 
      public rewardSelectedExperiment(campaign: Campaign, category: string): Promise<void> {
 
@@ -354,15 +347,37 @@ export class AutomatedExperimentManager {
             });
     }
 
+    public trimImageUrl(url: string, gameIcon?: boolean): string {
+        if (!url) {
+            return '';
+        }
+
+        // Remove the extension ('.jpg' or '.png') and split it by '/' to remove the initial part, containing the CDN URL
+        const splitUrl = url.slice(0, url.lastIndexOf('.')).split('/');
+        const urlLength = splitUrl.length;
+
+        if (urlLength < 4) {
+            return '';
+        }
+
+        const creativeId = splitUrl[urlLength - 2];
+        const uuid = splitUrl[urlLength - 1];
+
+        // If the URL is for a game icon, we only want the UUID (last part of the URL)
+        if (gameIcon) {
+            return `${uuid}`;
+        }
+
+        // Whereas if not, we want the last 2 parts, the creative ID & the UUID
+        return `${creativeId}/${uuid}`;
+    }
+
     private async collectAdSpecificFeatures(campaign: Campaign): Promise<{ [key: string]: ContextualFeature }> {
         const features: { [key: string]: ContextualFeature } = {};
         const gameSessionCounters = GameSessionCounters.getCurrentCounters();
 
         const ts = new Date();
         features.campaign_id = campaign.getId();
-        features.target_game_id = campaign instanceof PerformanceCampaign ? campaign.getGameId() : undefined;
-        features.rating = campaign instanceof PerformanceCampaign ? campaign.getRating() : undefined;
-        features.rating_count = campaign instanceof PerformanceCampaign ? campaign.getRatingCount() : undefined;
         features.gsc_ad_requests = gameSessionCounters.adRequests;
         features.gsc_views = gameSessionCounters.views;
         features.gsc_starts = gameSessionCounters.starts;
@@ -371,6 +386,21 @@ export class AutomatedExperimentManager {
         features.day_of_week = ts.getDay();
         features.local_day_time = ts.getHours() + ts.getMinutes() / 60;
 
+        if (campaign && campaign instanceof PerformanceCampaign) {
+            features.target_game_id = campaign.getGameId();
+            features.rating = campaign.getRating();
+            features.rating_count = campaign.getRatingCount();
+            features.target_store_id = campaign.getAppStoreId();
+            features.target_game_name = campaign.getGameName();
+            features.portrait_creative_id = campaign.getPortraitVideo() ? campaign.getPortraitVideo()!.getCreativeId() : undefined;
+            features.landscape_creative_id = campaign.getVideo() ? campaign.getVideo()!.getCreativeId() : undefined;
+
+            // The fields are called *_url for historical reasons, but we actually only send the relevant parts of the URL
+            // and remove redundant parts such as the CDN & the file extension.
+            features.game_icon_url = this.trimImageUrl(campaign.getGameIcon().getUrl(), true);
+            features.endcard_portrait_image_url = campaign.getPortrait() ? this.trimImageUrl(campaign.getPortrait()!.getUrl()) : undefined;
+            features.endcard_landscape_image_url = campaign.getLandscape() ? this.trimImageUrl(campaign.getLandscape()!.getUrl()) : undefined;
+        }
         // Extract game session counters: targetted game centric
         let ids: string[] = [];
         let starts: number[] = [];

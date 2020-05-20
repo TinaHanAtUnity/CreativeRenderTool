@@ -112,6 +112,22 @@ describe('AssetManagerTest', () => {
         });
     });
 
+    it('should cache optional assets when cache mode is overridden from Allowed to Forced', () => {
+        const cache = new CacheManager(core, wakeUpManager, request, cacheBookkeeping);
+        const assetManager = new AssetManager(platform, core, cache, CacheMode.ALLOWED, deviceInfo, cacheBookkeeping);
+        const asset = new HTML('https://www.google.fi', TestFixtures.getSession());
+        const campaign = new TestCampaign([], [asset]);
+        const spy = sinon.spy(cache, 'cache');
+
+        assetManager.overrideCacheMode(CacheMode.FORCED);
+        return assetManager.setup(campaign).then(() => {
+            return new Promise((resolve, reject) => { setTimeout(resolve, 300); }).then(() => {
+                assert(spy.called, 'Cache was not called for optional asset');
+                assert(asset.isCached(), 'Asset was not cached');
+            });
+        });
+    });
+
     it('should not wait for optional assets when cache mode is allowed', () => {
         const cache = new CacheManager(core, wakeUpManager, request, cacheBookkeeping);
         const assetManager = new AssetManager(platform, core, cache, CacheMode.ALLOWED, deviceInfo, cacheBookkeeping);
@@ -123,7 +139,7 @@ describe('AssetManagerTest', () => {
     });
 
     it('should swallow optional errors when cache mode is allowed', () => {
-        const cache = new CacheManager(core, wakeUpManager, request, cacheBookkeeping, {retries: 0, retryDelay: 1});
+        const cache = new CacheManager(core, wakeUpManager, request, cacheBookkeeping, { retries: 0, retryDelay: 1 });
         const assetManager = new AssetManager(platform, core, cache, CacheMode.ALLOWED, deviceInfo, cacheBookkeeping);
         const asset = new HTML('https://www.google.fi', TestFixtures.getSession());
         const campaign = new TestCampaign([], [asset]);
@@ -134,7 +150,7 @@ describe('AssetManagerTest', () => {
     });
 
     it('should not swallow errors when cache mode is forced', () => {
-        const cache = new CacheManager(core, wakeUpManager, request, cacheBookkeeping, {retries: 0, retryDelay: 1});
+        const cache = new CacheManager(core, wakeUpManager, request, cacheBookkeeping, { retries: 0, retryDelay: 1 });
         const assetManager = new AssetManager(platform, core, cache, CacheMode.FORCED, deviceInfo, cacheBookkeeping);
         const asset = new HTML('https://www.google.fi', TestFixtures.getSession());
         const campaign = new TestCampaign([asset], []);

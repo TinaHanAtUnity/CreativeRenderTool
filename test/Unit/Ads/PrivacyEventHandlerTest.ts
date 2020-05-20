@@ -102,7 +102,7 @@ import { GamePrivacy, PrivacyMethod, UserPrivacy } from 'Privacy/Privacy';
 
         describe('on onGDPROptOut on legalFramework GDPR', () => {
             beforeEach(() => {
-                (<sinon.SinonStub>adUnitParameters.privacySDK.getGamePrivacy).returns(new GamePrivacy({method: PrivacyMethod.LEGITIMATE_INTEREST}));
+                (<sinon.SinonStub>adUnitParameters.privacySDK.getGamePrivacy).returns(new GamePrivacy({ method: PrivacyMethod.LEGITIMATE_INTEREST }));
                 (<sinon.SinonStub>adUnitParameters.privacySDK.getLegalFramework).returns(LegalFramework.GDPR);
 
             });
@@ -136,7 +136,7 @@ import { GamePrivacy, PrivacyMethod, UserPrivacy } from 'Privacy/Privacy';
 
         describe('on onGDPROptOut on legalFramework CCPA', () => {
             beforeEach(() => {
-                (<sinon.SinonStub>adUnitParameters.privacySDK.getGamePrivacy).returns(new GamePrivacy({method: PrivacyMethod.LEGITIMATE_INTEREST}));
+                (<sinon.SinonStub>adUnitParameters.privacySDK.getGamePrivacy).returns(new GamePrivacy({ method: PrivacyMethod.LEGITIMATE_INTEREST }));
                 (<sinon.SinonStub>adUnitParameters.privacySDK.getLegalFramework).returns(LegalFramework.CCPA);
             });
 

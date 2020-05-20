@@ -65,7 +65,7 @@ export class OpenMeasurementAdViewBuilder {
     }
 
     public buildAdmobImpressionView(om: AdmobOpenMeasurementController, screenWidth: number, screenHeight: number) {
-        const videoView =  om.getAdmobVideoElementBounds();
+        const videoView = om.getAdmobVideoElementBounds();
         this.setVideoView(videoView);
         let screenView;
         let percentageInView = 100;
@@ -86,7 +86,7 @@ export class OpenMeasurementAdViewBuilder {
     public buildAdmobAdView(obstructionReasons: ObstructionReasons[], om: AdmobOpenMeasurementController, obstructionRect: IRectangle): Promise<IAdView> {
         return Promise.all([this._deviceInfo.getScreenWidth(), this._deviceInfo.getScreenHeight()]).then(([screenWidth, screenHeight]) => {
 
-            const videoView =  om.getAdmobVideoElementBounds();
+            const videoView = om.getAdmobVideoElementBounds();
             this.setVideoView(videoView);
             let screenView;
             let percentInView = 100;
@@ -251,10 +251,9 @@ export class OpenMeasurementAdViewBuilder {
         };
 
         /*
-        * Only provided if both the native-layer ad view and web-layer
-        * ad element exist and are available for measurement
+        * Only provided if web-layer ad element exists and is available for measurement
         */
-        if (measuringElementAvailable) {
+        if (measuringElementAvailable && this._campaign instanceof AdMobCampaign) {
             adView.containerGeometry = {
                 x: 0,
                 y: 0,

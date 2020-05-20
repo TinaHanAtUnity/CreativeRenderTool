@@ -1,9 +1,10 @@
 import { RequestManager, RequestManagerMock } from 'Core/Managers/__mocks__/RequestManager';
 import { Core } from 'Core/__mocks__/Core';
 
-import { ThirdPartyEventMacro, ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
+import { ThirdPartyEventMacro, ThirdPartyEventManager, TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
 import { OMID_P } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
 import { ICoreApi } from 'Core/ICore';
+import { Campaign } from 'Ads/Models/__mocks__/Campaign';
 
 describe('ThirdPartyEventManagerTest', () => {
     let thirdPartyEventManager: ThirdPartyEventManager;
@@ -15,7 +16,7 @@ describe('ThirdPartyEventManagerTest', () => {
         request = new RequestManager();
         urlTemplate = 'http://foo.biz/123?is_om_enabled=%25OM_ENABLED%25&om_vendors=%25OM_VENDORS%25';
 
-        thirdPartyEventManager = new ThirdPartyEventManager(core, request, {[ThirdPartyEventMacro.OMIDPARTNER]: OMID_P, [ThirdPartyEventMacro.CACHEBUSTING]: '-1'});
+        thirdPartyEventManager = new ThirdPartyEventManager(core, request, { [ThirdPartyEventMacro.OMIDPARTNER]: OMID_P, [ThirdPartyEventMacro.CACHEBUSTING]: '-1' });
     });
 
     describe('when replacing Open Measurement Macros', () => {
@@ -49,9 +50,40 @@ describe('ThirdPartyEventManagerTest', () => {
 
         it('should replace the additional reason code macro correctly', () => {
             urlTemplate = urlTemplate + '&reason=%5BREASON%5D';
-            thirdPartyEventManager.sendWithGet('eventName', 'sessionId', urlTemplate, undefined, undefined, {'%5BREASON%5D': '1'});
+            thirdPartyEventManager.sendWithGet('eventName', 'sessionId', urlTemplate, undefined, undefined, { '%5BREASON%5D': '1' });
 
             expect(request.get).toHaveBeenCalledWith('http://foo.biz/123?is_om_enabled=%25OM_ENABLED%25&om_vendors=%25OM_VENDORS%25&reason=1', expect.anything(), expect.anything());
+        });
+    });
+
+    describe('sendTrackingEvents', () => {
+
+        beforeEach(() => {
+            return thirdPartyEventManager.sendTrackingEvents(Campaign(), TrackingEvent.IMPRESSION, '');
+        });
+
+        it('should call requestManager.post', () => {
+            expect(request.post).toBeCalledTimes(1);
+        });
+
+        it('should call requestManager.post with correct parameters', () => {
+            const metricData = JSON.stringify({
+                metrics: [
+                    {
+                        name: 'impression_duplicate_non_batching',
+                        value: 1,
+                        tags: ['ads_sdk2_tst:true']
+                    }
+                ]
+            });
+            const ptsHeaders = [['Content-Type', 'application/json']];
+            const requestOptions = {
+                retries: 2,
+                retryDelay: 0,
+                retryWithConnectionEvents: false,
+                followRedirects: false
+            };
+            expect(request.post).toBeCalledWith('https://sdk-diagnostics.prd.mz.internal.unity3d.com/v1/metrics', metricData, ptsHeaders, requestOptions);
         });
     });
 });

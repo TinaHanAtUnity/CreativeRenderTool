@@ -78,6 +78,10 @@ export class AssetManager {
         this._queueId = 0;
     }
 
+    public overrideCacheMode(cacheMode: CacheMode) {
+        this._cacheMode = cacheMode;
+    }
+
     public setCacheDiagnostics(value: boolean) {
         this._sendCacheDiagnostics = value;
     }
@@ -115,7 +119,7 @@ export class AssetManager {
 
         if (campaign instanceof PerformanceCampaign || campaign instanceof XPromoCampaign) {
             return this.getOrientedVideo(campaign).then(video => {
-                return [[video], optionalAssets];
+                return [[video, ...requiredAssets], optionalAssets];
             });
         }
 

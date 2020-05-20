@@ -5,7 +5,7 @@ import { AgeGateChoice } from 'Ads/Managers/UserPrivacyManager';
 
 describe('PrivacyConfigTest', () => {
     let privacyConfig: PrivacyConfig;
-    const flow = { testFlowValue: 'testFlowValue'};
+    const flow = { testFlowValue: 'testFlowValue' };
     const userSettings = {
         ads: false,
         external: false,
@@ -13,7 +13,7 @@ describe('PrivacyConfigTest', () => {
         ageGateChoice: AgeGateChoice.NO,
         agreementMethod: ''
     };
-    const env = { testEnvValue: 'testEnvValue'};
+    const env = { testEnvValue: 'testEnvValue' };
     const html = '<html></html>';
 
     beforeEach(() => {

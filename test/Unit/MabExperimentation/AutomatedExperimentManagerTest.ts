@@ -13,7 +13,7 @@ import { CacheManager } from 'Core/Managers/CacheManager';
 import { ContentTypeHandlerManager } from 'Ads/Managers/ContentTypeHandlerManager';
 import { PerformanceAdUnitParametersFactory } from 'Performance/AdUnits/PerformanceAdUnitParametersFactory';
 import { AbstractAdUnitParametersFactory } from 'Ads/AdUnits/AdUnitParametersFactory';
-import { PerformanceAdUnitFactory} from 'Performance/AdUnits/PerformanceAdUnitFactory';
+import { PerformanceAdUnitFactory } from 'Performance/AdUnits/PerformanceAdUnitFactory';
 import { CacheMode } from 'Core/Models/CoreConfiguration';
 import { CoreConfigurationParser } from 'Core/Parsers/CoreConfigurationParser';
 import { AdsConfigurationParser } from 'Ads/Parsers/AdsConfigurationParser';
@@ -51,6 +51,7 @@ const FooExperimentDefaultActions = {
 
 describe('AutomatedExperimentManagerTests', () => {
     const testCategory = 'TestCategory';
+    const testCategory2 = 'TestCategory2';
     const experimentID = 'test-exp';
     const campaignType = 'PerformanceCampaign'; // must match type of object returned by TestFixtures.getCampaign()
     const sandbox = sinon.createSandbox();
@@ -132,7 +133,14 @@ describe('AutomatedExperimentManagerTests', () => {
         gsc_target_game_starts: [0],
         gsc_target_game_views: [0],
         day_of_week: 0,
-        is_weekend: true
+        is_weekend: true,
+        target_store_id: 'com.unity3d.ads.example',
+        game_icon_url: 'com.unity3d.ads.example',
+        portrait_creative_id: '582bb5e352e4c4abd7fab850',
+        landscape_creative_id: '582bb5e352e4c4abd7fab850',
+        endcard_portrait_image_url: 'http://cdn-creatives-highwinds-prd.unityads.unity3d.com/assets/6e6f9a65-1862-4051-bda1-dda61ebb2f65/Lucky%20Day%203x4%20FULL%20END%20CARD%20UNITY.png',
+        endcard_landscape_image_url: 'http://cdn-creatives-highwinds-prd.unityads.unity3d.com/assets/6e6f9a65-1862-4051-bda1-dda61ebb2f65/Lucky%20Day%203x4%20FULL%20END%20CARD%20UNITY.png',
+        target_game_name: 'Example game name'
     };
 
     function ValidateFeaturesInRequestBody(body: string): boolean {
@@ -180,16 +188,28 @@ describe('AutomatedExperimentManagerTests', () => {
                             metadata: 'booh'
                         }
                     ]
+                },
+                TestCategory2:
+                {
+                    experiment_name: experimentID,
+                    parts:
+                    [
+                        {
+                            id: testCategory2 + '-' + experimentID,
+                            actions: actions,
+                            metadata: 'baah'
+                        }
+                    ]
                 }
             }
         });
     }
 
     [
-        {action1: FooExperimentDeclaration.action1.choiceA, action2: FooExperimentDeclaration.action2.choiceA},
-        {action1: FooExperimentDeclaration.action1.choiceA, action2: FooExperimentDeclaration.action2.choiceB},
-        {action1: FooExperimentDeclaration.action1.choiceB, action2: FooExperimentDeclaration.action2.choiceA},
-        {action1: FooExperimentDeclaration.action1.choiceB, action2: FooExperimentDeclaration.action2.choiceB}
+        { action1: FooExperimentDeclaration.action1.choiceA, action2: FooExperimentDeclaration.action2.choiceA },
+        { action1: FooExperimentDeclaration.action1.choiceA, action2: FooExperimentDeclaration.action2.choiceB },
+        { action1: FooExperimentDeclaration.action1.choiceB, action2: FooExperimentDeclaration.action2.choiceA },
+        { action1: FooExperimentDeclaration.action1.choiceB, action2: FooExperimentDeclaration.action2.choiceB }
     ].forEach((action) => {
         it(`initialize with request ok, use received action ${JSON.stringify(action)}`, () => {
             const postUrl = AutomatedExperimentManager.BaseUrl + AutomatedExperimentManager.CreateEndPoint;
@@ -218,6 +238,13 @@ describe('AutomatedExperimentManagerTests', () => {
                     assert.equal(JSON.stringify(selectedActions), JSON.stringify(action), 'Wrong variant...');
             });
         });
+    });
+
+    it(`Trims the image URL properly`, () => {
+        assert.equal(aem.trimImageUrl('http://mycdn.com/unity/monetization/creative-id/uuid.png', false), 'creative-id/uuid');
+        assert.equal(aem.trimImageUrl('http://mycdn.com/unity/monetization/creative-id/uuid.png', true), 'uuid');
+        assert.equal(aem.trimImageUrl('http://foo.com', false), '');
+        assert.equal(aem.trimImageUrl('http://foo.com', true), '');
     });
 
     it(`send proper request, receive garbage, returns undefined actions`, () => {
@@ -290,7 +317,7 @@ describe('AutomatedExperimentManagerTests', () => {
 
             const rewardPostUrl = AutomatedExperimentManager.BaseUrl + AutomatedExperimentManager.RewardEndPoint;
             const rewardRequestBodyText = JSON.stringify({
-                user_info: {ab_group: 99, auction_id: '12345'},
+                user_info: { ab_group: 99, auction_id: '12345' },
                 reward: rewarded,
                 experiments:
                 [
@@ -304,7 +331,7 @@ describe('AutomatedExperimentManagerTests', () => {
 
             const postStubReward = postStub.onSecondCall().resolves(<INativeResponse>{
                 responseCode: 200,
-                response: JSON.stringify({success: true})
+                response: JSON.stringify({ success: true })
             });
 
             aem.initialize(core, campaignSource);
@@ -420,6 +447,7 @@ describe('AutomatedExperimentManagerTests', () => {
         aem.registerExperimentCategory(testCategory, campaignType);
 
         return aem.onNewCampaign(campaign)
+
             .then(() => {
                 assert.equal(aem.activateSelectedExperiment(campaign, 'fooBar'), undefined);
 
@@ -429,5 +457,68 @@ describe('AutomatedExperimentManagerTests', () => {
 
     it(`AUI/Optmz endpoint targets Production env`, () => {
         assert.equal(AutomatedExperimentManager.BaseUrl, AutomatedExperimentManager.BaseUrlProduction);
+    });
+
+    [[0, 0], [0, 1], [1, 0], [1, 1]].forEach(value => {
+        const [firstReward, secondReward] = value;
+        it(`Works with multiple experiments in parallel [${firstReward}, ${secondReward}]`, () => {
+
+            sandbox.stub(SDKMetrics, 'reportMetricEvent')
+            .returns(true);
+
+            const postStub = sandbox.stub(core.RequestManager, 'post');
+
+            postStub.resolves(<INativeResponse>{
+                responseCode: 200,
+                response: genExperimentResponseBody()
+            });
+
+            const rewardPostUrl = AutomatedExperimentManager.BaseUrl + AutomatedExperimentManager.RewardEndPoint;
+            const rewardRequestBodyText = JSON.stringify({
+                user_info: { ab_group: 99, auction_id: '12345' },
+                reward: firstReward,
+                experiments:
+                [
+                    {
+                        experiment: testCategory + '-' + experimentID,
+                        actions: FooExperimentDefaultActions,
+                        metadata: 'booh'
+                    }
+                ]
+            });
+
+            const postStubReward = postStub.onSecondCall().resolves(<INativeResponse>{
+                responseCode: 200,
+                response: JSON.stringify({ success: true })
+            });
+
+            aem.initialize(core, campaignSource);
+            aem.registerExperimentCategory(testCategory, campaignType);
+            aem.registerExperimentCategory(testCategory2, campaignType);
+            return aem.onNewCampaign(campaign)
+                .then(() => {
+                    const firstVariant = aem.activateSelectedExperiment(campaign, testCategory);
+                    assert.deepEqual(firstVariant, FooExperimentDefaultActions, 'Wrong variant name');
+                    const secondVariant = aem.activateSelectedExperiment(campaign, testCategory2);
+                    assert.deepEqual(secondVariant, FooExperimentDefaultActions, 'Wrong variant name');
+
+                }).then(() => {
+                    if (firstReward) {
+                        return aem.rewardSelectedExperiment(campaign, testCategory);
+                    } else {
+                        return aem.endSelectedExperiment(campaign, testCategory);
+                    }
+                }).then(() => {
+                    if (firstReward) {
+                        assert(postStubReward.calledWith(rewardPostUrl, rewardRequestBodyText));
+                    }
+                }).then(() => {
+                    if (secondReward) {
+                        assert((aem.rewardSelectedExperiment(campaign, testCategory2)));
+                    } else {
+                        assert((aem.endSelectedExperiment(campaign, testCategory2)));
+                    }
+                });
+        });
     });
 });
