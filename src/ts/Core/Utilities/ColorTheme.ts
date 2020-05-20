@@ -2,7 +2,6 @@ import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { ICoreApi } from 'Core/ICore';
 import { ImageAnalysis } from 'Performance/Utilities/ImageAnalysis';
 import { IColorTheme } from 'Performance/Utilities/Swatch';
-import { AUIMetric } from 'Ads/Utilities/SDKMetrics';
 
 interface IEndcardColorTheme {
     baseColorTheme: IColorTheme;
@@ -28,14 +27,14 @@ export class ColorTheme {
                 image = portraitImage;
             }
             if (!image) {
-                return Promise.reject(AUIMetric.InvalidImageAssets);
+                Promise.reject();
             }
 
-            return ImageAnalysis.getImageSrc(core.Cache, image)
+            return ImageAnalysis.getImageSrc(core.Cache, image!)
                 .then(ImageAnalysis.analyseImage)
                 .then((swatches) => {
                     if (!swatches || !swatches.length) {
-                        return Promise.reject(AUIMetric.InvalidEndscreenColorTintSwitches);
+                        Promise.reject();
                     }
 
                     const baseColorTheme = swatches[0].getColorTheme();
