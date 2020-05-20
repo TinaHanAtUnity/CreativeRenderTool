@@ -27,14 +27,14 @@ export class ColorTheme {
                 image = portraitImage;
             }
             if (!image) {
-                Promise.reject();
+                return Promise.reject();
             }
 
-            return ImageAnalysis.getImageSrc(core.Cache, image!)
+            return ImageAnalysis.getImageSrc(core.Cache, image)
                 .then(ImageAnalysis.analyseImage)
                 .then((swatches) => {
                     if (!swatches || !swatches.length) {
-                        Promise.reject();
+                        return Promise.reject();
                     }
 
                     const baseColorTheme = swatches[0].getColorTheme();
