@@ -35,7 +35,7 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
 
     private _spinnerEnabled: boolean = false;
 
-    protected _skipEnabled: boolean;
+    private _skipEnabled: boolean;
 
     private _videoDurationEnabled: boolean = false;
     protected _videoProgress: number;
@@ -47,23 +47,23 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
     protected _callButtonVisible: boolean = false;
     private _callButtonEnabled: boolean = true;
 
-    protected _skipButtonElement: HTMLElement;
+    private _skipButtonElement: HTMLElement;
     private _spinnerElement: HTMLElement;
     private _muteButtonElement: HTMLElement;
     private _debugMessageElement: HTMLElement;
     protected _callButtonElement: HTMLElement;
-    protected _timerElement: HTMLElement;
+    private _timerElement: HTMLElement;
     private _chinaAdvertisementElement: HTMLElement;
 
     private _fadeTimer?: number;
-    protected _areControlsVisible: boolean = false;
+    private _areControlsVisible: boolean = false;
     private _gameId: string;
 
     private _country: string | undefined;
     protected _campaign: Campaign;
 
     private _useCloseIconInsteadOfSkipIcon: boolean | undefined = false;
-    protected _disableFadeOutOnClick: boolean | undefined = false;
+    private _disableFadeOutOnClick: boolean | undefined = false;
 
     constructor(parameters: IVideoOverlayParameters<Campaign>, privacy: AbstractPrivacy, showGDPRBanner: boolean, showPrivacyDuringVideo: boolean, attachTap?: boolean | undefined) {
         super(parameters.platform, 'video-overlay', parameters.placement.muteVideo(), attachTap);
@@ -215,15 +215,10 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
             this._chinaAdvertisementElement.classList.add('with-skip-button');
         }
 
-        if (!this._skipEnabled && this._videoProgress > 5000) {
-            this.showCTAButton();
-            return;
-        }
-    }
-
-    protected showCTAButton() {
-        if (this._campaign instanceof PerformanceCampaign || this._campaign instanceof XPromoCampaign) {
+        const isPerformanceCampaign = this._campaign instanceof PerformanceCampaign || this._campaign instanceof XPromoCampaign;
+        if (isPerformanceCampaign && !this._skipEnabled && this._videoProgress > 5000) {
             this.showCallButton();
+            return;
         }
     }
 
@@ -297,7 +292,7 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
         }
     }
 
-    protected onSkipEvent(event: Event): void {
+    private onSkipEvent(event: Event): void {
         event.preventDefault();
         event.stopPropagation();
         if (this._skipEnabled && this._videoProgress > this._skipDuration) {
@@ -319,7 +314,7 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
         this._handlers.forEach(handler => handler.onOverlayMute(this._muted));
     }
 
-    protected onCallButtonEvent(event: Event): void {
+    private onCallButtonEvent(event: Event): void {
         if (!this._callButtonEnabled) {
             return;
         }
@@ -330,7 +325,7 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
         this.triggerOnOverlayDownload();
     }
 
-    protected triggerOnOverlayDownload(): void {
+    private triggerOnOverlayDownload(): void {
         if (this._campaign instanceof PerformanceCampaign || this._campaign instanceof XPromoCampaign) {
             const campaign = this._campaign;
             this._handlers.filter(handler => typeof handler.onOverlayDownload === 'function')
@@ -359,7 +354,7 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
         this._handlers.forEach(handler => handler.onOverlayPauseForTesting(true));
     }
 
-    protected onClick(event: Event) {
+    private onClick(event: Event) {
         if (this._disableFadeOutOnClick) {
             return;
         }
@@ -373,7 +368,7 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
         }
     }
 
-    protected setupElementReferences(): void {
+    private setupElementReferences(): void {
         this._skipButtonElement = <HTMLElement> this._container.querySelector('.skip-button');
         this._spinnerElement = <HTMLElement> this._container.querySelector('.buffering-spinner');
         this._muteButtonElement = <HTMLElement> this._container.querySelector('.mute-button');
@@ -383,14 +378,16 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
         this._chinaAdvertisementElement = <HTMLLIElement> this._container.querySelector('.china-advertisement');
     }
 
-    protected showSkipButton() {
+    private showSkipButton() {
         if (this._skipEnabled) {
             this._skipButtonElement.classList.add('show-skip-button');
-            this.showCTAButton();
+            if (this._campaign instanceof PerformanceCampaign || this._campaign instanceof XPromoCampaign) {
+                this.showCallButton();
+            }
         }
     }
 
-    protected resetFadeTimer() {
+    private resetFadeTimer() {
         if (this._fadeTimer) {
             clearTimeout(this._fadeTimer);
             this._fadeTimer = undefined;
@@ -402,7 +399,7 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
         this._callButtonElement.classList.add('show-go-text');
     }
 
-    protected fadeIn() {
+    private fadeIn() {
         if (!this._container) {
             return;
         }
