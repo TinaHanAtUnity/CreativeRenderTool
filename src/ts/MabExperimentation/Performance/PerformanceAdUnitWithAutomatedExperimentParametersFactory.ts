@@ -47,12 +47,7 @@ export class PerformanceAdUnitWithAutomatedExperimentParametersFactory extends P
         let endScreen: ExternalEndScreen | AnimatedDownloadButtonEndScreen | ColorBlurEndScreen;
 
         if (this._campaign.getEndScreen()) {
-            endScreen = new ExternalEndScreen(
-                endScreenCombination,
-                endScreenParameters,
-                baseParams.campaign,
-                baseParams.coreConfig.getCountry()
-            );
+            endScreen = new ExternalEndScreen(endScreenCombination, endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
         } else if (endScreenCombination && endScreenCombination.scheme === ButtonExperimentDeclaration.scheme.COLOR_BLUR) {
             endScreen = new ColorBlurEndScreen(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
         } else {
@@ -85,13 +80,6 @@ export class PerformanceAdUnitWithAutomatedExperimentParametersFactory extends P
             AutomatedExperimentsCategories.VIDEO_OVERLAY
         );
 
-        return new SwipeUpVideoOverlay(
-            baseParams,
-            privacy,
-            showGDPRBanner,
-            showPrivacyDuringVideo,
-            videoCombination,
-            this._automatedExperimentManager
-        );
+        return new SwipeUpVideoOverlay(baseParams, privacy, showGDPRBanner, showPrivacyDuringVideo, videoCombination, this._automatedExperimentManager);
     }
 }
