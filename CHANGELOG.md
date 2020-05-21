@@ -1,3 +1,7 @@
+# Pending
+
+* [Deployment Scripts] Print PR name on Slack when merged [#15423](https://github.com/Applifier/unity-ads-webview/pull/15423)
+
 # Thu May 21 00:42:46 UTC 2020
 
 * [Load V5] Add 2 Voodoo Games [#15434](https://github.com/Applifier/unity-ads-webview/pull/15434)
