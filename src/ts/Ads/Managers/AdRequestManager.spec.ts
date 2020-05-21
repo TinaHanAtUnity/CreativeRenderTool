@@ -1,5 +1,5 @@
 import { Platform } from 'Core/Constants/Platform';
-import { AdRequestManager, INotCachedLoadedCampaign } from 'Ads/Managers/AdRequestManager';
+import { AdRequestManager, INotCachedLoadedCampaign, LoadV5ExperimentType } from 'Ads/Managers/AdRequestManager';
 import { Core } from 'Core/__mocks__/Core';
 import { ICore } from 'Core/ICore';
 import { CoreConfigurationMock, CoreConfiguration } from 'Core/Models/__mocks__/CoreConfiguration';
@@ -87,7 +87,7 @@ class SatisfiesMatcher {
             contentTypeHandlerManager = ContentTypeHandlerManager();
             privacySDK = PrivacySDK();
             userPrivacyManager = UserPrivacyManager();
-            adRequestManager = new AdRequestManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, contentTypeHandlerManager, privacySDK, userPrivacyManager);
+            adRequestManager = new AdRequestManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, contentTypeHandlerManager, privacySDK, userPrivacyManager, LoadV5ExperimentType.None);
         });
 
         describe('initial state', () => {
@@ -256,7 +256,7 @@ class SatisfiesMatcher {
             });
 
             it('should send fill metric', () => {
-                expect(SDKMetrics.reportMetricEvent).toBeCalledWith(LoadV5.LoadRequestFill);
+                expect(SDKMetrics.reportMetricEventWithTags).toBeCalledWith(LoadV5.LoadRequestFill, expect.anything());
             });
 
             it('should not increase request count in game session counter', () => {
@@ -484,7 +484,7 @@ class SatisfiesMatcher {
             });
 
             it('should send fill metric', () => {
-                expect(SDKMetrics.reportMetricEvent).toBeCalledWith(LoadV5.LoadRequestFill);
+                expect(SDKMetrics.reportMetricEventWithTags).toBeCalledWith(LoadV5.LoadRequestFill, expect.anything());
             });
 
             it('should not increase request count in game session counter', () => {
@@ -1317,8 +1317,8 @@ class SatisfiesMatcher {
                     preloadData: {}
                 }), [], {
                     followRedirects: false,
-                    retries: 0,
-                    retryDelay: 0,
+                    retries: 3,
+                    retryDelay: 1000,
                     retryWithConnectionEvents: false,
                     timeout: 20000
                 });

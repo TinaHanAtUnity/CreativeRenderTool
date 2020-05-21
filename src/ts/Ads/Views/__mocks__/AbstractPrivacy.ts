@@ -5,6 +5,8 @@ export type AbstractPrivacyMock = Base & {
     addEventHandler: jest.Mock;
     hide: jest.Mock;
     container: jest.Mock;
+    render: jest.Mock;
+    show: jest.Mock;
 };
 
 export const AbstractPrivacy = jest.fn(() => {
@@ -13,6 +15,8 @@ export const AbstractPrivacy = jest.fn(() => {
         hide: jest.fn(),
         container: jest.fn().mockImplementation(() => {
             return new AdUnitContainer();
-        })
+        }),
+        render: jest.fn(),
+        show: jest.fn()
     };
 });

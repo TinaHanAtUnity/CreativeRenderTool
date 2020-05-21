@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ExternalEndScreenFixture</title>
+    <script>
+        window.addEventListener('message', event => {
+            window.parent.postMessage(event.data, '*');
+        });
+    </script>
+</head>
+<body>
+
+</body>
+</html>

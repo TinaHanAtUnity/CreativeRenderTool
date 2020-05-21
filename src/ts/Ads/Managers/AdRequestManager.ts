@@ -63,6 +63,11 @@ class AdRequestManagerError extends Error {
     }
 }
 
+export enum LoadV5ExperimentType {
+    None = 'none',
+    AdUnit = 'adunit'
+}
+
 export class AdRequestManager extends CampaignManager {
     protected static LoadV5BaseUrl: string = 'https://auction-load.unityads.unity3d.com/v5/games';
 
@@ -76,6 +81,7 @@ export class AdRequestManager extends CampaignManager {
     private _reloadResults: { [key: string]: ILoadedCampaign };
     private _preloadFailed: boolean;
     private _activePreload: boolean;
+    private _currentExperiment: LoadV5ExperimentType;
 
     protected _platform: Platform;
     protected _core: ICoreApi;
@@ -98,7 +104,7 @@ export class AdRequestManager extends CampaignManager {
 
     public readonly onAdditionalPlacementsReady = new Observable2<string | undefined, IPlacementIdMap<INotCachedLoadedCampaign | undefined>>();
 
-    constructor(platform: Platform, core: ICore, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, assetManager: AssetManager, sessionManager: SessionManager, adMobSignalFactory: AdMobSignalFactory, request: RequestManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager, cacheBookkeeping: CacheBookkeepingManager, contentTypeHandlerManager: ContentTypeHandlerManager, privacySDK: PrivacySDK, userPrivacyManager: UserPrivacyManager) {
+    constructor(platform: Platform, core: ICore, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, assetManager: AssetManager, sessionManager: SessionManager, adMobSignalFactory: AdMobSignalFactory, request: RequestManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager, cacheBookkeeping: CacheBookkeepingManager, contentTypeHandlerManager: ContentTypeHandlerManager, privacySDK: PrivacySDK, userPrivacyManager: UserPrivacyManager, experiment: LoadV5ExperimentType) {
         super();
 
         this._platform = platform;
@@ -123,6 +129,7 @@ export class AdRequestManager extends CampaignManager {
         this._preloadFailed = false;
         this._ongoingPreloadRequest = new Promise((resolve) => { this._ongoingPreloadRequestResolve = resolve; });
         this._activePreload = false;
+        this._currentExperiment = experiment;
     }
 
     public requestPreload(): Promise<void> {
@@ -133,7 +140,7 @@ export class AdRequestManager extends CampaignManager {
         }
 
         if (this._activePreload) {
-            SDKMetrics.reportMetricEvent(LoadV5.PreloadRequestAlreadyActive);
+            this.reportMetricEvent(LoadV5.PreloadRequestAlreadyActive);
 
             let promiseResolve: () => void;
             const promise = new Promise<void>((resolve) => { promiseResolve = resolve; });
@@ -147,7 +154,7 @@ export class AdRequestManager extends CampaignManager {
         let requestPrivacy: IRequestPrivacy;
         let legacyRequestPrivacy: ILegacyRequestPrivacy;
 
-        SDKMetrics.reportMetricEvent(LoadV5.PreloadRequestStarted);
+        this.reportMetricEvent(LoadV5.PreloadRequestStarted);
 
         this._preloadData = null;
         this._currentSession = null;
@@ -182,7 +189,7 @@ export class AdRequestManager extends CampaignManager {
                 SdkStats.increaseAdRequestOrdinal();
             }
 
-            SDKMetrics.reportMetricEvent(LoadV5.PreloadRequestParsingResponse);
+            this.reportMetricEvent(LoadV5.PreloadRequestParsingResponse);
             return this.parsePreloadResponse(response, countersForOperativeEvents, requestPrivacy, legacyRequestPrivacy);
         }).catch((err) => {
             this._preloadFailed = true;
@@ -226,7 +233,7 @@ export class AdRequestManager extends CampaignManager {
         let requestPrivacy: IRequestPrivacy;
         let legacyRequestPrivacy: ILegacyRequestPrivacy;
 
-        SDKMetrics.reportMetricEvent(LoadV5.LoadRequestStarted);
+        this.reportMetricEvent(LoadV5.LoadRequestStarted);
 
         return Promise.resolve().then(() => {
             if (this.hasPreloadFailed()) {
@@ -273,15 +280,15 @@ export class AdRequestManager extends CampaignManager {
                 if (this._reloadResults[placementId] !== undefined) {
                     return Promise.resolve(this._reloadResults[placementId]);
                 }
-                SDKMetrics.reportMetricEvent(LoadV5.LoadRequestWasCanceled);
+                this.reportMetricEvent(LoadV5.LoadRequestWasCanceled);
                 return this.requestLoad(placementId);
             }
-            SDKMetrics.reportMetricEvent(LoadV5.LoadRequestParsingResponse);
+            this.reportMetricEvent(LoadV5.LoadRequestParsingResponse);
             return this.parseLoadResponse(response, this._adsConfig.getPlacement(placementId), additionalPlacements);
         }).then((campaign) => {
             delete this._ongoingLoadRequests[placementId];
             if (campaign) {
-                SDKMetrics.reportMetricEvent(LoadV5.LoadRequestFill);
+                this.reportMetricEvent(LoadV5.LoadRequestFill);
             }
             return campaign;
         }).catch((err) => {
@@ -300,7 +307,7 @@ export class AdRequestManager extends CampaignManager {
         let requestPrivacy: IRequestPrivacy;
         let legacyRequestPrivacy: ILegacyRequestPrivacy;
 
-        SDKMetrics.reportMetricEvent(LoadV5.ReloadRequestStarted);
+        this.reportMetricEvent(LoadV5.ReloadRequestStarted);
 
         let promiseResolve: () => void;
         this._ongoingReloadRequest = new Promise((resolve) => { promiseResolve = resolve; });
@@ -332,8 +339,8 @@ export class AdRequestManager extends CampaignManager {
                 CampaignManager.createRequestBody(this._clientInfo, this._coreConfig, this._deviceInfo, this._userPrivacyManager, this._sessionManager, this._privacy, countersForOperativeEvents, fullyCachedCampaignIds, versionCode, this._adMobSignalFactory, freeSpace, this._metaDataManager, this._adsConfig, true, this.getPreviousPlacementId(), requestPrivacy, legacyRequestPrivacy, false)
             ]);
         }).then(([requestUrl, requestBody]) => this._request.post(requestUrl, JSON.stringify(this.makeReloadBody(<ILoadV5BodyExtra>requestBody, placementsToLoad.map((placementId) => this._adsConfig.getPlacement(placementId)))), [], {
-            retries: 0,
-            retryDelay: 0,
+            retries: 3,
+            retryDelay: 1000,
             followRedirects: false,
             retryWithConnectionEvents: false,
             timeout: 20000
@@ -342,7 +349,7 @@ export class AdRequestManager extends CampaignManager {
                 SdkStats.increaseAdRequestOrdinal();
             }
 
-            SDKMetrics.reportMetricEvent(LoadV5.ReloadRequestParsingResponse);
+            this.reportMetricEvent(LoadV5.ReloadRequestParsingResponse);
             return this.parseReloadResponse(response, placementsToLoad.map((placementId) => this._adsConfig.getPlacement(placementId)), countersForOperativeEvents, requestPrivacy, legacyRequestPrivacy);
         }).catch((err) => {
             this._preloadFailed = true;
@@ -749,6 +756,13 @@ export class AdRequestManager extends CampaignManager {
             }
         }
 
-        SDKMetrics.reportMetricEventWithTags(event, { 'rsn': reason });
+        this.reportMetricEvent(event, { 'rsn': reason });
+    }
+
+    protected reportMetricEvent(metric: LoadV5, tags: { [key: string]: string } = {}) {
+        SDKMetrics.reportMetricEventWithTags(metric, {
+            ...tags,
+            'exp': this._currentExperiment
+        });
     }
 }

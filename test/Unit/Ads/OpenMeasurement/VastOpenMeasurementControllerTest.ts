@@ -112,15 +112,15 @@ import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
                     apiVersion: OMID_P, // Version code of official OMID JS Verification Client API
                     environment: 'app', // OMID JS Verification Client API
                     accessMode: AccessMode.LIMITED, // Verification code is executed in a sandbox with only indirect information about ad
-                    adSessionType: AdSessionType.HTML, // Needed to be native for IAS for some reason
+                    adSessionType: AdSessionType.NATIVE,
                     omidNativeInfo: {
                         partnerName: PARTNER_NAME,
                         partnerVersion: '2.0.0-alpha2'
                     },
                     omidJsInfo: {
                         omidImplementer: PARTNER_NAME,
-                        serviceVersion: TestFixtures.getClientInfo().getSdkVersionName(),
-                        sessionClientVersion: OMID_P,
+                        serviceVersion: '1.2.10',
+                        sessionClientVersion: '1.2.10',
                         partnerName: PARTNER_NAME,
                         partnerVersion: TestFixtures.getClientInfo().getSdkVersionName()
                     },

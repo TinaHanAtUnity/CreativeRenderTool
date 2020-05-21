@@ -28,54 +28,17 @@ if (typeof navigator !== 'undefined') {
 const animationFrame = window.requestAnimationFrame || window.webkitRequestAnimationFrame;
 let runningResizeEvent = false;
 
-const maxCallsToChangeOrientation = 5;
-
 const changeOrientation = () => {
-    // Since changeOrientation can be called by setTimeout or animationFrame,
-    // which may or may not have arguments passed with them, internalChangeOrientation
-    // is defined so it can take a single parameter representing the number of times
-    // it has been called.
-    const internalChangeOrientation = (callCount: number = 0) => {
-        // Helper function to test if window.innerWidth/window.innerHeight have been set.
-        const windowSizeReady = (): boolean => {
-            if (callCount > maxCallsToChangeOrientation) {
-                // We have waited too many times, allow to proceed to prevent a
-                // infinite loop.
-                return true;
-            }
+    // Calculate orientation based on width and height.
 
-            if (window.innerWidth === 0 || window.innerHeight === 0) {
-                // Some OSs will call changeOrientation with these set to 0 before
-                // the window is shown.
-                return false;
-            }
-
-            if (window.innerWidth === window.innerHeight) {
-                // Some OSs will sometimes start with innerWidth && innerHeight equal,
-                // in this case we can't determine the orientation.
-                return false;
-            }
-
-            return true;
-        };
-
-        if (!windowSizeReady()) {
-            // It is not yet know what orientation the window is.
-            // Allow rendering engine to process before trying again.
-            setTimeout(() => {
-                internalChangeOrientation(callCount++);
-            }, 0);
-            return;
-        }
-
-        // Calculate orientation based on width and height.
-        const orientation: string = window.innerWidth / window.innerHeight >= 1 ? 'landscape' : 'portrait';
-        document.body.classList.remove('landscape');
-        document.body.classList.remove('portrait');
-        document.body.classList.add(orientation);
-        runningResizeEvent = false;
-    };
-    internalChangeOrientation();
+    let orientation: string = 'portrait';
+    if (document.documentElement.clientHeight !== 0) {
+        orientation = document.documentElement.clientWidth / document.documentElement.clientHeight >= 1 ? 'landscape' : 'portrait';
+    }
+    document.body.classList.remove('landscape');
+    document.body.classList.remove('portrait');
+    document.body.classList.add(orientation);
+    runningResizeEvent = false;
 };
 
 const resizeHandler = () => {
