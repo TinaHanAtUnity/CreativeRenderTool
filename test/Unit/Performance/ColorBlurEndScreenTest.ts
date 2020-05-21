@@ -144,32 +144,35 @@ describe('ColorBlurEndScreenTest', () => {
         });
     });
     describe('Color matching for the game info container and the install container', () => {
-        it('should render with the same color for game info container background and install container text', async () => {
+        it('should render with the same color for game info container background and install container text', (done) => {
             // The color medium color returned from ColorTheme is rgb(98, 21, 183)
-            await ColorTheme.renderColorTheme(campaign, core).then((theme) => {
-                if (theme) {
-                    const color = theme.baseColorTheme.medium.toCssRgb();
+            ColorTheme.renderColorTheme(campaign, core)
+                .then((theme) => {
+                    if (theme) {
+                        const color = theme.baseColorTheme.medium.toCssRgb();
 
-                    const validateColorTheme = (endScreen: ColorBlurEndScreen) => {
-                        endScreen.render();
-                        const gameInfoContainer = <HTMLElement>endScreen.container().querySelector('.game-info-container');
-                        gameInfoContainer.style.backgroundColor = color;
-                        const gameInfoContainerColor = gameInfoContainer.style.backgroundColor;
+                        const validateColorTheme = (endScreen: ColorBlurEndScreen) => {
+                            endScreen.render();
+                            const gameInfoContainer = <HTMLElement>endScreen.container().querySelector('.game-info-container');
+                            gameInfoContainer.style.backgroundColor = color;
+                            const gameInfoContainerColor = gameInfoContainer.style.backgroundColor;
 
-                        const installContainer = <HTMLElement>endScreen.container().querySelector('.install-container');
-                        installContainer.style.color = color;
-                        const installContainerColor = installContainer.style.color;
+                            const installContainer = <HTMLElement>endScreen.container().querySelector('.install-container');
+                            installContainer.style.color = color;
+                            const installContainerColor = installContainer.style.color;
 
-                        if (!gameInfoContainerColor || !installContainerColor) {
-                            assert.fail('Couldnt render all the colors');
-                        } else {
-                            assert.equal(gameInfoContainerColor, installContainerColor);
-                        }
-                    };
-
-                    validateColorTheme(createColorBlurEndScreen('en'));
-                }
-            });
+                            if (!gameInfoContainerColor || !installContainerColor) {
+                                assert.fail('Couldnt render all the colors');
+                            } else {
+                                assert.equal(gameInfoContainerColor, installContainerColor);
+                            }
+                        };
+                        validateColorTheme(createColorBlurEndScreen('en'));
+                    }
+                })
+                .then(() => {
+                    done();
+                });
         });
     });
 });
