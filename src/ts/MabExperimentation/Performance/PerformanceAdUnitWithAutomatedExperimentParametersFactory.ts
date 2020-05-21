@@ -21,10 +21,7 @@ export class PerformanceAdUnitWithAutomatedExperimentParametersFactory extends P
     constructor(core: ICore, aem: AutomatedExperimentManager) {
         super(core, core.Ads);
         this._automatedExperimentManager = aem;
-        this._automatedExperimentManager.registerExperimentCategory(
-            AutomatedExperimentsCategories.PERFORMANCE_ENDCARD,
-            'PerformanceCampaign'
-        );
+        this._automatedExperimentManager.registerExperimentCategory(AutomatedExperimentsCategories.PERFORMANCE_ENDCARD, 'PerformanceCampaign');
         this._automatedExperimentManager.registerExperimentCategory(AutomatedExperimentsCategories.VIDEO_OVERLAY, 'PerformanceCampaign');
     }
 
