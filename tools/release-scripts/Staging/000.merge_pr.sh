@@ -5,13 +5,14 @@
 pr=$1
 
 echo -e "Fetching infromation for PR $pr..."
-info=$(hub pr show -f '%sH %pS %U %H' $pr)
+info=$(hub pr show -f '%sH %pS %U %H ^%t^' $pr)
 labels=$(hub pr show -f '%L' $pr)
 
 head=$(echo $info | awk '{print $1}')
 state=$(echo $info | awk '{print $2}')
 url=$(echo $info | awk '{print $3}')
 branch=$(echo $info | awk '{print $4}')
+title=$(echo $info | awk -F^ '{print $2}')
 
 if [ "$state" != "open" ]; then
     echo "PR should be opened before it can be merged, current PR state: $state"
@@ -109,7 +110,7 @@ if [ -f ".staginglock" ]; then
     slackjson=$(cat <<EOF
 {
     "channel": "GDTR512F2",
-    "text": "<${url}|#${pr}> was merged to master and will be staged",
+    "text": "<${url}|#${pr}> (${title}) was merged to master and will be staged",
     "thread_ts": $ts
 }
 EOF

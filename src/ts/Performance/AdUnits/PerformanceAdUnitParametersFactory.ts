@@ -9,6 +9,7 @@ import { Campaign } from 'Ads/Models/Campaign';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
 import { VideoOverlay } from 'Ads/Views/VideoOverlay';
+import { ExternalEndScreen } from 'ExternalEndScreen/Views/ExternalEndScreen';
 
 export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParametersFactory<PerformanceCampaign, IPerformanceAdUnitParameters> {
 
@@ -36,8 +37,10 @@ export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParameters
         };
     }
 
-    private createEndscreen(endScreenParameters: IEndScreenParameters, campaign: PerformanceCampaign, country: string) {
-        return new PerformanceEndScreen(endScreenParameters, campaign, country);
+    private createEndscreen(endScreenParameters: IEndScreenParameters, campaign: PerformanceCampaign, country: string): PerformanceEndScreen | ExternalEndScreen {
+        return campaign.getEndScreen()
+            ? new ExternalEndScreen(undefined, endScreenParameters, campaign, country)
+            : new PerformanceEndScreen(endScreenParameters, campaign, country);
     }
 
     protected createVideoOverlay(parameters: IAdUnitParameters<Campaign>, privacy: AbstractPrivacy, showGDPRBanner: boolean, showPrivacyDuringVideo: boolean): VideoOverlay {

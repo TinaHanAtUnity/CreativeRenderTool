@@ -7,19 +7,20 @@ import { Campaign, ICampaignTrackingUrls } from 'Ads/Models/Campaign';
 import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
 import { Placement, PlacementState } from 'Ads/Models/Placement';
 import { INativeResponse } from 'Core/Managers/RequestManager';
-import { AdRequestManager } from 'Ads/Managers/AdRequestManager';
+import { AdRequestManager, INotCachedLoadedCampaign } from 'Ads/Managers/AdRequestManager';
 import { Observables } from 'Core/Utilities/Observables';
 import { PerPlacementLoadManager } from 'Ads/Managers/PerPlacementLoadManager';
 import { LoadV5, SDKMetrics } from 'Ads/Utilities/SDKMetrics';
 import { PerformanceAdUnitFactory } from 'Performance/AdUnits/PerformanceAdUnitFactory';
+import { AdUnitAwareAdRequestManager } from 'Ads/Managers/AdUnitAwareAdRequestManager';
 
 export class PerPlacementLoadManagerV5 extends PerPlacementLoadManager {
     protected _adRequestManager: AdRequestManager;
 
     private _shouldRefresh: boolean = true;
 
-    constructor(ads: IAdsApi, adsConfig: AdsConfiguration, coreConfig: CoreConfiguration, adRequestManager: AdRequestManager, clientInfo: ClientInfo, focusManager: FocusManager) {
-        super(ads, adsConfig, coreConfig, adRequestManager, clientInfo, focusManager);
+    constructor(ads: IAdsApi, adsConfig: AdsConfiguration, coreConfig: CoreConfiguration, adRequestManager: AdRequestManager, clientInfo: ClientInfo, focusManager: FocusManager, useAdUnits: boolean) {
+        super(ads, adsConfig, coreConfig, useAdUnits ? new AdUnitAwareAdRequestManager(adRequestManager) : adRequestManager, clientInfo, focusManager);
 
         this._adRequestManager = adRequestManager;
 
@@ -112,6 +113,10 @@ export class PerPlacementLoadManagerV5 extends PerPlacementLoadManager {
     }
 
     private invalidateActivePlacements(excludePlacementId?: string): Promise<void> {
+        if (this._campaignManager instanceof AdUnitAwareAdRequestManager) {
+            this._campaignManager.invalidate();
+        }
+
         const placementToReload: string[] = [];
 
         for (const placementId of this._adsConfig.getPlacementIds()) {

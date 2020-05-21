@@ -150,7 +150,16 @@ export class CustomFeatures {
             '1434564', '3079031', '3334336', '3211592', '1566453', '3334337', // First batch
             '56659', '1514842', '3486364', '3475665', '3334339', '1346246', '1658494', // Second batch
             '1548038', '3250882', '1783251', '3464560', '1551176', '1565348', '3250883', // Second batch
-            '3334338', '3486365', '3475664', '131622009', '1551177', '3464561' // Second batch
+            '3334338', '3486365', '3475664', '131622009', '1551177', '3464561', // Second batch
+            '3147786', '3147787' // Voodoo Games
+        ];
+
+        return this.existsInList(gameIds, gameId);
+    }
+
+    public static useAdUnitSupport(gameId: string): boolean {
+        const gameIds = [
+            '3578767', '3578766', '3486365', '3486364'
         ];
 
         return this.existsInList(gameIds, gameId);

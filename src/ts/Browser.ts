@@ -16,6 +16,7 @@ import { AuctionRequest } from 'Ads/Networking/AuctionRequest';
 import { MetricInstance } from 'Ads/Networking/MetricInstance';
 import { HttpKafka } from 'Core/Utilities/HttpKafka';
 import { StorageType } from 'Core/Native/Storage';
+import { CometCampaignParser } from 'Performance/Parsers/CometCampaignParser';
 
 document.addEventListener('DOMContentLoaded', () => {
     const resizeHandler = (event?: Event) => {
@@ -149,6 +150,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const loadButtonDefault = <HTMLButtonElement>window.parent.document.getElementById('loadDefault');
         const loadButtonIncentivize = <HTMLButtonElement>window.parent.document.getElementById('loadIncentivize');
         const campaignResponseElement = <HTMLInputElement>window.parent.document.getElementById('campaignResponse');
+        const endScreenUrlElement = <HTMLInputElement>window.parent.document.getElementById('endScreenUrl');
         const forceLoadV5Element = <HTMLInputElement>window.parent.document.getElementById('forceLoadV5');
 
         const initialize = () => {
@@ -196,6 +198,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (campaignResponseElement.value.length) {
                 CampaignManager.setCampaignResponse(campaignResponseElement.value);
+            }
+
+            if (endScreenUrlElement.value.length) {
+                CometCampaignParser.setForceEndScreenUrl(endScreenUrlElement.value);
             }
 
             // tslint:disable:no-console
