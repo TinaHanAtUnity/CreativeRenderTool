@@ -327,18 +327,16 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
         const obstructionRect = OpenMeasurementUtilities.createRectangle(gdprRect.left, gdprRect.top, gdprRect.width, gdprRect.height);
 
         const adViewBuilder = om.getOMAdViewBuilder();
-        return adViewBuilder.buildAdmobAdView([ObstructionReasons.OBSTRUCTED], om, obstructionRect).then((adview) => {
-            const viewPort = adViewBuilder.getViewPort();
-            om.geometryChange(viewPort, adview);
-        });
+        const adView = adViewBuilder.buildAdmobAdView([ObstructionReasons.OBSTRUCTED], om, obstructionRect);
+        const viewPort = adViewBuilder.getViewPort();
+        om.geometryChange(viewPort, adView);
     }
 
     private sendUnObstructedOMGeometryChange(om: AdmobOpenMeasurementController) {
         const adViewBuilder = om.getOMAdViewBuilder();
         const obstructionRect: IRectangle = { x: 0, y: 0, width: 0, height: 0 };
-        return adViewBuilder.buildAdmobAdView([], om, obstructionRect).then((adview) => {
-            const viewPort = adViewBuilder.getViewPort();
-            om.geometryChange(viewPort, adview);
-        });
+        const adView = adViewBuilder.buildAdmobAdView([], om, obstructionRect);
+        const viewPort = adViewBuilder.getViewPort();
+        om.geometryChange(viewPort, adView);
     }
 }

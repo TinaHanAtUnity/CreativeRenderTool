@@ -9,6 +9,7 @@ import { VastEndScreen } from 'VAST/Views/VastEndScreen';
 import { VastOpenMeasurementController } from 'Ads/Views/OpenMeasurement/VastOpenMeasurementController';
 import { ObstructionReasons } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
 import { OpenMeasurementAdViewBuilder } from 'Ads/Views/OpenMeasurement/OpenMeasurementAdViewBuilder';
+import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurementUtilities';
 
 export interface IVastAdUnitParameters extends IVideoAdUnitParameters<VastCampaign> {
     endScreen?: VastEndScreen;
@@ -184,12 +185,17 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
             this._vastOMController.pause();
 
             const adViewBuilder = this._vastOMController.getOMAdViewBuilder();
-            adViewBuilder.buildVastAdView([ObstructionReasons.BACKGROUNDED], this).then((adView) => {
-                if (this._vastOMController) {
+            if (!adViewBuilder.getVideoView()) {
+                this.getVideoViewRectangle().then((rect) => {
+                    const view = OpenMeasurementUtilities.createRectangle(rect[0], rect[1], rect[2], rect[3]);
+                    adViewBuilder.setVideoView(view);
+                    const adView = adViewBuilder.buildVastAdView([ObstructionReasons.BACKGROUNDED]);
                     const viewPort = adViewBuilder.getViewPort();
-                    this._vastOMController.geometryChange(viewPort, adView);
-                }
-            });
+                    if (this._vastOMController) {
+                        this._vastOMController.geometryChange(viewPort, adView);
+                    }
+                });
+            }
         }
     }
 
@@ -203,12 +209,17 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
             this._vastOMController.resume();
 
             const adViewBuilder = this._vastOMController.getOMAdViewBuilder();
-            adViewBuilder.buildVastAdView([], this).then((adView) => {
-                if (this._vastOMController) {
+            if (!adViewBuilder.getVideoView()) {
+                this.getVideoViewRectangle().then((rect) => {
+                    const view = OpenMeasurementUtilities.createRectangle(rect[0], rect[1], rect[2], rect[3]);
+                    adViewBuilder.setVideoView(view);
+                    const adView = adViewBuilder.buildVastAdView([]);
                     const viewPort = adViewBuilder.getViewPort();
-                    this._vastOMController.geometryChange(viewPort, adView);
-                }
-            });
+                    if (this._vastOMController) {
+                        this._vastOMController.geometryChange(viewPort, adView);
+                    }
+                });
+            }
         }
     }
 

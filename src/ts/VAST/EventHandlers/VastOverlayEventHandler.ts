@@ -52,13 +52,9 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
 
             const obstructionRectangle = OpenMeasurementUtilities.createRectangle(x, y, width, height);
             const adViewBuilder = this._om.getOMAdViewBuilder();
-            adViewBuilder.buildVastAdView([ObstructionReasons.OBSTRUCTED], this._vastAdUnit, obstructionRectangle)
-            .then((adView) => {
-                if (this._om) {
-                    const viewPort = adViewBuilder.getViewPort();
-                    this._om.geometryChange(viewPort, adView);
-                }
-            });
+            const adView = adViewBuilder.buildVastAdView([ObstructionReasons.OBSTRUCTED], obstructionRectangle);
+            const viewPort = adViewBuilder.getViewPort();
+            this._om.geometryChange(viewPort, adView);
         }
 
         return super.onShowPrivacyPopUp(x, y, width, height);
@@ -67,12 +63,9 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
     public onClosePrivacyPopUp(): Promise<void> {
         if (this._om) {
             const adViewBuilder = this._om.getOMAdViewBuilder();
-            adViewBuilder.buildVastAdView([], this._vastAdUnit).then((adView) => {
-                if (this._om) {
-                    const viewPort = adViewBuilder.getViewPort();
-                    this._om.geometryChange(viewPort, adView);
-                }
-            });
+            const adView = adViewBuilder.buildVastAdView([]);
+            const viewPort = adViewBuilder.getViewPort();
+            this._om.geometryChange(viewPort, adView);
         }
 
         return super.onClosePrivacyPopUp();
