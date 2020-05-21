@@ -140,7 +140,7 @@ import { SDKMetrics } from 'Ads/Utilities/SDKMetrics';
             });
 
             const omInstance = sinon.createStubInstance(OpenMeasurement);
-            const omViewBuilder = new OpenMeasurementAdViewBuilder(campaign, deviceInfo, platform);
+            const omViewBuilder = new OpenMeasurementAdViewBuilder(campaign);
             const omController = new VastOpenMeasurementController(platform, placement, [omInstance], omViewBuilder, clientInfo, deviceInfo);
             sandbox.stub(omController, 'skipped');
             sandbox.stub(omController, 'setDeviceVolume');

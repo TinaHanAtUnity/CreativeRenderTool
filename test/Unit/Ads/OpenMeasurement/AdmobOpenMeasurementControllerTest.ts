@@ -142,7 +142,7 @@ import { OpenMeasurement } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
                     measuringElement: false,
                     reasons: []
                 };
-                omAdViewBuilder = new OpenMeasurementAdViewBuilder(campaign, deviceInfo, platform);
+                omAdViewBuilder = new OpenMeasurementAdViewBuilder(campaign);
 
                 sandbox.stub(omAdViewBuilder, 'buildAdmobImpressionView').returns(testAdView);
                 sandbox.stub(omManager, 'mountOMInstance');

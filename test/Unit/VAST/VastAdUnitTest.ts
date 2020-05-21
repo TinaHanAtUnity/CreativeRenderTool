@@ -149,7 +149,7 @@ describe('VastAdUnitTest', () => {
         const overlay = new VideoOverlay(videoOverlayParameters, privacy, false, false);
 
         const omInstance = sinon.createStubInstance(OpenMeasurement);
-        const omViewBuilder = new OpenMeasurementAdViewBuilder(vastCampaign, deviceInfo, platform);
+        const omViewBuilder = new OpenMeasurementAdViewBuilder(vastCampaign);
         const vastOMController = new VastOpenMeasurementController(platform, placement, [omInstance], omViewBuilder, clientInfo, deviceInfo);
         sandbox.stub(vastOMController, 'geometryChange');
         sandbox.stub(vastOMController, 'resume');

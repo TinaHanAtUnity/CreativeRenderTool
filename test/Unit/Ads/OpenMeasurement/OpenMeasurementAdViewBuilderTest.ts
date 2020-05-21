@@ -33,7 +33,7 @@ import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
             } else {
                 deviceInfo = TestFixtures.getIosDeviceInfo(core);
             }
-            return new OpenMeasurementAdViewBuilder(campaign, deviceInfo, platform);
+            return new OpenMeasurementAdViewBuilder(campaign);
         };
 
         describe('Vast Campaign', () => {

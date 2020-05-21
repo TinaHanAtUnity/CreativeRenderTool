@@ -1,27 +1,18 @@
 import { AdMobCampaign } from 'AdMob/Models/AdMobCampaign';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
-import { Platform } from 'Core/Constants/Platform';
-import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { IRectangle, IAdView, ObstructionReasons, IViewPort } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
 import { Campaign } from 'Ads/Models/Campaign';
 import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurementUtilities';
 import { AdmobOpenMeasurementController } from 'Ads/Views/OpenMeasurement/AdmobOpenMeasurementController';
-import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 
 export class OpenMeasurementAdViewBuilder {
 
     private _campaign: Campaign;
-    private _platform: Platform;
-
-    private _deviceInfo: DeviceInfo;
     private _viewPort: IViewPort;
-
     private _videoViewRectangle: IRectangle;
 
-    constructor(campaign: AdMobCampaign | VastCampaign, deviceInfo: DeviceInfo, platform: Platform) {
-        this._platform = platform;
+    constructor(campaign: AdMobCampaign | VastCampaign) {
         this._campaign = campaign;
-        this._deviceInfo = deviceInfo;
     }
 
     /**
@@ -29,12 +20,6 @@ export class OpenMeasurementAdViewBuilder {
      * @param videoView IRectangle passed on session start
      */
     public setVideoView(videoView: IRectangle) {
-        if (this._platform === Platform.ANDROID && this._campaign instanceof VastCampaign) {
-            videoView.x = OpenMeasurementUtilities.pxToDp(videoView.x, <AndroidDeviceInfo> this._deviceInfo);
-            videoView.y = OpenMeasurementUtilities.pxToDp(videoView.y, <AndroidDeviceInfo> this._deviceInfo);
-            videoView.width = OpenMeasurementUtilities.pxToDp(videoView.width, <AndroidDeviceInfo> this._deviceInfo);
-            videoView.height = OpenMeasurementUtilities.pxToDp(videoView.height, <AndroidDeviceInfo> this._deviceInfo);
-        }
         this._videoViewRectangle = videoView;
     }
 
