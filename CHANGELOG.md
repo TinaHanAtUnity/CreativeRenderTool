@@ -1,4 +1,4 @@
-# Pending
+# Thu May 21 00:42:46 UTC 2020
 
 * [Load V5] Add 2 Voodoo Games [#15434](https://github.com/Applifier/unity-ads-webview/pull/15434)
 * [Load V5, Ad Unit] Enable Ad Units for Load V5 [#15359](https://github.com/Applifier/unity-ads-webview/pull/15359)
