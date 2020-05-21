@@ -14,6 +14,7 @@ import { SDKMetrics } from 'Ads/Utilities/SDKMetrics';
 import { ColorBlurEndScreen } from 'MabExperimentation/Performance/Views/ColorBlurEndScreen';
 import { ColorTheme } from 'Core/Utilities/ColorTheme';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
+import { Localization } from 'Core/Utilities/Localization';
 
 describe('ColorBlurEndScreenTest', () => {
     let platform: Platform;
@@ -35,6 +36,15 @@ describe('ColorBlurEndScreenTest', () => {
         configuration = TestFixtures.getCoreConfiguration();
         sandbox.stub(SDKMetrics, 'reportMetricEvent').returns(Promise.resolve());
         sandbox.stub(SDKMetrics, 'reportMetricEventWithTags').returns(Promise.resolve());
+        // This hack is necessary, otherwise the 'fi' language renders in English
+        // Note: this behavior is unique to testing on github,, it renders in the proper
+        // language on devices, in browser, and while running local tests.
+        // Github CI may need a 'make setup'.
+        // Copied this behavior from 'EndScreenTest.ts:37
+        Localization.setLanguageMap('fi.*', 'endscreen', {
+            'Install Now': 'Asenna nyt',
+            Free: 'Ilmainen'
+        });
     });
 
     afterEach(() => {
