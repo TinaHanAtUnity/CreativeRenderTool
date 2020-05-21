@@ -759,7 +759,7 @@ export class AdRequestManager extends CampaignManager {
         this.reportMetricEvent(event, { 'rsn': reason });
     }
 
-    protected reportMetricEvent(metric: LoadV5, tags: { [key: string]: string } = {}) {
+    public reportMetricEvent(metric: LoadV5, tags: { [key: string]: string } = {}) {
         SDKMetrics.reportMetricEventWithTags(metric, {
             ...tags,
             'exp': this._currentExperiment
