@@ -12,6 +12,7 @@ import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { VideoOverlay } from 'Ads/Views/VideoOverlay';
 import { SwipeUpVideoOverlay } from 'Ads/Views/SwipeUpVideoOverlay';
 import { IExperimentActionChoice } from 'MabExperimentation/Models/AutomatedExperiment';
+import { ExternalEndScreen } from 'ExternalEndScreen/Views/ExternalEndScreen';
 
 export class PerformanceAdUnitWithAutomatedExperimentParametersFactory extends PerformanceAdUnitParametersFactory {
 
@@ -40,7 +41,9 @@ export class PerformanceAdUnitWithAutomatedExperimentParametersFactory extends P
 
         const endScreenCombination: IExperimentActionChoice | undefined = this._automatedExperimentManager.activateSelectedExperiment(baseParams.campaign, AutomatedExperimentsCategories.PERFORMANCE_ENDCARD);
 
-        const endScreen = new AnimatedDownloadButtonEndScreen(endScreenCombination, endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
+        const endScreen = this._campaign.getEndScreen()
+            ? new ExternalEndScreen(endScreenCombination, endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry())
+            : new AnimatedDownloadButtonEndScreen(endScreenCombination, endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
 
         return {
             ... baseParams,

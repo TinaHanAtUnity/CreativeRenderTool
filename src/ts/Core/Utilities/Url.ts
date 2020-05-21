@@ -86,12 +86,14 @@ export class Url {
         };
     }
 
-    public static addParameters(url: string, parameters: { [key: string]: unknown }): string {
+    public static addParameters(url: string, parameters: { [key: string]: unknown }, useHashBang?: boolean): string {
         let newUrl: string = url.toString();
-        if (newUrl.indexOf('?') !== -1) {
+        const firstParamPrefix = useHashBang ? '#' : '?';
+
+        if (newUrl.indexOf(firstParamPrefix) !== -1) {
             newUrl += '&';
         } else {
-            newUrl += '?';
+            newUrl += firstParamPrefix;
         }
 
         const pairs: string[] = [];

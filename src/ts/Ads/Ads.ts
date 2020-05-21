@@ -100,6 +100,7 @@ import { AutomatedExperimentManager } from 'MabExperimentation/AutomatedExperime
 import { CampaignAssetInfo } from 'Ads/Utilities/CampaignAssetInfo';
 import { AdRequestManager, LoadV5ExperimentType } from 'Ads/Managers/AdRequestManager';
 import { PerPlacementLoadManagerV5 } from 'Ads/Managers/PerPlacementLoadManagerV5';
+import { CometCampaignParser } from 'Performance/Parsers/CometCampaignParser';
 
 export class Ads implements IAds {
 
@@ -746,6 +747,10 @@ export class Ads implements IAds {
 
         if (TestEnvironment.get('forceLoadV5')) {
             this._forceLoadV5 = true;
+        }
+
+        if (TestEnvironment.get('forceEndScreenUrl')) {
+            CometCampaignParser.setForceEndScreenUrl(TestEnvironment.get('forceEndScreenUrl'));
         }
     }
 
