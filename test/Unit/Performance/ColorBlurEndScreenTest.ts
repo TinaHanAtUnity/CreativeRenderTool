@@ -173,6 +173,6 @@ describe('ColorBlurEndScreenTest', () => {
                 .then(() => {
                     done();
                 });
-        });
+        }).timeout(15000);
     });
 });
