@@ -54,30 +54,15 @@ export class ColorBlurEndScreen extends PerformanceEndScreen {
 
     public show(): void {
         super.show();
-        window.addEventListener('resize', this.handleResize, false);
         document.body.classList.add('color-blur');
     }
 
     public hide(): void {
         super.hide();
-        window.removeEventListener('resize', this.handleResize);
         document.body.classList.remove('color-blur');
     }
 
     protected getTemplate() {
         return EndScreenColorBlur;
-    }
-
-    private handleResize() {
-        const element = <HTMLElement>document.getElementById('end-screen');
-        if (element == null) {
-            return;
-        }
-
-        // By triggering a reflow, the button's animation is restarted when
-        // the end-screen is resized (in the case of an orientation change,
-        // for example).
-        element.classList.remove('on-show');
-        setTimeout(() => element.classList.add('on-show'), 0);
     }
 }
