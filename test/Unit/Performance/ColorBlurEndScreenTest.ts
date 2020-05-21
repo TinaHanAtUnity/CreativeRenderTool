@@ -107,7 +107,7 @@ describe('ColorBlurEndScreenTest', () => {
             validateTranslation(createColorBlurEndScreen('fi'), 'Asenna nyt', 'Ilmainen');
         });
         it('renders fr', () => {
-            validateTranslation(createColorBlurEndScreen('fr'), 'Installer', 'Gratuit');
+            validateTranslation(createColorBlurEndScreen('fr'), 'Installer maintenant', 'Gratuit');
         });
         it('renders is', () => {
             validateTranslation(createColorBlurEndScreen('is'), 'Setja upp', 'Frítt');
