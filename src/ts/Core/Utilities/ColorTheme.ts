@@ -28,14 +28,14 @@ export class ColorTheme {
                 image = portraitImage;
             }
             if (!image) {
-                return Promise.reject(AUIMetric.InvalidImageAssets);
+                throw new Error(AUIMetric.InvalidImageAssets);
             }
 
             return ImageAnalysis.getImageSrc(core.Cache, image)
                 .then(ImageAnalysis.analyseImage)
                 .then((swatches) => {
                     if (!swatches || !swatches.length) {
-                        return Promise.reject(AUIMetric.InvalidEndscreenColorTintSwitches);
+                        throw new Error(AUIMetric.InvalidEndscreenColorTintSwitches);
                     }
 
                     const baseColorTheme = swatches[0].getColorTheme();

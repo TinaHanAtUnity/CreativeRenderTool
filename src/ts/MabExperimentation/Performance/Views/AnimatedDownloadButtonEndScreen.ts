@@ -81,12 +81,10 @@ export class AnimatedDownloadButtonEndScreen extends PerformanceEndScreen {
 
             colorTheme
                 .then((theme) => {
-                    if (theme) {
-                        this.applyColorTheme(theme.baseColorTheme, theme.secondaryColorTheme);
-                    }
+                    this.applyColorTheme(theme.baseColorTheme, theme.secondaryColorTheme);
                 })
-                .catch((metric) => {
-                    SDKMetrics.reportMetricEvent(metric);
+                .catch((error) => {
+                    SDKMetrics.reportMetricEvent(error.message);
                 });
         }
     }

@@ -28,12 +28,10 @@ export class ColorBlurEndScreen extends PerformanceEndScreen {
 
         colorTheme
             .then((theme) => {
-                if (theme) {
-                    this.applyColorTheme(theme.baseColorTheme);
-                }
+                this.applyColorTheme(theme.baseColorTheme);
             })
-            .catch(() => {
-                SDKMetrics.reportMetricEvent(AUIMetric.InvalidEndscreenColorTintSwitches);
+            .catch((error) => {
+                SDKMetrics.reportMetricEvent(error.message);
             });
     }
 
