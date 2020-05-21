@@ -15,5 +15,7 @@
   "Download already enqueued": "下載任務已加入隊列",
   "Opening browser to complete download": "打開瀏覽器 - 請在瀏覽器完成下載",
   "Enqueuing is in progress": "正在將下載任務加入隊列",
-  "Safe to resume game": "可返回游戲"
+  "Safe to resume game": "可返回游戲",
+  "Install Now": "立即下载",
+  "Free": "免费"
 }
