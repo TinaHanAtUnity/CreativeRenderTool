@@ -11,14 +11,13 @@ describe('ColorTheme', () => {
             return ColorTheme.renderColorTheme(campaign, core);
         };
 
-        await getColorTheme().then((theme) => {
-            expect(theme.baseColorTheme.light.toCssRgb()).toEqual('rgb(215, 186, 247)');
-            expect(theme.baseColorTheme.medium.toCssRgb()).toEqual('rgb(98, 21, 183)');
-            expect(theme.baseColorTheme.dark.toCssRgb()).toEqual('rgb(61, 13, 114)');
-            expect(theme.secondaryColorTheme.light.toCssRgb()).toEqual('rgb(206, 192, 242)');
-            expect(theme.secondaryColorTheme.medium.toCssRgb()).toEqual('rgb(73, 36, 168)');
-            expect(theme.secondaryColorTheme.dark.toCssRgb()).toEqual('rgb(45, 22, 105)');
-            expect(theme.secondaryColorTheme.dark.toCssRgb()).toEqual('rgb(45, 22, 105)');
-        });
+        const theme = await getColorTheme();
+        expect(theme.baseColorTheme.light.toCssRgb()).toEqual('rgb(215, 186, 247)');
+        expect(theme.baseColorTheme.medium.toCssRgb()).toEqual('rgb(98, 21, 183)');
+        expect(theme.baseColorTheme.dark.toCssRgb()).toEqual('rgb(61, 13, 114)');
+        expect(theme.secondaryColorTheme.light.toCssRgb()).toEqual('rgb(206, 192, 242)');
+        expect(theme.secondaryColorTheme.medium.toCssRgb()).toEqual('rgb(73, 36, 168)');
+        expect(theme.secondaryColorTheme.dark.toCssRgb()).toEqual('rgb(45, 22, 105)');
+        expect(theme.secondaryColorTheme.dark.toCssRgb()).toEqual('rgb(45, 22, 105)');
     });
 });
