@@ -1,5 +1,6 @@
 # Pending
 
+* Use legacy end screen [#15490](https://github.com/Applifier/unity-ads-webview/pull/15490)
 * Add Endscreen Support For External Endscreen [#14355](https://github.com/Applifier/unity-ads-webview/pull/14355)
 * [AUI] Change the endscreen test fixture image to a valid image [#15425](https://github.com/Applifier/unity-ads-webview/pull/15425)
 * [AUI] Add new locales for the color blur experiment [#15367](https://github.com/Applifier/unity-ads-webview/pull/15367)
