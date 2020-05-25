@@ -1,6 +1,7 @@
 import { Core } from 'Core/__mocks__/Core';
 import { PerformanceCampaign, PerformanceCampaignWithoutImages, PerformanceCampaignMock } from 'Performance/Models/__mocks__/PerformanceCampaign';
 import { ColorTheme } from 'Core/Utilities/ColorTheme.ts';
+import { Color } from 'Core/Utilities/Color';
 
 describe('ColorTheme', () => {
     const campaignWithImages = new PerformanceCampaign();
@@ -11,29 +12,33 @@ describe('ColorTheme', () => {
         return ColorTheme.renderColorTheme(campaign, core);
     };
 
-    // RGBToHex transforms a string in the "rgb(1, 12, 123)" format to the "#010C7B"
-    const RGBToHex = (rgb: string): string => {
-        const sep = rgb.indexOf(',') > -1 ? ',' : ' ';
-        const splitRgb = rgb.substr(4).split(')')[0].split(sep);
-        let res = '#';
-        splitRgb.forEach((component: string) => {
-            let c = (+component).toString(16);
-            if (c.length === 1) {
-                c = '0' + c;
-            }
-            res += c;
-        });
-        return res;
+    const colorDiff = (color: Color, expectedColor: { r: number; g: number; b: number }) => {
+        const r = color.r;
+        const g = color.g;
+        const b = color.b;
+        const ex = expectedColor;
+        return Math.abs(ex.r - r) + Math.abs(ex.g - g) + Math.abs(ex.b - b);
     };
 
-    it('should successfully converts the 6 variants to their RGB values', async () => {
+    it('should successfully converts the 6 variants to their respective RGB values', async () => {
         const theme = await getColorTheme(campaignWithImages);
-        expect(RGBToHex(theme.baseColorTheme.light.toCssRgb())).toEqual('#d7baf7');
-        expect(RGBToHex(theme.baseColorTheme.medium.toCssRgb())).toEqual('#6215b7');
-        expect(RGBToHex(theme.baseColorTheme.dark.toCssRgb())).toEqual('#3d0d72');
-        expect(RGBToHex(theme.secondaryColorTheme.light.toCssRgb())).toEqual('#cec0f2');
-        expect(RGBToHex(theme.secondaryColorTheme.medium.toCssRgb())).toEqual('#4924a8');
-        expect(RGBToHex(theme.secondaryColorTheme.dark.toCssRgb())).toEqual('#2d1669');
+        const expectedBaseLight = { r: 215, g: 186, b: 247 };
+        const expectedBaseMedium = { r: 98, g: 21, b: 183 };
+        const expectedBaseDark = { r: 61, g: 13, b: 114 };
+        const expectedSecondaryLight = { r: 206, g: 192, b: 242 };
+        const expectedSecondaryMedium = { r: 73, g: 36, b: 168 };
+        const expectedSecondaryDark = { r: 45, g: 22, b: 105 };
+
+        // Because of the canvas implementation, which relies on the native implementation of the current platform,
+        // It's possible to have an error down to the 1/256, caused by different software implementation or GPU drivers, etc
+        // For that reason, we check if the output color is really close to the expected color.
+
+        expect(colorDiff(theme.baseColorTheme.light, expectedBaseLight)).toBeLessThanOrEqual(3);
+        expect(colorDiff(theme.baseColorTheme.medium, expectedBaseMedium)).toBeLessThanOrEqual(3);
+        expect(colorDiff(theme.baseColorTheme.dark, expectedBaseDark)).toBeLessThanOrEqual(3);
+        expect(colorDiff(theme.secondaryColorTheme.light, expectedSecondaryLight)).toBeLessThanOrEqual(3);
+        expect(colorDiff(theme.secondaryColorTheme.medium, expectedSecondaryMedium)).toBeLessThanOrEqual(3);
+        expect(colorDiff(theme.secondaryColorTheme.dark, expectedSecondaryDark)).toBeLessThanOrEqual(3);
     });
 
     it('should throw an error if the campaign provided has invalid images', async () => {
@@ -42,10 +47,3 @@ describe('ColorTheme', () => {
         });
     });
 });
-
-// expect(RGBToHex(theme.baseColorTheme.light.toCssRgb())).toEqual('rgb(215, 186, 247)');
-// expect(RGBToHex(theme.baseColorTheme.medium.toCssRgb())).toEqual('rgb(98, 21, 183)');
-// expect(RGBToHex(theme.baseColorTheme.dark.toCssRgb())).toEqual('rgb(61, 13, 114)');
-// expect(RGBToHex(theme.secondaryColorTheme.light.toCssRgb())).toEqual('rgb(206, 192, 242)');
-// expect(RGBToHex(theme.secondaryColorTheme.medium.toCssRgb())).toEqual('rgb(73, 36, 168)');
-// expect(RGBToHex(theme.secondaryColorTheme.dark.toCssRgb())).toEqual('rgb(45, 22, 105)');
