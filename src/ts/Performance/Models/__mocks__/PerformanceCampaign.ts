@@ -42,3 +42,24 @@ export const PerformanceCampaign = jest.fn(() => {
         getRatingCount: jest.fn(() => 50000)
     };
 });
+
+export const PerformanceCampaignWithoutImages = jest.fn(() => {
+    return <PerformanceCampaignMock> {
+        getGameName: jest.fn(() => 'GameName'),
+        getId: jest.fn(() => 'abc123'),
+        getLandscape: jest.fn().mockImplementation(() => undefined),
+        getPortrait: jest.fn().mockImplementation(() => undefined),
+        getSquare: jest.fn().mockImplementation(() => undefined),
+        getEndScreen: jest.fn().mockImplementation(() => undefined),
+        getGameIcon: jest.fn().mockImplementation(() => undefined),
+        getClickAttributionUrl: jest.fn().mockImplementation(() => ''),
+        getClickAttributionUrlFollowsRedirects: jest.fn().mockImplementation(() => ''),
+        getBypassAppSheet: jest.fn().mockImplementation(() => false),
+        getAppStoreId: jest.fn().mockImplementation(() => ''),
+        getStore: jest.fn().mockImplementation(() => StoreName.APPLE),
+        getAppDownloadUrl: jest.fn().mockImplementation(() => ''),
+        getSession: jest.fn().mockImplementation(() => new Session()),
+        getRating: jest.fn(() => 5),
+        getRatingCount: jest.fn(() => 50000)
+    };
+});
