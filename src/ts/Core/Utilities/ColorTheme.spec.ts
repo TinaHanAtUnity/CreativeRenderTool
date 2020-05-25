@@ -1,11 +1,11 @@
 import { Core } from 'Core/__mocks__/Core';
-import { PerformanceCampaign, PerformanceCampaignWithoutImages, PerformanceCampaignMock } from 'Performance/Models/__mocks__/PerformanceCampaign';
+import { PerformanceCampaign, PerformanceCampaignWithImages, PerformanceCampaignMock } from 'Performance/Models/__mocks__/PerformanceCampaign';
 import { ColorTheme } from 'Core/Utilities/ColorTheme.ts';
 import { Color } from 'Core/Utilities/Color';
 
 describe('ColorTheme', () => {
-    const campaignWithImages = new PerformanceCampaign();
-    const campaignWithoutImages = new PerformanceCampaignWithoutImages();
+    const campaignWithImages = new PerformanceCampaignWithImages();
+    const campaignWithoutImages = new PerformanceCampaign();
     const core = new Core().Api;
 
     const getColorTheme = async (campaign: PerformanceCampaignMock) => {

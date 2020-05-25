@@ -26,9 +26,9 @@ export const PerformanceCampaign = jest.fn(() => {
     return <PerformanceCampaignMock> {
         getGameName: jest.fn(() => 'GameName'),
         getId: jest.fn(() => 'abc123'),
-        getLandscape: jest.fn().mockImplementation(() => new Image('http://cdn-creatives-highwinds-prd.unityads.unity3d.com/assets/0fd53267-0620-4dce-b04f-dd70cecd4990/600x800.png', new Session())),
-        getPortrait: jest.fn().mockImplementation(() => new Image('http://cdn-creatives-highwinds-prd.unityads.unity3d.com/assets/0fd53267-0620-4dce-b04f-dd70cecd4990/600x800.png', new Session())),
-        getSquare: jest.fn().mockImplementation(() => new Image('http://cdn-creatives-highwinds-prd.unityads.unity3d.com/assets/0fd53267-0620-4dce-b04f-dd70cecd4990/600x800.png', new Session())),
+        getLandscape: jest.fn().mockImplementation(() => undefined),
+        getPortrait: jest.fn().mockImplementation(() => undefined),
+        getSquare: jest.fn().mockImplementation(() => undefined),
         getEndScreen: jest.fn().mockImplementation(() => undefined),
         getGameIcon: jest.fn().mockImplementation(() => undefined),
         getClickAttributionUrl: jest.fn().mockImplementation(() => ''),
@@ -43,13 +43,13 @@ export const PerformanceCampaign = jest.fn(() => {
     };
 });
 
-export const PerformanceCampaignWithoutImages = jest.fn(() => {
+export const PerformanceCampaignWithImages = jest.fn(() => {
     return <PerformanceCampaignMock> {
         getGameName: jest.fn(() => 'GameName'),
         getId: jest.fn(() => 'abc123'),
-        getLandscape: jest.fn().mockImplementation(() => undefined),
-        getPortrait: jest.fn().mockImplementation(() => undefined),
-        getSquare: jest.fn().mockImplementation(() => undefined),
+        getLandscape: jest.fn().mockImplementation(() => new Image('http://cdn-creatives-highwinds-prd.unityads.unity3d.com/assets/0fd53267-0620-4dce-b04f-dd70cecd4990/600x800.png', new Session())),
+        getPortrait: jest.fn().mockImplementation(() => new Image('http://cdn-creatives-highwinds-prd.unityads.unity3d.com/assets/0fd53267-0620-4dce-b04f-dd70cecd4990/600x800.png', new Session())),
+        getSquare: jest.fn().mockImplementation(() => new Image('http://cdn-creatives-highwinds-prd.unityads.unity3d.com/assets/0fd53267-0620-4dce-b04f-dd70cecd4990/600x800.png', new Session())),
         getEndScreen: jest.fn().mockImplementation(() => undefined),
         getGameIcon: jest.fn().mockImplementation(() => undefined),
         getClickAttributionUrl: jest.fn().mockImplementation(() => ''),
