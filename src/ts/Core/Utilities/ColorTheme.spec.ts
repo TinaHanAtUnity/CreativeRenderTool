@@ -9,7 +9,7 @@ describe('ColorTheme', () => {
     const core = new Core().Api;
 
     const getColorTheme = async (campaign: PerformanceCampaignMock) => {
-        return ColorTheme.calculateColorTheme(campaign, core);
+        return ColorTheme.calculateColorThemeForEndCard(campaign, core);
     };
 
     const colorDiff = (color: Color, expectedColor: { r: number; g: number; b: number }) => {
@@ -33,12 +33,12 @@ describe('ColorTheme', () => {
         // It's possible to have an error down to the 1/256, caused by different software implementation or GPU drivers, etc
         // For that reason, we check if the output color is really close to the expected color.
 
-        expect(colorDiff(theme.baseColorTheme.light, expectedBaseLight)).toBeLessThanOrEqual(3);
-        expect(colorDiff(theme.baseColorTheme.medium, expectedBaseMedium)).toBeLessThanOrEqual(3);
-        expect(colorDiff(theme.baseColorTheme.dark, expectedBaseDark)).toBeLessThanOrEqual(3);
-        expect(colorDiff(theme.secondaryColorTheme.light, expectedSecondaryLight)).toBeLessThanOrEqual(3);
-        expect(colorDiff(theme.secondaryColorTheme.medium, expectedSecondaryMedium)).toBeLessThanOrEqual(3);
-        expect(colorDiff(theme.secondaryColorTheme.dark, expectedSecondaryDark)).toBeLessThanOrEqual(3);
+        expect(colorDiff(theme.base.light, expectedBaseLight)).toBeLessThanOrEqual(3);
+        expect(colorDiff(theme.base.medium, expectedBaseMedium)).toBeLessThanOrEqual(3);
+        expect(colorDiff(theme.base.dark, expectedBaseDark)).toBeLessThanOrEqual(3);
+        expect(colorDiff(theme.secondary.light, expectedSecondaryLight)).toBeLessThanOrEqual(3);
+        expect(colorDiff(theme.secondary.medium, expectedSecondaryMedium)).toBeLessThanOrEqual(3);
+        expect(colorDiff(theme.secondary.dark, expectedSecondaryDark)).toBeLessThanOrEqual(3);
     });
 
     it('should throw an error if the provided campaign has invalid images', async () => {
