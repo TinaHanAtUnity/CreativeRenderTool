@@ -1,4 +1,4 @@
-# Pending
+# Tue May 26 22:09:32 UTC 2020
 
 * Replace IAdUnitParameters with IVideoAdUnitParameters as preparation work for introducing PopupController [#15426](https://github.com/Applifier/unity-ads-webview/pull/15426)
 * [Load V5] Add Etermax game ids [#15525](https://github.com/Applifier/unity-ads-webview/pull/15525)
