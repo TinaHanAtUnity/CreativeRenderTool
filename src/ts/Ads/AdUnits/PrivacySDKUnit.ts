@@ -114,6 +114,8 @@ export class PrivacySDKUnit implements IAdUnit, IPrivacySDKViewHandler {
         if (this._showing) {
             this._showing = false;
             this._adUnitContainer.removeEventHandler(this);
+            this._unityPrivacyView.hide();
+
             if (this._unityPrivacyView.container().parentElement) {
                 document.body.removeChild(this._unityPrivacyView.container());
                 delete this._unityPrivacyView;
