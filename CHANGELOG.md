@@ -1,5 +1,6 @@
 # Pending
 
+* Replace IAdUnitParameters with IVideoAdUnitParameters as preparation work for introducing PopupController [#15426](https://github.com/Applifier/unity-ads-webview/pull/15426)
 * [Load V5] Add Etermax game ids [#15525](https://github.com/Applifier/unity-ads-webview/pull/15525)
 * [PTS Migration] Fix PRD Endpoints in CI [#15526](https://github.com/Applifier/unity-ads-webview/pull/15526)
 * [Load V5] Use 1 retry with 10 sec timeout for PRELOAD request [#15495](https://github.com/Applifier/unity-ads-webview/pull/15495)
