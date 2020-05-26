@@ -1,5 +1,6 @@
 # Pending
 
+* [Load V5] Use 1 retry with 10 sec timeout for PRELOAD request [#15495](https://github.com/Applifier/unity-ads-webview/pull/15495)
 * [Load V5] Add experiment tag for all Load V5 metrics [#15463](https://github.com/Applifier/unity-ads-webview/pull/15463)
 * [3.4.6 Release] Add to Webview Version Map [#15491](https://github.com/Applifier/unity-ads-webview/pull/15491)
 * Use legacy end screen [#15490](https://github.com/Applifier/unity-ads-webview/pull/15490)
