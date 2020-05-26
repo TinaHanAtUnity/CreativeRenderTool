@@ -1,4 +1,4 @@
-import { AbstractAdUnit, IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
+import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
 import { GDPREventHandler } from 'Ads/EventHandlers/GDPREventHandler';
 import { IAdsApi } from 'Ads/IAds';
 import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
@@ -8,6 +8,7 @@ import { IEndScreenHandler } from 'Ads/Views/EndScreen';
 import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
 import { StoreName } from 'Performance/Models/PerformanceCampaign';
+import { IVideoAdUnitParameters } from 'Ads/AdUnits/VideoAdUnit';
 
 export interface IEndScreenDownloadParameters {
     clickAttributionUrl: string | undefined;
@@ -29,7 +30,7 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
 
     private _storeHandler: IStoreHandler;
 
-    constructor(adUnit: T2, parameters: IAdUnitParameters<T>, storeHandler: IStoreHandler) {
+    constructor(adUnit: T2, parameters: IVideoAdUnitParameters<T>, storeHandler: IStoreHandler) {
         super(parameters.privacyManager, parameters.coreConfig, parameters.adsConfig, parameters.privacySDK);
         this._adUnit = adUnit;
         this._storeHandler = storeHandler;

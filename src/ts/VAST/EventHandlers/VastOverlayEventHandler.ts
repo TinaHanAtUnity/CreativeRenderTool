@@ -1,4 +1,4 @@
-import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
+import { IVideoAdUnitParameters } from 'Ads/AdUnits/VideoAdUnit';
 import { OverlayEventHandler } from 'Ads/EventHandlers/OverlayEventHandler';
 import { MoatViewabilityService } from 'Ads/Utilities/MoatViewabilityService';
 import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
@@ -30,7 +30,7 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
     private _om?: VastOpenMeasurementController;
     private _deviceInfo: DeviceInfo;
 
-    constructor(adUnit: VastAdUnit, parameters: IAdUnitParameters<VastCampaign>) {
+    constructor(adUnit: VastAdUnit, parameters: IVideoAdUnitParameters<VastCampaign>) {
         super(adUnit, parameters);
 
         this._platform = parameters.platform;
