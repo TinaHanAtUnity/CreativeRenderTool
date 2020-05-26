@@ -11,6 +11,18 @@
 
     <script>
         (function() {
+            if (!window.Promise) {
+                window.Promise = window.parent.Promise;
+            }
+
+            if (!window.Object.entries) {
+                window.Object.entries = window.parent.Object.entries;
+            }
+
+            if (!window.Object.setPrototypeOf) {
+                window.Object.entries = window.parent.Object.setPrototypeOf;
+            }
+
             var AdsPrivacyAdapter = function() {
                 var listeners = {
                     error: [],
