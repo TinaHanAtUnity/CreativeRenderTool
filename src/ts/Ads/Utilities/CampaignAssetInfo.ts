@@ -10,7 +10,7 @@ import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 import { DeviceInfoApi } from 'Core/Native/DeviceInfo';
 import { AUIMetric } from 'Ads/Utilities/SDKMetrics';
 import { Image } from 'Ads/Models/Assets/Image';
-import { ColorThemeError } from 'Core/Utilities/ColorThemeTemp';
+import { ColorThemeError } from 'Core/Utilities/ColorTheme';
 
 export enum VideoType {
     CACHE,
