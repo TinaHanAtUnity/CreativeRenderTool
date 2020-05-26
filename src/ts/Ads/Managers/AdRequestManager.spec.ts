@@ -137,10 +137,10 @@ class SatisfiesMatcher {
                     preloadData: {}
                 }), [], {
                     followRedirects: false,
-                    retries: 0,
+                    retries: 1,
                     retryDelay: 0,
                     retryWithConnectionEvents: false,
-                    timeout: 20000
+                    timeout: 10000
                 });
             });
 

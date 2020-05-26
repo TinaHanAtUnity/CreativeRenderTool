@@ -179,11 +179,11 @@ export class AdRequestManager extends CampaignManager {
                 CampaignManager.createRequestBody(this._clientInfo, this._coreConfig, this._deviceInfo, this._userPrivacyManager, this._sessionManager, this._privacy, countersForOperativeEvents, fullyCachedCampaignIds, versionCode, this._adMobSignalFactory, freeSpace, this._metaDataManager, this._adsConfig, true, this.getPreviousPlacementId(), requestPrivacy, legacyRequestPrivacy, false)
             ]);
         }).then(([requestUrl, requestBody]) => this._request.post(requestUrl, JSON.stringify(this.makePreloadBody(<ILoadV5BodyExtra>requestBody)), [], {
-            retries: 0,
+            retries: 1,
             retryDelay: 0,
             followRedirects: false,
             retryWithConnectionEvents: false,
-            timeout: 20000
+            timeout: 10000
         })).then((response) => {
             if (response) {
                 SdkStats.increaseAdRequestOrdinal();
