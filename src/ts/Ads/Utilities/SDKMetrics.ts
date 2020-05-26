@@ -159,7 +159,8 @@ export enum AUIMetric {
 export enum ExternalEndScreenMetric {
     IframeTimeout = 'external_end_screen_iframe_timeout',
     GameIconImageMissing = 'external_end_screen_game_icon_missing',
-    ImageMissing = 'external_end_screen_image_missing'
+    ImageMissing = 'external_end_screen_image_missing',
+    UnableToGetDataUrl = 'external_end_screen_image_unable_to_get_data_url'
 }
 
 export enum GeneralTimingMetric {
