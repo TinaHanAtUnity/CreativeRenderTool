@@ -9,7 +9,7 @@ describe('ColorTheme', () => {
     const core = new Core().Api;
 
     const getColorTheme = async (campaign: PerformanceCampaignMock) => {
-        return ColorTheme.renderColorTheme(campaign, core);
+        return ColorTheme.calculateColorTheme(campaign, core);
     };
 
     const colorDiff = (color: Color, expectedColor: { r: number; g: number; b: number }) => {
@@ -41,9 +41,9 @@ describe('ColorTheme', () => {
         expect(colorDiff(theme.secondaryColorTheme.dark, expectedSecondaryDark)).toBeLessThanOrEqual(3);
     });
 
-    it('should throw an error if the campaign provided has invalid images', async () => {
+    it('should throw an error if the provided campaign has invalid images', async () => {
         await getColorTheme(campaignWithoutImages).catch((error) => {
-            expect(error.message).toEqual('invalid_image_assets');
+            expect(error.tag).toEqual('invalid_image_assets');
         });
     });
 });
