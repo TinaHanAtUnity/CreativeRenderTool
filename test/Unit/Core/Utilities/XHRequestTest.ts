@@ -215,4 +215,18 @@ describe('XHRequestTest', () => {
             assert.equal(sendSpy.firstCall.args[0], 'body', 'Did not call function open with correct body');
         });
     });
+
+    describe('getDataUrl', () => {
+        it('should give a correct data url', async () => {
+            const url = 'https://api.unity3d.com/file.txt';
+            const fileContent = 'HelloWorld!';
+
+            server.respondWith('GET', url, [200, {}, fileContent]);
+
+            return XHRequest.getDataUrl(url).then((responseText) => {
+                assert.equal(server.requests.length, 1, 'XHRequestTest should create one XMLHttpRequest instance');
+                assert.equal('data:application/octet-stream;base64,' + btoa(fileContent), responseText);
+            });
+        });
+    });
 });
