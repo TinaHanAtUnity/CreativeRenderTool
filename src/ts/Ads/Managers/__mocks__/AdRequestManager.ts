@@ -14,6 +14,7 @@ export type AdRequestManagerMock = Base & {
     onAdditionalPlacementsReady: ObservableMock;
     cacheCampaign: jest.Mock<Promise<ILoadedCampaign>>;
     loadCampaignWithAdditionalPlacement: jest.Mock;
+    reportMetricEvent: jest.Mock;
 };
 
 export const AdRequestManager = jest.fn(() => {
@@ -31,6 +32,7 @@ export const AdRequestManager = jest.fn(() => {
             campaign: notCachedLoadedCampaign.notCachedCampaign,
             trackingUrl: notCachedLoadedCampaign.notCachedTrackingUrls
         })),
-        loadCampaignWithAdditionalPlacement: jest.fn().mockImplementation(() => Promise.resolve())
+        loadCampaignWithAdditionalPlacement: jest.fn().mockImplementation(() => Promise.resolve()),
+        reportMetricEvent: jest.fn()
     };
 });
