@@ -8,8 +8,18 @@ interface IEndcardColorTheme {
     baseColorTheme: IColorTheme;
     secondaryColorTheme: IColorTheme;
 }
+
+class ColorThemeError extends Error {
+    public readonly tag: string;
+
+    constructor(message: string, tag: string) {
+        super(message);
+        this.tag = tag;
+    }
+}
+
 export class ColorTheme {
-    public static renderColorTheme(campaign: PerformanceCampaign, core: ICoreApi): Promise<IEndcardColorTheme> {
+    public static calculateColorTheme(campaign: PerformanceCampaign, core: ICoreApi): Promise<IEndcardColorTheme> {
         const portraitImage = campaign.getPortrait();
         const landscapeImage = campaign.getLandscape();
         const squareImage = campaign.getSquare();
@@ -28,14 +38,14 @@ export class ColorTheme {
                 image = portraitImage;
             }
             if (!image) {
-                throw new Error(AUIMetric.InvalidImageAssets);
+                throw new ColorThemeError('The images that were provided are not valid', AUIMetric.InvalidImageAssets);
             }
 
             return ImageAnalysis.getImageSrc(core.Cache, image)
                 .then(ImageAnalysis.analyseImage)
                 .then((swatches) => {
                     if (!swatches || !swatches.length) {
-                        throw new Error(AUIMetric.InvalidEndscreenColorTintSwitches);
+                        throw new ColorThemeError('', AUIMetric.InvalidEndscreenColorTintSwitches);
                     }
 
                     const baseColorTheme = swatches[0].getColorTheme();
