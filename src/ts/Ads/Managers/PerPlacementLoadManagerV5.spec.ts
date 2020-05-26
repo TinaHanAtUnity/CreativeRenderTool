@@ -265,30 +265,67 @@ import { ProgrammaticMraidParser } from 'MRAID/Parsers/ProgrammaticMraidParser';
         });
 
         describe('trigger on no fill programmatic', () => {
-            let placement: PlacementMock;
+            let placements: {[key: string]: PlacementMock};
 
             beforeEach(async () => {
-                placement = Placement();
+                placements = {
+                    'video': Placement('video', PlacementState.READY, Campaign(ProgrammaticMraidParser.ContentType, 'another')),
+                    'rewardedVideo': Placement('rewardedVideo', PlacementState.READY, Campaign(ProgrammaticMraidParser.ContentType, 'shown'))
+                };
 
-                placement.getCurrentCampaign.mockReturnValue(Campaign(ProgrammaticMraidParser.ContentType));
-                adsConfiguration.getPlacement.mockReturnValue(placement);
+                adsConfiguration.getPlacement.mockImplementation((x) => placements[x]);
 
                 await refreshManager.initialize();
+
+                refreshManager.setCurrentAdUnit(AbstractAdUnit(), placements.rewardedVideo);
 
                 adRequestManager.onNoFill.subscribe.mock.calls[0][0]('video');
             });
 
             it('should reset campaign', () => {
-                expect(placement.setCurrentCampaign).toBeCalledTimes(0);
+                expect(placements.video.setCurrentCampaign).toBeCalledTimes(0);
             });
 
             it('should reset tracking urls', () => {
-                expect(placement.setCurrentTrackingUrls).toBeCalledTimes(0);
+                expect(placements.video.setCurrentTrackingUrls).toBeCalledTimes(0);
             });
 
             it('should reset invalidation pending', () => {
-                expect(placement.setInvalidationPending).toBeCalledTimes(1);
-                expect(placement.setInvalidationPending).toHaveBeenNthCalledWith(1, false);
+                expect(placements.video.setInvalidationPending).toBeCalledTimes(1);
+                expect(placements.video.setInvalidationPending).toHaveBeenNthCalledWith(1, false);
+            });
+        });
+
+        describe(`trigger on no fill programmatic for same campaign`, () => {
+            let placements: { [key: string]: PlacementMock };
+
+            beforeEach(async () => {
+                const campaign = Campaign(ProgrammaticMraidParser.ContentType, 'shown');
+                placements = {
+                    'video': Placement('video', PlacementState.READY, campaign),
+                    'rewardedVideo': Placement('rewardedVideo', PlacementState.READY, campaign)
+                };
+
+                adsConfiguration.getPlacement.mockImplementation((x) => placements[x]);
+
+                await refreshManager.initialize();
+
+                refreshManager.setCurrentAdUnit(AbstractAdUnit(), placements.rewardedVideo);
+
+                adRequestManager.onNoFill.subscribe.mock.calls[0][0]('video');
+            });
+
+            it('should reset campaign', () => {
+                expect(placements.video.setCurrentCampaign).toBeCalledTimes(1);
+            });
+
+            it('should reset tracking urls', () => {
+                expect(placements.video.setCurrentTrackingUrls).toBeCalledTimes(1);
+            });
+
+            it('should reset invalidation pending', () => {
+                expect(placements.video.setInvalidationPending).toBeCalledTimes(1);
+                expect(placements.video.setInvalidationPending).toHaveBeenNthCalledWith(1, false);
             });
         });
 
