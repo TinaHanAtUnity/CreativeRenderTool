@@ -220,12 +220,13 @@ describe('XHRequestTest', () => {
         it('should give a correct data url', async () => {
             const url = 'https://api.unity3d.com/file.txt';
             const fileContent = 'HelloWorld!';
+            const expectedContent = 'data:application/octet-stream;base64,' + btoa(fileContent);
 
             server.respondWith('GET', url, [200, {}, fileContent]);
 
             return XHRequest.getDataUrl(url).then((responseText) => {
                 assert.equal(server.requests.length, 1, 'XHRequestTest should create one XMLHttpRequest instance');
-                assert.equal('data:application/octet-stream;base64,' + btoa(fileContent), responseText);
+                assert.equal(expectedContent, responseText);
             });
         });
     });
