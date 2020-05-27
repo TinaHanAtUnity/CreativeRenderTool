@@ -144,15 +144,18 @@ describe('ColorBlurEndScreenTest', () => {
         });
     });
 
-    describe('Color matching for the game info container and the install container', () => {
+    describe('Color matching for the game info container and the install container', async () => {
         let color: string;
 
-        beforeEach((done) => {
+        beforeEach(function (done) {
+            // tslint:disable:no-invalid-this
+            this.timeout(15000);
+            // tslint:enable
             ColorTheme.renderColorTheme(campaign, core)
                 .then((theme) => {
                     color = theme.baseColorTheme.medium.toCssRgb();
                 })
-                .then(() => done);
+                .then(done);
         });
 
         it('should render with the same color for game info container background and install container text', () => {
@@ -174,5 +177,5 @@ describe('ColorBlurEndScreenTest', () => {
 
             validateColorTheme(createColorBlurEndScreen('en'));
         });
-    }).timeout(15000);
+    });
 });
