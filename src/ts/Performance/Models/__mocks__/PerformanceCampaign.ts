@@ -43,23 +43,11 @@ export const PerformanceCampaign = jest.fn(() => {
     };
 });
 
-export const PerformanceCampaignWithImages = jest.fn(() => {
+export const PerformanceCampaignWithImages = jest.fn((performanceCampaign: PerformanceCampaignMock) => {
     return <PerformanceCampaignMock> {
-        getGameName: jest.fn(() => 'GameName'),
-        getId: jest.fn(() => 'abc123'),
+        ...performanceCampaign,
         getLandscape: jest.fn().mockImplementation(() => new Image('http://cdn-creatives-highwinds-prd.unityads.unity3d.com/assets/0fd53267-0620-4dce-b04f-dd70cecd4990/600x800.png', new Session())),
         getPortrait: jest.fn().mockImplementation(() => new Image('http://cdn-creatives-highwinds-prd.unityads.unity3d.com/assets/0fd53267-0620-4dce-b04f-dd70cecd4990/600x800.png', new Session())),
-        getSquare: jest.fn().mockImplementation(() => new Image('http://cdn-creatives-highwinds-prd.unityads.unity3d.com/assets/0fd53267-0620-4dce-b04f-dd70cecd4990/600x800.png', new Session())),
-        getEndScreen: jest.fn().mockReturnValue(() => undefined),
-        getGameIcon: jest.fn().mockReturnValue(() => undefined),
-        getClickAttributionUrl: jest.fn().mockReturnValue(() => ''),
-        getClickAttributionUrlFollowsRedirects: jest.fn().mockReturnValue(() => ''),
-        getBypassAppSheet: jest.fn().mockReturnValue(() => false),
-        getAppStoreId: jest.fn().mockReturnValue(() => ''),
-        getStore: jest.fn().mockReturnValue(() => StoreName.APPLE),
-        getAppDownloadUrl: jest.fn().mockReturnValue(() => ''),
-        getSession: jest.fn().mockReturnValue(() => new Session()),
-        getRating: jest.fn(() => 5),
-        getRatingCount: jest.fn(() => 50000)
+        getSquare: jest.fn().mockImplementation(() => new Image('http://cdn-creatives-highwinds-prd.unityads.unity3d.com/assets/0fd53267-0620-4dce-b04f-dd70cecd4990/600x800.png', new Session()))
     };
 });

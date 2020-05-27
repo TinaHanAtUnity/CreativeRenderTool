@@ -1,13 +1,13 @@
 jest.mock('Performance/Utilities/ImageAnalysis');
 import { Core } from 'Core/__mocks__/Core';
-import { PerformanceCampaignWithImages } from 'Performance/Models/__mocks__/PerformanceCampaign';
+import { PerformanceCampaignWithImages, PerformanceCampaign } from 'Performance/Models/__mocks__/PerformanceCampaign';
 import { ColorTheme, IImageColorTheme } from 'Core/Utilities/ColorTheme.ts';
 import { ImageAnalysis } from 'Performance/Utilities/ImageAnalysis';
 import { Swatch, IColorTheme } from 'Performance/Utilities/Swatch';
 import { Color } from 'Core/Utilities/Color';
 
 describe('ColorTheme', () => {
-    const campaignWithImages = new PerformanceCampaignWithImages();
+    const campaignWithImages = new PerformanceCampaignWithImages(new PerformanceCampaign());
     const core = new Core().Api;
     const mockedImageAnalysis = ImageAnalysis;
 
@@ -22,7 +22,7 @@ describe('ColorTheme', () => {
         let expectedBase: IColorTheme;
         let expectedSecondary: IColorTheme;
 
-        beforeAll(async () => {
+        beforeEach(async () => {
             (<jest.Mock>mockedImageAnalysis.getImageSrc).mockResolvedValue(
                 'http://cdn-creatives-highwinds-prd.unityads.unity3d.com/assets/0fd53267-0620-4dce-b04f-dd70cecd4990/600x800.png'
             );
@@ -41,8 +41,11 @@ describe('ColorTheme', () => {
             };
         });
 
-        it('should return a base and a secondary', () => {
+        it('should return a base', () => {
             expect(theme).toHaveProperty('base', expectedBase);
+        });
+
+        it('should return a secondary', () => {
             expect(theme).toHaveProperty('secondary', expectedSecondary);
         });
     });
