@@ -144,13 +144,15 @@ describe('ColorBlurEndScreenTest', () => {
         });
     });
 
-    describe('Color matching for the game info container and the install container', async () => {
+    describe('Color matching for the game info container and the install container', () => {
         let color: string;
 
-        beforeEach(async () => {
-            await ColorTheme.renderColorTheme(campaign, core).then((theme) => {
-                color = theme.baseColorTheme.medium.toCssRgb();
-            });
+        beforeEach((done) => {
+            ColorTheme.renderColorTheme(campaign, core)
+                .then((theme) => {
+                    color = theme.baseColorTheme.medium.toCssRgb();
+                })
+                .then(() => done);
         });
 
         it('should render with the same color for game info container background and install container text', () => {
@@ -164,7 +166,7 @@ describe('ColorBlurEndScreenTest', () => {
                 const installContainerColor = installContainer.style.color;
 
                 if (!gameInfoContainerColor || !installContainerColor) {
-                    assert.fail('Couldn\'t render all the colors');
+                    assert.fail(`Couldn't render all the colors`);
                 } else {
                     assert.equal(gameInfoContainerColor, installContainerColor);
                 }
