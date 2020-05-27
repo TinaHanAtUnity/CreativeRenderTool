@@ -7,7 +7,7 @@ import { Image } from 'Ads/Models/Assets/Image';
 import { CacheApi } from 'Core/Native/Cache';
 import { CampaignAssetInfo } from 'Ads/Utilities/CampaignAssetInfo';
 
-interface IImageColorTheme {
+export interface IImageColorTheme {
     base: IColorTheme;
     secondary: IColorTheme;
 }
@@ -34,11 +34,11 @@ export class ColorTheme {
     public static calculateColorThemeForImage(image: Image, cache: CacheApi): Promise<IImageColorTheme> {
         return ImageAnalysis.getImageSrc(cache, image)
             .then(ImageAnalysis.analyseImage)
-            .then((swatches) => this.convertSwatchesToImageColorTheme(swatches));
+            .then((swatches) => ColorTheme.convertSwatchesToImageColorTheme(swatches));
     }
 
     public static calculateColorThemeForEndCard(campaign: PerformanceCampaign, core: ICoreApi): Promise<IImageColorTheme> {
         return CampaignAssetInfo.getOrientedImage(campaign, core.DeviceInfo)
-            .then((image: Image) => this.calculateColorThemeForImage(image, core.Cache));
+            .then((image: Image) => ColorTheme.calculateColorThemeForImage(image, core.Cache));
     }
 }

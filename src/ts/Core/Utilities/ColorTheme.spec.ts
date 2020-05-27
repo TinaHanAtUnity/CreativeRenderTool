@@ -1,49 +1,49 @@
+jest.mock('Performance/Utilities/ImageAnalysis');
+import { mocked } from 'ts-jest/utils';
 import { Core } from 'Core/__mocks__/Core';
 import { PerformanceCampaign, PerformanceCampaignWithImages, PerformanceCampaignMock } from 'Performance/Models/__mocks__/PerformanceCampaign';
-import { ColorTheme } from 'Core/Utilities/ColorTheme.ts';
+import { ColorTheme, IImageColorTheme } from 'Core/Utilities/ColorTheme.ts';
 import { Color } from 'Core/Utilities/Color';
+import { ImageAnalysis } from 'Performance/Utilities/ImageAnalysis';
+import { Swatch } from 'Performance/Utilities/Swatch';
 
 describe('ColorTheme', () => {
     const campaignWithImages = new PerformanceCampaignWithImages();
     const campaignWithoutImages = new PerformanceCampaign();
     const core = new Core().Api;
+    const mockedImageAnalysis = mocked(ImageAnalysis, true);
 
-    const getColorTheme = async (campaign: PerformanceCampaignMock) => {
-        return ColorTheme.calculateColorThemeForEndCard(campaign, core);
-    };
+    describe('calculateColorThemeForEndCard', () => {
+        const swatches: Swatch[] | Promise<Swatch[]> = [];
+        const firstSwatch = new Swatch([88, 14, 49], 43962);
+        const secondSwatch = new Swatch([150, 15, 53], 12719);
+        swatches.push(firstSwatch);
+        swatches.push(secondSwatch);
 
-    const colorDiff = (color: Color, expectedColor: { r: number; g: number; b: number }) => {
-        const r = color.r;
-        const g = color.g;
-        const b = color.b;
-        const ex = expectedColor;
-        return Math.abs(ex.r - r) + Math.abs(ex.g - g) + Math.abs(ex.b - b);
-    };
+        let theme: IImageColorTheme;
 
-    it('should successfully converts the 6 variants to their respective RGB values', async () => {
-        const theme = await getColorTheme(campaignWithImages);
-        const expectedBaseLight = { r: 215, g: 186, b: 247 };
-        const expectedBaseMedium = { r: 98, g: 21, b: 183 };
-        const expectedBaseDark = { r: 61, g: 13, b: 114 };
-        const expectedSecondaryLight = { r: 206, g: 192, b: 242 };
-        const expectedSecondaryMedium = { r: 73, g: 36, b: 168 };
-        const expectedSecondaryDark = { r: 45, g: 22, b: 105 };
+        beforeAll(async () => {
+            mockedImageAnalysis.getImageSrc.mockResolvedValue(
+                'http://cdn-creatives-highwinds-prd.unityads.unity3d.com/assets/0fd53267-0620-4dce-b04f-dd70cecd4990/600x800.png'
+            );
+            mockedImageAnalysis.analyseImage.mockResolvedValue(swatches);
+            theme = await ColorTheme.calculateColorThemeForEndCard(campaignWithImages, core);
+        });
 
-        // Because of the canvas implementation, which relies on the native implementation of the current platform,
-        // It's possible to have an error down to the 1/256, caused by different software implementation or GPU drivers, etc
-        // For that reason, we check if the output color is really close to the expected color.
+        it('should return a base and a secondary', () => {
+            const expectedBase = {
+                dark: { a: 255, b: 61, g: 18, r: 110 },
+                light: { a: 255, b: 215, g: 189, r: 245 },
+                medium: { a: 255, b: 98, g: 28, r: 176 }
+            };
+            const expectedSecondary = {
+                dark: { a: 255, b: 41, g: 12, r: 116 },
+                light: { a: 255, b: 203, g: 185, r: 248 },
+                medium: { a: 255, b: 66, g: 19, r: 185 }
+            };
 
-        expect(colorDiff(theme.base.light, expectedBaseLight)).toBeLessThanOrEqual(3);
-        expect(colorDiff(theme.base.medium, expectedBaseMedium)).toBeLessThanOrEqual(3);
-        expect(colorDiff(theme.base.dark, expectedBaseDark)).toBeLessThanOrEqual(3);
-        expect(colorDiff(theme.secondary.light, expectedSecondaryLight)).toBeLessThanOrEqual(3);
-        expect(colorDiff(theme.secondary.medium, expectedSecondaryMedium)).toBeLessThanOrEqual(3);
-        expect(colorDiff(theme.secondary.dark, expectedSecondaryDark)).toBeLessThanOrEqual(3);
-    });
-
-    it('should throw an error if the provided campaign has invalid images', async () => {
-        await getColorTheme(campaignWithoutImages).catch((error) => {
-            expect(error.tag).toEqual('invalid_image_assets');
+            expect(theme).toHaveProperty('base', expectedBase);
+            expect(theme).toHaveProperty('secondary', expectedSecondary);
         });
     });
 });
