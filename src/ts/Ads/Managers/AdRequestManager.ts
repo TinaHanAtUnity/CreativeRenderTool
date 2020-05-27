@@ -449,7 +449,7 @@ export class AdRequestManager extends CampaignManager {
             ...additionalPlacements.map((x) => this._adsConfig.getPlacement(x))
         ];
 
-        return this.parseAllPlacements(json, allPlacements, auctionStatusCode).then((loadedCampaigns) => {
+        return this.parseAllPlacements(json, allPlacements, auctionStatusCode, LoadV5.LoadRequestParseCampaignFailed).then((loadedCampaigns) => {
             const additionalCampaigns = additionalPlacements.reduce<IPlacementIdMap<INotCachedLoadedCampaign | undefined>>((previousValue, currentValue, currentIndex) => {
                 previousValue[currentValue] = loadedCampaigns[currentValue];
                 return previousValue;
@@ -592,7 +592,7 @@ export class AdRequestManager extends CampaignManager {
         });
     }
 
-    private parseAllPlacements(json: IRawAuctionV5Response, allPlacements: Placement[], auctionStatusCode: AuctionStatusCode): Promise<IPlacementIdMap<INotCachedLoadedCampaign | undefined>> {
+    private parseAllPlacements(json: IRawAuctionV5Response, allPlacements: Placement[], auctionStatusCode: AuctionStatusCode, errorMetric: LoadV5): Promise<IPlacementIdMap<INotCachedLoadedCampaign | undefined>> {
         let allMedia: string[] = [];
         let campaignMap: IPlacementIdMap<Campaign | undefined> = {};
         let parsedMap: IPlacementIdMap<IParsedMediaAndTrackingIds> = {};
@@ -612,7 +612,10 @@ export class AdRequestManager extends CampaignManager {
 
             allMedia = allMedia.filter((val, index) => allMedia.indexOf(val) === index);
 
-            return Promise.all(allMedia.map((media) => this.parseCampaign(json, media, auctionStatusCode)));
+            return Promise.all(allMedia.map((media) => this.parseCampaign(json, media, auctionStatusCode).catch((err) => {
+                this.handleError(errorMetric, err);
+                return undefined;
+            })));
         }).then(allCampaigns => {
             campaignMap = allCampaigns.reduce<IPlacementIdMap<Campaign | undefined>>((previousValue, currentValue, currentIndex) => {
                 previousValue[allMedia[currentIndex]] = currentValue;
@@ -622,6 +625,7 @@ export class AdRequestManager extends CampaignManager {
             return Promise.all(
                 // Skip caching for those campaigns since we don't need them immediately
                 allPlacements.map((x) => this.createNotCachedLoadedCampaign(json, parsedMap[x.getId()].mediaId === undefined ? undefined : campaignMap[parsedMap[x.getId()].mediaId!], parsedMap[x.getId()].trackingId, auctionStatusCode).catch((err) => {
+                    this.handleError(errorMetric, err);
                     return undefined;
                 }
             )));
@@ -662,7 +666,7 @@ export class AdRequestManager extends CampaignManager {
             return Promise.resolve();
         }
 
-        return this.parseAllPlacements(json, placementsToLoad, auctionStatusCode)
+        return this.parseAllPlacements(json, placementsToLoad, auctionStatusCode, LoadV5.ReloadRequestParseCampaignFailed)
         .then((notCachedLoadedCampaigns) => {
             return Promise.all(placementsToLoad.map((placement) => {
                 const placementId = placement.getId();
