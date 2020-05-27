@@ -1,15 +1,13 @@
 jest.mock('Performance/Utilities/ImageAnalysis');
 import { mocked } from 'ts-jest/utils';
 import { Core } from 'Core/__mocks__/Core';
-import { PerformanceCampaign, PerformanceCampaignWithImages, PerformanceCampaignMock } from 'Performance/Models/__mocks__/PerformanceCampaign';
+import { PerformanceCampaignWithImages } from 'Performance/Models/__mocks__/PerformanceCampaign';
 import { ColorTheme, IImageColorTheme } from 'Core/Utilities/ColorTheme.ts';
-import { Color } from 'Core/Utilities/Color';
 import { ImageAnalysis } from 'Performance/Utilities/ImageAnalysis';
 import { Swatch } from 'Performance/Utilities/Swatch';
 
 describe('ColorTheme', () => {
     const campaignWithImages = new PerformanceCampaignWithImages();
-    const campaignWithoutImages = new PerformanceCampaign();
     const core = new Core().Api;
     const mockedImageAnalysis = mocked(ImageAnalysis, true);
 
