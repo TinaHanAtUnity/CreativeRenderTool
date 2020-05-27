@@ -25,6 +25,7 @@ export class CometCampaignParser extends CampaignParser {
     public static ContentTypeMRAID = 'comet/mraid-url';
 
     private _requestManager: RequestManager;
+    private static _forceEndScreenUrl: string | undefined;
 
     constructor(core: ICore) {
         super(core.NativeBridge.getPlatform());
@@ -115,6 +116,10 @@ export class CometCampaignParser extends CampaignParser {
             }
             return Promise.resolve(mraidCampaign);
         } else {
+            if (CometCampaignParser._forceEndScreenUrl) {
+                json.endScreenUrl = CometCampaignParser._forceEndScreenUrl;
+            }
+
             const parameters: IPerformanceCampaign = {
                 ... baseCampaignParams,
                 appStoreId: json.appStoreId,
@@ -132,7 +137,8 @@ export class CometCampaignParser extends CampaignParser {
                 videoEventUrls: this.validateAndEncodeVideoEventUrls(json.videoEventUrls, session),
                 bypassAppSheet: json.bypassAppSheet,
                 store: storeName,
-                adUnitStyle: json.adUnitStyle ? this.parseAdUnitStyle(json.adUnitStyle, session) : undefined
+                adUnitStyle: json.adUnitStyle ? this.parseAdUnitStyle(json.adUnitStyle, session) : undefined,
+                endScreen: json.endScreenUrl ? new HTML(this.validateAndEncodeUrl(json.endScreenUrl, session), session, json.creativeId) : undefined
             };
 
             if (json.trailerDownloadable && json.trailerDownloadableSize && json.trailerStreaming) {
@@ -173,5 +179,9 @@ export class CometCampaignParser extends CampaignParser {
             // do nothing
         }
         return adUnitStyle;
+    }
+
+    public static setForceEndScreenUrl(value: string | undefined): void {
+        CometCampaignParser._forceEndScreenUrl = value;
     }
 }

@@ -1,3 +1,22 @@
+# Tue May 26 22:09:32 UTC 2020
+
+* Replace IAdUnitParameters with IVideoAdUnitParameters as preparation work for introducing PopupController [#15426](https://github.com/Applifier/unity-ads-webview/pull/15426)
+* [Load V5] Add Etermax game ids [#15525](https://github.com/Applifier/unity-ads-webview/pull/15525)
+* [PTS Migration] Fix PRD Endpoints in CI [#15526](https://github.com/Applifier/unity-ads-webview/pull/15526)
+* [Load V5] Use 1 retry with 10 sec timeout for PRELOAD request [#15495](https://github.com/Applifier/unity-ads-webview/pull/15495)
+* [Load V5] Add experiment tag for all Load V5 metrics [#15463](https://github.com/Applifier/unity-ads-webview/pull/15463)
+* [3.4.6 Release] Add to Webview Version Map [#15491](https://github.com/Applifier/unity-ads-webview/pull/15491)
+* Use legacy end screen [#15490](https://github.com/Applifier/unity-ads-webview/pull/15490)
+* Add Endscreen Support For External Endscreen [#14355](https://github.com/Applifier/unity-ads-webview/pull/14355)
+* [AUI] Change the endscreen test fixture image to a valid image [#15425](https://github.com/Applifier/unity-ads-webview/pull/15425)
+* [AUI] Add new locales for the color blur experiment [#15367](https://github.com/Applifier/unity-ads-webview/pull/15367)
+* [Deployment Scripts] Print PR name on Slack when merged [#15423](https://github.com/Applifier/unity-ads-webview/pull/15423)
+
+# Thu May 21 00:42:46 UTC 2020
+
+* [Load V5] Add 2 Voodoo Games [#15434](https://github.com/Applifier/unity-ads-webview/pull/15434)
+* [Load V5, Ad Unit] Enable Ad Units for Load V5 [#15359](https://github.com/Applifier/unity-ads-webview/pull/15359)
+
 # Tue May 19 18:11:59 UTC 2020
 
 * [Open Measurement] Fix data discrepancy for MOAT and IAS [#15218](https://github.com/Applifier/unity-ads-webview/pull/15218)
