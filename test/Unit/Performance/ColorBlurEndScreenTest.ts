@@ -172,5 +172,5 @@ describe('ColorBlurEndScreenTest', () => {
 
             validateColorTheme(createColorBlurEndScreen('en'));
         });
-    });
+    }).timeout(15000);
 });
