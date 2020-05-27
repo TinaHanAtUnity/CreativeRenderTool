@@ -266,7 +266,7 @@ describe('Event parameters should match specifications', () => {
         });
     });
 
-    describe('with ad request usnig load v5 support', () => {
+    describe('with ad request using load v5 support', () => {
         let coreConfig: CoreConfiguration;
         let adsConfig: AdsConfiguration;
         let sandbox: sinon.SinonSandbox;
