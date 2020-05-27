@@ -167,7 +167,8 @@ export enum GeneralTimingMetric {
     AuctionHealthGood = 'auction_health_good',
     AuctionHealthBad = 'auction_health_bad',
     AuctionHealthGoodXHR = 'auction_health_good_xhr',
-    AuctionHealthBadXHR = 'auction_health_bad_xhr'
+    AuctionHealthBadXHR = 'auction_health_bad_xhr',
+    CacheSpeed = 'cache_speed'
 }
 
 export enum MediationMetric {
