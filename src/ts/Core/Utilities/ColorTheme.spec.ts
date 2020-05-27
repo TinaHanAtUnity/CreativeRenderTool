@@ -12,7 +12,7 @@ describe('ColorTheme', () => {
     const mockedImageAnalysis = ImageAnalysis;
 
     describe('calculateColorThemeForEndCard', () => {
-        const swatches: Swatch[] | Promise<Swatch[]> = [];
+        const swatches: Swatch[] = [];
         const firstSwatch = new Swatch([88, 14, 49], 43962);
         const secondSwatch = new Swatch([150, 15, 53], 12719);
         swatches.push(firstSwatch);
@@ -26,7 +26,7 @@ describe('ColorTheme', () => {
             (<jest.Mock>mockedImageAnalysis.getImageSrc).mockResolvedValue(
                 'http://cdn-creatives-highwinds-prd.unityads.unity3d.com/assets/0fd53267-0620-4dce-b04f-dd70cecd4990/600x800.png'
             );
-            (<jest.Mock>mockedImageAnalysis.analyseImage).mockResolvedValue(swatches);
+            (<jest.Mock>mockedImageAnalysis.analyseImage).mockResolvedValue(Promise.resolve(swatches));
 
             theme = await ColorTheme.calculateColorThemeForEndCard(campaignWithImages, core);
             expectedBase = {
