@@ -13,7 +13,7 @@ describe('CampaignAssetInfoTest', () => {
         orientedImage = await CampaignAssetInfo.getOrientedImage(campaign, core.DeviceInfo);
     });
 
-    it('should return an image when provided with a valid campaign', async () => {
+    it('should return an image when provided with a valid campaign', () => {
         expect(orientedImage).toBeInstanceOf(Image);
     });
 });
