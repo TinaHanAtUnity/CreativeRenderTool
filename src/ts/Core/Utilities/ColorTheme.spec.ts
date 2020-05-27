@@ -4,7 +4,8 @@ import { Core } from 'Core/__mocks__/Core';
 import { PerformanceCampaignWithImages } from 'Performance/Models/__mocks__/PerformanceCampaign';
 import { ColorTheme, IImageColorTheme } from 'Core/Utilities/ColorTheme.ts';
 import { ImageAnalysis } from 'Performance/Utilities/ImageAnalysis';
-import { Swatch } from 'Performance/Utilities/Swatch';
+import { Swatch, IColorTheme } from 'Performance/Utilities/Swatch';
+import { Color } from 'Core/Utilities/Color';
 
 describe('ColorTheme', () => {
     const campaignWithImages = new PerformanceCampaignWithImages();
@@ -19,6 +20,8 @@ describe('ColorTheme', () => {
         swatches.push(secondSwatch);
 
         let theme: IImageColorTheme;
+        let expectedBase: IColorTheme;
+        let expectedSecondary: IColorTheme;
 
         beforeAll(async () => {
             mockedImageAnalysis.getImageSrc.mockResolvedValue(
@@ -26,20 +29,19 @@ describe('ColorTheme', () => {
             );
             mockedImageAnalysis.analyseImage.mockResolvedValue(swatches);
             theme = await ColorTheme.calculateColorThemeForEndCard(campaignWithImages, core);
+            expectedBase = {
+                dark: new Color(110, 18, 61, 255),
+                light: new Color(245, 189, 215, 255),
+                medium: new Color(176, 28, 98, 255)
+            };
+            expectedSecondary = {
+                dark: new Color(116, 12, 41, 255),
+                light: new Color(248, 185, 203, 255),
+                medium: new Color(185, 19, 66, 255)
+            };
         });
 
         it('should return a base and a secondary', () => {
-            const expectedBase = {
-                dark: { a: 255, b: 61, g: 18, r: 110 },
-                light: { a: 255, b: 215, g: 189, r: 245 },
-                medium: { a: 255, b: 98, g: 28, r: 176 }
-            };
-            const expectedSecondary = {
-                dark: { a: 255, b: 41, g: 12, r: 116 },
-                light: { a: 255, b: 203, g: 185, r: 248 },
-                medium: { a: 255, b: 66, g: 19, r: 185 }
-            };
-
             expect(theme).toHaveProperty('base', expectedBase);
             expect(theme).toHaveProperty('secondary', expectedSecondary);
         });
