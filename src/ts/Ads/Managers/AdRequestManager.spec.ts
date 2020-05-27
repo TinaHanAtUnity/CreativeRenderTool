@@ -595,13 +595,13 @@ class SatisfiesMatcher {
                 expect(campaign).toBeUndefined();
             });
 
-            it('should have not the same campaigns in video2 and rewardedVideo', () => {
+            it('should have the same campaigns in video2 and rewardedVideo', () => {
                 const additionalCampaigns: IPlacementIdMap<INotCachedLoadedCampaign | undefined> = <IPlacementIdMap<INotCachedLoadedCampaign | undefined>>onAdditionalPlacementsReady.mock.calls[0][1];
 
                 const campaign1: Campaign = additionalCampaigns.rewardedVideo!.notCachedCampaign;
                 const campaign2: Campaign = additionalCampaigns.video2!.notCachedCampaign;
 
-                expect(campaign1).not.toBe(campaign2);
+                expect(campaign1).toBe(campaign2);
             });
 
             it('should cache only 1 campaigns', () => {
