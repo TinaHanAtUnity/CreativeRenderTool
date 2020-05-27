@@ -158,23 +158,23 @@ describe('ColorBlurEndScreenTest', () => {
                 .then(done);
         });
 
+        const validateColorTheme = (endScreen: ColorBlurEndScreen) => {
+            endScreen.render();
+            const gameInfoContainer = <HTMLElement>endScreen.container().querySelector('.game-info-container');
+            gameInfoContainer.style.backgroundColor = color;
+            const gameInfoContainerColor = gameInfoContainer.style.backgroundColor;
+            const installContainer = <HTMLElement>endScreen.container().querySelector('.install-container');
+            installContainer.style.color = color;
+            const installContainerColor = installContainer.style.color;
+
+            if (!gameInfoContainerColor || !installContainerColor) {
+                assert.fail(`Couldn't render all the colors`);
+            } else {
+                assert.equal(gameInfoContainerColor, installContainerColor);
+            }
+        };
+
         it('should render with the same color for game info container background and install container text', () => {
-            const validateColorTheme = (endScreen: ColorBlurEndScreen) => {
-                endScreen.render();
-                const gameInfoContainer = <HTMLElement>endScreen.container().querySelector('.game-info-container');
-                gameInfoContainer.style.backgroundColor = color;
-                const gameInfoContainerColor = gameInfoContainer.style.backgroundColor;
-                const installContainer = <HTMLElement>endScreen.container().querySelector('.install-container');
-                installContainer.style.color = color;
-                const installContainerColor = installContainer.style.color;
-
-                if (!gameInfoContainerColor || !installContainerColor) {
-                    assert.fail(`Couldn't render all the colors`);
-                } else {
-                    assert.equal(gameInfoContainerColor, installContainerColor);
-                }
-            };
-
             validateColorTheme(createColorBlurEndScreen('en'));
         });
     });
