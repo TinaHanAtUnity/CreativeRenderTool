@@ -16,7 +16,7 @@ import { ContentTypeHandlerManagerMock, ContentTypeHandlerManager } from 'Ads/Ma
 import { PrivacySDKMock, PrivacySDK } from 'Privacy/__mocks__/PrivacySDK';
 import { UserPrivacyManagerMock, UserPrivacyManager } from 'Ads/Managers/__mocks__/UserPrivacyManager';
 import { GameSessionCounters } from 'Ads/Utilities/GameSessionCounters';
-import { ILoadedCampaign } from 'Ads/Managers/CampaignManager';
+import { ILoadedCampaign, CampaignManager } from 'Ads/Managers/CampaignManager';
 import { Placement, PlacementMock, withAdUnit } from 'Ads/Models/__mocks__/Placement';
 import { CometCampaignParser } from 'Performance/Parsers/CometCampaignParser';
 import { INativeResponse } from 'Core/Managers/RequestManager';
@@ -87,7 +87,12 @@ class SatisfiesMatcher {
             contentTypeHandlerManager = ContentTypeHandlerManager();
             privacySDK = PrivacySDK();
             userPrivacyManager = UserPrivacyManager();
+            CampaignManager.setLoadV5Support(true);
             adRequestManager = new AdRequestManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, contentTypeHandlerManager, privacySDK, userPrivacyManager, LoadV5ExperimentType.None);
+        });
+
+        afterEach(() => {
+            CampaignManager.setLoadV5Support(undefined);
         });
 
         describe('initial state', () => {

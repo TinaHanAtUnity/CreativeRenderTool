@@ -75,9 +75,8 @@ export class LegacyCampaignManager extends CampaignManager {
     private _userPrivacyManager: UserPrivacyManager;
     private _mediationLoadTracking: MediationLoadTrackingManager | undefined;
     private _useChinaAuctionEndpoint: boolean | undefined = false;
-    private _loadV5Support: boolean | undefined;
 
-    constructor(platform: Platform, core: ICore, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, assetManager: AssetManager, sessionManager: SessionManager, adMobSignalFactory: AdMobSignalFactory, request: RequestManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager, cacheBookkeeping: CacheBookkeepingManager, contentTypeHandlerManager: ContentTypeHandlerManager, privacySDK: PrivacySDK, userPrivacyManager: UserPrivacyManager, mediationLoadTracking?: MediationLoadTrackingManager | undefined, loadV5Support?: boolean | undefined) {
+    constructor(platform: Platform, core: ICore, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, assetManager: AssetManager, sessionManager: SessionManager, adMobSignalFactory: AdMobSignalFactory, request: RequestManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager, cacheBookkeeping: CacheBookkeepingManager, contentTypeHandlerManager: ContentTypeHandlerManager, privacySDK: PrivacySDK, userPrivacyManager: UserPrivacyManager, mediationLoadTracking?: MediationLoadTrackingManager | undefined) {
         super();
 
         this._platform = platform;
@@ -99,7 +98,6 @@ export class LegacyCampaignManager extends CampaignManager {
         this._userPrivacyManager = userPrivacyManager;
         this._mediationLoadTracking = mediationLoadTracking;
         this._useChinaAuctionEndpoint = (CustomFeatures.sampleAtGivenPercent(20) && coreConfig.getCountry() === 'CN');
-        this._loadV5Support = loadV5Support;
     }
 
     public request(nofillRetry?: boolean): Promise<INativeResponse | void> {
@@ -142,7 +140,7 @@ export class LegacyCampaignManager extends CampaignManager {
             this._deviceFreeSpace = freeSpace;
             return Promise.all<string, unknown>([
                 CampaignManager.createRequestUrl(this.getBaseUrl(), this._platform, this._clientInfo, this._deviceInfo, this._coreConfig, this._lastAuctionId, nofillRetry),
-                CampaignManager.createRequestBody(this._clientInfo, this._coreConfig, this._deviceInfo, this._userPrivacyManager, this._sessionManager, this._privacy, countersForOperativeEvents, fullyCachedCampaignIds, versionCode, this._adMobSignalFactory, freeSpace, this._metaDataManager, this._adsConfig, this._isLoadEnabled, this.getPreviousPlacementId(), requestPrivacy, legacyRequestPrivacy, nofillRetry, undefined, this._loadV5Support)
+                CampaignManager.createRequestBody(this._clientInfo, this._coreConfig, this._deviceInfo, this._userPrivacyManager, this._sessionManager, this._privacy, countersForOperativeEvents, fullyCachedCampaignIds, versionCode, this._adMobSignalFactory, freeSpace, this._metaDataManager, this._adsConfig, this._isLoadEnabled, this.getPreviousPlacementId(), requestPrivacy, legacyRequestPrivacy, nofillRetry, undefined)
             ]);
         }).then(([requestUrl, requestBody]) => {
             measurement = createMeasurementsInstance(GeneralTimingMetric.AuctionRequest, {
