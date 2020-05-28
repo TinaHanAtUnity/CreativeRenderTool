@@ -34,8 +34,6 @@ export enum AdmobMetric {
     AdmobRewardedVideoStart = 'admob_rewarded_video_start',
     AdmobUserWasRewarded = 'admob_user_was_rewarded',
     AdmobUserSkippedRewardedVideo = 'admob_user_skipped_rewarded_video',
-    AdmobDBMRewardedStarted = 'admob_dbm_rewarded_started',
-    AdmobDBMNonRewardedStarted = 'admob_dbm_nonrewarded_started',
     AdmobVideoCanPlay = 'admob_video_canplay',
     AdmobVideoStarted = 'admob_video_started',
     AdmobOMEnabled = 'admob_om_enabled',
