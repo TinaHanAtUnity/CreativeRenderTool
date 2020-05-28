@@ -158,7 +158,7 @@ export class CustomFeatures {
             '3532031', '3532030', '3532021', '3532020' // Etermax Games
         ];
 
-        return this.existsInList(gameIds, gameId);
+        return this.existsInList(gameIds, gameId) || CustomFeatures.isZyngaDealGame(gameId);
     }
 
     public static useAdUnitSupport(gameId: string): boolean {

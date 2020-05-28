@@ -1,3 +1,9 @@
+# Pending
+
+* [Load V5] Add Zynga games to load v5 [#15531](https://github.com/Applifier/unity-ads-webview/pull/15531)
+* [Load V5] Always invalidate programatic campaigns if Ad Unit is in use. [#15527](https://github.com/Applifier/unity-ads-webview/pull/15527)
+* [AUI] Refactor renderColorTheme for reusability in the ColorBlur experiment [#15365](https://github.com/Applifier/unity-ads-webview/pull/15365)
+
 # Tue May 26 22:09:32 UTC 2020
 
 * Replace IAdUnitParameters with IVideoAdUnitParameters as preparation work for introducing PopupController [#15426](https://github.com/Applifier/unity-ads-webview/pull/15426)
