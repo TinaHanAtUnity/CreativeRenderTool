@@ -676,6 +676,36 @@ import { ProgrammaticMraidParser } from 'MRAID/Parsers/ProgrammaticMraidParser';
                     expect(placements.video_2.setCurrentCampaign).toBeCalledWith(campaign2);
                 });
             });
+
+            describe('invalidate programmatic campaigns', () => {
+                let placement: PlacementMock;
+
+                beforeEach(async () => {
+                    placement = Placement();
+
+                    placement.getCurrentCampaign.mockReturnValue(Campaign(ProgrammaticMraidParser.ContentType));
+                    adsConfiguration.getPlacement.mockReturnValue(placement);
+
+                    await refreshManager.initialize();
+
+                    adRequestManager.onNoFill.subscribe.mock.calls[0][0]('video');
+                });
+
+                it('should reset campaign', () => {
+                    expect(placement.setCurrentCampaign).toBeCalledTimes(1);
+                    expect(placement.setCurrentCampaign).toBeCalledWith(undefined);
+                });
+
+                it('should reset tracking urls', () => {
+                    expect(placement.setCurrentTrackingUrls).toBeCalledTimes(1);
+                    expect(placement.setCurrentTrackingUrls).toBeCalledWith(undefined);
+                });
+
+                it('should reset invalidation pending', () => {
+                    expect(placement.setInvalidationPending).toBeCalledTimes(1);
+                    expect(placement.setInvalidationPending).toHaveBeenNthCalledWith(1, false);
+                });
+            });
         });
     });
 });
