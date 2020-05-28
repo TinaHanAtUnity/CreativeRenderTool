@@ -118,6 +118,7 @@ class SatisfiesMatcher {
             it('should have correct request', () => {
                 expect(request.post).toHaveBeenCalledTimes(1);
                 expect(request.post).toHaveBeenLastCalledWith(expect.anything(), new SatisfiesMatcher({
+                    loadV5Support: true,
                     isLoadEnabled: true,
                     preload: true,
                     load: false,
@@ -390,6 +391,7 @@ class SatisfiesMatcher {
             it('should make request with correct body', () => {
                 expect(request.post).toHaveBeenCalledTimes(3);
                 expect(request.post).toHaveBeenNthCalledWith(2, expect.anything(), new SatisfiesMatcher({
+                    loadV5Support: true,
                     isLoadEnabled: true,
                     preload: false,
                     load: true,
@@ -514,6 +516,7 @@ class SatisfiesMatcher {
             it('should make request with correct body', () => {
                 expect(request.post).toHaveBeenCalledTimes(2);
                 expect(request.post).toHaveBeenNthCalledWith(2, expect.anything(), new SatisfiesMatcher({
+                    loadV5Support: true,
                     isLoadEnabled: true,
                     preload: false,
                     load: true,
@@ -679,6 +682,7 @@ class SatisfiesMatcher {
             it('should make request with correct body', () => {
                 expect(request.post).toHaveBeenCalledTimes(2);
                 expect(request.post).toHaveBeenNthCalledWith(2, expect.anything(), new SatisfiesMatcher({
+                    loadV5Support: true,
                     isLoadEnabled: true,
                     preload: false,
                     load: true,
@@ -774,6 +778,7 @@ class SatisfiesMatcher {
             it('should make request with correct body', () => {
                 expect(request.post).toHaveBeenCalledTimes(2);
                 expect(request.post).toHaveBeenNthCalledWith(2, expect.anything(), new SatisfiesMatcher({
+                    loadV5Support: true,
                     isLoadEnabled: true,
                     preload: false,
                     load: true,
@@ -1292,6 +1297,7 @@ class SatisfiesMatcher {
 
             it('should make request with correct body', () => {
                 expect(request.post).toHaveBeenNthCalledWith(4, expect.anything(), new SatisfiesMatcher({
+                    loadV5Support: true,
                     isLoadEnabled: true,
                     preload: true,
                     load: true,
