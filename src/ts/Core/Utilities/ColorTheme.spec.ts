@@ -9,7 +9,6 @@ import { Color } from 'Core/Utilities/Color';
 describe('ColorTheme', () => {
     const campaignWithImages = new PerformanceCampaignWithImages(new PerformanceCampaign());
     const core = new Core().Api;
-    let theme: IImageColorTheme;
 
     describe('calculateColorThemeForEndCard', () => {
         describe('When calculateColorThemeForEndCard succeeds', () => {
@@ -18,6 +17,8 @@ describe('ColorTheme', () => {
             const secondSwatch = new Swatch([150, 15, 53], 12719);
             swatches.push(firstSwatch);
             swatches.push(secondSwatch);
+
+            let theme: IImageColorTheme;
 
             beforeEach(async () => {
                 (<jest.Mock>ImageAnalysis.getImageSrc).mockResolvedValue('http://cdn-creatives-highwinds-prd.unityads.unity3d.com/assets/0fd53267-0620-4dce-b04f-dd70cecd4990/600x800.png');
