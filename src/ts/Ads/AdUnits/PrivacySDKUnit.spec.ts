@@ -11,7 +11,6 @@ import { AdsConfiguration } from 'Ads/Models/__mocks__/AdsConfiguration';
 import { IPrivacyCompletedParams } from 'Privacy/IPrivacySettings';
 import { AgeGateChoice, AgeGateSource, GDPREventAction, GDPREventSource } from 'Ads/Managers/UserPrivacyManager';
 import { GamePrivacy, UserPrivacy } from 'Privacy/Privacy';
-import { ICoreApi } from 'Core/ICore';
 import { ConsentPage } from 'Ads/Views/Privacy/Privacy';
 
 jest.mock('Ads/Views/Privacy/PrivacySDKView');
@@ -19,21 +18,16 @@ jest.mock('Ads/Views/Privacy/PrivacySDKView');
 describe('PrivacySDKUnit', () => {
     describe('onPrivacyCompleted callback', () => {
         describe('when callback contains error', () => {
-            let core: ICoreApi;
-
             let privacySDKUnit: PrivacySDKUnit;
             let params: IPrivacyUnitParameters;
 
             beforeEach(() => {
-                core = new Core().Api;
-                core.Sdk.logError = jest.fn();
-
                 params = {
                     abGroup: new CoreConfiguration().getAbGroup(),
                     adsConfig: new AdsConfiguration(),
                     deviceInfo: new DeviceInfo(),
                     platform: Platform.TEST,
-                    core,
+                    core: new Core().Api,
                     requestManager: new RequestManager(),
                     privacyManager: new UserPrivacyManager(),
                     adUnitContainer: new AdUnitContainer(),
