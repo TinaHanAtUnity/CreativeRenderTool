@@ -1,9 +1,9 @@
 jest.mock('Performance/Utilities/ImageAnalysis');
 import { Core } from 'Core/__mocks__/Core';
 import { PerformanceCampaignWithImages, PerformanceCampaign } from 'Performance/Models/__mocks__/PerformanceCampaign';
-import { ColorTheme, IImageColorTheme } from 'Core/Utilities/ColorTheme.ts';
+import { ColorTheme, IImageColorTheme } from 'Core/Utilities/ColorTheme';
 import { ImageAnalysis } from 'Performance/Utilities/ImageAnalysis';
-import { Swatch, IColorTheme } from 'Performance/Utilities/Swatch';
+import { Swatch } from 'Performance/Utilities/Swatch';
 import { Color } from 'Core/Utilities/Color';
 
 describe('ColorTheme', () => {
@@ -44,6 +44,7 @@ describe('ColorTheme', () => {
                 light: new Color(248, 185, 203, 255),
                 medium: new Color(185, 19, 66, 255)
             };
+
             expect(theme).toHaveProperty('secondary', expectedSecondary);
         });
     });
