@@ -95,7 +95,7 @@ export class PerPlacementLoadManagerV5 extends PerPlacementLoadManager {
                 const campaign = placement.getCurrentCampaign();
 
                 if (campaign && campaign.isExpired()) {
-                    SDKMetrics.reportMetricEvent(LoadV5.RefreshManagerCampaignExpired);
+                    this._adRequestManager.reportMetricEvent(LoadV5.RefreshManagerCampaignExpired);
                     placement.setCurrentCampaign(undefined);
                     this.setPlacementState(placement.getId(), PlacementState.NOT_AVAILABLE);
                 }
@@ -173,7 +173,7 @@ export class PerPlacementLoadManagerV5 extends PerPlacementLoadManager {
 
             // Invalidate only Direct Demand campaigns, we would like to show old programmatic campaign.
             if (shouldInvalidate) {
-                SDKMetrics.reportMetricEvent(LoadV5.RefreshManagerCampaignFailedToInvalidate);
+                this._adRequestManager.reportMetricEvent(LoadV5.RefreshManagerCampaignFailedToInvalidate);
                 placement.setCurrentCampaign(undefined);
                 placement.setCurrentTrackingUrls(undefined);
                 this.setPlacementState(placementId, PlacementState.NO_FILL);

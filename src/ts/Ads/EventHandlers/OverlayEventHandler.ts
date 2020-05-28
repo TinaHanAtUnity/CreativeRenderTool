@@ -1,6 +1,5 @@
-import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
 import { ViewConfiguration } from 'Ads/AdUnits/Containers/AdUnitContainer';
-import { VideoAdUnit, VideoState } from 'Ads/AdUnits/VideoAdUnit';
+import { IVideoAdUnitParameters, VideoAdUnit, VideoState } from 'Ads/AdUnits/VideoAdUnit';
 import { GDPREventHandler } from 'Ads/EventHandlers/GDPREventHandler';
 import { IAdsApi } from 'Ads/IAds';
 import { IOperativeSkipEventParams, OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
@@ -22,7 +21,7 @@ export class OverlayEventHandler<T extends Campaign> extends GDPREventHandler im
 
     private _adUnitStyle?: AdUnitStyle;
 
-    constructor(adUnit: VideoAdUnit<T>, parameters: IAdUnitParameters<T>, adUnitStyle?: AdUnitStyle) {
+    constructor(adUnit: VideoAdUnit<T>, parameters: IVideoAdUnitParameters<T>, adUnitStyle?: AdUnitStyle) {
         super(parameters.privacyManager, parameters.coreConfig, parameters.adsConfig, parameters.privacySDK);
         this._ads = parameters.ads;
         this._operativeEventManager = parameters.operativeEventManager;
