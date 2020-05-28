@@ -7,7 +7,6 @@ import { IExperimentActionChoice } from 'MabExperimentation/Models/AutomatedExpe
 import { ButtonExperimentDeclaration, ButtonAnimationsExperiment } from 'MabExperimentation/Models/AutomatedExperimentsList';
 import { AUIMetric, SDKMetrics } from 'Ads/Utilities/SDKMetrics';
 import { Color } from 'Core/Utilities/Color';
-import { ImageAnalysis } from 'Performance/Utilities/ImageAnalysis';
 import { IColorTheme } from 'Performance/Utilities/Swatch';
 import { ColorTheme } from 'Core/Utilities/ColorTheme';
 
@@ -77,14 +76,12 @@ export class AnimatedDownloadButtonEndScreen extends PerformanceEndScreen {
             }
         }
         if (this._tintColor) {
-            const colorTheme = ColorTheme.renderColorTheme(this._campaign, this._core);
-
-            colorTheme
+            ColorTheme.calculateColorThemeForEndCard(this._campaign, this._core)
                 .then((theme) => {
-                    this.applyColorTheme(theme.baseColorTheme, theme.secondaryColorTheme);
+                    this.applyColorTheme(theme.base, theme.secondary);
                 })
                 .catch((error) => {
-                    SDKMetrics.reportMetricEvent(error.message);
+                    SDKMetrics.reportMetricEvent(error.tag);
                 });
         }
     }
