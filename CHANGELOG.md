@@ -1,4 +1,4 @@
-# Pending
+# Thu May 28 23:11:17 UTC 2020
 
 * [Load V5] Add load v5 support flag to ad request body [#15528](https://github.com/Applifier/unity-ads-webview/pull/15528)
 * [Load V5] Add Zynga games to load v5 [#15531](https://github.com/Applifier/unity-ads-webview/pull/15531)
