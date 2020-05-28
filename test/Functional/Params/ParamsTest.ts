@@ -38,7 +38,6 @@ import { ClientInfo } from 'Core/Models/ClientInfo';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { SDKMetrics } from 'Ads/Utilities/SDKMetrics';
-import { CampaignManager } from 'Ads/Managers/CampaignManager';
 
 export class SpecVerifier {
     private _platform: Platform;
@@ -282,7 +281,6 @@ describe('Event parameters should match specifications', () => {
 
         afterEach(() => {
             sandbox.restore();
-            CampaignManager.setLoadV5Support(undefined);
         });
 
         it('on Android', () => {
@@ -312,8 +310,7 @@ describe('Event parameters should match specifications', () => {
             sandbox.stub(sessionManager, 'startNewSession').returns(Promise.resolve(new Session('abdce-12345')));
             sandbox.stub(RequestPrivacyFactory, 'create').returns(<IRequestPrivacy>{});
             sessionManager.setGameSessionId(1234);
-            CampaignManager.setLoadV5Support(true);
-            const campaignManager: LegacyCampaignManager = new LegacyCampaignManager(platform, coreModule, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, privacySDK, privacyManager, undefined);
+            const campaignManager: LegacyCampaignManager = new LegacyCampaignManager(platform, coreModule, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, privacySDK, privacyManager, undefined, true);
             return campaignManager.request().then(() => {
                 const url: string = requestSpy.getCall(0).args[0];
                 const body: string = requestSpy.getCall(0).args[1];
@@ -349,8 +346,7 @@ describe('Event parameters should match specifications', () => {
             sandbox.stub(core.DeviceInfo, 'getUniqueEventId').returns(Promise.resolve('abdce-12345'));
             sandbox.stub(sessionManager, 'startNewSession').returns(Promise.resolve(new Session('abdce-12345')));
             sessionManager.setGameSessionId(1234);
-            CampaignManager.setLoadV5Support(true);
-            const campaignManager: LegacyCampaignManager = new LegacyCampaignManager(platform, coreModule, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, privacySDK, privacyManager, undefined);
+            const campaignManager: LegacyCampaignManager = new LegacyCampaignManager(platform, coreModule, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, privacySDK, privacyManager, undefined, true);
             return campaignManager.request().then(() => {
                 const url: string = requestSpy.getCall(0).args[0];
                 const body: string = requestSpy.getCall(0).args[1];

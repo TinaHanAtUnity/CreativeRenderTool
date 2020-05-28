@@ -37,10 +37,6 @@ export interface ILoadedCampaign {
 
 export abstract class CampaignManager {
 
-    public static setLoadV5Support(loadV5Support: boolean | undefined) {
-        CampaignManager.LoadV5Support = loadV5Support;
-    }
-
     public static setCampaignId(campaignId: string) {
         CampaignManager.CampaignId = campaignId;
     }
@@ -76,7 +72,6 @@ export abstract class CampaignManager {
     protected static CampaignId: string | undefined;
     protected static SessionId: string | undefined;
     protected static Country: string | undefined;
-    protected static LoadV5Support: boolean | undefined;
 
     private _previousPlacementId: string | undefined;
 
@@ -200,7 +195,7 @@ export abstract class CampaignManager {
     }
 
     // todo: refactor requestedPlacement to something more sensible
-    public static createRequestBody(clientInfo: ClientInfo, coreConfig: CoreConfiguration, deviceInfo: DeviceInfo, userPrivacyManager: UserPrivacyManager, sessionManager: SessionManager, privacy: PrivacySDK, gameSessionCounters: IGameSessionCounters | undefined, fullyCachedCampaignIds: string[] | undefined, versionCode: number | undefined, adMobSignalFactory: AdMobSignalFactory, freeSpace: number, metaDataManager: MetaDataManager, adsConfig: AdsConfiguration, isLoadEnabled: boolean, previousPlacementId?: string, requestPrivacy?: IRequestPrivacy, legacyRequestPrivacy?: ILegacyRequestPrivacy, nofillRetry?: boolean, requestedPlacement?: Placement): Promise<unknown> {
+    public static createRequestBody(clientInfo: ClientInfo, coreConfig: CoreConfiguration, deviceInfo: DeviceInfo, userPrivacyManager: UserPrivacyManager, sessionManager: SessionManager, privacy: PrivacySDK, gameSessionCounters: IGameSessionCounters | undefined, fullyCachedCampaignIds: string[] | undefined, versionCode: number | undefined, adMobSignalFactory: AdMobSignalFactory, freeSpace: number, metaDataManager: MetaDataManager, adsConfig: AdsConfiguration, isLoadEnabled: boolean, previousPlacementId?: string, requestPrivacy?: IRequestPrivacy, legacyRequestPrivacy?: ILegacyRequestPrivacy, nofillRetry?: boolean, requestedPlacement?: Placement, loadV5Support?: boolean): Promise<unknown> {
         const measurement = createMeasurementsInstance(GeneralTimingMetric.AuctionRequest);
         const placementRequest: { [key: string]: unknown } = {};
 
@@ -331,8 +326,8 @@ export abstract class CampaignManager {
                     body.developerId = developerId;
                 }
 
-                if (CampaignManager.LoadV5Support) {
-                    body.loadV5Support = CampaignManager.LoadV5Support;
+                if (loadV5Support) {
+                    body.loadV5Support = loadV5Support;
                 }
 
                 measurement.measure('body_generation');
