@@ -1,3 +1,7 @@
+# Pending
+
+* [AUI] Refactor renderColorTheme for reusability in the ColorBlur experiment [#15365](https://github.com/Applifier/unity-ads-webview/pull/15365)
+
 # Tue May 26 22:09:32 UTC 2020
 
 * Replace IAdUnitParameters with IVideoAdUnitParameters as preparation work for introducing PopupController [#15426](https://github.com/Applifier/unity-ads-webview/pull/15426)
