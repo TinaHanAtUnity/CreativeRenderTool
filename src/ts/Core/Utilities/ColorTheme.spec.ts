@@ -1,7 +1,7 @@
 jest.mock('Performance/Utilities/ImageAnalysis');
 import { Core } from 'Core/__mocks__/Core';
 import { PerformanceCampaignWithImages, PerformanceCampaign } from 'Performance/Models/__mocks__/PerformanceCampaign';
-import { ColorTheme, IImageColorTheme } from 'Core/Utilities/ColorTheme.ts';
+import { ColorTheme, IImageColorTheme } from 'Core/Utilities/ColorTheme';
 import { ImageAnalysis } from 'Performance/Utilities/ImageAnalysis';
 import { Swatch } from 'Performance/Utilities/Swatch';
 import { Color } from 'Core/Utilities/Color';

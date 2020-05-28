@@ -7,7 +7,6 @@ import { IExperimentActionChoice } from 'MabExperimentation/Models/AutomatedExpe
 import { ButtonExperimentDeclaration, ButtonAnimationsExperiment } from 'MabExperimentation/Models/AutomatedExperimentsList';
 import { AUIMetric, SDKMetrics } from 'Ads/Utilities/SDKMetrics';
 import { Color } from 'Core/Utilities/Color';
-import { ImageAnalysis } from 'Performance/Utilities/ImageAnalysis';
 import { IColorTheme } from 'Performance/Utilities/Swatch';
 import { ColorTheme } from 'Core/Utilities/ColorTheme';
 
