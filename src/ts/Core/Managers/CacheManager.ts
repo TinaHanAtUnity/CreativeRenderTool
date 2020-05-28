@@ -310,8 +310,10 @@ export class CacheManager {
     private onDownloadEnd(url: string, size: number, totalSize: number, duration: number, responseCode: number, headers: HeadersType): void {
         this.updateProgress(size, true);
 
-        // Send caching speed in KB/sec
-        SDKMetrics.reportTimingEvent(GeneralTimingMetric.CacheSpeed, size / duration / 1024);
+        if (duration > 0) {
+            // Send caching speed in KB/sec
+            SDKMetrics.reportTimingEvent(GeneralTimingMetric.CacheSpeed, size / duration / 1024);
+        }
 
         const callback = this._callbacks[url];
         if (callback) {
