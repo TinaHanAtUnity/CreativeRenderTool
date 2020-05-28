@@ -151,9 +151,9 @@ describe('ColorBlurEndScreenTest', () => {
             // tslint:disable:no-invalid-this
             this.timeout(15000);
             // tslint:enable
-            ColorTheme.renderColorTheme(campaign, core)
+            ColorTheme.calculateColorThemeForEndCard(campaign, core)
                 .then((theme) => {
-                    color = theme.baseColorTheme.medium.toCssRgb();
+                    color = theme.base.medium.toCssRgb();
                 })
                 .then(done);
         });

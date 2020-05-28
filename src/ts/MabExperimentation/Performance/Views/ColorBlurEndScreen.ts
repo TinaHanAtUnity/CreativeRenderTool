@@ -24,15 +24,14 @@ export class ColorBlurEndScreen extends PerformanceEndScreen {
 
     public render(): void {
         super.render();
-        const colorTheme = ColorTheme.renderColorTheme(this._campaign, this._core);
 
-        colorTheme
-            .then((theme) => {
-                this.applyColorTheme(theme.baseColorTheme);
-            })
-            .catch((error) => {
-                SDKMetrics.reportMetricEvent(error.message);
-            });
+        ColorTheme.calculateColorThemeForEndCard(this._campaign, this._core)
+                .then((theme) => {
+                    this.applyColorTheme(theme.base);
+                })
+                .catch((error) => {
+                    SDKMetrics.reportMetricEvent(error.tag);
+                });
     }
 
     private applyColorTheme(baseColorTheme: IColorTheme): void {
