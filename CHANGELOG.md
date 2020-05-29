@@ -1,7 +1,7 @@
 # Pending
 
 * [AdUnit] Add 4 games for ad unit experiment [#15624](https://github.com/Applifier/unity-ads-webview/pull/15624)
-* [BugFix] Fix double click events fired on iOS UI
+* [BugFix] Fix double click events fired on iOS UI [#15623](https://github.com/Applifier/unity-ads-webview/pull/15623)
 * [Metric Refactoring] Refactor time measurement to stopwatch [#14411](https://github.com/Applifier/unity-ads-webview/pull/14411)
 * [Load V5] Add loadV5Support flag to operative events [#15621](https://github.com/Applifier/unity-ads-webview/pull/15621)
 * [Load V5, Ad Unit] Baseline for ad unit experiment [#15622](https://github.com/Applifier/unity-ads-webview/pull/15622)
