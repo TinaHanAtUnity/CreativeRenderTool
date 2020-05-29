@@ -1,5 +1,6 @@
 # Pending
 
+* Add support for data url in external end screen [#15524](https://github.com/Applifier/unity-ads-webview/pull/15524)
 * Add getDataUrl to XHRequest.ts [#15523](https://github.com/Applifier/unity-ads-webview/pull/15523)
 
 # Thu May 28 23:11:17 UTC 2020
