@@ -1,4 +1,4 @@
-# Pending
+# Fri May 29 23:04:47 UTC 2020
 
 * Remove Legacy Load API Whitelist [#15625](https://github.com/Applifier/unity-ads-webview/pull/15625)
 * [AdUnit] Add 4 games for ad unit experiment [#15624](https://github.com/Applifier/unity-ads-webview/pull/15624)
