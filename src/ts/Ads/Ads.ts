@@ -331,8 +331,7 @@ export class Ads implements IAds {
             }
         }
 
-        const loadV5Support = this._loadApiEnabled && CustomFeatures.isLoadV5Game(this._core.ClientInfo.getGameId());
-        this.CampaignManager = new LegacyCampaignManager(this._core.NativeBridge.getPlatform(), this._core, this._core.Config, this.Config, this.AssetManager, this.SessionManager, this.AdMobSignalFactory, this._core.RequestManager, this._core.ClientInfo, this._core.DeviceInfo, this._core.MetaDataManager, this._core.CacheBookkeeping, this.ContentTypeHandlerManager, this.PrivacySDK, this.PrivacyManager, this.MediationLoadTrackingManager, loadV5Support);
+        this.CampaignManager = new LegacyCampaignManager(this._core.NativeBridge.getPlatform(), this._core, this._core.Config, this.Config, this.AssetManager, this.SessionManager, this.AdMobSignalFactory, this._core.RequestManager, this._core.ClientInfo, this._core.DeviceInfo, this._core.MetaDataManager, this._core.CacheBookkeeping, this.ContentTypeHandlerManager, this.PrivacySDK, this.PrivacyManager, this.MediationLoadTrackingManager, this.isLoadV5Supported());
     }
 
     private configureAutomatedExperimentManager() {
@@ -586,7 +585,7 @@ export class Ads implements IAds {
 
             const orientation = screenWidth >= screenHeight ? Orientation.LANDSCAPE : Orientation.PORTRAIT;
             AbstractPrivacy.createBuildInformation(this._core.NativeBridge.getPlatform(), this._core.ClientInfo, this._core.DeviceInfo, campaign, this._core.Config);
-            this._currentAdUnit = this.getAdUnitFactory(campaign).create(campaign, placement, orientation, playerMetadataServerId || '', options);
+            this._currentAdUnit = this.getAdUnitFactory(campaign).create(campaign, placement, orientation, playerMetadataServerId || '', options, this.isLoadV5Supported());
             this.RefreshManager.setCurrentAdUnit(this._currentAdUnit, placement);
             if (this.Monetization.isInitialized()) {
                 this.Monetization.PlacementContentManager.setCurrentAdUnit(placement.getId(), this._currentAdUnit);
@@ -815,6 +814,12 @@ export class Ads implements IAds {
         const loadV5Game = CustomFeatures.isLoadV5Game(this._core.ClientInfo.getGameId());
 
         return (loadV5Test && loadV5Game) || this._forceLoadV5;
+    }
+
+    private isLoadV5Supported(): boolean {
+        const loadV5Game = CustomFeatures.isLoadV5Game(this._core.ClientInfo.getGameId());
+
+        return (this._loadApiEnabled && loadV5Game) || this._forceLoadV5;
     }
 
     private useAdUnitSupport(): boolean {
