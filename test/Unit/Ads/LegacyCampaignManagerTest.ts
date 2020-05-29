@@ -157,6 +157,7 @@ describe('LegacyCampaignManager', () => {
         sinon.stub(SDKMetrics, 'reportMetricEvent');
         sinon.stub(SDKMetrics, 'reportTimingEvent');
         sinon.stub(SDKMetrics, 'reportMetricEventWithTags');
+        sinon.stub(SDKMetrics, 'reportTimingEventWithTags');
         contentTypeHandlerManager = new ContentTypeHandlerManager();
         adUnitParametersFactory = sinon.createStubInstance(AbstractAdUnitParametersFactory);
         userPrivacyManager = new UserPrivacyManager(platform, core.Api, coreConfig, adsConfig, clientInfo, deviceInfo, request, privacySDK);
