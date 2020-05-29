@@ -146,29 +146,6 @@ describe('CustomFeatures', () => {
         });
     });
 
-    describe('isWhitelistedForLoadApi', () => {
-        const tests: {
-            gameId: string;
-            expected: boolean;
-        }[] = [{
-            gameId: '2924747',
-            expected: true
-        }, {
-            gameId: '292474799999',
-            expected: false
-        }, {
-            gameId: 'scott',
-            expected: false
-        }];
-
-        tests.forEach(t => {
-            it('should match the expected value', () => {
-                const value = CustomFeatures.isWhiteListedForLoadApi(t.gameId);
-                assert.equal(value, t.expected);
-            });
-        });
-    });
-
     describe('isFanateeExtermaxGameForLoad', () => {
         const tests: {
             gameId: string;
