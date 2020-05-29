@@ -1,5 +1,6 @@
 # Pending
 
+* [Metric Refactoring] Refactor time measurement to stopwatch [#14411](https://github.com/Applifier/unity-ads-webview/pull/14411)
 * [Load V5] Add loadV5Support flag to operative events [#15621](https://github.com/Applifier/unity-ads-webview/pull/15621)
 * [Load V5, Ad Unit] Baseline for ad unit experiment [#15622](https://github.com/Applifier/unity-ads-webview/pull/15622)
 * [Open Measurement] Clean up Admob unused metrics [#15532](https://github.com/Applifier/unity-ads-webview/pull/15532)
