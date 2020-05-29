@@ -41,10 +41,13 @@ describe('VastAdUnitPopupEventHandler', () => {
     let vastOMController: VastOpenMeasurementControllerMock;
     let oMAdViewBuilder: OpenMeasurementAdViewBuilderMock;
     let testRectangle: IRectangle;
+    const testViewPort = { height: 10, width: 10 };
 
     beforeEach(() => {
-        vastOMController = new VastOpenMeasurementController();
         oMAdViewBuilder = new OpenMeasurementAdViewBuilder();
+        oMAdViewBuilder.getViewPort = jest.fn().mockReturnValue(testViewPort);
+
+        vastOMController = new VastOpenMeasurementController();
         vastOMController.getOMAdViewBuilder = jest.fn().mockReturnValue(oMAdViewBuilder);
         vastOMController.geometryChange = jest.fn();
 
@@ -82,31 +85,42 @@ describe('VastAdUnitPopupEventHandler', () => {
     });
 
     describe('when calling onPopupClosed', () => {
-        const resolvedPromise = Promise.resolve([]);
 
-        beforeEach(() => {
+        beforeEach(async () => {
+            const resolvedPromise = Promise.resolve({});
             oMAdViewBuilder.buildVastAdView = jest.fn().mockReturnValue(resolvedPromise);
             vastAdUnitPopupEventHandler.onPopupClosed();
+
+            await resolvedPromise;
         });
 
         it('should build VAST ad view', () => {
             expect(oMAdViewBuilder.buildVastAdView).toHaveBeenCalledWith([], adUnit);
         });
+
+        it('should call geometryChange', () => {
+            expect(vastOMController.geometryChange).toHaveBeenCalledWith(testViewPort, {});
+        });
     });
 
     describe('when calling onPopupVisible', () => {
-        const resolvedPromise = Promise.resolve([]);
 
-        beforeEach(() => {
+        beforeEach(async () => {
+            const resolvedPromise = Promise.resolve({});
             oMAdViewBuilder.buildVastAdView = jest.fn().mockReturnValue(resolvedPromise);
             const testElement = document.createElement('div');
-
             document.querySelector = jest.fn().mockReturnValue(testElement);
+
             vastAdUnitPopupEventHandler.onPopupVisible();
+            await resolvedPromise;
         });
 
         it('should build VAST ad view', () => {
             expect(oMAdViewBuilder.buildVastAdView).toHaveBeenCalledWith([ObstructionReasons.OBSTRUCTED], adUnit, testRectangle);
+        });
+
+        it('should call geometryChange', () => {
+            expect(vastOMController.geometryChange).toHaveBeenCalledWith(testViewPort, {});
         });
     });
 });
