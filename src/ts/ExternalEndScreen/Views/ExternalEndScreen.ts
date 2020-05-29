@@ -222,12 +222,6 @@ export class ExternalEndScreen extends View<IEndScreenHandler> implements IPriva
                 });
             }
         }
-
-        // Before 2.1.0
-        // return XHRequest.getDataUrl(originalUrl).catch(() => {
-        //      SDKMetrics.reportMetricEvent(ExternalEndScreenMetric.UnableToGetDataUrl);
-        //      return originalUrl;
-        // });
     }
 
     private getParameters(): Promise<IExternalEndScreenUrlParameters> {
