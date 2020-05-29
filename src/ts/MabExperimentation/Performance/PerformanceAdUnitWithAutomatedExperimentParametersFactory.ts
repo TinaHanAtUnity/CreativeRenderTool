@@ -13,7 +13,6 @@ import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { VideoOverlay } from 'Ads/Views/VideoOverlay';
 import { SwipeUpVideoOverlay } from 'Ads/Views/SwipeUpVideoOverlay';
 import { IExperimentActionChoice } from 'MabExperimentation/Models/AutomatedExperiment';
-import { ExternalEndScreen } from 'ExternalEndScreen/Views/ExternalEndScreen';
 
 export class PerformanceAdUnitWithAutomatedExperimentParametersFactory extends PerformanceAdUnitParametersFactory {
     private _automatedExperimentManager: AutomatedExperimentManager;
@@ -41,11 +40,9 @@ export class PerformanceAdUnitWithAutomatedExperimentParametersFactory extends P
 
         const endScreenCombination: IExperimentActionChoice | undefined = this._automatedExperimentManager.activateSelectedExperiment(baseParams.campaign, AutomatedExperimentsCategories.PERFORMANCE_ENDCARD);
 
-        let endScreen: AnimatedDownloadButtonEndScreen | ColorBlurEndScreen | ExternalEndScreen;
+        let endScreen: AnimatedDownloadButtonEndScreen | ColorBlurEndScreen;
 
-        if (this._campaign.getEndScreen()) {
-            endScreen = new ExternalEndScreen(endScreenCombination, endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
-        } else if (endScreenCombination && endScreenCombination.scheme === ButtonExperimentDeclaration.scheme.COLORBLUR) {
+         if (endScreenCombination && endScreenCombination.scheme === ButtonExperimentDeclaration.scheme.COLORBLUR) {
             endScreen = new ColorBlurEndScreen(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
         } else {
             endScreen = new AnimatedDownloadButtonEndScreen(
