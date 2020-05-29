@@ -324,8 +324,15 @@ export class Ads implements IAds {
         if (this._loadApiEnabled && this._webViewEnabledLoad) {
             if (this.isLoadV5Enabled()) {
                 const useAdUnits = this.useAdUnitSupport();
+                const adUnitGame = CustomFeatures.useAdUnitSupport(this._core.ClientInfo.getGameId());
 
-                this.AdRequestManager = new AdRequestManager(this._core.NativeBridge.getPlatform(), this._core, this._core.Config, this.Config, this.AssetManager, this.SessionManager, this.AdMobSignalFactory, this._core.RequestManager, this._core.ClientInfo, this._core.DeviceInfo, this._core.MetaDataManager, this._core.CacheBookkeeping, this.ContentTypeHandlerManager, this.PrivacySDK, this.PrivacyManager, useAdUnits ? LoadV5ExperimentType.AdUnit : LoadV5ExperimentType.None);
+                let experiment = LoadV5ExperimentType.None;
+
+                if (adUnitGame) {
+                    experiment = useAdUnits ? LoadV5ExperimentType.AdUnit : LoadV5ExperimentType.BaseAdUnit;
+                }
+
+                this.AdRequestManager = new AdRequestManager(this._core.NativeBridge.getPlatform(), this._core, this._core.Config, this.Config, this.AssetManager, this.SessionManager, this.AdMobSignalFactory, this._core.RequestManager, this._core.ClientInfo, this._core.DeviceInfo, this._core.MetaDataManager, this._core.CacheBookkeeping, this.ContentTypeHandlerManager, this.PrivacySDK, this.PrivacyManager, experiment);
                 this.CampaignManager = this.AdRequestManager;
                 return;
             }
