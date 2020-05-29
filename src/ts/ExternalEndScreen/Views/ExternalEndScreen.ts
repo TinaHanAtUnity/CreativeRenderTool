@@ -10,9 +10,10 @@ import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
 import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
 import { Observable0 } from 'Core/Utilities/Observable';
 import { IObserver0 } from 'Core/Utilities/IObserver';
-import { ImageAnalysis } from 'Performance/Utilities/ImageAnalysis';
 import { Image } from 'Ads/Models/Assets/Image';
 import { ExternalEndScreenMetric, SDKMetrics } from 'Ads/Utilities/SDKMetrics';
+import { Platform } from 'Core/Constants/Platform';
+import { XHRequest } from 'Core/Utilities/XHRequest';
 
 interface IExternalEndScreenUrlParameters {
     gameIcon: string | undefined;
@@ -195,9 +196,37 @@ export class ExternalEndScreen extends View<IEndScreenHandler> implements IPriva
         this._handlers.forEach(handler => handler.onEndScreenClose());
     }
 
+    // The iframe cannot load images from cache url.
+    // Cache API is only available with 2.1.0 and works only on ios for this purpose.
+    private getImage(image: Image): Promise<string | undefined> {
+        const originalUrl = image.getOriginalUrl();
+
+        // After 2.1.0
+        const imageExt = originalUrl.split('.').pop();
+
+        const dataUrl = (rawData: string) => `data:image/${imageExt};base64,${rawData}`;
+
+        if (this._platform === Platform.ANDROID) {
+            return XHRequest.getDataUrl(image.getUrl()).catch(() => {
+                SDKMetrics.reportMetricEvent(ExternalEndScreenMetric.UnableToGetDataUrl);
+                return originalUrl;
+            });
+        } else {
+            const fileId = image.getFileId();
+            if (fileId) {
+                return this._core.Cache.getFileContent(fileId, 'Base64').then(dataUrl);
+            } else {
+                return XHRequest.getDataUrl(image.getOriginalUrl()).catch(() => {
+                    SDKMetrics.reportMetricEvent(ExternalEndScreenMetric.UnableToGetDataUrl);
+                    return originalUrl;
+                });
+            }
+        }
+    }
+
     private getParameters(): Promise<IExternalEndScreenUrlParameters> {
         const getImage = (image: Image | undefined) => image
-            ? ImageAnalysis.getImageSrc(this._core.Cache, image)
+            ? this.getImage(image)
             : Promise.resolve(undefined);
 
         return Promise.all([
