@@ -163,7 +163,7 @@ export class CustomFeatures {
 
     public static useAdUnitSupport(gameId: string): boolean {
         const gameIds = [
-            '3578767', '3578766', '3486365', '3486364'
+            '3578767', '3578766', '3486365', '3486364', '3211592', '3079031', '1566453', '1434564'
         ];
 
         return this.existsInList(gameIds, gameId);
