@@ -72,8 +72,12 @@ describe('VideoAdUnitPopupEventHandler', () => {
             });
 
             it('the video play method should be called', () => {
-                expect(adUnit.setVideoState).toHaveBeenCalledWith(VideoState.PLAYING);
                 expect(baseParams.ads.VideoPlayer.play).toHaveBeenCalledTimes(1);
+
+            });
+
+            it('the video state should be set to playing', () => {
+                expect(adUnit.setVideoState).toHaveBeenCalledWith(VideoState.PLAYING);
 
             });
         });
@@ -83,9 +87,13 @@ describe('VideoAdUnitPopupEventHandler', () => {
                 videoAdUnitPopupEventHandler.onShowPopup();
             });
 
-            it('the video play method should be called', () => {
-                expect(adUnit.setVideoState).toHaveBeenCalledWith(VideoState.PAUSED);
+            it('the video pause method should be called', () => {
                 expect(baseParams.ads.VideoPlayer.pause).toHaveBeenCalledTimes(1);
+
+            });
+
+            it('the video state should be set to paused', () => {
+                expect(adUnit.setVideoState).toHaveBeenCalledWith(VideoState.PAUSED);
 
             });
         });

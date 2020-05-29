@@ -60,7 +60,6 @@ describe('PopupController', () => {
     describe('when calling onPrivacyClose after showing privacy view', () => {
         beforeEach(() => {
             popupController.show();
-            expect(popupController.isShowing()).toBe(true);
             popupController.onPrivacyClose();
         });
 
