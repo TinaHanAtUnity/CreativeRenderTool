@@ -1265,14 +1265,14 @@ describe('LegacyCampaignManager', () => {
                 assert.deepEqual(noFillPlacements, ['mraid'], 'mraid placement did not properly receive no fill event');
 
                 const startEvent: string = 'start';
-                assert.deepEqual(premiumTrackingUrls[startEvent], ['https://tracking.prd.mz.internal.unity3d.com/impression/%ZONE%?data=randomData&test=0', 'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=start&test=0'], 'incorrect premium placement start tracking URLs');
-                assert.deepEqual(videoTrackingUrls[startEvent], ['https://tracking.prd.mz.internal.unity3d.com/impression/%ZONE%?data=randomData&test=2', 'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=start&test=2'], 'incorrect video placement start tracking URLs');
-                assert.deepEqual(rewardedTrackingUrls[startEvent], ['https://tracking.prd.mz.internal.unity3d.com/impression/%ZONE%?data=randomData&test=1', 'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=start&test=1'], 'incorrect rewardedVideoZone placement start tracking URLs');
+                assert.deepEqual(premiumTrackingUrls[startEvent], ['https://tracking.stg.mz.internal.unity3d.com/impression/%ZONE%?data=randomData&test=0', 'https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=start&test=0'], 'incorrect premium placement start tracking URLs');
+                assert.deepEqual(videoTrackingUrls[startEvent], ['https://tracking.stg.mz.internal.unity3d.com/impression/%ZONE%?data=randomData&test=2', 'https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=start&test=2'], 'incorrect video placement start tracking URLs');
+                assert.deepEqual(rewardedTrackingUrls[startEvent], ['https://tracking.stg.mz.internal.unity3d.com/impression/%ZONE%?data=randomData&test=1', 'https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=start&test=1'], 'incorrect rewardedVideoZone placement start tracking URLs');
 
                 const clickEvent: string = 'click';
-                assert.deepEqual(premiumTrackingUrls[clickEvent], ['https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=click&test=0'], 'incorrect premium placement click tracking URL');
-                assert.deepEqual(videoTrackingUrls[clickEvent], ['https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=click&test=2'], 'incorrect video placement click tracking URL');
-                assert.deepEqual(rewardedTrackingUrls[clickEvent], ['https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=click&test=1'], 'incorrect rewarded placement click tracking URL');
+                assert.deepEqual(premiumTrackingUrls[clickEvent], ['https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=click&test=0'], 'incorrect premium placement click tracking URL');
+                assert.deepEqual(videoTrackingUrls[clickEvent], ['https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=click&test=2'], 'incorrect video placement click tracking URL');
+                assert.deepEqual(rewardedTrackingUrls[clickEvent], ['https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=click&test=1'], 'incorrect rewarded placement click tracking URL');
             });
         });
     });
@@ -1310,7 +1310,7 @@ describe('LegacyCampaignManager', () => {
                     assert.isDefined(loadedCampaign.campaign);
                     assert.isTrue(loadedCampaign.campaign.isLoadEnabled(), 'isLoadEnabled was not set to true');
                     assert.isDefined(loadedCampaign.trackingUrls);
-                    assert.deepEqual(loadedCampaign.trackingUrls[TrackingEvent.START], ['https://tracking.prd.mz.internal.unity3d.com/impression/%ZONE%?data=randomData&test=0', 'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=start&test=0']);
+                    assert.deepEqual(loadedCampaign.trackingUrls[TrackingEvent.START], ['https://tracking.stg.mz.internal.unity3d.com/impression/%ZONE%?data=randomData&test=0', 'https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=start&test=0']);
                 } else {
                     assert.fail();
                 }

@@ -1,5 +1,15 @@
-# Pending
+# Thu May 28 23:11:17 UTC 2020
 
+* [Load V5] Add load v5 support flag to ad request body [#15528](https://github.com/Applifier/unity-ads-webview/pull/15528)
+* [Load V5] Add Zynga games to load v5 [#15531](https://github.com/Applifier/unity-ads-webview/pull/15531)
+* [Load V5] Always invalidate programatic campaigns if Ad Unit is in use. [#15527](https://github.com/Applifier/unity-ads-webview/pull/15527)
+* [AUI] Refactor renderColorTheme for reusability in the ColorBlur experiment [#15365](https://github.com/Applifier/unity-ads-webview/pull/15365)
+
+# Tue May 26 22:09:32 UTC 2020
+
+* Replace IAdUnitParameters with IVideoAdUnitParameters as preparation work for introducing PopupController [#15426](https://github.com/Applifier/unity-ads-webview/pull/15426)
+* [Load V5] Add Etermax game ids [#15525](https://github.com/Applifier/unity-ads-webview/pull/15525)
+* [PTS Migration] Fix PRD Endpoints in CI [#15526](https://github.com/Applifier/unity-ads-webview/pull/15526)
 * [Load V5] Use 1 retry with 10 sec timeout for PRELOAD request [#15495](https://github.com/Applifier/unity-ads-webview/pull/15495)
 * [Load V5] Add experiment tag for all Load V5 metrics [#15463](https://github.com/Applifier/unity-ads-webview/pull/15463)
 * [3.4.6 Release] Add to Webview Version Map [#15491](https://github.com/Applifier/unity-ads-webview/pull/15491)

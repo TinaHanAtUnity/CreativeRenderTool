@@ -266,6 +266,97 @@ describe('Event parameters should match specifications', () => {
         });
     });
 
+    describe('with ad request using load v5 support', () => {
+        let coreConfig: CoreConfiguration;
+        let adsConfig: AdsConfiguration;
+        let sandbox: sinon.SinonSandbox;
+
+        beforeEach(() => {
+            sandbox = sinon.createSandbox();
+            coreConfig = TestFixtures.getCoreConfiguration();
+            adsConfig = TestFixtures.getAdsConfiguration();
+
+            sandbox.stub(SDKMetrics, 'reportMetricEventWithTags');
+        });
+
+        afterEach(() => {
+            sandbox.restore();
+        });
+
+        it('on Android', () => {
+            const platform = Platform.ANDROID;
+            const backend = TestFixtures.getBackend(platform);
+            const nativeBridge = TestFixtures.getNativeBridge(platform, backend);
+            const coreModule = TestFixtures.getCoreModule(nativeBridge);
+            const core = coreModule.Api;
+            const privacySDK = TestFixtures.getPrivacySDK(core);
+            const ads = TestFixtures.getAdsApi(nativeBridge);
+            const storageBridge = new StorageBridge(core);
+            const metaDataManager = new MetaDataManager(core);
+            const request = new RequestManager(platform, core, new WakeUpManager(core));
+            const requestSpy: any = sandbox.stub(request, 'post').returns(Promise.resolve(TestFixtures.getOkNativeResponse()));
+            const clientInfo = TestFixtures.getClientInfo(platform);
+            const deviceInfo = TestFixtures.getAndroidDeviceInfo(core);
+            const cacheBookkeeping = new CacheBookkeepingManager(core);
+            const wakeUpManager = new WakeUpManager(core);
+            const assetManager = new AssetManager(platform, core, new CacheManager(core, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping);
+            const sessionManager = new SessionManager(core, request, storageBridge);
+            const focusManager = new FocusManager(platform, core);
+            const adMobSignalFactory = new AdMobSignalFactory(platform, core, ads, clientInfo, deviceInfo, focusManager);
+            const campaignParserManager = new ContentTypeHandlerManager();
+            const privacyManager = new UserPrivacyManager(platform, core, coreConfig, adsConfig, clientInfo, deviceInfo, request, privacySDK);
+            sandbox.stub(adMobSignalFactory, 'getOptionalSignal').returns(Promise.resolve(new AdMobOptionalSignal()));
+            sandbox.stub(core.DeviceInfo, 'getUniqueEventId').returns(Promise.resolve('abdce-12345'));
+            sandbox.stub(sessionManager, 'startNewSession').returns(Promise.resolve(new Session('abdce-12345')));
+            sandbox.stub(RequestPrivacyFactory, 'create').returns(<IRequestPrivacy>{});
+            sessionManager.setGameSessionId(1234);
+            const campaignManager: LegacyCampaignManager = new LegacyCampaignManager(platform, coreModule, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, privacySDK, privacyManager, undefined, true);
+            return campaignManager.request().then(() => {
+                const url: string = requestSpy.getCall(0).args[0];
+                const body: string = requestSpy.getCall(0).args[1];
+
+                const verifier: SpecVerifier = new SpecVerifier(Platform.ANDROID, ParamsTestData.getAdRequestParams(), url, body);
+                verifier.assert();
+            });
+        });
+
+        it('on iOS', () => {
+            const platform = Platform.IOS;
+            const backend = TestFixtures.getBackend(platform);
+            const nativeBridge = TestFixtures.getNativeBridge(platform, backend);
+            const coreModule = TestFixtures.getCoreModule(nativeBridge);
+            const core = coreModule.Api;
+            const privacySDK = TestFixtures.getPrivacySDK(core);
+            const ads = TestFixtures.getAdsApi(nativeBridge);
+            const storageBridge = new StorageBridge(core);
+            const metaDataManager = new MetaDataManager(core);
+            const request = new RequestManager(platform, core, new WakeUpManager(core));
+            const requestSpy: any = sandbox.stub(request, 'post').returns(Promise.resolve(TestFixtures.getOkNativeResponse()));
+            const clientInfo = TestFixtures.getClientInfo(platform);
+            const deviceInfo = TestFixtures.getIosDeviceInfo(core);
+            const cacheBookkeeping = new CacheBookkeepingManager(core);
+            const wakeUpManager = new WakeUpManager(core);
+            const assetManager = new AssetManager(platform, core, new CacheManager(core, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping);
+            const sessionManager = new SessionManager(core, request, storageBridge);
+            const focusManager = new FocusManager(platform, core);
+            const adMobSignalFactory = new AdMobSignalFactory(platform, core, ads, clientInfo, deviceInfo, focusManager);
+            const campaignParserManager = new ContentTypeHandlerManager();
+            const privacyManager = new UserPrivacyManager(platform, core, coreConfig, adsConfig, clientInfo, deviceInfo, request, privacySDK);
+            sandbox.stub(adMobSignalFactory, 'getOptionalSignal').returns(Promise.resolve(new AdMobOptionalSignal()));
+            sandbox.stub(core.DeviceInfo, 'getUniqueEventId').returns(Promise.resolve('abdce-12345'));
+            sandbox.stub(sessionManager, 'startNewSession').returns(Promise.resolve(new Session('abdce-12345')));
+            sessionManager.setGameSessionId(1234);
+            const campaignManager: LegacyCampaignManager = new LegacyCampaignManager(platform, coreModule, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, privacySDK, privacyManager, undefined, true);
+            return campaignManager.request().then(() => {
+                const url: string = requestSpy.getCall(0).args[0];
+                const body: string = requestSpy.getCall(0).args[1];
+
+                const verifier: SpecVerifier = new SpecVerifier(Platform.IOS, ParamsTestData.getAdRequestParams(), url, body);
+                verifier.assert();
+            });
+        });
+    });
+
     [Platform.ANDROID, Platform.IOS].forEach(platform => {
 
         describe(`with ad request using AuctionRequest on ${Platform[platform]}`, () => {
