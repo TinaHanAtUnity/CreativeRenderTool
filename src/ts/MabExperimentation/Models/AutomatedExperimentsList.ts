@@ -11,7 +11,7 @@ export const ButtonExperimentDeclaration = {
       DARK: 'dark',
       LIGHT: 'light',
       COLORMATCHING: 'color_matching',
-      COLOR_BLUR: 'color_blur'
+      COLORBLUR: 'color_blur'
   },
   animation: {
       STATIC: 'static',

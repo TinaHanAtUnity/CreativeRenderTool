@@ -45,7 +45,7 @@ export class PerformanceAdUnitWithAutomatedExperimentParametersFactory extends P
 
         if (this._campaign.getEndScreen()) {
             endScreen = new ExternalEndScreen(endScreenCombination, endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
-        } else if (endScreenCombination && endScreenCombination.scheme === ButtonExperimentDeclaration.scheme.COLOR_BLUR) {
+        } else if (endScreenCombination && endScreenCombination.scheme === ButtonExperimentDeclaration.scheme.COLORBLUR) {
             endScreen = new ColorBlurEndScreen(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
         } else {
             endScreen = new AnimatedDownloadButtonEndScreen(
