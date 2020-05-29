@@ -1,5 +1,6 @@
 # Pending
 
+* Revert "Restore external end screen usage when available" [#15593](https://github.com/Applifier/unity-ads-webview/pull/15593)
 * Restore external end screen usage when available [#15537](https://github.com/Applifier/unity-ads-webview/pull/15537)
 * Add support for data url in external end screen [#15524](https://github.com/Applifier/unity-ads-webview/pull/15524)
 * Add getDataUrl to XHRequest.ts [#15523](https://github.com/Applifier/unity-ads-webview/pull/15523)
