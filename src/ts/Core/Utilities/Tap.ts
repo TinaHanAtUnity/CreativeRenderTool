@@ -33,6 +33,9 @@ export class Tap {
         }
 
         // Use the above detect's results. passive applied if supported, capture will be false either way.
+        // The passive property should always be false here,
+        // since we send an extra fake click event inside touchEnd listener
+        // so the touch even should be cancellable using preventDefault, otherwise duplicate click events will be fired.
         this._element.addEventListener('touchstart', (event) => this.onTouchStart(event), this._supportsPassive ? { passive: false } : false);
     }
 
