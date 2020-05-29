@@ -59,9 +59,7 @@ class Stopwatch implements IStopwatch {
     }
 
     public send(event: TimingEvent, tags: { [key: string]: string }): void {
-        if (SDKMetrics.isMetricInstanceInitialized()) {
-            SDKMetrics.reportTimingEventWithTags(event, this._totalTime, tags);
-        }
+        SDKMetrics.reportTimingEventWithTags(event, this._totalTime, tags);
     }
 }
 

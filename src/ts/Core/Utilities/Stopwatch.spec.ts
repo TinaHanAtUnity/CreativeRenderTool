@@ -33,5 +33,26 @@ describe('TimeMeasurements', () => {
                 expect(SDKMetrics.reportTimingEventWithTags).toBeCalledWith(InitializationMetric.WebviewInitialization, 200, { 'simple': 'tag' });
             });
         });
+
+        describe('start stop start stop', () => {
+            beforeEach(() => {
+                performanceNowSpy
+                    .mockReturnValueOnce(100)
+                    .mockReturnValueOnce(300)
+                    .mockReturnValueOnce(700)
+                    .mockReturnValueOnce(1100);
+
+                stopwatch.start();
+                stopwatch.stop();
+                stopwatch.start();
+                stopwatch.stop();
+                stopwatch.send(InitializationMetric.WebviewInitialization, { 'simple': 'tag' });
+            });
+
+            it('should send metric', () => {
+                expect(SDKMetrics.reportTimingEventWithTags).toBeCalledTimes(1);
+                expect(SDKMetrics.reportTimingEventWithTags).toBeCalledWith(InitializationMetric.WebviewInitialization, 600, { 'simple': 'tag' });
+            });
+        });
     });
 });
