@@ -52,7 +52,7 @@ describe('AdUnitParametersFactoryTest', () => {
 
         describe('when getBaseParameters', () => {
             it('it should set third party event macros on creation', () => {
-                adUnitParametersFactory.create(campaign, placement, Orientation.NONE, '123', 'option');
+                adUnitParametersFactory.create(campaign, placement, Orientation.NONE, '123', 'option', false);
 
                 expect(thirdPartyEventManagerFactory.create).toHaveBeenCalledWith({
                     [ThirdPartyEventMacro.ZONE]: 'video',
@@ -99,7 +99,7 @@ describe('AdUnitParametersFactoryTest', () => {
                         beforeEach(() => {
                             campaign.hasStaticEndscreen.mockReturnValue(hasStaticEndscreen);
                             campaign.hasHtmlEndscreen.mockReturnValue(hasHtmlEndscreen);
-                            parameters = adUnitParametersFactory.create(campaign, placement, Orientation.NONE, '123', 'option');
+                            parameters = adUnitParametersFactory.create(campaign, placement, Orientation.NONE, '123', 'option', false);
                         });
                         it(expectedResult, () => {
                             expect(parameters.endScreen).toBeInstanceOf(expectedType);
@@ -110,7 +110,7 @@ describe('AdUnitParametersFactoryTest', () => {
 
             it('it should not set om tracking if an adverification does not exist in the adVerifications array', () => {
                 vast.getAdVerifications.mockReturnValue([]);
-                adUnitParametersFactory.create(campaign, placement, Orientation.NONE, '123', 'option');
+                adUnitParametersFactory.create(campaign, placement, Orientation.NONE, '123', 'option', false);
                 expect(campaign.setOmEnabled).toHaveBeenCalledTimes(0);
                 expect(campaign.setOMVendors).toHaveBeenCalledTimes(0);
             });
@@ -122,7 +122,7 @@ describe('AdUnitParametersFactoryTest', () => {
                 const verificationResource = new VastVerificationResource('https://scootmcdoot.com', 'omid');
                 vastAdVerificton1.getVerficationResources.mockReturnValue([verificationResource]);
                 vast.getAdVerifications.mockReturnValue([vastAdVerificton1]);
-                adUnitParametersFactory.create(campaign, placement, Orientation.NONE, '123', 'option');
+                adUnitParametersFactory.create(campaign, placement, Orientation.NONE, '123', 'option', false);
                 expect(campaign.setOmEnabled).toHaveBeenCalled();
                 expect(campaign.setOMVendors).toHaveBeenCalled();
             });

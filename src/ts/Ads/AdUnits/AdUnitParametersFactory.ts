@@ -34,7 +34,7 @@ import { OMID_P } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
 import { PrivacyTestEnvironment } from 'Privacy/PrivacyTestEnvironment';
 
 export interface IAbstractAdUnitParametersFactory<T1 extends Campaign, T2 extends IAdUnitParameters<T1>> {
-    create(campaign: T1, placement: Placement, orientation: Orientation, playerMetadataServerId: string, options: unknown): T2;
+    create(campaign: T1, placement: Placement, orientation: Orientation, playerMetadataServerId: string, options: unknown, loadV5Support: boolean): T2;
 }
 
 export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 extends IAdUnitParameters<T1>> implements IAbstractAdUnitParametersFactory<T1, T2> {
@@ -64,6 +64,7 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
     private _privacySDK: PrivacySDK;
 
     private _playerMetadataServerId: string;
+    private _loadV5Support: boolean;
     private _options: unknown;
 
     constructor(core: ICore, ads: IAds) {
@@ -87,12 +88,13 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
         this._privacySDK = ads.PrivacySDK;
     }
 
-    public create(campaign: T1, placement: Placement, orientation: Orientation, playerMetadataServerId: string, options: unknown): T2 {
+    public create(campaign: T1, placement: Placement, orientation: Orientation, playerMetadataServerId: string, options: unknown, loadV5Support: boolean): T2 {
         this._campaign = campaign;
         this._placement = placement;
         this._orientation = orientation;
         this._options = options;
         this._playerMetadataServerId = playerMetadataServerId;
+        this._loadV5Support = loadV5Support;
         const defaultParams = this.getBaseParameters();
         return this.createParameters(defaultParams);
     }
@@ -149,7 +151,8 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
             campaign: this._campaign,
             playerMetadataServerId: this._playerMetadataServerId,
             privacySDK: this._privacySDK,
-            userPrivacyManager: this._privacyManager
+            userPrivacyManager: this._privacyManager,
+            loadV5Support: this._loadV5Support
         });
     }
 

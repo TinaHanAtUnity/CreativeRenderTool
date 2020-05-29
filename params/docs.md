@@ -261,6 +261,7 @@
 | legalFramework | all | False | True | string | Current legal framework e.g. "gdpr", "ccpa" or "default" | Server | all |
 | agreedOverAgeLimit | all | False | True | string | User answer to age gate "yes" or "no", "missing" if no age gate has been presented | SDK | all |
 | privacyType | no | False | True | string | Privacy method, only sent if it is developer_consent or legitimate_interest | SDK | all |
+| loadV5Support | no | False | True | boolean | Indicates if client can work with Load V5 or not | SDK | all |
 
 
 
@@ -315,4 +316,5 @@
 | legalFramework | all | False | True | string | Current legal framework e.g. "gdpr", "ccpa" or "default" | Server | all |
 | agreedOverAgeLimit | all | False | True | string | User answer to age gate "yes" or "no", "missing" if no age gate has been presented | SDK | all |
 | privacyType | no | False | True | string | Privacy method, only sent if it is developer_consent or legitimate_interest | SDK | all |
+| loadV5Support | no | False | True | boolean | Indicates if client can work with Load V5 or not | SDK | all |
 
