@@ -1,5 +1,6 @@
 # Pending
 
+* [Chore] Collect cache speed metric [#15538](https://github.com/Applifier/unity-ads-webview/pull/15538)
 * [AUI] Add ColorBlurEndScreen to AutomatedExperiment [#15029](https://github.com/Applifier/unity-ads-webview/pull/15029)
 * Revert "Restore external end screen usage when available" [#15593](https://github.com/Applifier/unity-ads-webview/pull/15593)
 * Restore external end screen usage when available [#15537](https://github.com/Applifier/unity-ads-webview/pull/15537)
