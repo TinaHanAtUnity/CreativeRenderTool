@@ -4,7 +4,6 @@ import NestedIframePlayableCreativeJson from 'json/custom_features/NestedIframeP
 import Game7GamesJson from 'json/custom_features/Game7Games.json';
 import LionStudiosGamesJson from 'json/custom_features/LionStudiosGames.json';
 import MobilityWareGamesJson from 'json/custom_features/MobilityWareGames.json';
-import LoadWhitelist from 'json/custom_features/LoadWhitelist.json';
 import CacheModeAllowedExperimentGames from 'json/custom_features/CacheModeAllowedExperimentGames.json';
 
 export class CustomFeatures {
@@ -113,13 +112,6 @@ export class CustomFeatures {
         const wordsWithFriends = ['2895988', '2895998', '2796593', '2895987', '2896000', '2796594'];
         const zyngaSolitaire = ['2988442', '2988443', '2988494', '2988495'];
         return this.existsInList(wordsWithFriends, gameId) || this.existsInList(zyngaSolitaire, gameId);
-    }
-
-    /**
-     * Includes the list of games for the 3.2 Load API Whitelist on the 10/90 Load AB Test
-     */
-    public static isWhiteListedForLoadApi(gameId: string): boolean {
-        return this.existsInList(LoadWhitelist, gameId);
     }
 
     public static isMopubTestGameForLoad(gameId: string): boolean {
