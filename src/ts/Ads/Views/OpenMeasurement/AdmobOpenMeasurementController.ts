@@ -35,8 +35,6 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
     private _request: RequestManager;
     private _thirdPartyEventManager: ThirdPartyEventManager;
 
-    private _omMetricFirstCheck: boolean = false;
-
     constructor(platform: Platform, core: ICoreApi, clientInfo: ClientInfo, campaign: AdMobCampaign, placement: Placement, deviceInfo: DeviceInfo, request: RequestManager, omAdViewBuilder: OpenMeasurementAdViewBuilder, thirdPartyEventManager: ThirdPartyEventManager) {
         super(placement, omAdViewBuilder);
 
@@ -149,22 +147,6 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
 
     public getSDKVersion(): string {
         return this._clientInfo.getSdkVersionName();
-    }
-
-    public loaded(vastProperties: IVastProperties) {
-        if (!this._omMetricFirstCheck && this._platform === Platform.ANDROID) {
-            SDKMetrics.reportMetricEvent(AdmobMetric.AdmobOMLoadedFirst);
-            this._omMetricFirstCheck = true;
-        }
-        super.loaded(vastProperties);
-    }
-
-    public start(duration: number) {
-        if (!this._omMetricFirstCheck && this._platform === Platform.ANDROID) {
-            SDKMetrics.reportMetricEvent(AdmobMetric.AdmobOMStartFirst);
-            this._omMetricFirstCheck = true;
-        }
-        super.start(duration);
     }
 
     public admobImpression(omAdViewBuilder: OpenMeasurementAdViewBuilder): Promise<void> {

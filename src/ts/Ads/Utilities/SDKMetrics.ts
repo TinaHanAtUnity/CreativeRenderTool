@@ -34,8 +34,6 @@ export enum AdmobMetric {
     AdmobRewardedVideoStart = 'admob_rewarded_video_start',
     AdmobUserWasRewarded = 'admob_user_was_rewarded',
     AdmobUserSkippedRewardedVideo = 'admob_user_skipped_rewarded_video',
-    AdmobDBMRewardedStarted = 'admob_dbm_rewarded_started',
-    AdmobDBMNonRewardedStarted = 'admob_dbm_nonrewarded_started',
     AdmobVideoCanPlay = 'admob_video_canplay',
     AdmobVideoStarted = 'admob_video_started',
     AdmobOMEnabled = 'admob_om_enabled',
@@ -44,9 +42,7 @@ export enum AdmobMetric {
     DoubleClickOMStarts = 'doubleclick_om_starts',
     DoubleClickOMImpressions = 'doubleclick_om_impressions',
     DoubleClickInstanceCreated = 'doubleclick_om_instance_created',
-    AdmobOMVideoStart = 'admob_om_video_start',
-    AdmobOMStartFirst = 'admob_om_start_first',
-    AdmobOMLoadedFirst = 'admob_om_load_first'
+    AdmobOMVideoStart = 'admob_om_video_start'
 }
 
 export enum BannerMetric {
