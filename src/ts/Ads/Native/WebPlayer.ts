@@ -163,10 +163,10 @@ export interface IWebPlayerWebSettingsIos {
 }
 
 export enum WKAudiovisualMediaTypes {
-    NONE    = 0,
-    AUDIO   = 1 << 0,
-    VIDEO   = 1 << 1,
-    ALL     = AUDIO | VIDEO
+    NONE = 0,
+    AUDIO = 1 << 0,
+    VIDEO = 1 << 1,
+    ALL = AUDIO | VIDEO
 }
 
 export enum WebPlayerViewId {
@@ -193,15 +193,15 @@ export class WebPlayerApi extends NativeApi {
         return this._nativeBridge.invoke<void>(this._fullApiClassName, 'setUrl', [url, viewId]);
     }
 
-    public setData(data: string, mimeType: string, encoding: string, viewId: string): Promise<void>  {
+    public setData(data: string, mimeType: string, encoding: string, viewId: string): Promise<void> {
         return this._nativeBridge.invoke<void>(this._fullApiClassName, 'setData', [data, mimeType, encoding, viewId]);
     }
 
-    public setDataWithUrl(baseUrl: string, data: string, mimeType: string, encoding: string, viewId: string): Promise<void>  {
+    public setDataWithUrl(baseUrl: string, data: string, mimeType: string, encoding: string, viewId: string): Promise<void> {
         return this._nativeBridge.invoke<void>(this._fullApiClassName, 'setDataWithUrl', [baseUrl, data, mimeType, encoding, viewId]);
     }
 
-    public setSettings(webSettings: IWebPlayerWebSettingsAndroid | IWebPlayerWebSettingsIos, webPlayerSettings: IWebPlayerPlayerSettingsAndroid, viewId: string): Promise<void>  {
+    public setSettings(webSettings: IWebPlayerWebSettingsAndroid | IWebPlayerWebSettingsIos, webPlayerSettings: IWebPlayerPlayerSettingsAndroid, viewId: string): Promise<void> {
         return this._nativeBridge.invoke<void>(this._fullApiClassName, 'setSettings', [webSettings, webPlayerSettings, viewId]).catch((e) => {
             if (this._nativeBridge.getPlatform() === Platform.ANDROID && e === 'WEBPLAYER_NULL') {
                 // Fix for Android WEBPLAYER_NULL errors:

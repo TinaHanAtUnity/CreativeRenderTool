@@ -7,6 +7,10 @@ import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
+import { DeviceInfoApi } from 'Core/Native/DeviceInfo';
+import { AUIMetric } from 'Ads/Utilities/SDKMetrics';
+import { Image } from 'Ads/Models/Assets/Image';
+import { ColorThemeError } from 'Core/Utilities/ColorTheme';
 
 export enum VideoType {
     CACHE,
@@ -26,11 +30,6 @@ export class CampaignAssetInfo {
         } else if (campaign instanceof MRAIDCampaign) {
             const resourceUrl = campaign.getResourceUrl();
             if ((resourceUrl && resourceUrl.isCached()) || campaign.getResource()) {
-                return true;
-            }
-        } else if (campaign instanceof AdMobCampaign) {
-            const video = campaign.getVideo();
-            if (video && video.getVideo() && video.getVideo().isCached()) {
                 return true;
             }
         }
@@ -133,4 +132,28 @@ export class CampaignAssetInfo {
 
         return undefined;
     }
+
+    public static getOrientedImage(campaign: PerformanceCampaign, deviceInfo: DeviceInfoApi): Promise<Image> {
+        const portraitImage = campaign.getPortrait();
+        const landscapeImage = campaign.getLandscape();
+        const squareImage = campaign.getSquare();
+        return Promise.all([deviceInfo.getScreenWidth(), deviceInfo.getScreenHeight()]).then(([screenWidth, screenHeight]) => {
+            const isLandscape = screenWidth > screenHeight;
+            let image;
+            if (squareImage) {
+                image = squareImage;
+            } else if (isLandscape && portraitImage) {
+                image = portraitImage; // when the device is in landscape mode, we are showing a portrait image
+            } else if (landscapeImage) {
+                image = landscapeImage;
+            } else {
+                image = portraitImage;
+            }
+            if (!image) {
+                throw new ColorThemeError('The images assets provided are invalid', AUIMetric.InvalidImageAssets);
+            }
+            return image;
+        });
+    }
+
 }

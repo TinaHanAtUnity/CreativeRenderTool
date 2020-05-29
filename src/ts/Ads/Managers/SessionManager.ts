@@ -8,6 +8,7 @@ import { StorageBridge } from 'Core/Utilities/StorageBridge';
 import { StorageOperation } from 'Core/Utilities/StorageOperation';
 import { FailedXpromoOperativeEventManager } from 'XPromo/Managers/FailedXpromoOperativeEventManager';
 import { ICoreApi } from 'Core/ICore';
+import { FailedPTSEventManager } from 'Ads/Managers/FailedPTSEventManager';
 
 export class SessionManager {
 
@@ -88,9 +89,12 @@ export class SessionManager {
     private sendUnsentEvents(sessionId: string): Promise<unknown[]> {
         const promises: Promise<unknown>[] = [];
         const failedOperativeEventManager = new FailedOperativeEventManager(this._core, sessionId);
-        promises.push(failedOperativeEventManager.sendFailedEvents(this._request, this._storageBridge));
         const failedXpromoOperativeEventManager = new FailedXpromoOperativeEventManager(this._core, sessionId);
-        promises.push(failedXpromoOperativeEventManager.sendFailedEvents(this._request, this._storageBridge));
+        const failedUnityInternalPTSEventManager = new FailedPTSEventManager(this._core, sessionId);
+
+        promises.push(failedOperativeEventManager.sendFailedEvents(this._request, this._storageBridge),
+                      failedXpromoOperativeEventManager.sendFailedEvents(this._request, this._storageBridge),
+                      failedUnityInternalPTSEventManager.sendFailedEvents(this._request, this._storageBridge));
         return Promise.all(promises);
     }
 }

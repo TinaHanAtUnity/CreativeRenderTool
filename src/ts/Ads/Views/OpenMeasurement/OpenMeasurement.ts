@@ -53,12 +53,12 @@ interface IContext {
     environment: string;
     accessMode: AccessMode;
     videoElement?: HTMLVideoElement | null; // Only required for AccessMode.FULL video
-    slotElement?: HTMLElement;              // Only required for AccessMode.FULL display
+    slotElement?: HTMLElement; // Only required for AccessMode.FULL display
     adSessionType: AdSessionType;
-    adServingId?: string;                   // VAST optional field - <AdServingId>
-    transactionId?: string;                 // VAST optional field - VAST 4.1 [TRANSACTIONID]
-    podSequence?: string;                   // VAST optional field - sequence <Ad> attribute
-    adCount?: number;                       // VAST optional field - number of <InLine> elements
+    adServingId?: string; // VAST optional field - <AdServingId>
+    transactionId?: string; // VAST optional field - VAST 4.1 [TRANSACTIONID]
+    podSequence?: string; // VAST optional field - sequence <Ad> attribute
+    adCount?: number; // VAST optional field - number of <InLine> elements
     omidNativeInfo?: {
         partnerName: string;
         partnerVersion: string;
@@ -100,7 +100,7 @@ export class OpenMeasurement<T extends Campaign> extends View<T> {
     // GUID for running all current omid3p with same sessionid as session interface
     private _admobOMSessionId: string;
 
-    constructor(platform: Platform, core: ICoreApi, clientInfo: ClientInfo, campaign: T, placement: Placement, deviceInfo: DeviceInfo,  thirdPartyEventManager: ThirdPartyEventManager, vendorKey: string | undefined, vastAdVerification?: VastAdVerification) {
+    constructor(platform: Platform, core: ICoreApi, clientInfo: ClientInfo, campaign: T, placement: Placement, deviceInfo: DeviceInfo, thirdPartyEventManager: ThirdPartyEventManager, vendorKey: string | undefined, vastAdVerification?: VastAdVerification) {
         super(platform, 'openMeasurement_' + (vendorKey ? vendorKey : DEFAULT_VENDOR_KEY));
 
         this._template = new Template(OMIDTemplate);
@@ -196,9 +196,8 @@ export class OpenMeasurement<T extends Campaign> extends View<T> {
         super.render();
 
         this._omIframe = <HTMLIFrameElement> this._container.querySelector('#omid-iframe');
-        this._omIframe.srcdoc = MacroUtil.replaceMacro(OMID3p, {'{{ DEFAULT_KEY_ }}': DEFAULT_VENDOR_KEY });
-
         this._omIframe.id += this._omAdSessionId;
+        this._omIframe.srcdoc = MacroUtil.replaceMacro(OMID3p, { '{{ DEFAULT_KEY_ }}': DEFAULT_VENDOR_KEY, '{{ IFRAME_ID_ }}': this._omIframe.id });
         this._omIframe.style.position = 'absolute';
         this._omIframe.style.top = '0';
         this._omIframe.style.left = '0';
@@ -220,22 +219,13 @@ export class OpenMeasurement<T extends Campaign> extends View<T> {
     }
 
     /**
-     * Video-only event. The player has loaded and buffered the creative’s
-     * media and assets either fully or to the extent that it is ready
-     * to play the media. Corresponds to the VAST  loaded  event.
-     */
-    public loaded(vastProperties: IVastProperties) {
-        this._omBridge.triggerVideoEvent(OMID3pEvents.OMID_LOADED, {vastProperties});
-    }
-
-    /**
      * Must ensure this is only called once per background and foreground
      * Videos are in the STOPPED state before they begin playing and this gets called during the Foreground event
      * onContainerBackground and Foreground are subscribed to multiple events Activity.ts
      * Current Calculation Locations: VastAdUnit onContainerBackground, onContainerForeground
      */
     public geometryChange(viewport: IViewPort, adView: IAdView) {
-        this._omBridge.triggerAdEvent(OMID3pEvents.OMID_GEOMETRY_CHANGE, {viewport, adView});
+        this._omBridge.triggerAdEvent(OMID3pEvents.OMID_GEOMETRY_CHANGE, { viewport, adView });
     }
 
     public getVerificationResource(): IVerificationScriptResource {
@@ -458,7 +448,7 @@ export class OpenMeasurement<T extends Campaign> extends View<T> {
     private sendErrorEvent(reasonCode: VerificationReasonCode) {
         const adVerificationErrorURL = this._adVerification.getVerificationTrackingEvent();
         if (adVerificationErrorURL) {
-            this._thirdPartyEventManager.sendWithGet('adVerificationErrorEvent', this._campaign.getSession().getId(), adVerificationErrorURL, undefined, undefined, {'%5BREASON%5D': reasonCode.toString()});
+            this._thirdPartyEventManager.sendWithGet('adVerificationErrorEvent', this._campaign.getSession().getId(), adVerificationErrorURL, undefined, undefined, { '%5BREASON%5D': reasonCode.toString() });
         }
     }
 

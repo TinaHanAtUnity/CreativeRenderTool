@@ -15,6 +15,8 @@ import { ProgrammaticOperativeEventManager } from 'Ads/Managers/ProgrammaticOper
 import { AuctionRequest } from 'Ads/Networking/AuctionRequest';
 import { MetricInstance } from 'Ads/Networking/MetricInstance';
 import { HttpKafka } from 'Core/Utilities/HttpKafka';
+import { StorageType } from 'Core/Native/Storage';
+import { CometCampaignParser } from 'Performance/Parsers/CometCampaignParser';
 
 document.addEventListener('DOMContentLoaded', () => {
     const resizeHandler = (event?: Event) => {
@@ -148,6 +150,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const loadButtonDefault = <HTMLButtonElement>window.parent.document.getElementById('loadDefault');
         const loadButtonIncentivize = <HTMLButtonElement>window.parent.document.getElementById('loadIncentivize');
         const campaignResponseElement = <HTMLInputElement>window.parent.document.getElementById('campaignResponse');
+        const endScreenUrlElement = <HTMLInputElement>window.parent.document.getElementById('endScreenUrl');
+        const forceLoadV5Element = <HTMLInputElement>window.parent.document.getElementById('forceLoadV5');
 
         const initialize = () => {
             window.localStorage.setItem('abGroup', abGroupElement.value);
@@ -159,6 +163,7 @@ document.addEventListener('DOMContentLoaded', () => {
             window.localStorage.setItem('loadMode', loadModeElement.checked.toString());
             window.localStorage.setItem('autoSkip', autoSkipElement.checked.toString());
             window.localStorage.setItem('useStaging', useStagingElement.checked.toString());
+            window.localStorage.setItem('forceLoadV5', forceLoadV5Element.checked.toString());
 
             abGroupElement.disabled = true;
             campaignIdElement.disabled = true;
@@ -193,6 +198,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (campaignResponseElement.value.length) {
                 CampaignManager.setCampaignResponse(campaignResponseElement.value);
+            }
+
+            if (endScreenUrlElement.value.length) {
+                CometCampaignParser.setForceEndScreenUrl(endScreenUrlElement.value);
             }
 
             // tslint:disable:no-console
@@ -248,6 +257,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     UnityAds.getBackend().Api.Request.setPassthrough(true);
                     setClientInfo();
                     setAndroidDeviceInfo();
+                    UnityAds.getBackend().Api.Storage.set(StorageType.PUBLIC, 'test.forceLoadV5.value', forceLoadV5Element.checked);
                     UnityAds.initialize(Platform.ANDROID, gameIdElement.value, listener, testModeElement.checked, loadModeElement.checked);
                     break;
 
@@ -256,6 +266,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     UnityAds.getBackend().Api.Request.setPassthrough(true);
                     setClientInfo();
                     setIosDeviceInfo();
+                    UnityAds.getBackend().Api.Storage.set(StorageType.PUBLIC, 'test.forceLoadV5.value', forceLoadV5Element.checked);
                     UnityAds.initialize(Platform.IOS, gameIdElement.value, listener, testModeElement.checked, loadModeElement.checked);
                     break;
 
@@ -283,13 +294,14 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             abGroupElement.value = window.localStorage.getItem('abGroup') === null ? abGroupElement.value : window.localStorage.getItem('abGroup')!;
             campaignIdElement.value = window.localStorage.getItem('campaignId') === null ? campaignIdElement.value : window.localStorage.getItem('campaignId')!;
-            countryElement.value = window.localStorage.getItem('country') === null ?  countryElement.value : window.localStorage.getItem('country')!;
+            countryElement.value = window.localStorage.getItem('country') === null ? countryElement.value : window.localStorage.getItem('country')!;
             platformElement.value = window.localStorage.getItem('platform') === null ? platformElement.value : window.localStorage.getItem('platform')!;
-            gameIdElement.value =  window.localStorage.getItem('gameId') === null ? gameIdElement.value  : window.localStorage.getItem('gameId')!;
+            gameIdElement.value = window.localStorage.getItem('gameId') === null ? gameIdElement.value : window.localStorage.getItem('gameId')!;
             testModeElement.checked = window.localStorage.getItem('testMode') === null ? testModeElement.checked : window.localStorage.getItem('testMode') === 'true';
             loadModeElement.checked = window.localStorage.getItem('loadMode') === null ? loadModeElement.checked : window.localStorage.getItem('loadMode') === 'true';
             autoSkipElement.checked = window.localStorage.getItem('autoSkip') === null ? autoSkipElement.checked : window.localStorage.getItem('autoSkip') === 'true';
             useStagingElement.checked = window.localStorage.getItem('useStaging') === null ? useStagingElement.checked : window.localStorage.getItem('useStaging') === 'true';
+            forceLoadV5Element.checked = window.localStorage.getItem('forceLoadV5') === null ? useStagingElement.checked : window.localStorage.getItem('forceLoadV5') === 'true';
 
             initializeButton.addEventListener('click', (event: Event) => {
                 event.preventDefault();

@@ -15,9 +15,8 @@ import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 import { WebPlayerMRAID } from 'MRAID/Views/WebPlayerMRAID';
 import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCampaign';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
-import { AutomatedExperimentManager } from 'Ads/Managers/AutomatedExperimentManager';
-import { ArAutomatedExperimentsList } from 'Ads/Models/AutomatedExperimentsList';
-import { AUIMetric, SDKMetrics } from 'Ads/Utilities/SDKMetrics';
+import { AutomatedExperimentManager } from 'MabExperimentation/AutomatedExperimentManager';
+import { AutomatedExperimentsCategories } from 'MabExperimentation/Models/AutomatedExperimentsList';
 import { arAvailableButtonDecision } from 'AR/Experiments/ARUIExperiments';
 
 export class MRAIDAdUnitParametersFactory extends AbstractAdUnitParametersFactory<MRAIDCampaign, IMRAIDAdUnitParameters> {
@@ -31,6 +30,7 @@ export class MRAIDAdUnitParametersFactory extends AbstractAdUnitParametersFactor
 
     public static setForcedARMRAID(value: boolean) {
         MRAIDAdUnitParametersFactory._forcedARMRAID = value;
+        AutomatedExperimentManager.setForcedARMRAID(value);
     }
 
     private _ar: IARApi;
@@ -39,11 +39,9 @@ export class MRAIDAdUnitParametersFactory extends AbstractAdUnitParametersFactor
 
     constructor(ar: IARApi, core: ICore, ads: IAds, automatedExperimentManager: AutomatedExperimentManager) {
         super(core, ads);
-        this._automatedExperimentManager = automatedExperimentManager;
 
-        if (ads.Config.getHasArPlacement()) {
-            this._automatedExperimentManager.registerExperiments(ArAutomatedExperimentsList);
-        }
+        this._automatedExperimentManager = automatedExperimentManager;
+        this._automatedExperimentManager.registerExperimentCategory(AutomatedExperimentsCategories.MRAID_AR, 'MRAIDCampaign_AR');
 
         this._ar = ar;
         this._webPlayerContainer = ads.InterstitialWebPlayerContainer;

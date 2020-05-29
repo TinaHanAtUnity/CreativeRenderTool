@@ -6,7 +6,7 @@ import { ICoreApi } from 'Core/ICore';
 import { WebViewError } from 'Core/Errors/WebViewError';
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { PrivacyConfig } from 'Privacy/PrivacyConfig';
-import { IPrivacySettings, IUserPrivacySettings } from 'Privacy/IPrivacySettings';
+import { IPrivacyCompletedParams, IPrivacyFetchUrlParams, IUserPrivacySettings } from 'Privacy/IPrivacySettings';
 import { IPrivacySDKViewHandler } from 'Ads/Views/Privacy/IPrivacySDKViewHandler';
 import { ConsentPage } from 'Ads/Views/Privacy/Privacy';
 import { Platform } from 'Core/Constants/Platform';
@@ -114,8 +114,8 @@ export class PrivacySDKView extends View<IPrivacySDKViewHandler> {
         });
     }
 
-    public onPrivacyCompleted(privacySettings: IPrivacySettings): void {
-        this._handlers.forEach(handler => handler.onPrivacyCompleted(privacySettings));
+    public onPrivacyCompleted(params: IPrivacyCompletedParams): void {
+        this._handlers.forEach(handler => handler.onPrivacyCompleted(params));
     }
 
     public completeCallback(): void {
@@ -130,7 +130,7 @@ export class PrivacySDKView extends View<IPrivacySDKViewHandler> {
         this._frameEventAdapter.postMessage('openUrlCallback', url);
     }
 
-    public onPrivacyMetric(data: string): void {
+    public onPrivacyMetric(data: { [key: string]: unknown }): void {
         this._handlers.forEach(handler => handler.onPrivacyMetric(data));
     }
 
@@ -138,12 +138,12 @@ export class PrivacySDKView extends View<IPrivacySDKViewHandler> {
         this._frameEventAdapter.postMessage('metricCallback');
     }
 
-    public onPrivacyFetch(url: string, data: { [key: string]: unknown }): void {
-        this._handlers.forEach(handler => handler.onPrivacyFetch(url, data));
+    public onPrivacyFetchUrl(data: IPrivacyFetchUrlParams): void {
+        this._handlers.forEach(handler => handler.onPrivacyFetchUrl(data));
     }
 
-    public fetchCallback(response: string): void {
-        this._frameEventAdapter.postMessage('fetchCallback', response);
+    public fetchUrlCallback(response: { [key: string]: unknown }, property: string): void {
+        this._frameEventAdapter.postMessage('fetchUrlCallback', { value: response, property });
     }
 
     public postMessage(event: string, data?: unknown) {

@@ -1,11 +1,11 @@
 import { VastMediaFile } from 'VAST/Models/VastMediaFile';
 
 export enum VASTMediaFileSize {
-    WIFI_MIN = 5242880,    // 5 MB in Bytes
-    WIFI_MAX = 10485760,   // 10 MB
-    CELL_MIN = 512000,     // 500 KB
-    CELL_MAX = 3145728,    // 3 MB
-    SDK_MAX = 20971520     // 20 MB SDK max limit for 'too_large_file' error
+    WIFI_MIN = 5242880, // 5 MB in Bytes
+    WIFI_MAX = 10485760, // 10 MB
+    CELL_MIN = 512000, // 500 KB
+    CELL_MAX = 3145728, // 3 MB
+    SDK_MAX = 20971520 // 20 MB SDK max limit for 'too_large_file' error
 }
 
 export class VastMediaSelector {

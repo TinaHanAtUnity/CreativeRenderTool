@@ -7,20 +7,24 @@ import { Campaign, ICampaignTrackingUrls } from 'Ads/Models/Campaign';
 import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
 import { Placement, PlacementState } from 'Ads/Models/Placement';
 import { INativeResponse } from 'Core/Managers/RequestManager';
-import { AdRequestManager } from 'Ads/Managers/AdRequestManager';
+import { AdRequestManager, INotCachedLoadedCampaign } from 'Ads/Managers/AdRequestManager';
 import { Observables } from 'Core/Utilities/Observables';
 import { PerPlacementLoadManager } from 'Ads/Managers/PerPlacementLoadManager';
 import { LoadV5, SDKMetrics } from 'Ads/Utilities/SDKMetrics';
+import { PerformanceAdUnitFactory } from 'Performance/AdUnits/PerformanceAdUnitFactory';
+import { AdUnitAwareAdRequestManager } from 'Ads/Managers/AdUnitAwareAdRequestManager';
 
 export class PerPlacementLoadManagerV5 extends PerPlacementLoadManager {
     protected _adRequestManager: AdRequestManager;
 
     private _shouldRefresh: boolean = true;
+    private _useAdUnits: boolean;
 
-    constructor(ads: IAdsApi, adsConfig: AdsConfiguration, coreConfig: CoreConfiguration, adRequestManager: AdRequestManager, clientInfo: ClientInfo, focusManager: FocusManager) {
-        super(ads, adsConfig, coreConfig, adRequestManager, clientInfo, focusManager);
+    constructor(ads: IAdsApi, adsConfig: AdsConfiguration, coreConfig: CoreConfiguration, adRequestManager: AdRequestManager, clientInfo: ClientInfo, focusManager: FocusManager, useAdUnits: boolean) {
+        super(ads, adsConfig, coreConfig, useAdUnits ? new AdUnitAwareAdRequestManager(adRequestManager) : adRequestManager, clientInfo, focusManager);
 
         this._adRequestManager = adRequestManager;
+        this._useAdUnits = useAdUnits;
 
         this._adRequestManager.onCampaign.subscribe((placementId, campaign, trackingUrls) => this.onCampaign(placementId, campaign, trackingUrls));
         this._adRequestManager.onNoFill.subscribe((placementId) => this.onNoFill(placementId));
@@ -60,7 +64,6 @@ export class PerPlacementLoadManagerV5 extends PerPlacementLoadManager {
 
     protected loadPlacement(placementId: string, count: number) {
         if (this._adRequestManager.isPreloadDataExpired()) {
-            SDKMetrics.reportMetricEvent(LoadV5.RefreshManagerPreloadDataExpired);
             this.invalidateActivePlacements();
         }
 
@@ -69,7 +72,6 @@ export class PerPlacementLoadManagerV5 extends PerPlacementLoadManager {
         // It would make sense to use reload request here, however it would require some refactoring,
         // which will be done later.
         if (this._adRequestManager.hasPreloadFailed()) {
-            SDKMetrics.reportMetricEvent(LoadV5.LoadCampaignWithPreloadData);
             return this._adRequestManager.requestPreload().then(() => {
                 super.loadPlacement(placementId, count);
             }).catch((err) => {
@@ -85,7 +87,6 @@ export class PerPlacementLoadManagerV5 extends PerPlacementLoadManager {
 
     protected invalidateExpiredCampaigns(): Promise<void> {
         if (this._adRequestManager.isPreloadDataExpired()) {
-            SDKMetrics.reportMetricEvent(LoadV5.RefreshManagerPreloadDataExpired);
             return this.invalidateActivePlacements();
         }
 
@@ -96,7 +97,7 @@ export class PerPlacementLoadManagerV5 extends PerPlacementLoadManager {
                 const campaign = placement.getCurrentCampaign();
 
                 if (campaign && campaign.isExpired()) {
-                    SDKMetrics.reportMetricEvent(LoadV5.RefreshManagerCampaignExpired);
+                    this._adRequestManager.reportMetricEvent(LoadV5.RefreshManagerCampaignExpired);
                     placement.setCurrentCampaign(undefined);
                     this.setPlacementState(placement.getId(), PlacementState.NOT_AVAILABLE);
                 }
@@ -114,6 +115,10 @@ export class PerPlacementLoadManagerV5 extends PerPlacementLoadManager {
     }
 
     private invalidateActivePlacements(excludePlacementId?: string): Promise<void> {
+        if (this._campaignManager instanceof AdUnitAwareAdRequestManager) {
+            this._campaignManager.invalidate();
+        }
+
         const placementToReload: string[] = [];
 
         for (const placementId of this._adsConfig.getPlacementIds()) {
@@ -151,11 +156,31 @@ export class PerPlacementLoadManagerV5 extends PerPlacementLoadManager {
         const placement = this._adsConfig.getPlacement(placementId);
 
         if (placement) {
-            SDKMetrics.reportMetricEvent(LoadV5.RefreshManagerCampaignFailedToInvalidate);
-            placement.setCurrentCampaign(undefined);
-            placement.setCurrentTrackingUrls(undefined);
             placement.setInvalidationPending(false);
-            this.setPlacementState(placementId, PlacementState.NO_FILL);
+
+            let shouldInvalidate = true;
+            if (!this._useAdUnits) {
+                // Invalidate only Direct Demand campaigns, we would like to show old programmatic campaign.
+                const campaign = placement.getCurrentCampaign();
+                if (campaign) {
+                    const contentType = campaign.getContentType();
+                    switch (contentType) {
+                        case PerformanceAdUnitFactory.ContentType:
+                        case PerformanceAdUnitFactory.ContentTypeMRAID:
+                        case PerformanceAdUnitFactory.ContentTypeVideo:
+                            shouldInvalidate = true;
+                            break;
+                        default:
+                            shouldInvalidate = false;
+                    }
+                }
+            }
+            if (shouldInvalidate) {
+                this._adRequestManager.reportMetricEvent(LoadV5.RefreshManagerCampaignFailedToInvalidate);
+                placement.setCurrentCampaign(undefined);
+                placement.setCurrentTrackingUrls(undefined);
+                this.setPlacementState(placementId, PlacementState.NO_FILL);
+            }
         }
     }
 }

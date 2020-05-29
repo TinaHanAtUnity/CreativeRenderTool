@@ -50,7 +50,7 @@ import { VideoPosition, VideoPlayerState, InteractionType, SessionEvents, OMID3p
             iframe = document.createElement('iframe');
             document.body.appendChild(iframe);
 
-            handler =  {
+            handler = {
                 onImpression: sinon.spy(),
                 onLoaded: sinon.spy(),
                 onStart: sinon.spy(),
@@ -112,7 +112,7 @@ import { VideoPosition, VideoPlayerState, InteractionType, SessionEvents, OMID3p
                 {
                     event: OMEvents.LOADED,
                     data: {
-                        isSkippable: true,
+                        skippable: true,
                         skipOffset: 5,
                         isAutoplay: true,
                         position: VideoPosition.STANDALONE

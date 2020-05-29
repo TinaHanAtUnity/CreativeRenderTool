@@ -56,7 +56,7 @@ describe('XHRequestTest', () => {
         );
 
         it('should fail from bad response with correct headers and response', async () => {
-            server.respondWith('GET', 'https://api.unity3d.com/test', [500, {'test-header': 'test-value'}, 'Status code 500']);
+            server.respondWith('GET', 'https://api.unity3d.com/test', [500, { 'test-header': 'test-value' }, 'Status code 500']);
 
             try {
                 await XHRequest.get('https://api.unity3d.com/test');
@@ -213,6 +213,21 @@ describe('XHRequestTest', () => {
             assert.isTrue(openSpy.called, 'Did not call function open'); // Checking if actually did a call
             assert.equal(openSpy.firstCall.args[0], 'POST', 'Did not call function open with POST');
             assert.equal(sendSpy.firstCall.args[0], 'body', 'Did not call function open with correct body');
+        });
+    });
+
+    describe('getDataUrl', () => {
+        it('should give a correct data url', async () => {
+            const url = 'https://api.unity3d.com/file.txt';
+            const fileContent = 'HelloWorld!';
+            const expectedContent = 'data:application/octet-stream;base64,' + btoa(fileContent);
+
+            server.respondWith('GET', url, [200, {}, fileContent]);
+
+            return XHRequest.getDataUrl(url).then((responseText) => {
+                assert.equal(server.requests.length, 1, 'XHRequestTest should create one XMLHttpRequest instance');
+                assert.equal(expectedContent, responseText);
+            });
         });
     });
 });

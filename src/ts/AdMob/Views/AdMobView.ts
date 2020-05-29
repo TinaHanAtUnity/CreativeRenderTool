@@ -256,7 +256,7 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
     private onClose() {
         if (this._admobOMController) {
             this._admobOMController.sessionFinish();
-            setTimeout(() => {if (this._admobOMController) { this._admobOMController.removeFromViewHieararchy(); }}, 1000);
+            setTimeout(() => { if (this._admobOMController) { this._admobOMController.removeFromViewHieararchy(); } }, 1000);
         }
         // Added a timeout for admob session interface to receive session finish before removing the dom element
         setTimeout(() => this._handlers.forEach((h) => h.onClose()), 1);
@@ -290,7 +290,7 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
         this._handlers.forEach((h) => h.onClickSignalRequest(touchInfo));
     }
 
-    private onTrackingEvent(event: TrackingEvent, data?: unknown) {
+    private onTrackingEvent(event: TrackingEvent, data?: string) {
         this._handlers.forEach((h) => h.onTrackingEvent(event, data));
     }
 

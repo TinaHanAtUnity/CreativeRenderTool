@@ -66,7 +66,7 @@ export class OpenMeasurementUtilities {
         const obstructionOverlapPercentage = this.calculateObstructionOverlapPercentage(videoRectangle, adjustedObstruction);
         const percentOfVideoInViewPort = this.calculateObstructionOverlapPercentage(videoRectangle, screenRectangle);
 
-        return  percentOfVideoInViewPort - obstructionOverlapPercentage;
+        return percentOfVideoInViewPort - obstructionOverlapPercentage;
     }
 
     public static calculateObstructionOverlapPercentage(videoView: IRectangle, obstruction: IRectangle) {

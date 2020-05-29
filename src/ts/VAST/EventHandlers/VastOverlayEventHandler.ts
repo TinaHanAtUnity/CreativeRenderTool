@@ -1,4 +1,4 @@
-import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
+import { IVideoAdUnitParameters } from 'Ads/AdUnits/VideoAdUnit';
 import { OverlayEventHandler } from 'Ads/EventHandlers/OverlayEventHandler';
 import { MoatViewabilityService } from 'Ads/Utilities/MoatViewabilityService';
 import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
@@ -24,13 +24,13 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
     private _request: RequestManager;
     private _vastCampaign: VastCampaign;
     private _moat?: MOAT;
-    private _vastOverlay?: AbstractVideoOverlay;
+    protected _vastOverlay?: AbstractVideoOverlay;
     private _gameSessionId?: number;
     private _abGroup: ABGroup;
     private _om?: VastOpenMeasurementController;
     private _deviceInfo: DeviceInfo;
 
-    constructor(adUnit: VastAdUnit, parameters: IAdUnitParameters<VastCampaign>) {
+    constructor(adUnit: VastAdUnit, parameters: IVideoAdUnitParameters<VastCampaign>) {
         super(adUnit, parameters);
 
         this._platform = parameters.platform;
@@ -135,8 +135,7 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
         if (this._om) {
             this._om.adUserInteraction(InteractionType.CLICK);
         }
-
-        const clickThroughURL = this._vastAdUnit.getVideoClickThroughURL();
+        const clickThroughURL = this.getClickThroughURL();
         if (clickThroughURL) {
             const useWebViewUserAgentForTracking = this._vastCampaign.getUseWebViewUserAgentForTracking();
             const ctaClickedTime = Date.now();
@@ -149,6 +148,10 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
         } else {
             return Promise.reject(new Error('No clickThroughURL was defined'));
         }
+    }
+
+    protected getClickThroughURL(): string | null {
+        return this._vastAdUnit.getVideoClickThroughURL();
     }
 
     private openUrlOnCallButton(url: string, clickDuration: number, clickUrl: string): Promise<void> {

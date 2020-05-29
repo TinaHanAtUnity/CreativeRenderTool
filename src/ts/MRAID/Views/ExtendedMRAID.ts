@@ -116,7 +116,7 @@ export class ExtendedMRAID extends MRAIDView<IMRAIDViewHandler> {
             originalUrl = htmlResource.getOriginalUrl();
         }
 
-        let container = this._gameSessionId % 1000 === 0 ? MRAIDPerfContainer : MacroUtil.replaceMacro(MRAIDContainer, {'{{ CREATIVE_URL }}': originalUrl});
+        let container = this._gameSessionId % 1000 === 0 ? MRAIDPerfContainer : MacroUtil.replaceMacro(MRAIDContainer, { '{{ CREATIVE_URL }}': originalUrl });
         const playableConfiguration = this._campaign.getPlayableConfiguration();
         if (playableConfiguration) {
             // check configuration based on the ab group
@@ -145,7 +145,7 @@ export class ExtendedMRAID extends MRAIDView<IMRAIDViewHandler> {
         const frameLoadDuration = (Date.now() - SdkStats.getFrameSetStartTimestamp(this._placement.getId())) / 1000;
         this._core.Sdk.logDebug('Unity Ads placement ' + this._placement.getId() + ' iframe load duration ' + frameLoadDuration + ' s');
 
-        if (this.isKPIDataValid({frameLoadDuration}, 'playable_mraid_playable_loading_time')) {
+        if (this.isKPIDataValid({ frameLoadDuration }, 'playable_mraid_playable_loading_time')) {
             this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(frameLoadDuration, 0, 0, 'playable_loading_time', {}));
         }
     }

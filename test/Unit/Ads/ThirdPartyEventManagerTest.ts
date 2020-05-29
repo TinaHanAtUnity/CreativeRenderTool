@@ -9,12 +9,16 @@ import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import 'mocha';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
+import { FailedPTSEventManager } from 'Ads/Managers/FailedPTSEventManager';
+import { StorageBridge } from 'Core/Utilities/StorageBridge';
 
 describe('ThirdPartyEventManagerTest', () => {
     let platform: Platform;
     let backend: Backend;
     let nativeBridge: NativeBridge;
     let core: ICoreApi;
+    let failedPTSEventManager: FailedPTSEventManager;
+    let storageBridge: StorageBridge;
 
     let thirdPartyEventManager: ThirdPartyEventManager;
     let request: RequestManager;
@@ -24,10 +28,12 @@ describe('ThirdPartyEventManagerTest', () => {
         backend = TestFixtures.getBackend(platform);
         nativeBridge = TestFixtures.getNativeBridge(platform, backend);
         core = TestFixtures.getCoreApi(nativeBridge);
+        failedPTSEventManager = sinon.createStubInstance(FailedPTSEventManager);
+        storageBridge = sinon.createStubInstance(StorageBridge);
 
         request = sinon.createStubInstance(RequestManager);
         (<sinon.SinonStub>request.get).returns(Promise.resolve({}));
-        thirdPartyEventManager = new ThirdPartyEventManager(core, request);
+        thirdPartyEventManager = new ThirdPartyEventManager(core, request, {}, storageBridge);
     });
 
     it('Send successful third party event', () => {
@@ -84,11 +90,25 @@ describe('ThirdPartyEventManagerTest', () => {
         assert.deepEqual(requestOptionsToTest, requestStub.getCall(0).args[2], 'Internal tracking options were not overwritten');
     });
 
+    it('should queue to store failed internal unity tracking event', () => {
+        const url: string = 'https://tracking.prd.mz.internal.unity3d.com/third_party_event';
+        const requestStub = <sinon.SinonStub>request.get;
+        const queueStub = <sinon.SinonStub>storageBridge.queue;
+        requestStub.returns(Promise.reject());
+        queueStub.returns({});
+
+        return thirdPartyEventManager.sendWithGet('click', 'abcde-12345', url).then(() => {
+            assert.fail();
+        }).catch(() => {
+            sinon.assert.calledOnce(queueStub);
+        });
+    });
+
     it('should replace "%ZONE%" in the url with the placement id', () => {
         const requestSpy = <sinon.SinonSpy>request.get;
         const urlTemplate = 'http://foo.biz/%ZONE%/123';
         const placement = TestFixtures.getPlacement();
-        thirdPartyEventManager.setTemplateValues({[ThirdPartyEventMacro.ZONE]: placement.getId()});
+        thirdPartyEventManager.setTemplateValues({ [ThirdPartyEventMacro.ZONE]: placement.getId() });
         thirdPartyEventManager.sendWithGet('eventName', 'sessionId', urlTemplate);
         assert(requestSpy.calledOnce, 'request get should\'ve been called');
         assert.equal(requestSpy.getCall(0).args[0], 'http://foo.biz/' + placement.getId() + '/123', 'Should have replaced %ZONE% from the url');
@@ -97,7 +117,7 @@ describe('ThirdPartyEventManagerTest', () => {
     it('should replace "%SDK_VERSION%" in the url with the SDK version as a query parameter', () => {
         const requestSpy = <sinon.SinonSpy>request.get;
         const urlTemplate = 'http://foo.biz/%SDK_VERSION%/123';
-        thirdPartyEventManager.setTemplateValues({[ThirdPartyEventMacro.SDK_VERSION]: '12345'});
+        thirdPartyEventManager.setTemplateValues({ [ThirdPartyEventMacro.SDK_VERSION]: '12345' });
         thirdPartyEventManager.sendWithGet('eventName', 'sessionId', urlTemplate);
         assert(requestSpy.calledOnce, 'request get should\'ve been called');
         assert.equal(requestSpy.getCall(0).args[0], 'http://foo.biz/12345/123', 'Should have replaced %SDK_VERSION% from the url');
@@ -106,7 +126,7 @@ describe('ThirdPartyEventManagerTest', () => {
     it('should replace template values given in constructor', () => {
         const requestSpy = <sinon.SinonSpy>request.get;
         const urlTemplate = 'http://foo.biz/%SDK_VERSION%/123';
-        thirdPartyEventManager = new ThirdPartyEventManager(core, request, {[ThirdPartyEventMacro.SDK_VERSION]: '12345'});
+        thirdPartyEventManager = new ThirdPartyEventManager(core, request, { [ThirdPartyEventMacro.SDK_VERSION]: '12345' });
         thirdPartyEventManager.sendWithGet('eventName', 'sessionId', urlTemplate);
         assert(requestSpy.calledOnce, 'request get should\'ve been called');
         assert.equal(requestSpy.getCall(0).args[0], 'http://foo.biz/12345/123', 'Should have replaced %SDK_VERSION% from the url');

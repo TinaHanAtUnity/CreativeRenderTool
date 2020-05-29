@@ -9,7 +9,7 @@ export enum VerificationReasonCode {
 
 interface IVastAdVerification {
     verificationVendor: string;
-    verificationResources: VastVerificationResource[];  // javascript only
+    verificationResources: VastVerificationResource[]; // javascript only
     verificationTrackingEvent: string | null;
     verificationParameters: string | null;
 }

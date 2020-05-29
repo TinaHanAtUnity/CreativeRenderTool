@@ -9,13 +9,7 @@ describe('OmidEventBridge', () => {
     let handler: IOMIDEventHandler;
 
     let omInstance: OpenMeasurementMockVast;
-
-    const iframe: HTMLIFrameElement = document.createElement('iframe');
-    Object.defineProperty(iframe, 'contentWindow', {
-        value: {
-            postMessage: jest.fn()
-        }
-    });
+    let iframe: HTMLIFrameElement;
 
     beforeEach(() => {
         handler = {
@@ -28,16 +22,24 @@ describe('OmidEventBridge', () => {
         omInstance = new OpenMeasurementVast();
         jest.spyOn(Date, 'now').mockImplementation(() => 1000);
 
+        iframe = document.createElement('iframe');
+        Object.defineProperty(iframe, 'contentWindow', {
+            value: {
+                postMessage: jest.fn()
+            }
+        });
+        Object.defineProperty(iframe, 'id', { value: 'iframeId' });
+
         omidEventBridge = new OMIDEventBridge(core.Api, handler, iframe, omInstance, campaign);
     });
 
     describe('when triggering admob impression event', () => {
         it('should send postmessage event', () => {
-            omidEventBridge.onEventRegistered('omidImpression', 'test', '1');
+            omidEventBridge.onEventRegistered('omidImpression', 'test', '1', 'iframeId');
             omidEventBridge.triggerVideoEvent('omidImpression');
 
             // tslint:disable-next-line
-            expect(iframe.contentWindow!.postMessage).toHaveBeenCalledWith({'adSessionId': '', 'payload': undefined, 'timestamp': 1000, 'type': 'omidImpression', 'uuid': '1'}, '*');
+            expect(iframe.contentWindow!.postMessage).toHaveBeenCalledWith({ 'adSessionId': '', 'payload': undefined, 'timestamp': 1000, 'type': 'omidImpression', 'uuid': '1' }, '*');
         });
     });
 });

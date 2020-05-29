@@ -8,13 +8,13 @@ import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
 import { Video } from 'Ads/Models/Assets/Video';
 import { Campaign } from 'Ads/Models/Campaign';
 import { Placement } from 'Ads/Models/Placement';
-import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { FinishState } from 'Core/Constants/FinishState';
 import { Platform } from 'Core/Constants/Platform';
 import { UnityAdsError } from 'Core/Constants/UnityAdsError';
 import { ICoreApi } from 'Core/ICore';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
+import { SDKMetrics, VideoMetric } from 'Ads/Utilities/SDKMetrics';
 
 export interface IVideoEventHandlerParams<T extends VideoAdUnit = VideoAdUnit, T2 extends Campaign = Campaign, T3 extends OperativeEventManager = OperativeEventManager> {
     adUnit: T;
@@ -64,12 +64,12 @@ export abstract class BaseVideoEventHandler {
         this._adUnit.onFinish.trigger();
     }
 
-    protected handleVideoError(errorType: string, errorData: unknown) {
+    protected handleVideoError(metric: VideoMetric) {
         if (this._adUnit.getVideoState() !== VideoState.ERRORED) {
             const previousState = this._adUnit.getVideoState();
             this._adUnit.setVideoState(VideoState.ERRORED);
 
-            SessionDiagnostics.trigger(errorType, errorData, this._campaign.getSession());
+            SDKMetrics.reportMetricEvent(metric);
 
             this._adUnit.setFinishState(FinishState.ERROR);
 

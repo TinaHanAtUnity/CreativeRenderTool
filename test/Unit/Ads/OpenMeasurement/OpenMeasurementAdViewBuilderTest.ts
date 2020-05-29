@@ -139,20 +139,7 @@ import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
                             obstructions: []
                         },
                         measuringElement: true,
-                        reasons: [],
-                        containerGeometry: {
-                            x: 0,
-                            y: 0,
-                            width: 200,
-                            height: 100
-                        },
-                        onScreenContainerGeometry: {
-                            x: 0,
-                            y: 0,
-                            width: 200,
-                            height: 100,
-                            obstructions: []
-                        }
+                        reasons: []
                     };
                     assert.equal(JSON.stringify(calculatedAdView), JSON.stringify(testAdView));
                 });
@@ -245,7 +232,7 @@ import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
                         y: 0,
                         width: 300,
                         height: 300,
-                        obstructions: [{x: 0, y: 0, width: 200, height: 200}]
+                        obstructions: [{ x: 0, y: 0, width: 200, height: 200 }]
                     },
                     measuringElement: true,
                     reasons: [ObstructionReasons.OBSTRUCTED],
@@ -260,7 +247,7 @@ import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
                         y: 0,
                         width: platform === Platform.ANDROID ? 283 : 567,
                         height: platform === Platform.ANDROID ? 617 : 1234,
-                        obstructions: [{x: 0, y: 0, width: 200, height: 200}]
+                        obstructions: [{ x: 0, y: 0, width: 200, height: 200 }]
                     }
                 };
                 return omAdViewBuilder.buildAdmobAdView([reason], omController, rect).then((adview) => {
@@ -291,23 +278,10 @@ import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
                             y: 0,
                             width: 0,
                             height: 0,
-                            obstructions: [{x: 0, y: 0, width: 567, height: 1234}]
+                            obstructions: [{ x: 0, y: 0, width: 567, height: 1234 }]
                         },
                         measuringElement: true,
-                        reasons: [ObstructionReasons.BACKGROUNDED],
-                        containerGeometry: {
-                            x: 0,
-                            y: 0,
-                            width: platform === Platform.ANDROID ? 567 : 567,
-                            height: platform === Platform.ANDROID ? 1234 : 1234
-                        },
-                        onScreenContainerGeometry: {
-                            x: 0,
-                            y: 0,
-                            width: platform === Platform.ANDROID ? 567 : 567,
-                            height: platform === Platform.ANDROID ? 1234 : 1234,
-                            obstructions: [{x: 0, y: 0, width: 567, height: 1234}]
-                        }
+                        reasons: [ObstructionReasons.BACKGROUNDED]
                     };
 
                     const vastadunit = sinon.createStubInstance(VastAdUnit);
@@ -335,20 +309,7 @@ import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
                             obstructions: []
                         },
                         measuringElement: true,
-                        reasons: [],
-                        containerGeometry: {
-                            x: 0,
-                            y: 0,
-                            width: platform === Platform.ANDROID ? 567 : 567,
-                            height: platform === Platform.ANDROID ? 1234 : 1234
-                        },
-                        onScreenContainerGeometry: {
-                            x: 0,
-                            y: 0,
-                            width: platform === Platform.ANDROID ? 567 : 567,
-                            height: platform === Platform.ANDROID ? 1234 : 1234,
-                            obstructions: []
-                        }
+                        reasons: []
                     };
                     const vastadunit = sinon.createStubInstance(VastAdUnit);
                     omAdViewBuilder.setVideoView(OpenMeasurementUtilities.createRectangle(0, 200, 300, 300));
@@ -371,23 +332,10 @@ import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
                             y: 200,
                             width: 600,
                             height: 400,
-                            obstructions: [{x: 0, y: 200, width: 300, height: 300}]
+                            obstructions: [{ x: 0, y: 200, width: 300, height: 300 }]
                         },
                         measuringElement: true,
-                        reasons: [ObstructionReasons.OBSTRUCTED],
-                        containerGeometry: {
-                            x: 0,
-                            y: 0,
-                            width: platform === Platform.ANDROID ? 567 : 567,
-                            height: platform === Platform.ANDROID ? 1234 : 1234
-                        },
-                        onScreenContainerGeometry: {
-                            x: 0,
-                            y: 0,
-                            width: platform === Platform.ANDROID ? 567 : 567,
-                            height: platform === Platform.ANDROID ? 1234 : 1234,
-                            obstructions: [{x: 0, y: 200, width: 300, height: 300}]
-                        }
+                        reasons: [ObstructionReasons.OBSTRUCTED]
                     };
                     const vastadunit = sinon.createStubInstance(VastAdUnit);
                     const obstructionRect = OpenMeasurementUtilities.createRectangle(0, 200, 300, 300);

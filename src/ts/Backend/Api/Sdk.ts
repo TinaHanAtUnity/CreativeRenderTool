@@ -26,6 +26,12 @@ export class Sdk extends BackendApi {
         return;
     }
 
+    public initError(message: string, code: number) {
+        // tslint:disable:no-console
+        console.error(`Failed to initialize Unity Ads SDK.\nError: ${message}\nError Code: ${code}`);
+        // tslint:enable:no-console
+    }
+
     public logError(message: string) {
         if (this._enableLogs) {
             // tslint:disable:no-console

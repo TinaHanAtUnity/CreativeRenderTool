@@ -5,15 +5,16 @@ import { CampaignAssetInfo } from 'Ads/Utilities/CampaignAssetInfo';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
+import { ExternalEndScreen } from 'ExternalEndScreen/Views/ExternalEndScreen';
 
 export interface IPerformanceAdUnitParameters extends IVideoAdUnitParameters<PerformanceCampaign> {
-    endScreen: PerformanceEndScreen;
+    endScreen: PerformanceEndScreen | ExternalEndScreen;
     adUnitStyle?: AdUnitStyle;
 }
 
 export class PerformanceAdUnit extends VideoAdUnit<PerformanceCampaign> {
 
-    private _endScreen: PerformanceEndScreen;
+    private _endScreen: PerformanceEndScreen | ExternalEndScreen;
     private _privacy: AbstractPrivacy;
     private _performanceCampaign: PerformanceCampaign;
     private _thirdPartyEventManager: ThirdPartyEventManager;
@@ -56,7 +57,7 @@ export class PerformanceAdUnit extends VideoAdUnit<PerformanceCampaign> {
         return 'performance';
     }
 
-    public getEndScreen(): PerformanceEndScreen | undefined {
+    public getEndScreen(): PerformanceEndScreen | ExternalEndScreen | undefined {
         return this._endScreen;
     }
 
@@ -93,7 +94,7 @@ export class PerformanceAdUnit extends VideoAdUnit<PerformanceCampaign> {
         this._thirdPartyEventManager.sendTrackingEvents(this._performanceCampaign, event, 'performance');
     }
 
-    public getCampaign(): PerformanceCampaign  {
+    public getCampaign(): PerformanceCampaign {
         return this._performanceCampaign;
     }
 

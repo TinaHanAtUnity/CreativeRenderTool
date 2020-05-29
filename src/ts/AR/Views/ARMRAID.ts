@@ -18,8 +18,9 @@ import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { IMRAIDViewHandler, MRAIDView } from 'MRAID/Views/MRAIDView';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { MRAIDIFrameEventAdapter } from 'MRAID/EventBridge/MRAIDIFrameEventAdapter';
-import { AutomatedExperimentManager } from 'Ads/Managers/AutomatedExperimentManager';
-import { IArUiExperiments } from 'AR/Experiments/ARUIExperiments';
+import { AutomatedExperimentManager } from 'MabExperimentation/AutomatedExperimentManager';
+import { AutomatedExperimentsCategories } from 'MabExperimentation/Models/AutomatedExperimentsList';
+import { IExperimentActionChoice } from 'MabExperimentation/Models/AutomatedExperiment';
 import { Color } from 'Core/Utilities/Color';
 
 export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
@@ -55,13 +56,13 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
     private _arSessionInterruptedObserver: IObserver0;
     private _arSessionInterruptionEndedObserver: IObserver0;
     private _arAndroidEnumsReceivedObserver: IObserver1<unknown>;
-    private _arUiExperiments: IArUiExperiments;
+    private _arUiExperiments: IExperimentActionChoice;
     private _automatedExperimentManager: AutomatedExperimentManager;
 
     private _hasCameraPermission = false;
     private _viewable: boolean;
 
-    constructor(platform: Platform, core: ICoreApi, ar: IARApi, deviceInfo: DeviceInfo, placement: Placement, campaign: MRAIDCampaign, language: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup, gameSessionId: number, hidePrivacy: boolean | undefined, automatedExperimentManager: AutomatedExperimentManager, arUiExperiments: IArUiExperiments) {
+    constructor(platform: Platform, core: ICoreApi, ar: IARApi, deviceInfo: DeviceInfo, placement: Placement, campaign: MRAIDCampaign, language: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup, gameSessionId: number, hidePrivacy: boolean | undefined, automatedExperimentManager: AutomatedExperimentManager, arUiExperiments: IExperimentActionChoice) {
         super(platform, core, deviceInfo, 'extended-mraid', placement, campaign, privacy, showGDPRBanner, abGroup, !!hidePrivacy, gameSessionId);
 
         this._ar = ar;
@@ -109,7 +110,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
                         this.hideArAvailableButton();
                         this.showARPermissionPanel();
                         this.sendMraidAnalyticsEvent('ar_button_tapped', undefined);
-                        this._automatedExperimentManager.rewardExperiments(campaign);
+                        this._automatedExperimentManager.rewardSelectedExperiment(campaign, AutomatedExperimentsCategories.MRAID_AR);
                     }
                 },
                 selector: '.ar-available-button'
@@ -163,7 +164,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
                     width,
                     height
                 })));
-                this._arErrorObserver = this._ar.AR.onError.subscribe(errorCode => this.handleAREvent('error', JSON.stringify({errorCode})));
+                this._arErrorObserver = this._ar.AR.onError.subscribe(errorCode => this.handleAREvent('error', JSON.stringify({ errorCode })));
                 this._arSessionInterruptedObserver = this._ar.AR.onSessionInterrupted.subscribe(() => this.handleAREvent('sessioninterrupted', ''));
                 this._arSessionInterruptionEndedObserver = this._ar.AR.onSessionInterruptionEnded.subscribe(() => this.handleAREvent('sessioninterruptionended', ''));
                 if (this._platform === Platform.ANDROID) {
@@ -198,13 +199,11 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
         this._showTimestamp = Date.now();
         const backgroundTime = this._backgroundTime / 1000;
 
-        if (this.isKPIDataValid({backgroundTime}, 'playable_show')) {
+        if (this.isKPIDataValid({ backgroundTime }, 'playable_show')) {
             this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(0, 0, backgroundTime, 'playable_show', {}));
         }
 
         this.showLoadingScreen();
-
-        this._automatedExperimentManager.startCampaign(this._campaign);
     }
 
     public hide() {
@@ -236,7 +235,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
         super.hide();
         this._mraidAdapterContainer.disconnect();
 
-        this._automatedExperimentManager.endCampaign(this._campaign);
+        this._automatedExperimentManager.endSelectedExperiment(this._campaign, AutomatedExperimentsCategories.MRAID_AR);
     }
 
     private showLoadingScreen() {
@@ -331,7 +330,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
             this._handlers.forEach(handler => handler.onMraidClose());
         }
 
-        if (this.isKPIDataValid({timeFromShow, timeFromPlayableStart, backgroundTime}, eventName)) {
+        if (this.isKPIDataValid({ timeFromShow, timeFromPlayableStart, backgroundTime }, eventName)) {
             this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(timeFromShow, timeFromPlayableStart, backgroundTime, eventName, undefined));
         }
     }
@@ -341,7 +340,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
         const timeFromPlayableStart = (Date.now() - this._playableStartTimestamp - this._backgroundTime) / 1000;
         const backgroundTime = this._backgroundTime / 1000;
 
-        if (this.isKPIDataValid({timeFromShow, timeFromPlayableStart, backgroundTime}, eventName)) {
+        if (this.isKPIDataValid({ timeFromShow, timeFromPlayableStart, backgroundTime }, eventName)) {
             this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(timeFromShow, timeFromPlayableStart, backgroundTime, eventName, eventData));
         }
     }
@@ -361,14 +360,14 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
         const timeFromShow = (this._playableStartTimestamp - this._showTimestamp - this._backgroundTime) / 1000;
         const backgroundTime = this._backgroundTime / 1000;
 
-        if (this.isKPIDataValid({timeFromShow, backgroundTime}, 'playable_loading_time')) {
+        if (this.isKPIDataValid({ timeFromShow, backgroundTime }, 'playable_loading_time')) {
             this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(frameLoadDuration, timeFromShow, backgroundTime, 'playable_loading_time', {}));
         }
     }
 
     private handleAREvent(event: string, parameters: string) {
         if (this._iframeLoaded) {
-            this._iframe.contentWindow!.postMessage({type: 'AREvent', data: {parameters, event}}, '*');
+            this._iframe.contentWindow!.postMessage({ type: 'AREvent', data: { parameters, event } }, '*');
         }
     }
 
@@ -517,7 +516,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
                 const timeFromShow = (this._playableStartTimestamp - this._showTimestamp - this._backgroundTime) / 1000;
                 const backgroundTime = this._backgroundTime / 1000;
 
-                if (this.isKPIDataValid({timeFromShow, backgroundTime}, 'playable_start')) {
+                if (this.isKPIDataValid({ timeFromShow, backgroundTime }, 'playable_start')) {
                     this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(timeFromShow, 0, backgroundTime, 'playable_start', undefined));
                 }
 

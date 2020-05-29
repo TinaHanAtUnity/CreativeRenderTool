@@ -10,10 +10,13 @@ import { VastVideoEventHandler } from 'VAST/EventHandlers/VastVideoEventHandler'
 import { IVideoEventHandlerParams } from 'Ads/EventHandlers/BaseVideoEventHandler';
 import { IObserver2, IObserver3 } from 'Core/Utilities/IObserver';
 import { StreamType } from 'Core/Constants/Android/StreamType';
+import { TencentVastOverlayEventHandler } from 'VAST/EventHandlers/TencentVastOverlayEventHandler';
+import { TencentVastEndScreenEventHandler } from 'VAST/EventHandlers/TencentVastEndScreenEventHandler';
 
 export class VastAdUnitFactory extends AbstractAdUnitFactory<VastCampaign, IVastAdUnitParameters> {
 
     public createAdUnit(parameters: IVastAdUnitParameters): VastAdUnit {
+        const useTencentHandlers = CustomFeatures.isTencentSeat(parameters.campaign.getSeatId());
         const hasAdvertiserDomain = parameters.campaign.getAdvertiserDomain() !== undefined;
         if (hasAdvertiserDomain && parameters.campaign.isMoatEnabled()) {
             MoatViewabilityService.initMoat(parameters.platform, parameters.core, parameters.campaign, parameters.clientInfo, parameters.placement, parameters.deviceInfo, parameters.coreConfig);
@@ -21,15 +24,25 @@ export class VastAdUnitFactory extends AbstractAdUnitFactory<VastCampaign, IVast
 
         const vastAdUnit = new VastAdUnit(parameters);
 
-        const vastOverlayHandler = new VastOverlayEventHandler(vastAdUnit, parameters);
+        let vastOverlayHandler: VastOverlayEventHandler;
+        if (useTencentHandlers) {
+            vastOverlayHandler = new TencentVastOverlayEventHandler(vastAdUnit, parameters);
+        } else {
+            vastOverlayHandler = new VastOverlayEventHandler(vastAdUnit, parameters);
+        }
         parameters.overlay.addEventHandler(vastOverlayHandler);
 
         if ((parameters.campaign.hasStaticEndscreen() || parameters.campaign.hasIframeEndscreen() || parameters.campaign.hasHtmlEndscreen()) && parameters.endScreen) {
-            const vastEndScreenHandler = new VastEndScreenEventHandler(vastAdUnit, parameters);
+            let vastEndScreenHandler: VastEndScreenEventHandler;
+            if (useTencentHandlers) {
+                vastEndScreenHandler = new TencentVastEndScreenEventHandler(vastAdUnit, parameters);
+            } else {
+                vastEndScreenHandler = new VastEndScreenEventHandler(vastAdUnit, parameters);
+            }
             parameters.endScreen.addEventHandler(vastEndScreenHandler);
 
             if (parameters.platform === Platform.ANDROID) {
-                const onBackKeyObserver = parameters.ads.Android!.AdUnit.onKeyDown.subscribe((keyCode, eventTime, downTime, repeatCount) =>  {
+                const onBackKeyObserver = parameters.ads.Android!.AdUnit.onKeyDown.subscribe((keyCode, eventTime, downTime, repeatCount) => {
                     vastEndScreenHandler.onKeyEvent(keyCode);
                     if (CustomFeatures.isCloseIconSkipEnabled(parameters.clientInfo.getGameId())) {
                         vastOverlayHandler.onKeyEvent(keyCode);

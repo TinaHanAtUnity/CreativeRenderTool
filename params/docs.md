@@ -100,6 +100,7 @@
 | load | boolean | Load Flag for Load V5 | SDK | all |
 | preloadPlacements | object | All placements received in configuration | SDK | all |
 | preloadData | object | Preload Data for all placements received in configuration | SDK | all |
+| loadV5Support | boolean | Indicates if client can work with Load V5 or not | SDK | all |
 
 
 
@@ -205,6 +206,7 @@
 | load | no | False | True | boolean | Load Flag for Load V5 | SDK | all |
 | preloadPlacements | no | False | True | object | All placements received in configuration | SDK | all |
 | preloadData | no | False | True | object | Preload Data for all placements received in configuration | SDK | all |
+| loadV5Support | no | False | True | boolean | Indicates if client can work with Load V5 or not | SDK | all |
 
 
 

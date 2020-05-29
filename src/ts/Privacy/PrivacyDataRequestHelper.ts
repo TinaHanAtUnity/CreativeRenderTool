@@ -1,8 +1,10 @@
-import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
+import { INativeResponse } from 'Core/Managers/RequestManager';
 import { RequestError } from 'Core/Errors/RequestError';
 import { Platform } from 'Core/Constants/Platform';
 import { ICore } from 'Core/ICore';
-import { CaptchaEvent, PrivacyMetrics} from 'Privacy/PrivacyMetrics';
+import { CaptchaEvent, PrivacyMetrics } from 'Privacy/PrivacyMetrics';
+import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
+import { PrivacySDK } from 'Privacy/PrivacySDK';
 
 export enum DataRequestResponseStatus {
     SUCCESS,
@@ -32,28 +34,14 @@ export class PrivacyDataRequestHelper {
 
     private static BaseUrl: string = 'https://us-central1-unity-ads-debot-prd.cloudfunctions.net/debot/';
 
-    private static _platform: Platform;
-    private static _request: RequestManager;
-    private static _idfa: string | null | undefined;
-    private static _gameID: string;
-    private static _bundleID: string;
-    private static _projectID: string;
-    private static _language: string;
-    private static _country: string;
-    private static _subdivision: string;
-    private static _token: string;
+    private static _core: ICore;
+    private static _userPrivacyManager: UserPrivacyManager;
+    private static _privacySDK: PrivacySDK;
 
-    public static init(core: ICore) {
-        this._request = core.RequestManager;
-        this._platform = core.NativeBridge.getPlatform();
-        this._idfa = core.DeviceInfo.getAdvertisingIdentifier();
-        this._gameID = core.ClientInfo.getGameId();
-        this._bundleID = core.ClientInfo.getApplicationName();
-        this._projectID = core.Config.getUnityProjectId();
-        this._language = core.DeviceInfo.getLanguage();
-        this._country = core.Config.getCountry();
-        this._subdivision = core.Config.getSubdivision();
-        this._token = core.Config.getToken();
+    public static init(core: ICore, userPrivacyManager: UserPrivacyManager, privacySDK: PrivacySDK) {
+        this._core = core;
+        this._userPrivacyManager = userPrivacyManager;
+        this._privacySDK = privacySDK;
     }
 
     public static sendInitRequest(email: string): Promise<IDataRequestResponse> {
@@ -71,7 +59,13 @@ export class PrivacyDataRequestHelper {
         const body = {
             ... this.getRequestBody(),
             email: email,
-            answer: selectedImage
+            answer: selectedImage,
+            abGroup: PrivacyDataRequestHelper._core.Config.getAbGroup(),
+            legalFramework: PrivacyDataRequestHelper._userPrivacyManager.getLegalFramework(),
+            agreedOverAgeLimit: PrivacyDataRequestHelper._userPrivacyManager.getAgeGateChoice(),
+            agreedVersion: PrivacyDataRequestHelper._privacySDK.getGamePrivacy().getVersion(),
+            coppa: PrivacyDataRequestHelper._core.Config.isCoppaCompliant(),
+            layout: ''
         };
 
         const url = PrivacyDataRequestHelper.BaseUrl + 'verify';
@@ -86,7 +80,7 @@ export class PrivacyDataRequestHelper {
     }
 
     private static sendRequest(url: string, data: string): Promise<IDataRequestResponse> {
-        return PrivacyDataRequestHelper._request.post(url, data).then((response: INativeResponse) => {
+        return PrivacyDataRequestHelper._core.RequestManager.post(url, data).then((response: INativeResponse) => {
             if (response.responseCode === 200) {
                 if (url.includes('init')) {
                     PrivacyMetrics.trigger(CaptchaEvent.REQUEST_SCREEN_SHOW);
@@ -130,15 +124,15 @@ export class PrivacyDataRequestHelper {
 
     private static getRequestBody(): IDataRequestBody {
         return {
-            idfa: PrivacyDataRequestHelper._idfa,
-            gameID: PrivacyDataRequestHelper._gameID,
-            bundleID: PrivacyDataRequestHelper._bundleID,
-            projectID: PrivacyDataRequestHelper._projectID,
-            platform: Platform[PrivacyDataRequestHelper._platform].toLowerCase(),
-            language: PrivacyDataRequestHelper._language,
-            country: PrivacyDataRequestHelper._country,
-            subdivision: PrivacyDataRequestHelper._subdivision,
-            token: PrivacyDataRequestHelper._token
+            idfa: PrivacyDataRequestHelper._core.DeviceInfo.getAdvertisingIdentifier(),
+            gameID: PrivacyDataRequestHelper._core.ClientInfo.getGameId(),
+            bundleID: PrivacyDataRequestHelper._core.ClientInfo.getApplicationName(),
+            projectID: PrivacyDataRequestHelper._core.Config.getUnityProjectId(),
+            platform: Platform[PrivacyDataRequestHelper._core.NativeBridge.getPlatform()].toLowerCase(),
+            language: PrivacyDataRequestHelper._core.DeviceInfo.getLanguage(),
+            country: PrivacyDataRequestHelper._core.Config.getCountry(),
+            subdivision: PrivacyDataRequestHelper._core.Config.getSubdivision(),
+            token: PrivacyDataRequestHelper._core.Config.getToken()
         };
     }
 }

@@ -40,7 +40,6 @@ export class AdMobVideo extends Model<IAdMobVideo> {
 
 export interface IAdMobCampaign extends IProgrammaticCampaign {
     dynamicMarkup: string;
-    video: AdMobVideo | null;
     omVendors: string[];
     isOMEnabled: boolean | undefined;
     shouldMuteByDefault: boolean | undefined;
@@ -51,7 +50,6 @@ export class AdMobCampaign extends ProgrammaticCampaign<IAdMobCampaign> {
         super('AdMobCampaign', {
             ... ProgrammaticCampaign.Schema,
             dynamicMarkup: ['string'],
-            video: ['object', 'null'],
             omVendors: ['array'],
             isOMEnabled: ['boolean', 'undefined'],
             shouldMuteByDefault: ['boolean', 'undefined']
@@ -80,10 +78,6 @@ export class AdMobCampaign extends ProgrammaticCampaign<IAdMobCampaign> {
 
     public getDynamicMarkup(): string {
         return this.get('dynamicMarkup');
-    }
-
-    public getVideo(): AdMobVideo | null {
-        return this.get('video');
     }
 
     public getRequiredAssets(): Asset[] {

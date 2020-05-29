@@ -149,7 +149,7 @@ export abstract class CampaignManager {
         }
 
         if (coreConfig.getTestMode()) {
-            url = Url.addParameters(url, {test: true});
+            url = Url.addParameters(url, { test: true });
         }
 
         if (CampaignManager.CampaignId) {
@@ -193,7 +193,7 @@ export abstract class CampaignManager {
     }
 
     // todo: refactor requestedPlacement to something more sensible
-    public static createRequestBody(clientInfo: ClientInfo, coreConfig: CoreConfiguration, deviceInfo: DeviceInfo, userPrivacyManager: UserPrivacyManager, sessionManager: SessionManager, privacy: PrivacySDK, gameSessionCounters: IGameSessionCounters | undefined, fullyCachedCampaignIds: string[] | undefined, versionCode: number | undefined, adMobSignalFactory: AdMobSignalFactory, freeSpace: number, metaDataManager: MetaDataManager, adsConfig: AdsConfiguration, isLoadEnabled: boolean, previousPlacementId?: string, requestPrivacy?: IRequestPrivacy, legacyRequestPrivacy?: ILegacyRequestPrivacy, nofillRetry?: boolean, requestedPlacement?: Placement): Promise<unknown> {
+    public static createRequestBody(clientInfo: ClientInfo, coreConfig: CoreConfiguration, deviceInfo: DeviceInfo, userPrivacyManager: UserPrivacyManager, sessionManager: SessionManager, privacy: PrivacySDK, gameSessionCounters: IGameSessionCounters | undefined, fullyCachedCampaignIds: string[] | undefined, versionCode: number | undefined, adMobSignalFactory: AdMobSignalFactory, freeSpace: number, metaDataManager: MetaDataManager, adsConfig: AdsConfiguration, isLoadEnabled: boolean, previousPlacementId?: string, requestPrivacy?: IRequestPrivacy, legacyRequestPrivacy?: ILegacyRequestPrivacy, nofillRetry?: boolean, requestedPlacement?: Placement, loadV5Support?: boolean): Promise<unknown> {
         const placementRequest: { [key: string]: unknown } = {};
 
         const body: { [key: string]: unknown } = {
@@ -322,6 +322,11 @@ export abstract class CampaignManager {
                 if (developerId) {
                     body.developerId = developerId;
                 }
+
+                if (loadV5Support) {
+                    body.loadV5Support = loadV5Support;
+                }
+
                 return body;
             });
         });

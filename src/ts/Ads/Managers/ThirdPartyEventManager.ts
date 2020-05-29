@@ -5,10 +5,13 @@ import { RequestError } from 'Core/Errors/RequestError';
 import { ICoreApi } from 'Core/ICore';
 import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
 import { Url } from 'Core/Utilities/Url';
-import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { MacroUtil } from 'Ads/Utilities/MacroUtil';
 import { SDKMetrics, MiscellaneousMetric } from 'Ads/Utilities/SDKMetrics';
+import { Diagnostics } from 'Core/Utilities/Diagnostics';
+import { FailedPTSEventManager } from 'Ads/Managers/FailedPTSEventManager';
+import { StorageBridge } from 'Core/Utilities/StorageBridge';
+import { JaegerUtilities } from 'Core/Jaeger/JaegerUtilities';
 
 enum ThirdPartyEventMethod {
     POST,
@@ -37,7 +40,6 @@ export enum TrackingEvent {
     COMPLETE = 'complete',
     ERROR = 'error',
     SKIP = 'skip',
-    VIEW = 'view',
     STALLED = 'stalled',
     COMPANION_CLICK = 'companionClick',
     COMPANION = 'companion',
@@ -58,11 +60,14 @@ export class ThirdPartyEventManager {
 
     private _core: ICoreApi;
     private _request: RequestManager;
+    private _storageBridge: StorageBridge | undefined;
     private _templateValues: { [id: string]: string } = {};
 
-    constructor(core: ICoreApi, request: RequestManager, templateValues?: ITemplateValueMap) {
+    // TODO: Make storageBridge required param if resending the failed PTS Events accounts for the discrepancy
+    constructor(core: ICoreApi, request: RequestManager, templateValues?: ITemplateValueMap, storageBridge?: StorageBridge) {
         this._core = core;
         this._request = request;
+        this._storageBridge = storageBridge;
 
         if (templateValues) {
             this.setTemplateValues(templateValues);
@@ -74,8 +79,33 @@ export class ThirdPartyEventManager {
         const sessionId = campaign.getSession().getId();
         const events = [];
 
-        if (event === TrackingEvent.IMPRESSION && CustomFeatures.sampleAtGivenPercent(50)) {
-            SDKMetrics.reportMetricEvent(MiscellaneousMetric.ImpressionDuplicate);
+        // For the investigation of the batching implementation of metrics in the SDK
+        if (event === TrackingEvent.IMPRESSION) {
+
+            // Keep original metric and sampling as it was
+            if (CustomFeatures.sampleAtGivenPercent(50)) {
+                SDKMetrics.reportMetricEvent(MiscellaneousMetric.ImpressionDuplicate);
+            }
+
+            const metricData = JSON.stringify({
+                metrics: [
+                    {
+                        name: MiscellaneousMetric.ImpressionDuplicateNonBatching,
+                        value: 1,
+                        tags: ['ads_sdk2_tst:true']
+                    }
+                ]
+            });
+
+            const requestOptions = {
+                retries: 2,
+                retryDelay: 0,
+                retryWithConnectionEvents: false,
+                followRedirects: false
+            };
+
+            const ptsHeaders: [string, string][] = [['Content-Type', 'application/json']];
+            events.push(this._request.post('https://sdk-diagnostics.prd.mz.internal.unity3d.com/v1/metrics', metricData, ptsHeaders, requestOptions));
         }
 
         for (const url of urls) {
@@ -144,6 +174,13 @@ export class ThirdPartyEventManager {
                 request = this._request.get(url, headers, options);
         }
         return request.catch(error => {
+
+            if (this._storageBridge && method === ThirdPartyEventMethod.GET && Url.isInternalPTSTrackingProtocol(url)) {
+                new FailedPTSEventManager(this._core, sessionId, JaegerUtilities.uuidv4()).storeFailedEvent(this._storageBridge, {
+                    url: url
+                });
+            }
+
             const urlParts = Url.parse(url);
             const auctionProtocol = RequestManager.getAuctionProtocol();
             const diagnosticData = {
@@ -187,7 +224,7 @@ export class ThirdPartyEventManager {
                 url = MacroUtil.replaceMacro(url, additionalMacros);
             }
 
-            url = MacroUtil.replaceMacro(url, {'[TIMESTAMP]': (new Date()).toISOString()});
+            url = MacroUtil.replaceMacro(url, { '[TIMESTAMP]': (new Date()).toISOString() });
         }
 
         return Url.encode(url);

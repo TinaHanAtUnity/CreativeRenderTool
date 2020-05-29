@@ -402,6 +402,12 @@
       "required": "no",
       "queryString": false,
       "body": true
+    },
+    {
+      "parameter": "loadV5Support",
+      "required": "no",
+      "queryString": false,
+      "body": true
     }
   ]
 }

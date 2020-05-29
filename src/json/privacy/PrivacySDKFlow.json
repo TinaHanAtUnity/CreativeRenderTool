@@ -7,33 +7,69 @@
         {
           "node": "consent",
           "condition": {
-            "==": [
+            "and": [
               {
-                "var": "env.developerAgeGate"
+                "==": [
+                  {
+                    "var": "env.developerAgeGate"
+                  },
+                  true
+                ]
               },
-              true
+              {
+                "==": [
+                  {
+                    "var": "env.privacyMethod"
+                  },
+                  "unity_consent"
+                ]
+              }
             ]
           }
         },
         {
           "node": "ageSelect",
           "condition": {
-            ">": [
+            "and": [
               {
-                "var": "env.ageGateLimit"
+                ">": [
+                  {
+                    "var": "env.ageGateLimit"
+                  },
+                  0
+                ]
               },
-              0
+              {
+                "==": [
+                  {
+                    "var": "user.ageGateChoice"
+                  },
+                  "missing"
+                ]
+              }
             ]
           }
         },
         {
           "node": "consent",
           "condition": {
-            "==": [
+            "or": [
               {
-                "var": "env.ageGateLimit"
+                "==": [
+                  {
+                    "var": "env.ageGateLimit"
+                  },
+                  0
+                ]
               },
-              0
+              {
+                "!=": [
+                  {
+                    "var": "user.ageGateChoice"
+                  },
+                  "missing"
+                ]
+              }
             ]
           }
         }
@@ -69,7 +105,19 @@
             "variant": "secondary",
             "actions": [
               {
-                "property": "user.agreedOverAgeLimit",
+                "property": "user.ageGateChoice",
+                "value": "no"
+              },
+              {
+                "property": "user.gameExp",
+                "value": false
+              },
+              {
+                "property": "user.ads",
+                "value": false
+              },
+              {
+                "property": "user.external",
                 "value": false
               }
             ]
@@ -82,8 +130,8 @@
             "variant": "primary",
             "actions": [
               {
-                "property": "user.agreedOverAgeLimit",
-                "value": true
+                "property": "user.ageGateChoice",
+                "value": "yes"
               }
             ]
           }
@@ -93,11 +141,57 @@
         {
           "node": "consent",
           "condition": {
+            "and": [
+              {
+                "==": [
+                  {
+                    "var": "user.ageGateChoice"
+                  },
+                  "yes"
+                ]
+              },
+              {
+                "==": [
+                  {
+                    "var": "env.privacyMethod"
+                  },
+                  "unity_consent"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "node": null,
+          "condition": {
+            "and": [
+              {
+                "==": [
+                  {
+                    "var": "user.ageGateChoice"
+                  },
+                  "yes"
+                ]
+              },
+              {
+                "!=": [
+                  {
+                    "var": "env.privacyMethod"
+                  },
+                  "unity_consent"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "node": null,
+          "condition": {
             "==": [
               {
-                "var": "user.agreedOverAgeLimit"
+                "var": "user.ageGateChoice"
               },
-              true
+              "no"
             ]
           }
         }
@@ -131,12 +225,7 @@
             "text": "showChoices",
             "variant": "secondary",
             "isSubmit": true,
-            "actions": [
-              {
-                "property": "state.hasAcceptedTracking",
-                "value": false
-              }
-            ]
+            "actions": []
           },
           {
             "id": "acceptTracking",
@@ -159,10 +248,6 @@
               {
                 "property": "user.agreementMethod",
                 "value": "all"
-              },
-              {
-                "property": "state.hasAcceptedTracking",
-                "value": true
               }
             ],
             "isSubmit": true
@@ -171,13 +256,24 @@
       },
       "links": [
         {
+          "node": null,
+          "condition": {
+            "==": [
+              {
+                "var": "user.agreementMethod"
+              },
+              "all"
+            ]
+          }
+        },
+        {
           "node": "customization",
           "condition": {
             "!=": [
               {
-                "var": "state.hasAcceptedTracking"
+                "var": "user.agreementMethod"
               },
-              true
+              "all"
             ]
           }
         }
@@ -779,7 +875,18 @@
           }
         ]
       },
-      "links": [],
+      "links": [
+        {
+          "node": null,
+          "condition": true
+        }
+      ],
+      "fetchUrls": [
+        {
+          "url": "env.userSummaryUrl",
+          "property": "env.userSummary"
+        }
+      ],
       "allowGoBack": true
     }
   }

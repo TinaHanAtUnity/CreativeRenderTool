@@ -28,23 +28,23 @@ export enum OMID3pEvents {
 }
 
 export enum VideoPosition {
-    PREROLL     = 'preroll',                            // The ad plays preceding video content
-    MIDROLL     = 'midroll',                            // The ad plays in the middle of video content
-    POSTROLL    = 'postroll',                           // The ad plays following video content
-    STANDALONE  = 'standalone'                          // The ad plays independently of any video
+    PREROLL = 'preroll', // The ad plays preceding video content
+    MIDROLL = 'midroll', // The ad plays in the middle of video content
+    POSTROLL = 'postroll', // The ad plays following video content
+    STANDALONE = 'standalone' // The ad plays independently of any video
 }
 
 export enum VideoPlayerState {
-    MINIMIZED  = 'minimized',
-    COLLAPSED  = 'collapsed',
-    NORMAL     = 'normal',
-    EXPANDED   = 'expanded',
+    MINIMIZED = 'minimized',
+    COLLAPSED = 'collapsed',
+    NORMAL = 'normal',
+    EXPANDED = 'expanded',
     FULLSCREEN = 'fullscreen'
 }
 
 export enum InteractionType {
-    CLICK              = 'click',
-    INVITATION_ACCEPT  = 'invitationAccept'
+    CLICK = 'click',
+    INVITATION_ACCEPT = 'invitationAccept'
 }
 
 export interface IRectangle {
@@ -94,13 +94,13 @@ export enum MediaType {
 }
 
 export enum AccessMode {
-    FULL = 'full',                                      // Verification scripts have access to the entire JS object graph and DOM.
-    LIMITED = 'limited'                                 // Verification scripts are limited to a sandboxed iframe.
+    FULL = 'full', // Verification scripts have access to the entire JS object graph and DOM.
+    LIMITED = 'limited' // Verification scripts are limited to a sandboxed iframe.
 }
 
 export enum VideoEventAdaptorType {
-    JS_CUSTOM = 'jsCustom',                             // Verification scripts have access to the entire JS object graph and DOM.
-    NATIVE_CUSTOM = 'nativeCustom'                      // Verification scripts are limited to a sandboxed iframe.
+    JS_CUSTOM = 'jsCustom', // Verification scripts have access to the entire JS object graph and DOM.
+    NATIVE_CUSTOM = 'nativeCustom' // Verification scripts are limited to a sandboxed iframe.
 }
 
 export interface IImpressionValues {
@@ -112,7 +112,7 @@ export interface IImpressionValues {
 }
 
 export interface IVastProperties {
-    isSkippable: boolean;
+    skippable: boolean;
     skipOffset: number;
     isAutoplay: boolean;
     position: VideoPosition;
@@ -137,12 +137,12 @@ export interface IContext {
     environment: string;
     accessMode: AccessMode;
     videoElement?: HTMLVideoElement | null; // Only required for AccessMode.FULL video
-    slotElement?: HTMLElement;              // Only required for AccessMode.FULL display
+    slotElement?: HTMLElement; // Only required for AccessMode.FULL display
     adSessionType: AdSessionType;
-    adServingId?: string;                   // VAST optional field - <AdServingId>
-    transactionId?: string;                 // VAST optional field - VAST 4.1 [TRANSACTIONID]
-    podSequence?: string;                   // VAST optional field - sequence <Ad> attribute
-    adCount?: number;                       // VAST optional field - number of <InLine> elements
+    adServingId?: string; // VAST optional field - <AdServingId>
+    transactionId?: string; // VAST optional field - VAST 4.1 [TRANSACTIONID]
+    podSequence?: string; // VAST optional field - sequence <Ad> attribute
+    adCount?: number; // VAST optional field - number of <InLine> elements
     omidNativeInfo?: {
         partnerName: string;
         partnerVersion: string;

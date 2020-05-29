@@ -14,21 +14,21 @@ export interface IOpenableIntentsResponse {
 }
 
 export enum AFMAEvents {
-    OPEN_URL                = 'openUrl',
-    CLOSE                   = 'close',
-    FORCE_ORIENTATION       = 'forceOrientation',
-    CLICK                   = 'click',
-    VIDEO_START             = 'videoStart',
-    GRANT_REWARD            = 'grantReward',
-    DISABLE_BACK_BUTTON     = 'disableBackButton',
-    OPEN_STORE_OVERLAY      = 'openStoreOverlay',
-    OPEN_IN_APP_STORE       = 'openInAppStore',
+    OPEN_URL = 'openUrl',
+    CLOSE = 'close',
+    FORCE_ORIENTATION = 'forceOrientation',
+    CLICK = 'click',
+    VIDEO_START = 'videoStart',
+    GRANT_REWARD = 'grantReward',
+    DISABLE_BACK_BUTTON = 'disableBackButton',
+    OPEN_STORE_OVERLAY = 'openStoreOverlay',
+    OPEN_IN_APP_STORE = 'openInAppStore',
     FETCH_APP_STORE_OVERLAY = 'fetchAppStoreOverlay',
-    OPEN_INTENTS_REQUEST    = 'openableIntents',
-    TRACKING                = 'tracking',
-    GET_CLICK_SIGNAL        = 'getClickSignal',
-    USER_SEEKED             = 'seeked',
-    VOLUME_CHANGE           = 'volumeChanged'
+    OPEN_INTENTS_REQUEST = 'openableIntents',
+    TRACKING = 'tracking',
+    GET_CLICK_SIGNAL = 'getClickSignal',
+    USER_SEEKED = 'seeked',
+    VOLUME_CHANGE = 'volumeChanged'
 }
 
 export interface IPoint {
@@ -75,7 +75,7 @@ export interface IAFMAHandler {
     onAFMAOpenInAppStore(productId: string, url: string): void;
     onAFMAFetchAppStoreOverlay(productId: string): void;
     onAFMAResolveOpenableIntents(productId: IOpenableIntentsRequest): void;
-    onAFMATrackingEvent(event: TrackingEvent, data?: unknown): void;
+    onAFMATrackingEvent(event: TrackingEvent, data?: string): void;
     onAFMAClickSignalRequest(touchInfo: ITouchInfo): void;
     onAFMAUserSeeked(): void;
     onVolumeChange(volume: number): void;
@@ -104,10 +104,10 @@ export class AFMABridge {
         this._afmaHandlers[AFMAEvents.OPEN_IN_APP_STORE] = (msg) => this._handler.onAFMAOpenInAppStore(<string>msg.data.productId, <string>msg.data.url);
         this._afmaHandlers[AFMAEvents.FETCH_APP_STORE_OVERLAY] = (msg) => this._handler.onAFMAFetchAppStoreOverlay(<string>msg.data.productId);
         this._afmaHandlers[AFMAEvents.OPEN_INTENTS_REQUEST] = (msg) => this._handler.onAFMAResolveOpenableIntents(<IOpenableIntentsRequest>msg.data);
-        this._afmaHandlers[AFMAEvents.TRACKING] = (msg) => this._handler.onAFMATrackingEvent(<TrackingEvent>msg.data.event, msg.data.data);
+        this._afmaHandlers[AFMAEvents.TRACKING] = (msg) => this._handler.onAFMATrackingEvent(<TrackingEvent>msg.data.event, <string>msg.data.data);
         this._afmaHandlers[AFMAEvents.GET_CLICK_SIGNAL] = (msg) => this._handler.onAFMAClickSignalRequest(<ITouchInfo>msg.data);
         this._afmaHandlers[AFMAEvents.USER_SEEKED] = (msg) => this._handler.onAFMAUserSeeked();
-        this._afmaHandlers[AFMAEvents.VOLUME_CHANGE] =  (msg) => this._handler.onVolumeChange(<number>msg.data.volume);
+        this._afmaHandlers[AFMAEvents.VOLUME_CHANGE] = (msg) => this._handler.onVolumeChange(<number>msg.data.volume);
     }
 
     public connect(iframe: HTMLIFrameElement) {

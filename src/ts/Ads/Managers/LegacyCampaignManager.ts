@@ -19,7 +19,7 @@ import { AuctionResponseParser, IParsedAuctionResponse } from 'Ads/Parsers/Aucti
 import { CampaignParser } from 'Ads/Parsers/CampaignParser';
 import { CampaignContentTypes } from 'Ads/Utilities/CampaignContentTypes';
 import { GameSessionCounters, IGameSessionCounters } from 'Ads/Utilities/GameSessionCounters';
-import { GeneralTimingMetric, LoadMetric, MiscellaneousMetric, SDKMetrics } from 'Ads/Utilities/SDKMetrics';
+import { GeneralTimingMetric, LoadMetric, MiscellaneousMetric, SDKMetrics, ChinaAucionEndpoint } from 'Ads/Utilities/SDKMetrics';
 import { SdkStats } from 'Ads/Utilities/SdkStats';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { UserCountData } from 'Ads/Utilities/UserCountData';
@@ -45,6 +45,7 @@ import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCam
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { ProgrammaticVastParser } from 'VAST/Parsers/ProgrammaticVastParser';
+import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 
 export interface ILoadedCampaign {
     campaign: Campaign;
@@ -60,7 +61,7 @@ export class LegacyCampaignManager extends CampaignManager {
     protected _adsConfig: AdsConfiguration;
     protected _clientInfo: ClientInfo;
     protected _cacheBookkeeping: CacheBookkeepingManager;
-    protected  _privacy: PrivacySDK;
+    protected _privacy: PrivacySDK;
     private _contentTypeHandlerManager: ContentTypeHandlerManager;
     private _adMobSignalFactory: AdMobSignalFactory;
     private _sessionManager: SessionManager;
@@ -73,8 +74,10 @@ export class LegacyCampaignManager extends CampaignManager {
     private _isLoadEnabled: boolean = false;
     private _userPrivacyManager: UserPrivacyManager;
     private _mediationLoadTracking: MediationLoadTrackingManager | undefined;
+    private _useChinaAuctionEndpoint: boolean | undefined = false;
+    private _loadV5Support: boolean | undefined;
 
-    constructor(platform: Platform, core: ICore, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, assetManager: AssetManager, sessionManager: SessionManager, adMobSignalFactory: AdMobSignalFactory, request: RequestManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager, cacheBookkeeping: CacheBookkeepingManager, contentTypeHandlerManager: ContentTypeHandlerManager, privacySDK: PrivacySDK, userPrivacyManager: UserPrivacyManager, mediationLoadTracking?: MediationLoadTrackingManager | undefined) {
+    constructor(platform: Platform, core: ICore, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, assetManager: AssetManager, sessionManager: SessionManager, adMobSignalFactory: AdMobSignalFactory, request: RequestManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager, cacheBookkeeping: CacheBookkeepingManager, contentTypeHandlerManager: ContentTypeHandlerManager, privacySDK: PrivacySDK, userPrivacyManager: UserPrivacyManager, mediationLoadTracking?: MediationLoadTrackingManager | undefined, loadV5Support?: boolean | undefined) {
         super();
 
         this._platform = platform;
@@ -95,6 +98,8 @@ export class LegacyCampaignManager extends CampaignManager {
         this._privacy = privacySDK;
         this._userPrivacyManager = userPrivacyManager;
         this._mediationLoadTracking = mediationLoadTracking;
+        this._useChinaAuctionEndpoint = (CustomFeatures.sampleAtGivenPercent(20) && coreConfig.getCountry() === 'CN');
+        this._loadV5Support = loadV5Support;
     }
 
     public request(nofillRetry?: boolean): Promise<INativeResponse | void> {
@@ -137,11 +142,15 @@ export class LegacyCampaignManager extends CampaignManager {
             this._deviceFreeSpace = freeSpace;
             return Promise.all<string, unknown>([
                 CampaignManager.createRequestUrl(this.getBaseUrl(), this._platform, this._clientInfo, this._deviceInfo, this._coreConfig, this._lastAuctionId, nofillRetry),
-                CampaignManager.createRequestBody(this._clientInfo, this._coreConfig, this._deviceInfo, this._userPrivacyManager, this._sessionManager, this._privacy, countersForOperativeEvents, fullyCachedCampaignIds, versionCode, this._adMobSignalFactory, freeSpace, this._metaDataManager, this._adsConfig, this._isLoadEnabled, this.getPreviousPlacementId(), requestPrivacy, legacyRequestPrivacy, nofillRetry)
+                CampaignManager.createRequestBody(this._clientInfo, this._coreConfig, this._deviceInfo, this._userPrivacyManager, this._sessionManager, this._privacy, countersForOperativeEvents, fullyCachedCampaignIds, versionCode, this._adMobSignalFactory, freeSpace, this._metaDataManager, this._adsConfig, this._isLoadEnabled, this.getPreviousPlacementId(), requestPrivacy, legacyRequestPrivacy, nofillRetry, undefined, this._loadV5Support)
             ]);
         }).then(([requestUrl, requestBody]) => {
             measurement = createStopwatch();
             this._core.Sdk.logInfo('Requesting ad plan from ' + requestUrl);
+
+            if (this._useChinaAuctionEndpoint) {
+                SDKMetrics.reportMetricEvent(ChinaAucionEndpoint.AuctionRequest);
+            }
 
             if (this._mediationLoadTracking && this._mediationLoadTracking.getCurrentExperiment() === MediationExperimentType.AuctionXHR) {
                 return XHRequest.post(requestUrl, JSON.stringify(requestBody)).then((resp: string) => {
@@ -183,6 +192,11 @@ export class LegacyCampaignManager extends CampaignManager {
                 'iar': `${GameSessionCounters.getCurrentCounters().adRequests === 1}`,
                 'stg': 'auction_response'
             });
+
+            if (this._useChinaAuctionEndpoint) {
+                SDKMetrics.reportMetricEvent(ChinaAucionEndpoint.AuctionResponse);
+            }
+
             const cachingTime = this.getTime();
             if (this._mediationLoadTracking && performance && performance.now) {
                 this._mediationLoadTracking.reportAuctionRequest(this.getTime() - requestStartTime, true);
@@ -269,6 +283,10 @@ export class LegacyCampaignManager extends CampaignManager {
             const body = JSON.stringify(requestBody);
             SDKMetrics.reportMetricEvent(LoadMetric.LoadEnabledAuctionRequest);
 
+            if (this._useChinaAuctionEndpoint) {
+                SDKMetrics.reportMetricEvent(ChinaAucionEndpoint.AuctionRequest);
+            }
+
             return Promise.resolve().then(() => {
                 return this._request.post(requestUrl, body, [], {
                     retries: 0,
@@ -303,6 +321,10 @@ export class LegacyCampaignManager extends CampaignManager {
                 cachingTime = this.getTime();
                 if (this._mediationLoadTracking && performance && performance.now) {
                     this._mediationLoadTracking.reportAuctionRequest(this.getTime() - requestStartTime, true);
+                }
+
+                if (this._useChinaAuctionEndpoint) {
+                    SDKMetrics.reportMetricEvent(ChinaAucionEndpoint.AuctionResponse);
                 }
                 return this.parseLoadedCampaign(response, placement, countersForOperativeEvents, this._deviceFreeSpace, requestPrivacy, legacyRequestPrivacy);
             }).then((loadedCampaign) => {
@@ -870,6 +892,9 @@ export class LegacyCampaignManager extends CampaignManager {
     }
 
     private constructBaseUrl(baseUri: string): string {
+        if (this._useChinaAuctionEndpoint) {
+            baseUri = baseUri.replace(/(.*auction\.unityads\.)(unity3d\.com)(.*)/, '$1unity.cn$3');
+        }
         return [
             baseUri,
             this._clientInfo.getGameId(),

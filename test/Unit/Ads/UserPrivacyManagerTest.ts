@@ -1,4 +1,10 @@
-import { GDPREventAction, GDPREventSource, LegalFramework, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
+import {
+    AgeGateChoice,
+    GDPREventAction,
+    GDPREventSource,
+    LegalFramework,
+    UserPrivacyManager
+} from 'Ads/Managers/UserPrivacyManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { GamePrivacy, IPrivacyPermissions, PrivacyMethod, UserPrivacy } from 'Privacy/Privacy';
 import { Backend } from 'Backend/Backend';
@@ -77,7 +83,7 @@ describe('UserPrivacyManagerTest', () => {
            ads: false,
            gameExp: false,
            external: false,
-           agreedOverAgeLimit: false,
+           ageGateChoice: AgeGateChoice.MISSING,
            agreementMethod: ''
         });
         privacySDK.getUserPrivacy.returns(userPrivacy);
@@ -216,7 +222,7 @@ describe('UserPrivacyManagerTest', () => {
                     userPrivacy.getPermissions.returns(currentPermissions);
                     userPrivacy.getMethod.returns(PrivacyMethod.DEVELOPER_CONSENT);
                     userPrivacy.getVersion.returns(0);
-                    storageTrigger('', {gdpr: {consent: {value: b}}});
+                    storageTrigger('', { gdpr: { consent: { value: b } } });
                     return Promise.resolve().then(() => {
                         return (<Promise<void>>updateUserPrivacy.firstCall.returnValue).then(() => {
                             sinon.assert.notCalled(httpKafkaSpy);
@@ -229,7 +235,7 @@ describe('UserPrivacyManagerTest', () => {
         describe('prioritises privacy.consent over gdpr.consent', () => {
             beforeEach(() => {
                 isGDPREnabled = true;
-                userPrivacy.getPermissions.returns({ads: false, external: true, gameExp: false});
+                userPrivacy.getPermissions.returns({ ads: false, external: true, gameExp: false });
                 userPrivacy.getMethod.returns(PrivacyMethod.DEVELOPER_CONSENT);
                 userPrivacy.getVersion.returns(0);
                 getStub.reset();
@@ -545,7 +551,7 @@ describe('UserPrivacyManagerTest', () => {
 
         beforeEach(() => {
             getRequestStub = <sinon.SinonStub>request.get;
-            getRequestStub.resolves({response: '{"adsSeenInGameThisWeek":27,"gamePlaysThisWeek":39,"installsFromAds":0}'});
+            getRequestStub.resolves({ response: '{"adsSeenInGameThisWeek":27,"gamePlaysThisWeek":39,"installsFromAds":0}' });
             diagnosticTriggerStub = sinon.stub(Diagnostics, 'trigger');
             logErrorStub = sinon.stub(core.Sdk, 'logError');
 
@@ -588,7 +594,6 @@ describe('UserPrivacyManagerTest', () => {
                 assert.fail('Should throw error');
             }).catch((error) => {
                 assert.equal(error, 'Test Error');
-                sinon.assert.calledWith(diagnosticTriggerStub, 'gdpr_request_failed', {url: `https://ads-privacy-api.prd.mz.internal.unity3d.com/api/v1/summary?gameId=${gameId}&adid=${adId}&projectId=${projectId}&storeId=${stores}`});
             });
         });
 
@@ -599,14 +604,14 @@ describe('UserPrivacyManagerTest', () => {
                 assert.fail('Should throw error');
             }).catch((error) => {
                 assert.equal(error, 'Test Error');
-                sinon.assert.calledWith(logErrorStub, 'Gdpr request failedTest Error');
+                sinon.assert.calledWith(logErrorStub, 'User summary request failedTest Error');
             });
         });
     });
 
     describe('Sending privacy events', () => {
         let sandbox: sinon.SinonSandbox;
-        const permissions = {ads: true, external: true, gameExp: false};
+        const permissions = { ads: true, external: true, gameExp: false };
         const source = GDPREventSource.USER;
         const action = GDPREventAction.PERSONALIZED_PERMISSIONS;
         const layout = ConsentPage.MY_CHOICES;
@@ -635,7 +640,7 @@ describe('UserPrivacyManagerTest', () => {
 
         it('with proper fields', () => {
             const expectedKafkaObject = {
-                v: 2,
+                v: 3,
                 advertisingId: testAdvertisingId,
                 abGroup: abGroup,
                 layout: layout,
@@ -653,7 +658,8 @@ describe('UserPrivacyManagerTest', () => {
                 bundleId: testBundleId,
                 permissions: permissions,
                 legalFramework: 'none',
-                agreedOverAgeLimit: 'missing'
+                agreedOverAgeLimit: 'missing',
+                ageGateSource: 'missing'
             };
 
             return privacyManager.updateUserPrivacy(permissions, source, action, layout).then(() => {
@@ -683,15 +689,14 @@ describe('UserPrivacyManagerTest', () => {
         describe('when updating user privacy', () => {
             function sendEvent(permissions: IPrivacyPermissions = anyConsent, source: GDPREventSource = GDPREventSource.USER, layout?: ConsentPage): Promise<any> {
                 return privacyManager.updateUserPrivacy(permissions, source, GDPREventAction.PERSONALIZED_PERMISSIONS, layout).then(() => {
-                    sinon.assert.calledTwice(httpKafkaSpy); // First one is temporary diagnostics
-                    return httpKafkaSpy.secondCall.args[2];
+                    sinon.assert.calledOnce(httpKafkaSpy);
+                    return httpKafkaSpy.firstCall.args[2];
                 });
             }
 
             it('should send event to a correct topic', () => {
                 return sendEvent().then(() => {
-                    sinon.assert.calledTwice(httpKafkaSpy);
-                    sinon.assert.calledWith(httpKafkaSpy, 'ads.sdk2.diagnostics', sinon.match.any);
+                    sinon.assert.calledOnce(httpKafkaSpy);
                     sinon.assert.calledWith(httpKafkaSpy, 'ads.events.optout.v1.json', KafkaCommonObjectType.EMPTY);
                 });
             });
@@ -725,7 +730,7 @@ describe('UserPrivacyManagerTest', () => {
                     assert.equal(eventData.abGroup, expectedAbGroup);
                     assert.equal(eventData.layout, '');
                     assert.equal(eventData.firstRequest, true);
-                    assert.equal(eventData.v, 2);
+                    assert.equal(eventData.v, 3);
                     assert.equal(eventData.agreedVersion, gamePrivacy.getVersion());
                 });
             });
@@ -777,7 +782,7 @@ describe('UserPrivacyManagerTest', () => {
             isGDPREnabled = true;
             privacyConsent = undefined;
             gdprConsent = undefined;
-            userPrivacy.getPermissions.returns({ads: false, external: true, gameExp: false});
+            userPrivacy.getPermissions.returns({ ads: false, external: true, gameExp: false });
             userPrivacy.getMethod.returns(PrivacyMethod.DEVELOPER_CONSENT);
             userPrivacy.getVersion.returns(0);
             getStub.withArgs(StorageType.PUBLIC, 'gdpr.consent.value').callsFake(() => {
@@ -807,9 +812,9 @@ describe('UserPrivacyManagerTest', () => {
         [true, false, undefined].forEach((gdprInitDevConsent) => {
             describe('when developer consent was set on init with gdpr.consent=' + gdprInitDevConsent, () => {
                 const allowedTransitions = [
-                    {from: 'privacy', to: 'privacy'},
-                    {from: 'gdpr', to: 'privacy'},
-                    {from: 'gdpr', to: 'gdpr'}];
+                    { from: 'privacy', to: 'privacy' },
+                    { from: 'gdpr', to: 'privacy' },
+                    { from: 'gdpr', to: 'gdpr' }];
                 beforeEach(() => {
                     gdprConsent = gdprInitDevConsent;
                     return privacyManager.getConsentAndUpdateConfiguration().then(() => {
@@ -928,7 +933,7 @@ describe('UserPrivacyManagerTest', () => {
                    ads: false,
                    external: false,
                    gameExp: false,
-                   agreedOverAgeLimit: false,
+                   ageGateChoice: AgeGateChoice.MISSING,
                    agreementMethod: ''
                });
             });

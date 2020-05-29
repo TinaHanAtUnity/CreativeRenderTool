@@ -1,4 +1,5 @@
 import { IMetricInstance } from 'Ads/Networking/MetricInstance';
+import { BufferedMetricInstance } from 'Ads/Networking/BufferedMetricInstance';
 
 export enum ErrorMetric {
     TooLargeFile = 'too_large_file', // a file 20mb and over are considered too large
@@ -10,10 +11,23 @@ export enum ErrorMetric {
     CampaignExpired = 'campaign_expired',
     NoConnectionWhenNeeded = 'no_connection_when_needed',
     MissingTrackingUrlsOnShow = 'missing_tracking_urls_on_show',
-    PlacementInvalidationPending = 'placement_invalidation_pending'
+    PlacementInvalidationPending = 'placement_invalidation_pending',
+    AttemptToStreamCampaignWithoutConnection = 'attempt_to_stream_campaign_without_connection'
+}
+
+export enum VideoMetric {
+    GenericError = 'video_player_generic_error',
+    PrepareError = 'video_player_prepare_error',
+    PrepareTimeout = 'video_player_prepare_timeout',
+    SeekToError = 'video_player_seek_to_error',
+    PauseError = 'video_player_pause_error',
+    IllegalStateError = 'video_player_illegal_state_error',
+    TooLongError = 'video_too_long',
+    PlayerStuck = 'video_player_stuck'
 }
 
 export enum AdmobMetric {
+    AdmobVideoElementMissing = 'admob_video_element_missing',
     AdmobUsedCachedVideo = 'admob_used_cached_video',
     AdmobUsedStreamedVideo = 'admob_used_streamed_video',
     AdmobUserVideoSeeked = 'admob_user_video_seeked',
@@ -58,11 +72,14 @@ export enum ChinaMetric {
 }
 
 export enum VastMetric {
-    VastVideoImpressionFailed = 'vast_video_impression_failed'
+    VastVideoImpressionFailed = 'vast_video_impression_failed',
+    VastHTMLEndcardShown = 'vast_html_endcard_shown',
+    VastHTMLEndcardShownFailed = 'vast_html_endcard_shown_failed'
 }
 
 export enum MiscellaneousMetric {
     ImpressionDuplicate = 'impression_duplicate',
+    ImpressionDuplicateNonBatching = 'impression_duplicate_non_batching',
     CampaignNotFound = 'campaign_not_found',
     ConsentParagraphLinkClicked = 'consent_paragraph_link_clicked',
     CampaignAttemptedShowInBackground = 'ad_attempted_show_background',
@@ -116,14 +133,14 @@ export enum MraidMetric {
 }
 
 export enum AUIMetric {
-    CampaignAlreadyActive = 'campaign_already_active',
+    CampaignCategoryAlreadyActive = 'campaign_category_already_active',
+    CampaignCategoryInactive = 'campaign_category_inactive',
     CampaignInitializationError = 'automated_experiment_manager_initialization_error',
     FailedToCollectStaticFeatures = 'FailedToCollectStaticFeatures',
     FailedToCollectDeviceFeatures = 'failed_to_collect_device_features',
     FailedToFetchAutomatedExperiements = 'failed_to_fetch_automated_experiments',
     FailedToParseExperimentResponse = 'failed_to_parse_automated_experiments_response',
     FailedToPublishOutcome = 'failed_to_publish_experiment_outcome',
-    IgnoringNonPerformanceCampaign = 'ignoring_non_performance_campaign',
     InvalidEndscreenAnimation = 'invalid_endscreen_animation',
     OptimizationResponseApplied = 'campaign_optimization_response_applied',
     AutomatedExperimentManagerInitializationError = 'automated_experiment_manager_initialization_error',
@@ -134,7 +151,17 @@ export enum AUIMetric {
     EndscreenColorTintThemingFailed = 'endscreen_color_tint_theming_failed',
     OptimizationResponseIgnored = 'campaign_optimization_response_ignored',
     RequestingCampaignOptimization = 'requesting_campaign_optimization',
-    UnknownExperimentName = 'unknown_experiement_name'
+    UnknownExperimentName = 'unknown_experiment_name',
+    InvalidVideoOverlayMode = 'invalid_video_overlay_mode',
+    UnknownCategoryProvided = 'unknown_automated_experiment_category_provided',
+    InvalidImageAssets = 'invalid_image_assets'
+}
+
+export enum ExternalEndScreenMetric {
+    IframeTimeout = 'external_end_screen_iframe_timeout',
+    GameIconImageMissing = 'external_end_screen_game_icon_missing',
+    ImageMissing = 'external_end_screen_image_missing',
+    UnableToGetDataUrl = 'external_end_screen_image_unable_to_get_data_url'
 }
 
 export enum GeneralTimingMetric {
@@ -158,7 +185,10 @@ export enum MediationMetric {
     MediaCount = 'media_count',
     AuctionRequest = 'auction_request_time',
     AdCaching = 'ad_caching_time',
-    AuctionRequestStarted = 'auction_request_start'
+    AuctionRequestStarted = 'auction_request_start',
+    FillLatencyByPlacements = 'fill_latency_by_placements',
+    NofillLatencyByPlacements = 'nofill_latency_by_placements',
+    InitCompleteByPlacements = 'mediation_init_complete_by_placements'
 }
 
 export enum LoadV5 {
@@ -166,24 +196,15 @@ export enum LoadV5 {
     PreloadRequestParsingResponse = 'v5_preload_request_parsing_response',
     PreloadRequestStarted = 'v5_preload_request_started',
     PreloadRequestAlreadyActive = 'v5_preload_request_already_active',
-    LoadRequestNoPreloadData = 'v5_load_request_no_preload_data',
-    LoadRequestPreloadDataExpired = 'v5_load_request_preload_data_expired',
-    LoadRequestWhilePreloadOngoing = 'v5_load_request_while_preload_ongoing',
-    LoadRequestWhileReloadOngoing = 'v5_load_request_while_reload_ongoing',
-    LoadRequestCurrentSessionIsNotSet = 'v5_load_request_current_session_is_not_set',
     LoadRequestStarted = 'v5_load_request_started',
     LoadRequestParsingResponse = 'v5_load_request_parsing_response',
     LoadRequestFailed = 'v5_load_request_failed',
     LoadRequestWasCanceled = 'v5_load_request_was_canceled',
-    LoadRequestCurrentSessionMissing = 'v5_load_request_current_session_missing',
     LoadRequestFill = 'v5_load_request_fill',
-    ReloadRequestOngoing = 'v5_reload_request_ongoing',
     ReloadRequestFailed = 'v5_reload_request_failed',
     ReloadRequestParsingResponse = 'v5_reload_request_parsing_response',
     ReloadRequestStarted = 'v5_reload_request_started',
     ReloadRequestParseCampaignFailed = 'v5_reload_request_parse_campaign_failed',
-    LoadCampaignWithPreloadData = 'v5_load_campaign_with_preload_data',
-    RefreshManagerPreloadDataExpired = 'v5_refresh_manager_preload_data_expired',
     RefreshManagerCampaignExpired = 'v5_refresh_manager_campaign_expired',
     RefreshManagerCampaignFailedToInvalidate = 'v5_refresh_manager_campaign_failed_to_be_invalidate',
     Show = 'v5_show'
@@ -193,29 +214,33 @@ export enum AuctionV6 {
     FailedToParse = 'v6_failed_to_parse',
     AuctionIdMissing = 'v6_auction_id_missing',
     PlacementsMissing = 'v6_placements_missing',
-    MediaIdMissing = 'v6_media_id_missing',
-    TrackingMissing = 'v6_tracking_missing',
     TrackingIndicesOutOfBounds = 'v6_tracking_indices_out_of_bounds',
-    BannerPlacementNotRemoved = 'v6_banner_placement_not_removed',
     FailedCreatingAuctionResponse = 'v6_failed_creating_auction_response'
+}
+
+export enum ChinaAucionEndpoint {
+    AuctionRequest = 'china_user_auction_request',
+    AuctionResponse = 'china_user_auction_response'
 }
 
 export type TimingEvent = InitializationMetric | MediationMetric | GeneralTimingMetric;
 
-export type PTSEvent = TimingEvent | AuctionV6 | AdmobMetric | BannerMetric | CachingMetric | ChinaMetric | VastMetric | MraidMetric | MiscellaneousMetric | LoadMetric | ErrorMetric | OMMetric | AUIMetric | LoadV5;
+export type PTSEvent = VideoMetric | TimingEvent | AuctionV6 | AdmobMetric | BannerMetric | CachingMetric | ChinaMetric | VastMetric | MraidMetric | MiscellaneousMetric | LoadMetric | ErrorMetric | OMMetric | AUIMetric | LoadV5 | ChinaAucionEndpoint | ExternalEndScreenMetric;
 
 export class SDKMetrics {
 
-    private static _metricInstance: IMetricInstance;
+    // Setting a default value since legacy tests are relying on it.
+    private static _metricInstance: IMetricInstance = new BufferedMetricInstance();
 
-    public static initialize(metricInstance: IMetricInstance): void {
-        if (!this._metricInstance) {
-            this._metricInstance = metricInstance;
-        }
+    public static initialize(): void {
+        this._metricInstance = new BufferedMetricInstance();
     }
 
-    public static isMetricInstanceInitialized(): boolean {
-        return !!this._metricInstance;
+    public static setMetricInstance(metricInstance: IMetricInstance): void {
+        if (this._metricInstance instanceof BufferedMetricInstance) {
+            this._metricInstance.forwardTo(metricInstance);
+        }
+        this._metricInstance = metricInstance;
     }
 
     public static reportMetricEvent(event: PTSEvent): void {

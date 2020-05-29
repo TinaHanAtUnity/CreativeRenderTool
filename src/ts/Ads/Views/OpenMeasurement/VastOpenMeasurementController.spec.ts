@@ -23,12 +23,21 @@ import { Platform } from 'Core/Constants/Platform';
           return new VastOpenMeasurementController(platform, placement, om, adViewBuilder, clientInfo, deviceInfo);
       };
 
+      describe('when controller triggers video start event', () => {
+          it('the duration time in event data should be integer', () => {
+              const openMeasurementInstance = new OpenMeasurementVast();
+              const omController = initOMManager([openMeasurementInstance]);
+              omController.start(5120);
+              expect(openMeasurementInstance.triggerVideoEvent).toHaveBeenCalledWith('omidStart', { duration: 5, videoPlayerVolume: 1, deviceVolume: undefined });
+          });
+      });
+
       describe('session start', () => {
           let omManager: VastOpenMeasurementController;
           let openMeasurement1: OpenMeasurementMockVast;
           let openMeasurement2: OpenMeasurementMockVast;
           let vastAdVerificton1: VastAdVerificationMock;
-          let vastAdVerificton2:  VastAdVerificationMock;
+          let vastAdVerificton2: VastAdVerificationMock;
 
           beforeEach(() => {
 
@@ -54,15 +63,15 @@ import { Platform } from 'Core/Constants/Platform';
                   apiVersion: OMID_P,
                   environment: 'app',
                   accessMode: AccessMode.LIMITED,
-                  adSessionType: AdSessionType.HTML,
+                  adSessionType: AdSessionType.NATIVE,
                   omidNativeInfo: {
                       partnerName: PARTNER_NAME,
                       partnerVersion: ''
                   },
                   omidJsInfo: {
                       omidImplementer: PARTNER_NAME,
-                      serviceVersion: '',
-                      sessionClientVersion: OMID_P,
+                      serviceVersion: '1.2.10',
+                      sessionClientVersion: '1.2.10',
                       partnerName: PARTNER_NAME,
                       partnerVersion: ''
                   },
