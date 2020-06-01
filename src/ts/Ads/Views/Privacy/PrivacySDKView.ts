@@ -6,7 +6,11 @@ import { ICoreApi } from 'Core/ICore';
 import { WebViewError } from 'Core/Errors/WebViewError';
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { PrivacyConfig } from 'Privacy/PrivacyConfig';
-import { IPrivacyCompletedParams, IPrivacyFetchUrlParams, IUserPrivacySettings } from 'Privacy/IPrivacySettings';
+import {
+    IPrivacyCompletedParams,
+    IPrivacyFetchUrlParams,
+    IPrivacyReadyCallbackParams
+} from 'Privacy/IPrivacySettings';
 import { IPrivacySDKViewHandler } from 'Ads/Views/Privacy/IPrivacySDKViewHandler';
 import { ConsentPage } from 'Ads/Views/Privacy/Privacy';
 import { Platform } from 'Core/Constants/Platform';
@@ -107,11 +111,8 @@ export class PrivacySDKView extends View<IPrivacySDKViewHandler> {
         this._handlers.forEach(handler => handler.onPrivacyReady());
     }
 
-    public readyCallback(flow: { [key: string]: unknown }, data: { env: { [key: string]: unknown }; user: IUserPrivacySettings }): void {
-        this._frameEventAdapter.postMessage('readyCallback', {
-            ... data,
-            flow
-        });
+    public readyCallback(params: IPrivacyReadyCallbackParams): void {
+        this._frameEventAdapter.postMessage('readyCallback', params);
     }
 
     public onPrivacyCompleted(params: IPrivacyCompletedParams): void {
