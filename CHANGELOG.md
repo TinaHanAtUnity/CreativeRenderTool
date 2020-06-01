@@ -1,3 +1,7 @@
+# Pending
+
+* [Privacy] Release 1.4.0 [#15535](https://github.com/Applifier/unity-ads-webview/pull/15535)
+
 # Fri May 29 23:04:47 UTC 2020
 
 * Remove Legacy Load API Whitelist [#15625](https://github.com/Applifier/unity-ads-webview/pull/15625)
