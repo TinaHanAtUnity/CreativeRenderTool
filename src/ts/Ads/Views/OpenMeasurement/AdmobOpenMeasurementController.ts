@@ -167,7 +167,6 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
             }
         });
         super.impression(impressionObject);
-        // TODO: Remove once Admob fixes their issue in Jan 2020
         this.geometryChange(viewport, adView);
     }
 
