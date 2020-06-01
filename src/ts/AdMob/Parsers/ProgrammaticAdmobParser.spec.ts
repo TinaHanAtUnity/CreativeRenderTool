@@ -4,7 +4,7 @@ import { ICore } from 'Core/ICore';
 import { Core } from 'Core/__mocks__/Core';
 
 // TODO: Fix imports in spec.ts files
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+// eslint-disable-next-line
 const ValidAdMobCampaign = require('json/campaigns/admob/ValidAdMobCampaign.json');
 
 import { AdMobCampaign } from 'AdMob/Models/AdMobCampaign';

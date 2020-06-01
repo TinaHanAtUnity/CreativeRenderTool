@@ -180,11 +180,11 @@ import { ProgrammaticMraidParser } from 'MRAID/Parsers/ProgrammaticMraidParser';
             });
 
             it('should set invalidation pending for placements', () => {
-                expect(placements['video_5'].setInvalidationPending).toBeCalledTimes(1);
-                expect(placements['video_5'].setInvalidationPending).toHaveBeenNthCalledWith(1, true);
+                expect(placements.video_5.setInvalidationPending).toBeCalledTimes(1);
+                expect(placements.video_5.setInvalidationPending).toHaveBeenNthCalledWith(1, true);
 
-                expect(placements['video_6'].setInvalidationPending).toBeCalledTimes(1);
-                expect(placements['video_6'].setInvalidationPending).toHaveBeenNthCalledWith(1, true);
+                expect(placements.video_6.setInvalidationPending).toBeCalledTimes(1);
+                expect(placements.video_6.setInvalidationPending).toHaveBeenNthCalledWith(1, true);
             });
         });
 
@@ -218,11 +218,11 @@ import { ProgrammaticMraidParser } from 'MRAID/Parsers/ProgrammaticMraidParser';
             });
 
             it('should set invalidation pending for placements', () => {
-                expect(placements['video_5'].setInvalidationPending).toBeCalledTimes(1);
-                expect(placements['video_5'].setInvalidationPending).toHaveBeenNthCalledWith(1, true);
+                expect(placements.video_5.setInvalidationPending).toBeCalledTimes(1);
+                expect(placements.video_5.setInvalidationPending).toHaveBeenNthCalledWith(1, true);
 
-                expect(placements['video_6'].setInvalidationPending).toBeCalledTimes(1);
-                expect(placements['video_6'].setInvalidationPending).toHaveBeenNthCalledWith(1, true);
+                expect(placements.video_6.setInvalidationPending).toBeCalledTimes(1);
+                expect(placements.video_6.setInvalidationPending).toHaveBeenNthCalledWith(1, true);
             });
         });
 
@@ -256,11 +256,11 @@ import { ProgrammaticMraidParser } from 'MRAID/Parsers/ProgrammaticMraidParser';
             });
 
             it('should set invalidation pending for placements', () => {
-                expect(placements['video_5'].setInvalidationPending).toBeCalledTimes(1);
-                expect(placements['video_5'].setInvalidationPending).toHaveBeenNthCalledWith(1, true);
+                expect(placements.video_5.setInvalidationPending).toBeCalledTimes(1);
+                expect(placements.video_5.setInvalidationPending).toHaveBeenNthCalledWith(1, true);
 
-                expect(placements['video_6'].setInvalidationPending).toBeCalledTimes(1);
-                expect(placements['video_6'].setInvalidationPending).toHaveBeenNthCalledWith(1, true);
+                expect(placements.video_6.setInvalidationPending).toBeCalledTimes(1);
+                expect(placements.video_6.setInvalidationPending).toHaveBeenNthCalledWith(1, true);
             });
         });
 
@@ -501,7 +501,7 @@ import { ProgrammaticMraidParser } from 'MRAID/Parsers/ProgrammaticMraidParser';
 
             it('should call loadCampaign', () => {
                 expect(adRequestManager.loadCampaign).toBeCalledTimes(1);
-                expect(adRequestManager.loadCampaign).toBeCalledWith(placements['video_2']);
+                expect(adRequestManager.loadCampaign).toBeCalledWith(placements.video_2);
             });
 
             it('should call requestReload', () => {
