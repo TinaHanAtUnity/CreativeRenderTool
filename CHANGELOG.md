@@ -1,4 +1,4 @@
-# Pending
+# Mon Jun  1 15:17:59 UTC 2020
 
 * [External Endscreen] Activate external end screen when available [#15620](https://github.com/Applifier/unity-ads-webview/pull/15620)
 
