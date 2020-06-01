@@ -42,8 +42,8 @@ do
 
         case "$answer" in
             h)
-                echo "\n\tPress 'c' to automatically commit changes"
-                echo "\n\tPress 'n' to continue to the next branch"
+                echo -e "\n\tPress 'c' to automatically commit changes"
+                echo -e "\n\tPress 'n' to continue to the next branch"
                 ;;
 
             c)
