@@ -1,4 +1,4 @@
-# Pending
+# Mon Jun 1 09:13:23 UTC 2020
 
 * [Privacy] Release 1.4.0 [#15535](https://github.com/Applifier/unity-ads-webview/pull/15535)
 
