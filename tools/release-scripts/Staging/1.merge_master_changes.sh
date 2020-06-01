@@ -16,13 +16,13 @@ RESET='\033[0m'
 
 while IFS= read -r release
 do
-    git checkout $release < /dev/null
-    git checkout staging/$release < /dev/null
-    git merge master --no-commit --no-ff < /dev/null
+    git checkout $release > /dev/null
+    git checkout staging/$release > /dev/null
+    git merge master --no-commit --no-ff > /dev/null
     if [ "$?" -eq "1" ]; then
         # Removes diff from unincluded files from previous staging
-        $(git status | grep 'deleted by us' | sed 's/^.*deleted by us: //g' | xargs git rm) < /dev/null
-        $(git status | grep 'added by them' | sed 's/^.*added by them: //g' | xargs git rm) < /dev/null
+        $(git status | grep 'deleted by us' | sed 's/^.*deleted by us: //g' | xargs git rm) > /dev/null
+        $(git status | grep 'added by them' | sed 's/^.*added by them: //g' | xargs git rm) > /dev/null
         echo -e "\n${RED}Merge conflicts detected. Fix the conflicts and continue to the next branch.${RESET}"
     else
         echo -e "\n${GREEN}No merge conflicts detected. Confirm that the changes are applied correctly.${RESET}"
