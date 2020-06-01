@@ -60,7 +60,7 @@ do
                 ;;
 
             *)
-                echo "\nUnknown command. Please try again."
+                echo -e "Unknown command: $answer. Please try again."
                 ;;
         esac
     done
