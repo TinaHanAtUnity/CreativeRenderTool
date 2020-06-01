@@ -1,3 +1,7 @@
+# Pending
+
+* [External Endscreen] Activate external end screen when available [#15620](https://github.com/Applifier/unity-ads-webview/pull/15620)
+
 # Mon Jun 1 09:13:23 UTC 2020
 
 * [Privacy] Release 1.4.0 [#15535](https://github.com/Applifier/unity-ads-webview/pull/15535)
