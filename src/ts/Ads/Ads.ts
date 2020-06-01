@@ -83,7 +83,7 @@ import { Analytics } from 'Analytics/Analytics';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { PrivacyParser } from 'Privacy/Parsers/PrivacyParser';
 import { Promises } from 'Core/Utilities/Promises';
-import { MediationCacheModeAllowedTest, AuctionXHR, LoadV5, BaseLineLoadV5 } from 'Core/Models/ABGroup';
+import { MediationCacheModeAllowedTest, AuctionXHR, LoadV5, BaseLineLoadV5, LoadV5AdUnit } from 'Core/Models/ABGroup';
 import { PerPlacementLoadManagerV4 } from 'Ads/Managers/PerPlacementLoadManagerV4';
 import { PrivacyMetrics } from 'Privacy/PrivacyMetrics';
 import { PrivacySDKUnit } from 'Ads/AdUnits/PrivacySDKUnit';
@@ -91,7 +91,7 @@ import { PerPlacementLoadAdapter } from 'Ads/Managers/PerPlacementLoadAdapter';
 import { PrivacyDataRequestHelper } from 'Privacy/PrivacyDataRequestHelper';
 import { MediationMetaData } from 'Core/Models/MetaData/MediationMetaData';
 import { MediationLoadTrackingManager, MediationExperimentType } from 'Ads/Managers/MediationLoadTrackingManager';
-import { createMeasurementsInstance } from 'Core/Utilities/TimeMeasurements';
+import { createStopwatch } from 'Core/Utilities/Stopwatch';
 import { XHRequest } from 'Core/Utilities/XHRequest';
 import { LegacyCampaignManager } from 'Ads/Managers/LegacyCampaignManager';
 import { PrivacyTestEnvironment } from 'Privacy/PrivacyTestEnvironment';
@@ -100,6 +100,7 @@ import { AutomatedExperimentManager } from 'MabExperimentation/AutomatedExperime
 import { CampaignAssetInfo } from 'Ads/Utilities/CampaignAssetInfo';
 import { AdRequestManager, LoadV5ExperimentType } from 'Ads/Managers/AdRequestManager';
 import { PerPlacementLoadManagerV5 } from 'Ads/Managers/PerPlacementLoadManagerV5';
+import { CometCampaignParser } from 'Performance/Parsers/CometCampaignParser';
 
 export class Ads implements IAds {
 
@@ -188,7 +189,7 @@ export class Ads implements IAds {
     }
 
     public initialize(): Promise<void> {
-        let measurements = createMeasurementsInstance(InitializationMetric.WebviewInitializationPhases);
+        const measurements = createStopwatch();
         return Promise.resolve().then(() => {
             SdkStats.setInitTimestamp();
             GameSessionCounters.init();
@@ -197,7 +198,6 @@ export class Ads implements IAds {
             this.setupPrivacyTestEnvironment();
         }).then(() => {
             this.setupLoadApiEnabled();
-            measurements.overrideTag('wel', `${this._webViewEnabledLoad}`);
         }).then(() => {
             return this.Analytics.initialize();
         }).then((gameSessionId: number) => {
@@ -283,11 +283,13 @@ export class Ads implements IAds {
                 this.MediationLoadTrackingManager.setInitComplete();
             }
 
-            measurements = createMeasurementsInstance(InitializationMetric.WebviewInitializationPhases);
-
             return Promises.voidResult(this.RefreshManager.initialize());
         }).then(() => {
-            measurements.measure('request_on_init');
+            measurements.stopAndSend(
+                InitializationMetric.WebviewInitializationPhases, {
+                'wel': `${this._webViewEnabledLoad}`,
+                'stg': 'request_on_init'
+            });
             return Promises.voidResult(this.SessionManager.sendUnsentSessions());
         }).then(() => {
             if (performance && performance.now) {
@@ -322,13 +324,22 @@ export class Ads implements IAds {
     private configureCampaignManager() {
         if (this._loadApiEnabled && this._webViewEnabledLoad) {
             if (this.isLoadV5Enabled()) {
-                this.AdRequestManager = new AdRequestManager(this._core.NativeBridge.getPlatform(), this._core, this._core.Config, this.Config, this.AssetManager, this.SessionManager, this.AdMobSignalFactory, this._core.RequestManager, this._core.ClientInfo, this._core.DeviceInfo, this._core.MetaDataManager, this._core.CacheBookkeeping, this.ContentTypeHandlerManager, this.PrivacySDK, this.PrivacyManager, LoadV5ExperimentType.None);
+                const useAdUnits = this.useAdUnitSupport();
+                const adUnitGame = CustomFeatures.useAdUnitSupport(this._core.ClientInfo.getGameId());
+
+                let experiment = LoadV5ExperimentType.None;
+
+                if (adUnitGame) {
+                    experiment = useAdUnits ? LoadV5ExperimentType.AdUnit : LoadV5ExperimentType.BaseAdUnit;
+                }
+
+                this.AdRequestManager = new AdRequestManager(this._core.NativeBridge.getPlatform(), this._core, this._core.Config, this.Config, this.AssetManager, this.SessionManager, this.AdMobSignalFactory, this._core.RequestManager, this._core.ClientInfo, this._core.DeviceInfo, this._core.MetaDataManager, this._core.CacheBookkeeping, this.ContentTypeHandlerManager, this.PrivacySDK, this.PrivacyManager, experiment);
                 this.CampaignManager = this.AdRequestManager;
                 return;
             }
         }
 
-        this.CampaignManager = new LegacyCampaignManager(this._core.NativeBridge.getPlatform(), this._core, this._core.Config, this.Config, this.AssetManager, this.SessionManager, this.AdMobSignalFactory, this._core.RequestManager, this._core.ClientInfo, this._core.DeviceInfo, this._core.MetaDataManager, this._core.CacheBookkeeping, this.ContentTypeHandlerManager, this.PrivacySDK, this.PrivacyManager, this.MediationLoadTrackingManager);
+        this.CampaignManager = new LegacyCampaignManager(this._core.NativeBridge.getPlatform(), this._core, this._core.Config, this.Config, this.AssetManager, this.SessionManager, this.AdMobSignalFactory, this._core.RequestManager, this._core.ClientInfo, this._core.DeviceInfo, this._core.MetaDataManager, this._core.CacheBookkeeping, this.ContentTypeHandlerManager, this.PrivacySDK, this.PrivacyManager, this.MediationLoadTrackingManager, this.isLoadV5Supported());
     }
 
     private configureAutomatedExperimentManager() {
@@ -340,7 +351,8 @@ export class Ads implements IAds {
     private configureRefreshManager(): void {
         // AdRequestManager will be set only if Load V5 is enabled.
         if (this.AdRequestManager) {
-            this.RefreshManager = new PerPlacementLoadManagerV5(this.Api, this.Config, this._core.Config, this.AdRequestManager, this._core.ClientInfo, this._core.FocusManager);
+            const useAdUnits = this.useAdUnitSupport();
+            this.RefreshManager = new PerPlacementLoadManagerV5(this.Api, this.Config, this._core.Config, this.AdRequestManager, this._core.ClientInfo, this._core.FocusManager, useAdUnits);
             return;
         }
 
@@ -581,7 +593,7 @@ export class Ads implements IAds {
 
             const orientation = screenWidth >= screenHeight ? Orientation.LANDSCAPE : Orientation.PORTRAIT;
             AbstractPrivacy.createBuildInformation(this._core.NativeBridge.getPlatform(), this._core.ClientInfo, this._core.DeviceInfo, campaign, this._core.Config);
-            this._currentAdUnit = this.getAdUnitFactory(campaign).create(campaign, placement, orientation, playerMetadataServerId || '', options);
+            this._currentAdUnit = this.getAdUnitFactory(campaign).create(campaign, placement, orientation, playerMetadataServerId || '', options, this.isLoadV5Supported());
             this.RefreshManager.setCurrentAdUnit(this._currentAdUnit, placement);
             if (this.Monetization.isInitialized()) {
                 this.Monetization.PlacementContentManager.setCurrentAdUnit(placement.getId(), this._currentAdUnit);
@@ -625,7 +637,7 @@ export class Ads implements IAds {
 
                 // AdRequestManager is valid only if Load V5 is enabled
                 if (this.AdRequestManager) {
-                    SDKMetrics.reportMetricEvent(LoadV5Metrics.Show);
+                    this.AdRequestManager.reportMetricEvent(LoadV5Metrics.Show);
                 } else if (this._loadApiEnabled && BaseLineLoadV5.isValid(this._core.Config.getAbGroup()) && CustomFeatures.isLoadV5Game(this._core.ClientInfo.getGameId())) {
                     SDKMetrics.reportMetricEvent(LoadV5Metrics.Show);
                 }
@@ -744,6 +756,10 @@ export class Ads implements IAds {
         if (TestEnvironment.get('forceLoadV5')) {
             this._forceLoadV5 = true;
         }
+
+        if (TestEnvironment.get('forceEndScreenUrl')) {
+            CometCampaignParser.setForceEndScreenUrl(TestEnvironment.get('forceEndScreenUrl'));
+        }
     }
 
     private setupPrivacyTestEnvironment(): Promise<void> {
@@ -806,5 +822,18 @@ export class Ads implements IAds {
         const loadV5Game = CustomFeatures.isLoadV5Game(this._core.ClientInfo.getGameId());
 
         return (loadV5Test && loadV5Game) || this._forceLoadV5;
+    }
+
+    private isLoadV5Supported(): boolean {
+        const loadV5Game = CustomFeatures.isLoadV5Game(this._core.ClientInfo.getGameId());
+
+        return (this._loadApiEnabled && loadV5Game) || this._forceLoadV5;
+    }
+
+    private useAdUnitSupport(): boolean {
+        const adUnitTest = LoadV5AdUnit.isValid(this._core.Config.getAbGroup());
+        const adUnitGame = CustomFeatures.useAdUnitSupport(this._core.ClientInfo.getGameId());
+
+        return (adUnitTest && adUnitGame);
     }
 }

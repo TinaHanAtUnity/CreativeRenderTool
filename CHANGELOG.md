@@ -1,3 +1,53 @@
+# Mon Jun  1 15:17:59 UTC 2020
+
+* [External Endscreen] Activate external end screen when available [#15620](https://github.com/Applifier/unity-ads-webview/pull/15620)
+
+# Mon Jun 1 09:13:23 UTC 2020
+
+* [Privacy] Release 1.4.0 [#15535](https://github.com/Applifier/unity-ads-webview/pull/15535)
+
+# Fri May 29 23:04:47 UTC 2020
+
+* Remove Legacy Load API Whitelist [#15625](https://github.com/Applifier/unity-ads-webview/pull/15625)
+* [AdUnit] Add 4 games for ad unit experiment [#15624](https://github.com/Applifier/unity-ads-webview/pull/15624)
+* [BugFix] Fix double click events fired on iOS UI [#15623](https://github.com/Applifier/unity-ads-webview/pull/15623)
+* [Metric Refactoring] Refactor time measurement to stopwatch [#14411](https://github.com/Applifier/unity-ads-webview/pull/14411)
+* [Load V5] Add loadV5Support flag to operative events [#15621](https://github.com/Applifier/unity-ads-webview/pull/15621)
+* [Load V5, Ad Unit] Baseline for ad unit experiment [#15622](https://github.com/Applifier/unity-ads-webview/pull/15622)
+* [Open Measurement] Clean up Admob unused metrics [#15532](https://github.com/Applifier/unity-ads-webview/pull/15532)
+* [Chore] Collect cache speed metric [#15538](https://github.com/Applifier/unity-ads-webview/pull/15538)
+* [AUI] Add ColorBlurEndScreen to AutomatedExperiment [#15029](https://github.com/Applifier/unity-ads-webview/pull/15029)
+* Revert "Restore external end screen usage when available" [#15593](https://github.com/Applifier/unity-ads-webview/pull/15593)
+* Restore external end screen usage when available [#15537](https://github.com/Applifier/unity-ads-webview/pull/15537)
+* Add support for data url in external end screen [#15524](https://github.com/Applifier/unity-ads-webview/pull/15524)
+* Add getDataUrl to XHRequest.ts [#15523](https://github.com/Applifier/unity-ads-webview/pull/15523)
+
+# Thu May 28 23:11:17 UTC 2020
+
+* [Load V5] Add load v5 support flag to ad request body [#15528](https://github.com/Applifier/unity-ads-webview/pull/15528)
+* [Load V5] Add Zynga games to load v5 [#15531](https://github.com/Applifier/unity-ads-webview/pull/15531)
+* [Load V5] Always invalidate programatic campaigns if Ad Unit is in use. [#15527](https://github.com/Applifier/unity-ads-webview/pull/15527)
+* [AUI] Refactor renderColorTheme for reusability in the ColorBlur experiment [#15365](https://github.com/Applifier/unity-ads-webview/pull/15365)
+
+# Tue May 26 22:09:32 UTC 2020
+
+* Replace IAdUnitParameters with IVideoAdUnitParameters as preparation work for introducing PopupController [#15426](https://github.com/Applifier/unity-ads-webview/pull/15426)
+* [Load V5] Add Etermax game ids [#15525](https://github.com/Applifier/unity-ads-webview/pull/15525)
+* [PTS Migration] Fix PRD Endpoints in CI [#15526](https://github.com/Applifier/unity-ads-webview/pull/15526)
+* [Load V5] Use 1 retry with 10 sec timeout for PRELOAD request [#15495](https://github.com/Applifier/unity-ads-webview/pull/15495)
+* [Load V5] Add experiment tag for all Load V5 metrics [#15463](https://github.com/Applifier/unity-ads-webview/pull/15463)
+* [3.4.6 Release] Add to Webview Version Map [#15491](https://github.com/Applifier/unity-ads-webview/pull/15491)
+* Use legacy end screen [#15490](https://github.com/Applifier/unity-ads-webview/pull/15490)
+* Add Endscreen Support For External Endscreen [#14355](https://github.com/Applifier/unity-ads-webview/pull/14355)
+* [AUI] Change the endscreen test fixture image to a valid image [#15425](https://github.com/Applifier/unity-ads-webview/pull/15425)
+* [AUI] Add new locales for the color blur experiment [#15367](https://github.com/Applifier/unity-ads-webview/pull/15367)
+* [Deployment Scripts] Print PR name on Slack when merged [#15423](https://github.com/Applifier/unity-ads-webview/pull/15423)
+
+# Thu May 21 00:42:46 UTC 2020
+
+* [Load V5] Add 2 Voodoo Games [#15434](https://github.com/Applifier/unity-ads-webview/pull/15434)
+* [Load V5, Ad Unit] Enable Ad Units for Load V5 [#15359](https://github.com/Applifier/unity-ads-webview/pull/15359)
+
 # Tue May 19 18:11:59 UTC 2020
 
 * [Open Measurement] Fix data discrepancy for MOAT and IAS [#15218](https://github.com/Applifier/unity-ads-webview/pull/15218)

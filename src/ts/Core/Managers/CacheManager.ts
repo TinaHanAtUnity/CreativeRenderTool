@@ -8,6 +8,7 @@ import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { FileId } from 'Core/Utilities/FileId';
 import { FileInfo } from 'Core/Utilities/FileInfo';
 import { Observable0, Observable1, Observable2, Observable3, Observable5 } from 'Core/Utilities/Observable';
+import { SDKMetrics, GeneralTimingMetric } from 'Ads/Utilities/SDKMetrics';
 
 export enum CacheStatus {
     OK,
@@ -308,6 +309,11 @@ export class CacheManager {
 
     private onDownloadEnd(url: string, size: number, totalSize: number, duration: number, responseCode: number, headers: HeadersType): void {
         this.updateProgress(size, true);
+
+        if (duration > 0) {
+            // Send caching speed in KB/sec
+            SDKMetrics.reportTimingEvent(GeneralTimingMetric.CacheSpeed, size / duration / 1024);
+        }
 
         const callback = this._callbacks[url];
         if (callback) {

@@ -31,80 +31,80 @@
     "tracking": {
         "0": {
             "click": [
-                "https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=click&test=0&5be40c5f602f4510ec583881"
+                "https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=click&test=0&5be40c5f602f4510ec583881"
             ],
             "complete": [
-                "https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=complete&test=0&5be40c5f602f4510ec583881"
+                "https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=complete&test=0&5be40c5f602f4510ec583881"
             ],
             "error": [
-                "https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=error&test=0&5be40c5f602f4510ec583881"
+                "https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=error&test=0&5be40c5f602f4510ec583881"
             ],
             "firstQuartile": [
-                "https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=firstQuartile&test=0&5be40c5f602f4510ec583881"
+                "https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=firstQuartile&test=0&5be40c5f602f4510ec583881"
             ],
             "loaded": [
-                "https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=loaded&test=0&5be40c5f602f4510ec583881"
+                "https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=loaded&test=0&5be40c5f602f4510ec583881"
             ],
             "midpoint": [
-                "https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=midpoint&test=0&5be40c5f602f4510ec583881"
+                "https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=midpoint&test=0&5be40c5f602f4510ec583881"
             ],
             "show": [
-                "https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=skip&test=0&5be40c5f602f4510ec583881"
+                "https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=skip&test=0&5be40c5f602f4510ec583881"
             ],
             "skip": [
-                "https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=skip&test=0&5be40c5f602f4510ec583881"
+                "https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=skip&test=0&5be40c5f602f4510ec583881"
             ],
             "stalled": [
-                "https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=stalled&test=0&5be40c5f602f4510ec583881"
+                "https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=stalled&test=0&5be40c5f602f4510ec583881"
             ],
             "start": [
-                "https://tracking.prd.mz.internal.unity3d.com/impression/%ZONE%?data=randomData&test=0&5be40c5f602f4510ec583881",
-                "https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=start&test=0&5be40c5f602f4510ec583881"
+                "https://tracking.stg.mz.internal.unity3d.com/impression/%ZONE%?data=randomData&test=0&5be40c5f602f4510ec583881",
+                "https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=start&test=0&5be40c5f602f4510ec583881"
             ],
             "thirdQuartile": [
-                "https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=thirdQuartile&test=0&5be40c5f602f4510ec583881"
+                "https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=thirdQuartile&test=0&5be40c5f602f4510ec583881"
             ],
             "videoEndCardClick": [
-                "https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=videoEndCardClick&test=0&5be40c5f602f4510ec583881"
+                "https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=videoEndCardClick&test=0&5be40c5f602f4510ec583881"
             ]
         },
         "1": {
             "click": [
-                "https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=click&test=0&load_v5_1_rewardedVideo"
+                "https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=click&test=0&load_v5_1_rewardedVideo"
             ],
             "complete": [
-                "https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=complete&test=0&load_v5_1_rewardedVideo"
+                "https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=complete&test=0&load_v5_1_rewardedVideo"
             ],
             "error": [
-                "https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=error&test=0&load_v5_1_rewardedVideo"
+                "https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=error&test=0&load_v5_1_rewardedVideo"
             ],
             "firstQuartile": [
-                "https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=firstQuartile&test=0&load_v5_1_rewardedVideo"
+                "https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=firstQuartile&test=0&load_v5_1_rewardedVideo"
             ],
             "loaded": [
-                "https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=loaded&test=0&load_v5_1_rewardedVideo"
+                "https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=loaded&test=0&load_v5_1_rewardedVideo"
             ],
             "midpoint": [
-                "https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=midpoint&test=0&load_v5_1_rewardedVideo"
+                "https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=midpoint&test=0&load_v5_1_rewardedVideo"
             ],
             "show": [
-                "https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=skip&test=0&load_v5_1_rewardedVideo"
+                "https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=skip&test=0&load_v5_1_rewardedVideo"
             ],
             "skip": [
-                "https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=skip&test=0&load_v5_1_rewardedVideo"
+                "https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=skip&test=0&load_v5_1_rewardedVideo"
             ],
             "stalled": [
-                "https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=stalled&test=0&load_v5_1_rewardedVideo"
+                "https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=stalled&test=0&load_v5_1_rewardedVideo"
             ],
             "start": [
-                "https://tracking.prd.mz.internal.unity3d.com/impression/%ZONE%?data=randomData&test=0&load_v5_1_rewardedVideo",
-                "https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=start&test=0&load_v5_1_rewardedVideo"
+                "https://tracking.stg.mz.internal.unity3d.com/impression/%ZONE%?data=randomData&test=0&load_v5_1_rewardedVideo",
+                "https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=start&test=0&load_v5_1_rewardedVideo"
             ],
             "thirdQuartile": [
-                "https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=thirdQuartile&test=0&load_v5_1_rewardedVideo"
+                "https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=thirdQuartile&test=0&load_v5_1_rewardedVideo"
             ],
             "videoEndCardClick": [
-                "https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=videoEndCardClick&test=0&load_v5_1_rewardedVideo"
+                "https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=videoEndCardClick&test=0&load_v5_1_rewardedVideo"
             ]
         }
     }

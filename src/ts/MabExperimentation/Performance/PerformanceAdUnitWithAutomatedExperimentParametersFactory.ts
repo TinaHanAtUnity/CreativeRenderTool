@@ -3,18 +3,19 @@ import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
 import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
 import { IEndScreenParameters } from 'Ads/Views/EndScreen';
 import { ICore } from 'Core/ICore';
+import { ColorBlurEndScreen } from 'MabExperimentation/Performance/Views/ColorBlurEndScreen';
 import { AnimatedDownloadButtonEndScreen } from 'MabExperimentation/Performance/Views/AnimatedDownloadButtonEndScreen';
 import { AutomatedExperimentManager } from 'MabExperimentation/AutomatedExperimentManager';
-import { AutomatedExperimentsCategories } from 'MabExperimentation/Models/AutomatedExperimentsList';
+import { AutomatedExperimentsCategories, ButtonExperimentDeclaration } from 'MabExperimentation/Models/AutomatedExperimentsList';
 import { PerformanceAdUnitParametersFactory } from 'Performance/AdUnits/PerformanceAdUnitParametersFactory';
 import { Campaign } from 'Ads/Models/Campaign';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { VideoOverlay } from 'Ads/Views/VideoOverlay';
 import { SwipeUpVideoOverlay } from 'Ads/Views/SwipeUpVideoOverlay';
 import { IExperimentActionChoice } from 'MabExperimentation/Models/AutomatedExperiment';
+import { ExternalEndScreen } from 'ExternalEndScreen/Views/ExternalEndScreen';
 
 export class PerformanceAdUnitWithAutomatedExperimentParametersFactory extends PerformanceAdUnitParametersFactory {
-
     private _automatedExperimentManager: AutomatedExperimentManager;
 
     constructor(core: ICore, aem: AutomatedExperimentManager) {
@@ -30,7 +31,7 @@ export class PerformanceAdUnitWithAutomatedExperimentParametersFactory extends P
         const adUnitStyle: AdUnitStyle = baseParams.campaign.getAdUnitStyle() || AdUnitStyle.getDefaultAdUnitStyle();
 
         const endScreenParameters: IEndScreenParameters = {
-            ... this.createEndScreenParameters(baseParams.privacy, baseParams.campaign.getGameName(), baseParams),
+            ...this.createEndScreenParameters(baseParams.privacy, baseParams.campaign.getGameName(), baseParams),
             adUnitStyle: adUnitStyle,
             campaignId: baseParams.campaign.getId(),
             osVersion: baseParams.deviceInfo.getOsVersion()
@@ -40,10 +41,23 @@ export class PerformanceAdUnitWithAutomatedExperimentParametersFactory extends P
 
         const endScreenCombination: IExperimentActionChoice | undefined = this._automatedExperimentManager.activateSelectedExperiment(baseParams.campaign, AutomatedExperimentsCategories.PERFORMANCE_ENDCARD);
 
-        const endScreen = new AnimatedDownloadButtonEndScreen(endScreenCombination, endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
+        let endScreen: AnimatedDownloadButtonEndScreen | ColorBlurEndScreen | ExternalEndScreen;
+
+        if (this._campaign.getEndScreen()) {
+            endScreen = new ExternalEndScreen(endScreenCombination, endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
+        } else if (endScreenCombination && endScreenCombination.scheme === ButtonExperimentDeclaration.scheme.COLORBLUR) {
+            endScreen = new ColorBlurEndScreen(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
+        } else {
+            endScreen = new AnimatedDownloadButtonEndScreen(
+                endScreenCombination,
+                endScreenParameters,
+                baseParams.campaign,
+                baseParams.coreConfig.getCountry()
+            );
+        }
 
         return {
-            ... baseParams,
+            ...baseParams,
             video: video,
             overlay: overlay,
             endScreen: endScreen,

@@ -13,6 +13,16 @@ export interface IPrivacyCompletedParams {
     error?: string;
 }
 
+export interface IPrivacyReadyCallbackParams {
+    locale: { [key: string]: unknown };
+    startNode: string;
+    nodes: { [key: string]: unknown };
+    state: {
+        env: { [key: string]: unknown };
+        user: IUserPrivacySettings;
+    };
+}
+
 export interface IPrivacyFetchUrlParams {
     url: string;
     property: string;

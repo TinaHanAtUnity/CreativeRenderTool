@@ -118,6 +118,7 @@ class SatisfiesMatcher {
             it('should have correct request', () => {
                 expect(request.post).toHaveBeenCalledTimes(1);
                 expect(request.post).toHaveBeenLastCalledWith(expect.anything(), new SatisfiesMatcher({
+                    loadV5Support: true,
                     isLoadEnabled: true,
                     preload: true,
                     load: false,
@@ -137,10 +138,10 @@ class SatisfiesMatcher {
                     preloadData: {}
                 }), [], {
                     followRedirects: false,
-                    retries: 0,
+                    retries: 1,
                     retryDelay: 0,
                     retryWithConnectionEvents: false,
-                    timeout: 20000
+                    timeout: 10000
                 });
             });
 
@@ -287,41 +288,41 @@ class SatisfiesMatcher {
             it('should have correct tracking url in loadedCampaign1', () => {
                 expect(loadedCampaign1!.trackingUrls).toEqual({
                     click: [
-                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=click&test=0&5be40c5f602f4510ec583881'
+                        'https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=click&test=0&5be40c5f602f4510ec583881'
                     ],
                     complete: [
-                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=complete&test=0&5be40c5f602f4510ec583881'
+                        'https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=complete&test=0&5be40c5f602f4510ec583881'
                     ],
                     error: [
-                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=error&test=0&5be40c5f602f4510ec583881'
+                        'https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=error&test=0&5be40c5f602f4510ec583881'
                     ],
                     firstQuartile: [
-                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=firstQuartile&test=0&5be40c5f602f4510ec583881'
+                        'https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=firstQuartile&test=0&5be40c5f602f4510ec583881'
                     ],
                     loaded: [
-                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=loaded&test=0&5be40c5f602f4510ec583881'
+                        'https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=loaded&test=0&5be40c5f602f4510ec583881'
                     ],
                     midpoint: [
-                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=midpoint&test=0&5be40c5f602f4510ec583881'
+                        'https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=midpoint&test=0&5be40c5f602f4510ec583881'
                     ],
                     show: [
-                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=skip&test=0&5be40c5f602f4510ec583881'
+                        'https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=skip&test=0&5be40c5f602f4510ec583881'
                     ],
                     skip: [
-                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=skip&test=0&5be40c5f602f4510ec583881'
+                        'https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=skip&test=0&5be40c5f602f4510ec583881'
                     ],
                     stalled: [
-                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=stalled&test=0&5be40c5f602f4510ec583881'
+                        'https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=stalled&test=0&5be40c5f602f4510ec583881'
                     ],
                     start: [
-                        'https://tracking.prd.mz.internal.unity3d.com/impression/%ZONE%?data=randomData&test=0&5be40c5f602f4510ec583881',
-                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=start&test=0&5be40c5f602f4510ec583881'
+                        'https://tracking.stg.mz.internal.unity3d.com/impression/%ZONE%?data=randomData&test=0&5be40c5f602f4510ec583881',
+                        'https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=start&test=0&5be40c5f602f4510ec583881'
                     ],
                     thirdQuartile: [
-                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=thirdQuartile&test=0&5be40c5f602f4510ec583881'
+                        'https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=thirdQuartile&test=0&5be40c5f602f4510ec583881'
                     ],
                     videoEndCardClick: [
-                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=videoEndCardClick&test=0&5be40c5f602f4510ec583881'
+                        'https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=videoEndCardClick&test=0&5be40c5f602f4510ec583881'
                     ]
                 });
             });
@@ -333,41 +334,41 @@ class SatisfiesMatcher {
             it('should have correct tracking url in loadedCampaign2', () => {
                 expect(loadedCampaign2!.trackingUrls).toEqual({
                     click: [
-                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=click&test=0&load_v5_2_rewardedVideo'
+                        'https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=click&test=0&load_v5_2_rewardedVideo'
                     ],
                     complete: [
-                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=complete&test=0&load_v5_2_rewardedVideo'
+                        'https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=complete&test=0&load_v5_2_rewardedVideo'
                     ],
                     error: [
-                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=error&test=0&load_v5_2_rewardedVideo'
+                        'https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=error&test=0&load_v5_2_rewardedVideo'
                     ],
                     firstQuartile: [
-                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=firstQuartile&test=0&load_v5_2_rewardedVideo'
+                        'https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=firstQuartile&test=0&load_v5_2_rewardedVideo'
                     ],
                     loaded: [
-                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=loaded&test=0&load_v5_2_rewardedVideo'
+                        'https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=loaded&test=0&load_v5_2_rewardedVideo'
                     ],
                     midpoint: [
-                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=midpoint&test=0&load_v5_2_rewardedVideo'
+                        'https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=midpoint&test=0&load_v5_2_rewardedVideo'
                     ],
                     show: [
-                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=skip&test=0&load_v5_2_rewardedVideo'
+                        'https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=skip&test=0&load_v5_2_rewardedVideo'
                     ],
                     skip: [
-                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=skip&test=0&load_v5_2_rewardedVideo'
+                        'https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=skip&test=0&load_v5_2_rewardedVideo'
                     ],
                     stalled: [
-                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=stalled&test=0&load_v5_2_rewardedVideo'
+                        'https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=stalled&test=0&load_v5_2_rewardedVideo'
                     ],
                     start: [
-                        'https://tracking.prd.mz.internal.unity3d.com/impression/%ZONE%?data=randomData&test=0&load_v5_2_rewardedVideo',
-                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=start&test=0&load_v5_2_rewardedVideo'
+                        'https://tracking.stg.mz.internal.unity3d.com/impression/%ZONE%?data=randomData&test=0&load_v5_2_rewardedVideo',
+                        'https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=start&test=0&load_v5_2_rewardedVideo'
                     ],
                     thirdQuartile: [
-                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=thirdQuartile&test=0&load_v5_2_rewardedVideo'
+                        'https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=thirdQuartile&test=0&load_v5_2_rewardedVideo'
                     ],
                     videoEndCardClick: [
-                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=videoEndCardClick&test=0&load_v5_2_rewardedVideo'
+                        'https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=videoEndCardClick&test=0&load_v5_2_rewardedVideo'
                     ]
                 });
             });
@@ -390,6 +391,7 @@ class SatisfiesMatcher {
             it('should make request with correct body', () => {
                 expect(request.post).toHaveBeenCalledTimes(3);
                 expect(request.post).toHaveBeenNthCalledWith(2, expect.anything(), new SatisfiesMatcher({
+                    loadV5Support: true,
                     isLoadEnabled: true,
                     preload: false,
                     load: true,
@@ -514,6 +516,7 @@ class SatisfiesMatcher {
             it('should make request with correct body', () => {
                 expect(request.post).toHaveBeenCalledTimes(2);
                 expect(request.post).toHaveBeenNthCalledWith(2, expect.anything(), new SatisfiesMatcher({
+                    loadV5Support: true,
                     isLoadEnabled: true,
                     preload: false,
                     load: true,
@@ -679,6 +682,7 @@ class SatisfiesMatcher {
             it('should make request with correct body', () => {
                 expect(request.post).toHaveBeenCalledTimes(2);
                 expect(request.post).toHaveBeenNthCalledWith(2, expect.anything(), new SatisfiesMatcher({
+                    loadV5Support: true,
                     isLoadEnabled: true,
                     preload: false,
                     load: true,
@@ -774,6 +778,7 @@ class SatisfiesMatcher {
             it('should make request with correct body', () => {
                 expect(request.post).toHaveBeenCalledTimes(2);
                 expect(request.post).toHaveBeenNthCalledWith(2, expect.anything(), new SatisfiesMatcher({
+                    loadV5Support: true,
                     isLoadEnabled: true,
                     preload: false,
                     load: true,
@@ -1245,41 +1250,41 @@ class SatisfiesMatcher {
 
                 expect(trackingUrls).toEqual({
                     click: [
-                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=click&test=0&reload_v5_rewardedVideo'
+                        'https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=click&test=0&reload_v5_rewardedVideo'
                     ],
                     complete: [
-                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=complete&test=0&reload_v5_rewardedVideo'
+                        'https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=complete&test=0&reload_v5_rewardedVideo'
                     ],
                     error: [
-                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=error&test=0&reload_v5_rewardedVideo'
+                        'https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=error&test=0&reload_v5_rewardedVideo'
                     ],
                     firstQuartile: [
-                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=firstQuartile&test=0&reload_v5_rewardedVideo'
+                        'https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=firstQuartile&test=0&reload_v5_rewardedVideo'
                     ],
                     loaded: [
-                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=loaded&test=0&reload_v5_rewardedVideo'
+                        'https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=loaded&test=0&reload_v5_rewardedVideo'
                     ],
                     midpoint: [
-                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=midpoint&test=0&reload_v5_rewardedVideo'
+                        'https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=midpoint&test=0&reload_v5_rewardedVideo'
                     ],
                     show: [
-                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=skip&test=0&reload_v5_rewardedVideo'
+                        'https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=skip&test=0&reload_v5_rewardedVideo'
                     ],
                     skip: [
-                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=skip&test=0&reload_v5_rewardedVideo'
+                        'https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=skip&test=0&reload_v5_rewardedVideo'
                     ],
                     stalled: [
-                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=stalled&test=0&reload_v5_rewardedVideo'
+                        'https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=stalled&test=0&reload_v5_rewardedVideo'
                     ],
                     start: [
-                        'https://tracking.prd.mz.internal.unity3d.com/impression/%ZONE%?data=randomData&test=0&reload_v5_rewardedVideo',
-                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=start&test=0&reload_v5_rewardedVideo'
+                        'https://tracking.stg.mz.internal.unity3d.com/impression/%ZONE%?data=randomData&test=0&reload_v5_rewardedVideo',
+                        'https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=start&test=0&reload_v5_rewardedVideo'
                     ],
                     thirdQuartile: [
-                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=thirdQuartile&test=0&reload_v5_rewardedVideo'
+                        'https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=thirdQuartile&test=0&reload_v5_rewardedVideo'
                     ],
                     videoEndCardClick: [
-                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=videoEndCardClick&test=0&reload_v5_rewardedVideo'
+                        'https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=videoEndCardClick&test=0&reload_v5_rewardedVideo'
                     ]
                 });
             });
@@ -1292,6 +1297,7 @@ class SatisfiesMatcher {
 
             it('should make request with correct body', () => {
                 expect(request.post).toHaveBeenNthCalledWith(4, expect.anything(), new SatisfiesMatcher({
+                    loadV5Support: true,
                     isLoadEnabled: true,
                     preload: true,
                     load: true,

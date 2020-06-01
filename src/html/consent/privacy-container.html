@@ -11,6 +11,18 @@
 
     <script>
         (function() {
+            if (!window.Promise) {
+                window.Promise = window.parent.Promise;
+            }
+
+            if (!window.Object.entries) {
+                window.Object.entries = window.parent.Object.entries;
+            }
+
+            if (!window.Object.setPrototypeOf) {
+                window.Object.entries = window.parent.Object.setPrototypeOf;
+            }
+
             var AdsPrivacyAdapter = function() {
                 var listeners = {
                     error: [],
@@ -21,10 +33,7 @@
                     switch(event.data.type) {
                         case 'readyCallback':
                             if (window.privacyAdapter.readyCallback) {
-                                var data = event.data.data;
-                                var flow = event.data.data.flow;
-                                delete data.flow;
-                                window.privacyAdapter.readyCallback(flow, data);
+                                window.privacyAdapter.readyCallback(event.data.data);
                             }
                             break;
                         case 'completeCallback':
@@ -99,6 +108,10 @@
                 this.setFetchUrlCallback = function(fetchUrlCallback) {
                     this.fetchUrlCallback = fetchUrlCallback;
                 };
+
+                this.setReadyCallback = function(readyCallback) {
+                    this.readyCallback = readyCallback;
+                }
             };
 
             window.privacyAdapter = new AdsPrivacyAdapter();

@@ -34,8 +34,6 @@ export enum AdmobMetric {
     AdmobRewardedVideoStart = 'admob_rewarded_video_start',
     AdmobUserWasRewarded = 'admob_user_was_rewarded',
     AdmobUserSkippedRewardedVideo = 'admob_user_skipped_rewarded_video',
-    AdmobDBMRewardedStarted = 'admob_dbm_rewarded_started',
-    AdmobDBMNonRewardedStarted = 'admob_dbm_nonrewarded_started',
     AdmobVideoCanPlay = 'admob_video_canplay',
     AdmobVideoStarted = 'admob_video_started',
     AdmobOMEnabled = 'admob_om_enabled',
@@ -44,9 +42,7 @@ export enum AdmobMetric {
     DoubleClickOMStarts = 'doubleclick_om_starts',
     DoubleClickOMImpressions = 'doubleclick_om_impressions',
     DoubleClickInstanceCreated = 'doubleclick_om_instance_created',
-    AdmobOMVideoStart = 'admob_om_video_start',
-    AdmobOMStartFirst = 'admob_om_start_first',
-    AdmobOMLoadedFirst = 'admob_om_load_first'
+    AdmobOMVideoStart = 'admob_om_video_start'
 }
 
 export enum BannerMetric {
@@ -153,7 +149,15 @@ export enum AUIMetric {
     RequestingCampaignOptimization = 'requesting_campaign_optimization',
     UnknownExperimentName = 'unknown_experiment_name',
     InvalidVideoOverlayMode = 'invalid_video_overlay_mode',
-    UnknownCategoryProvided = 'unknown_automated_experiment_category_provided'
+    UnknownCategoryProvided = 'unknown_automated_experiment_category_provided',
+    InvalidImageAssets = 'invalid_image_assets'
+}
+
+export enum ExternalEndScreenMetric {
+    IframeTimeout = 'external_end_screen_iframe_timeout',
+    GameIconImageMissing = 'external_end_screen_game_icon_missing',
+    ImageMissing = 'external_end_screen_image_missing',
+    UnableToGetDataUrl = 'external_end_screen_image_unable_to_get_data_url'
 }
 
 export enum GeneralTimingMetric {
@@ -161,7 +165,8 @@ export enum GeneralTimingMetric {
     AuctionHealthGood = 'auction_health_good',
     AuctionHealthBad = 'auction_health_bad',
     AuctionHealthGoodXHR = 'auction_health_good_xhr',
-    AuctionHealthBadXHR = 'auction_health_bad_xhr'
+    AuctionHealthBadXHR = 'auction_health_bad_xhr',
+    CacheSpeed = 'cache_speed'
 }
 
 export enum MediationMetric {
@@ -217,7 +222,7 @@ export enum ChinaAucionEndpoint {
 
 export type TimingEvent = InitializationMetric | MediationMetric | GeneralTimingMetric;
 
-export type PTSEvent = VideoMetric | TimingEvent | AuctionV6 | AdmobMetric | BannerMetric | CachingMetric | ChinaMetric | VastMetric | MraidMetric | MiscellaneousMetric | LoadMetric | ErrorMetric | OMMetric | AUIMetric | LoadV5 | ChinaAucionEndpoint;
+export type PTSEvent = VideoMetric | TimingEvent | AuctionV6 | AdmobMetric | BannerMetric | CachingMetric | ChinaMetric | VastMetric | MraidMetric | MiscellaneousMetric | LoadMetric | ErrorMetric | OMMetric | AUIMetric | LoadV5 | ChinaAucionEndpoint | ExternalEndScreenMetric;
 
 export class SDKMetrics {
 

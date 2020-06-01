@@ -14,7 +14,26 @@ import PrivacyWebUI from 'html/PrivacyWebUI.html';
 describe('PrivacySDKViewTest', () => {
     let params: IPrivacySDKViewParameters;
     let privacyView: PrivacySDKView;
-    const config = new PrivacyConfig(PrivacySDKFlow,
+    const config = new PrivacyConfig(
+        {
+          buildOsVersion: '10.0.3',
+          platform: Platform.ANDROID,
+          userLocale: 'en_EN',
+          country: 'EN',
+          subCountry: 'EN',
+          privacyMethod: PrivacyMethod.UNITY_CONSENT,
+          ageGateLimit: 13,
+          legalFramework: LegalFramework.GDPR,
+          isCoppa: false,
+          apiLevel: 25,
+          userSummary: {
+              deviceModel: '-',
+              country: '-',
+              gamePlaysThisWeek: '-',
+              adsSeenInGameThisWeek: '-',
+              installsFromAds: '-'
+          }
+        },
         {
             ads: false,
             external: false,
@@ -22,26 +41,10 @@ describe('PrivacySDKViewTest', () => {
             ageGateChoice: AgeGateChoice.NO,
             agreementMethod: ''
         },
-        {
-            buildOsVersion: '10.0.3',
-            platform: Platform.ANDROID,
-            userLocale: 'en_EN',
-            country: 'EN',
-            subCountry: 'EN',
-            privacyMethod: PrivacyMethod.UNITY_CONSENT,
-            ageGateLimit: 13,
-            legalFramework: LegalFramework.GDPR,
-            isCoppa: false,
-            apiLevel: 25,
-            userSummary: {
-                deviceModel: '-',
-                country: '-',
-                gamePlaysThisWeek: '-',
-                adsSeenInGameThisWeek: '-',
-                installsFromAds: '-'
-            }
-        },
-        PrivacyWebUI);
+        '',
+        PrivacyWebUI,
+        PrivacySDKFlow,
+        {});
 
     beforeEach(() => {
         const core = <Core>sinon.createStubInstance(Core);

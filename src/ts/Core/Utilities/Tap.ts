@@ -33,7 +33,10 @@ export class Tap {
         }
 
         // Use the above detect's results. passive applied if supported, capture will be false either way.
-        this._element.addEventListener('touchstart', (event) => this.onTouchStart(event), this._supportsPassive ? { passive: true } : false);
+        // The passive property should always be false here,
+        // since we send an extra fake click event inside touchEnd listener
+        // so the touch event should be cancellable using preventDefault, otherwise duplicate click events will be fired.
+        this._element.addEventListener('touchstart', (event) => this.onTouchStart(event), this._supportsPassive ? { passive: false } : false);
     }
 
     public getTouchStartPosition() {
@@ -42,9 +45,7 @@ export class Tap {
 
     private onTouchStart(event: TouchEvent) {
         event.stopPropagation();
-        if (!this._supportsPassive) {
-            event.preventDefault();
-        }
+        event.preventDefault();
 
         this._onTouchMoveListener = (touchEvent) => this.onTouchMove(touchEvent);
         this._onTouchEndListener = (touchEvent) => this.onTouchEnd(touchEvent);
