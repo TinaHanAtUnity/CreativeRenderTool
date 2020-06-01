@@ -52,7 +52,7 @@ do
             
             n)
                 # Ensures next branch isn't continued to unless all changes have been committed
-                if [ $(git status) == *"modified"* ]; then
+                if [ $(git status) == *"use"* ]; then
                     echo -e "\n${RED}Staged changes have not been committed. Staying on the current branch.${RESET}"
                 else
                     move_to_next_release_branch=true
