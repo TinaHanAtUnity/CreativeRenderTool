@@ -1,5 +1,6 @@
 # Pending
 
+* [Chore] Update lint rules and auto fix existing issues (Part 2) [#15096](https://github.com/Applifier/unity-ads-webview/pull/15096)
 * [Deployment] Update Master Merge Commands [#15678](https://github.com/Applifier/unity-ads-webview/pull/15678)
 
 # Mon Jun  1 15:17:59 UTC 2020
