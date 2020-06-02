@@ -604,6 +604,15 @@ class SatisfiesMatcher {
                 expect(campaign1).toBe(campaign2);
             });
 
+            it('should have different tracking urls', () => {
+                const additionalCampaigns: IPlacementIdMap<INotCachedLoadedCampaign | undefined> = <IPlacementIdMap<INotCachedLoadedCampaign | undefined>>onAdditionalPlacementsReady.mock.calls[0][1];
+
+                const trackingUrls1: ICampaignTrackingUrls = additionalCampaigns.rewardedVideo!.notCachedTrackingUrls;
+                const trackingUrls2: ICampaignTrackingUrls = additionalCampaigns.video2!.notCachedTrackingUrls;
+
+                expect(trackingUrls1).not.toEqual(trackingUrls2);
+            });
+
             it('should cache only 1 campaigns', () => {
                 expect(assetManager.setup).toBeCalledTimes(1);
             });
