@@ -28,6 +28,8 @@ import { SDKMetrics, LoadV5 } from 'Ads/Utilities/SDKMetrics';
 import { RequestError } from 'Core/Errors/RequestError';
 import { SdkStats } from 'Ads/Utilities/SdkStats';
 import { Observable2 } from 'Core/Utilities/Observable';
+import { CampaignAssetInfo } from 'Ads/Utilities/CampaignAssetInfo';
+import { FileInfo } from 'Core/Utilities/FileInfo';
 
 export interface INotCachedLoadedCampaign {
     notCachedCampaign: Campaign;
@@ -591,6 +593,13 @@ export class AdRequestManager extends CampaignManager {
     public cacheCampaign(notCachedLoadedCampaign: INotCachedLoadedCampaign | undefined): Promise<ILoadedCampaign | undefined> {
         if (notCachedLoadedCampaign === undefined) {
             return Promise.resolve(undefined);
+        }
+
+        if (CampaignAssetInfo.isCached(notCachedLoadedCampaign.notCachedCampaign)) {
+            return Promise.resolve({
+                campaign: notCachedLoadedCampaign.notCachedCampaign,
+                trackingUrls: notCachedLoadedCampaign.notCachedTrackingUrls
+            });
         }
 
         return this._assetManager.setup(notCachedLoadedCampaign.notCachedCampaign).catch((err) => {
