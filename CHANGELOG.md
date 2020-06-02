@@ -1,5 +1,6 @@
 # Pending
 
+* [Load V5] Add placement count bucket for reload request [#15707](https://github.com/Applifier/unity-ads-webview/pull/15707)
 * [Bug] Start stopwatch when measuring auction request time [#15706](https://github.com/Applifier/unity-ads-webview/pull/15706)
 * [3.4.6] Separate Version from 3.4.* [#15710](https://github.com/Applifier/unity-ads-webview/pull/15710)
 * [Release] Fix iOS Hybrid Tests [#15705](https://github.com/Applifier/unity-ads-webview/pull/15705)
