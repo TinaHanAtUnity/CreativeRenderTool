@@ -1,5 +1,6 @@
 # Pending
 
+* [Release] Fix iOS Hybrid Tests [#15705](https://github.com/Applifier/unity-ads-webview/pull/15705)
 * [Chore] Update lint rules and auto fix existing issues (Part 2) [#15096](https://github.com/Applifier/unity-ads-webview/pull/15096)
 * [Deployment] Update Master Merge Commands [#15678](https://github.com/Applifier/unity-ads-webview/pull/15678)
 
