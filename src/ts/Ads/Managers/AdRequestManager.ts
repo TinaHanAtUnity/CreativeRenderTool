@@ -308,7 +308,9 @@ export class AdRequestManager extends CampaignManager {
         let requestPrivacy: IRequestPrivacy;
         let legacyRequestPrivacy: ILegacyRequestPrivacy;
 
-        this.reportMetricEvent(LoadV5.ReloadRequestStarted);
+        this.reportMetricEvent(LoadV5.ReloadRequestStarted, {
+            'bucket': `${Math.min(20, Math.ceil(placementsToLoad.length / 2) * 2)}`
+        });
 
         let promiseResolve: () => void;
         this._ongoingReloadRequest = new Promise((resolve) => { promiseResolve = resolve; });
@@ -350,14 +352,18 @@ export class AdRequestManager extends CampaignManager {
                 SdkStats.increaseAdRequestOrdinal();
             }
 
-            this.reportMetricEvent(LoadV5.ReloadRequestParsingResponse);
+            this.reportMetricEvent(LoadV5.ReloadRequestParsingResponse, {
+                'bucket': `${Math.min(20, Math.ceil(placementsToLoad.length / 2) * 2)}`
+            });
             return this.parseReloadResponse(response, placementsToLoad.map((placementId) => this._adsConfig.getPlacement(placementId)), countersForOperativeEvents, requestPrivacy, legacyRequestPrivacy);
         }).catch((err) => {
             this._preloadFailed = true;
 
             placementsToLoad.forEach((placementId) => this.onNoFill.trigger(placementId));
 
-            this.handleError(LoadV5.ReloadRequestFailed, err);
+            this.handleError(LoadV5.ReloadRequestFailed, err, {
+                'bucket': `${Math.min(20, Math.ceil(placementsToLoad.length / 2) * 2)}`
+            });
         }).then(() => {
             this._ongoingReloadRequest = null;
             promiseResolve();
@@ -745,7 +751,7 @@ export class AdRequestManager extends CampaignManager {
         return body;
     }
 
-    private handleError(event: LoadV5, err: unknown) {
+    private handleError(event: LoadV5, err: unknown, tags: { [key: string]: string } = {}) {
         let reason: string = 'unknown';
         if (err instanceof AdRequestManagerError) {
             reason = err.tag;
@@ -757,7 +763,7 @@ export class AdRequestManager extends CampaignManager {
             }
         }
 
-        this.reportMetricEvent(event, { 'rsn': reason });
+        this.reportMetricEvent(event, { 'rsn': reason, ...tags });
     }
 
     public reportMetricEvent(metric: LoadV5, tags: { [key: string]: string } = {}) {
