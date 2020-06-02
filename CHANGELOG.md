@@ -1,4 +1,4 @@
-# Pending
+# Tue Jun  2 19:11:16 UTC 2020
 
 * [Bug] Send placement invalidation as load v5 metric [#15708](https://github.com/Applifier/unity-ads-webview/pull/15708)
 * [Load V5] Add placement count bucket for reload request [#15707](https://github.com/Applifier/unity-ads-webview/pull/15707)
