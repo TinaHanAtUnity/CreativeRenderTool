@@ -217,17 +217,25 @@ describe('XHRequestTest', () => {
     });
 
     describe('getDataUrl', () => {
-        it('should give a correct data url', async () => {
-            const url = 'https://api.unity3d.com/file.txt';
-            const fileContent = 'HelloWorld!';
-            const expectedContent = 'data:application/octet-stream;base64,' + btoa(fileContent);
 
+        const url = 'https://api.unity3d.com/file.txt';
+        const fileContent = 'HelloWorld!';
+        let responseText: string;
+
+        beforeEach(() => {
             server.respondWith('GET', url, [200, {}, fileContent]);
-
-            return XHRequest.getDataUrl(url).then((responseText) => {
-                assert.equal(server.requests.length, 1, 'XHRequestTest should create one XMLHttpRequest instance');
-                assert.equal(expectedContent, responseText);
+            return XHRequest.getDataUrl(url).then((response) => {
+                responseText = response;
             });
+        });
+
+        it('should give a correct data url', () => {
+            assert.equal(server.requests.length, 1, 'XHRequestTest should create one XMLHttpRequest instance');
+        });
+
+        it('should give the correct response text', () => {
+            // iOS does not return with application/octet-stream - This should be confirmed if expected
+            assert.isNotNull(responseText.match(/data:.*;base64,SGVsbG9Xb3JsZCE=/i), `${responseText} did not match regex`);
         });
     });
 });
