@@ -12,7 +12,6 @@ import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { SDKMetrics } from 'Ads/Utilities/SDKMetrics';
 import { ColorBlurEndScreen } from 'MabExperimentation/Performance/Views/ColorBlurEndScreen';
-import { ColorTheme } from 'Core/Utilities/ColorTheme';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { Localization } from 'Core/Utilities/Localization';
 
@@ -145,26 +144,19 @@ describe('ColorBlurEndScreenTest', () => {
     });
 
     describe('Color matching for the game info container and the install container', async () => {
-        let color: string;
+        let campaignColorRgbCss: string;
 
-        beforeEach(function (done) {
-            // tslint:disable:no-invalid-this
-            this.timeout(15000);
-            // tslint:enable
-            ColorTheme.calculateColorThemeForEndCard(campaign, core)
-                .then((theme) => {
-                    color = theme.base.medium.toCssRgb();
-                })
-                .then(done);
+        beforeEach(() => {
+            campaignColorRgbCss = 'rgb(98, 21, 183)';
         });
 
         const validateColorTheme = (endScreen: ColorBlurEndScreen) => {
             endScreen.render();
             const gameInfoContainer = <HTMLElement>endScreen.container().querySelector('.game-info-container');
-            gameInfoContainer.style.backgroundColor = color;
+            gameInfoContainer.style.backgroundColor = campaignColorRgbCss;
             const gameInfoContainerColor = gameInfoContainer.style.backgroundColor;
             const installContainer = <HTMLElement>endScreen.container().querySelector('.install-container');
-            installContainer.style.color = color;
+            installContainer.style.color = campaignColorRgbCss;
             const installContainerColor = installContainer.style.color;
 
             if (!gameInfoContainerColor || !installContainerColor) {
