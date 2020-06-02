@@ -145,13 +145,14 @@ export class LegacyCampaignManager extends CampaignManager {
                 CampaignManager.createRequestBody(this._clientInfo, this._coreConfig, this._deviceInfo, this._userPrivacyManager, this._sessionManager, this._privacy, countersForOperativeEvents, fullyCachedCampaignIds, versionCode, this._adMobSignalFactory, freeSpace, this._metaDataManager, this._adsConfig, this._isLoadEnabled, this.getPreviousPlacementId(), requestPrivacy, legacyRequestPrivacy, nofillRetry, undefined, this._loadV5Support)
             ]);
         }).then(([requestUrl, requestBody]) => {
-            measurement = createStopwatch();
             this._core.Sdk.logInfo('Requesting ad plan from ' + requestUrl);
 
             if (this._useChinaAuctionEndpoint) {
                 SDKMetrics.reportMetricEvent(ChinaAucionEndpoint.AuctionRequest);
             }
 
+            measurement = createStopwatch();
+            measurement.start();
             if (this._mediationLoadTracking && this._mediationLoadTracking.getCurrentExperiment() === MediationExperimentType.AuctionXHR) {
                 return XHRequest.post(requestUrl, JSON.stringify(requestBody)).then((resp: string) => {
                     return {
