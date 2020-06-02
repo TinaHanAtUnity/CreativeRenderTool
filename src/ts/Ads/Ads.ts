@@ -510,7 +510,7 @@ export class Ads implements IAds {
         // isInvalidationPending is valid only when Load V5 is in use.
         if (this.AdRequestManager && placement.isInvalidationPending()) {
             this.showError(true, placementId, 'Invalidation pending for a placement');
-            SDKMetrics.reportMetricEvent(ErrorMetric.PlacementInvalidationPending);
+            this.AdRequestManager.reportMetricEvent(LoadV5Metrics.PlacementInvalidationPending);
             return;
         }
 

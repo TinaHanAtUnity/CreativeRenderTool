@@ -11,7 +11,6 @@ export enum ErrorMetric {
     CampaignExpired = 'campaign_expired',
     NoConnectionWhenNeeded = 'no_connection_when_needed',
     MissingTrackingUrlsOnShow = 'missing_tracking_urls_on_show',
-    PlacementInvalidationPending = 'placement_invalidation_pending',
     AttemptToStreamCampaignWithoutConnection = 'attempt_to_stream_campaign_without_connection'
 }
 
@@ -204,7 +203,8 @@ export enum LoadV5 {
     ReloadRequestParseCampaignFailed = 'v5_reload_request_parse_campaign_failed',
     RefreshManagerCampaignExpired = 'v5_refresh_manager_campaign_expired',
     RefreshManagerCampaignFailedToInvalidate = 'v5_refresh_manager_campaign_failed_to_be_invalidate',
-    Show = 'v5_show'
+    Show = 'v5_show',
+    PlacementInvalidationPending = 'placement_invalidation_pending'
 }
 
 export enum AuctionV6 {
