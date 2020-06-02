@@ -83,7 +83,7 @@ import { Analytics } from 'Analytics/Analytics';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { PrivacyParser } from 'Privacy/Parsers/PrivacyParser';
 import { Promises } from 'Core/Utilities/Promises';
-import { MediationCacheModeAllowedTest, AuctionXHR, LoadV5, BaseLineLoadV5, LoadV5AdUnit } from 'Core/Models/ABGroup';
+import { MediationCacheModeAllowedTest, AuctionXHR, LoadV5, BaseLineLoadV5, LoadV5AdUnit, LoadV5NoInvalidation } from 'Core/Models/ABGroup';
 import { PerPlacementLoadManagerV4 } from 'Ads/Managers/PerPlacementLoadManagerV4';
 import { PrivacyMetrics } from 'Privacy/PrivacyMetrics';
 import { PrivacySDKUnit } from 'Ads/AdUnits/PrivacySDKUnit';
@@ -101,6 +101,7 @@ import { CampaignAssetInfo } from 'Ads/Utilities/CampaignAssetInfo';
 import { AdRequestManager, LoadV5ExperimentType } from 'Ads/Managers/AdRequestManager';
 import { PerPlacementLoadManagerV5 } from 'Ads/Managers/PerPlacementLoadManagerV5';
 import { CometCampaignParser } from 'Performance/Parsers/CometCampaignParser';
+import { PerPlacementLoadManagerV5NoInvalidation } from 'Ads/Managers/PerPlacementLoadManagerV5NoInvalidation';
 
 export class Ads implements IAds {
 
@@ -329,7 +330,9 @@ export class Ads implements IAds {
 
                 let experiment = LoadV5ExperimentType.None;
 
-                if (adUnitGame) {
+                if (LoadV5NoInvalidation.isValid(this._core.Config.getAbGroup())) {
+                    experiment = LoadV5ExperimentType.NoInvalidation;
+                } else if (adUnitGame) {
                     experiment = useAdUnits ? LoadV5ExperimentType.AdUnit : LoadV5ExperimentType.BaseAdUnit;
                 }
 
@@ -351,8 +354,12 @@ export class Ads implements IAds {
     private configureRefreshManager(): void {
         // AdRequestManager will be set only if Load V5 is enabled.
         if (this.AdRequestManager) {
-            const useAdUnits = this.useAdUnitSupport();
-            this.RefreshManager = new PerPlacementLoadManagerV5(this.Api, this.Config, this._core.Config, this.AdRequestManager, this._core.ClientInfo, this._core.FocusManager, useAdUnits);
+            if (LoadV5NoInvalidation.isValid(this._core.Config.getAbGroup())) {
+                this.RefreshManager = new PerPlacementLoadManagerV5NoInvalidation(this.Api, this.Config, this._core.Config, this.AdRequestManager, this._core.ClientInfo, this._core.FocusManager, false);
+            } else {
+                const useAdUnits = this.useAdUnitSupport();
+                this.RefreshManager = new PerPlacementLoadManagerV5(this.Api, this.Config, this._core.Config, this.AdRequestManager, this._core.ClientInfo, this._core.FocusManager, useAdUnits);
+            }
             return;
         }
 
