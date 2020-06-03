@@ -1,21 +1,29 @@
 import * as sinon from 'sinon';
-import { Platform } from 'Core/Constants/Platform';
-import { Placement } from 'Ads/Models/Placement';
-import { VastOpenMeasurementController } from 'Ads/Views/OpenMeasurement/VastOpenMeasurementController';
-import { OpenMeasurement } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
-import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { OpenMeasurementAdViewBuilder } from 'Ads/Views/OpenMeasurement/OpenMeasurementAdViewBuilder';
-import { ClientInfo } from 'Core/Models/ClientInfo';
-import { DeviceInfo } from 'Core/Models/DeviceInfo';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { ICoreApi } from 'Core/ICore';
-import { Backend } from 'Backend/Backend';
-import { VastAdVerification } from 'VAST/Models/VastAdVerification';
-import { VastVerificationResource } from 'VAST/Models/VastVerificationResource';
-import { AccessMode, ISessionEvent, IContext, AdSessionType, PARTNER_NAME, OM_JS_VERSION, OMID_P } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
+import {Platform} from 'Core/Constants/Platform';
+import {Placement} from 'Ads/Models/Placement';
+import {VastOpenMeasurementController} from 'Ads/Views/OpenMeasurement/VastOpenMeasurementController';
+import {OpenMeasurement} from 'Ads/Views/OpenMeasurement/OpenMeasurement';
+import {TestFixtures} from 'TestHelpers/TestFixtures';
+import {OpenMeasurementAdViewBuilder} from 'Ads/Views/OpenMeasurement/OpenMeasurementAdViewBuilder';
+import {ClientInfo} from 'Core/Models/ClientInfo';
+import {DeviceInfo} from 'Core/Models/DeviceInfo';
+import {NativeBridge} from 'Core/Native/Bridge/NativeBridge';
+import {ICoreApi} from 'Core/ICore';
+import {Backend} from 'Backend/Backend';
+import {VastAdVerification} from 'VAST/Models/VastAdVerification';
+import {VastVerificationResource} from 'VAST/Models/VastVerificationResource';
+import {
+    AccessMode,
+    AdSessionType,
+    IContext,
+    ISessionEvent,
+    OM_JS_VERSION,
+    OMID_P,
+    PARTNER_NAME
+} from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
 import SimpleVast from 'xml/SimpleVast.xml';
-import { VastCampaign } from 'VAST/Models/VastCampaign';
-import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
+import {VastCampaign} from 'VAST/Models/VastCampaign';
+import {ThirdPartyEventManager} from 'Ads/Managers/ThirdPartyEventManager';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe(`${platform} OMManager`, () => {
@@ -130,7 +138,7 @@ import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
                     },
                     deviceInfo: {
                         deviceType: deviceInfo.getModel(), //this._deviceInfo.getModel(),
-                        os: Platform[platform].toLocaleLowerCase(), //platform.toLowerCase(),
+                        os: platform === Platform.ANDROID ? 'Android' : 'iOS',
                         osVersion: deviceInfo.getOsVersion()
                     },
                     supports: ['vlid', 'clid']

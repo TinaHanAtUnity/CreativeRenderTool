@@ -67,7 +67,7 @@ export abstract class OpenMeasurementController implements IOMController {
      */
     public loaded(vastProperties: IVastProperties) {
         this._omInstances.forEach((om) => {
-            om.triggerVideoEvent(OMID3pEvents.OMID_LOADED, { vastProperties });
+            om.triggerVideoEvent(OMID3pEvents.OMID_LOADED, vastProperties);
         });
     }
 
