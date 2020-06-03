@@ -82,9 +82,9 @@ describe('VideoAdUnitPopupEventHandler', () => {
             });
         });
 
-        describe('when calling onShowPopup', () => {
+        describe('when calling onPopupShow', () => {
             beforeEach(() => {
-                videoAdUnitPopupEventHandler.onShowPopup();
+                videoAdUnitPopupEventHandler.onPopupShow();
             });
 
             it('the video pause method should be called', () => {
@@ -117,9 +117,9 @@ describe('VideoAdUnitPopupEventHandler', () => {
             });
         });
 
-        describe('when calling onShowPopup', () => {
+        describe('when calling onPopupShow', () => {
             beforeEach(() => {
-                videoAdUnitPopupEventHandler.onShowPopup();
+                videoAdUnitPopupEventHandler.onPopupShow();
             });
 
             it('the video play method should be called', () => {

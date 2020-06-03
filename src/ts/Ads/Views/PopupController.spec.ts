@@ -25,8 +25,8 @@ describe('PopupController', () => {
             expect(privacyView.addEventHandler).toHaveBeenCalledTimes(1);
         });
 
-        it('Should have called event handlers onShowPopup', () => {
-            expect(eventHandler.onShowPopup).toHaveBeenCalledTimes(1);
+        it('Should have called event handlers onPopupShow', () => {
+            expect(eventHandler.onPopupShow).toHaveBeenCalledTimes(1);
         });
 
         it('Should have called event handlers onPopupVisible', () => {

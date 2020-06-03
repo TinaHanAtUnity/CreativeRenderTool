@@ -20,7 +20,7 @@ export class VideoAdUnitPopupEventHandler<T extends Campaign> implements IPopupE
         }
     }
 
-    public onShowPopup(): void {
+    public onPopupShow(): void {
         if (this._adUnit.isShowing() && this._adUnit.canShowVideo() && this._adUnit.canPlayVideo()) {
             this._adUnit.setVideoState(VideoState.PAUSED);
             this._ads.VideoPlayer.pause();

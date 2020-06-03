@@ -1,7 +1,7 @@
 import { AbstractPrivacy, IPrivacyHandlerView } from 'Ads/Views/AbstractPrivacy';
 
 export interface IPopupEventHandler {
-    onShowPopup(): void;
+    onPopupShow(): void;
     onPopupClosed(): void;
     onPopupVisible(): void;
 }
@@ -43,7 +43,7 @@ export class PopupController implements IPrivacyHandlerView {
         }
 
         this._showingPrivacy = true;
-        this._handlers.forEach(handler => handler.onShowPopup());
+        this._handlers.forEach(handler => handler.onPopupShow());
 
         this._privacySettings.show();
 
