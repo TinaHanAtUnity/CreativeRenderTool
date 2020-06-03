@@ -1,17 +1,17 @@
 import * as sinon from 'sinon';
-import {Platform} from 'Core/Constants/Platform';
-import {Placement} from 'Ads/Models/Placement';
-import {VastOpenMeasurementController} from 'Ads/Views/OpenMeasurement/VastOpenMeasurementController';
-import {OpenMeasurement} from 'Ads/Views/OpenMeasurement/OpenMeasurement';
-import {TestFixtures} from 'TestHelpers/TestFixtures';
-import {OpenMeasurementAdViewBuilder} from 'Ads/Views/OpenMeasurement/OpenMeasurementAdViewBuilder';
-import {ClientInfo} from 'Core/Models/ClientInfo';
-import {DeviceInfo} from 'Core/Models/DeviceInfo';
-import {NativeBridge} from 'Core/Native/Bridge/NativeBridge';
-import {ICoreApi} from 'Core/ICore';
-import {Backend} from 'Backend/Backend';
-import {VastAdVerification} from 'VAST/Models/VastAdVerification';
-import {VastVerificationResource} from 'VAST/Models/VastVerificationResource';
+import { Platform } from 'Core/Constants/Platform';
+import { Placement } from 'Ads/Models/Placement';
+import { VastOpenMeasurementController } from 'Ads/Views/OpenMeasurement/VastOpenMeasurementController';
+import { OpenMeasurement } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
+import { OpenMeasurementAdViewBuilder } from 'Ads/Views/OpenMeasurement/OpenMeasurementAdViewBuilder';
+import { ClientInfo } from 'Core/Models/ClientInfo';
+import { DeviceInfo } from 'Core/Models/DeviceInfo';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { ICoreApi } from 'Core/ICore';
+import { Backend } from 'Backend/Backend';
+import { VastAdVerification } from 'VAST/Models/VastAdVerification';
+import { VastVerificationResource } from 'VAST/Models/VastVerificationResource';
 import {
     AccessMode,
     AdSessionType,
@@ -22,8 +22,8 @@ import {
     PARTNER_NAME
 } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
 import SimpleVast from 'xml/SimpleVast.xml';
-import {VastCampaign} from 'VAST/Models/VastCampaign';
-import {ThirdPartyEventManager} from 'Ads/Managers/ThirdPartyEventManager';
+import { VastCampaign } from 'VAST/Models/VastCampaign';
+import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe(`${platform} OMManager`, () => {
