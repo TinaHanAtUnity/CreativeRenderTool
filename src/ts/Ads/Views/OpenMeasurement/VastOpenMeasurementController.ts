@@ -1,13 +1,21 @@
 import { OpenMeasurement } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
 import { Placement } from 'Ads/Models/Placement';
-import { OpenMeasurementController, OMState } from 'Ads/Views/OpenMeasurement/OpenMeasurementController';
+import { OMState, OpenMeasurementController } from 'Ads/Views/OpenMeasurement/OpenMeasurementController';
 import { OpenMeasurementAdViewBuilder } from 'Ads/Views/OpenMeasurement/OpenMeasurementAdViewBuilder';
-import { AccessMode, ISessionEvent, IContext, AdSessionType, PARTNER_NAME, OM_JS_VERSION, OMID_P, IVastProperties } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
+import {
+    AccessMode,
+    AdSessionType,
+    IContext,
+    ISessionEvent,
+    IVastProperties,
+    OM_JS_VERSION,
+    OMID_P,
+    PARTNER_NAME
+} from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { Platform } from 'Core/Constants/Platform';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
-import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 
 export class VastOpenMeasurementController extends OpenMeasurementController {
     private _clientInfo: ClientInfo;
@@ -102,7 +110,7 @@ export class VastOpenMeasurementController extends OpenMeasurementController {
             },
             deviceInfo: {
                 deviceType: this._deviceInfo.getModel(),
-                os: Platform[this._platform].toLowerCase(),
+                os: this._platform === Platform.ANDROID ? 'Android' : 'iOS',
                 osVersion: this._deviceInfo.getOsVersion()
             },
             supports: ['vlid', 'clid']
