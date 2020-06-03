@@ -1,10 +1,21 @@
 import { Placement, PlacementMock } from 'Ads/Models/__mocks__/Placement';
-import { OpenMeasurementVast, OpenMeasurementMockVast } from 'Ads/Views/OpenMeasurement/__mocks__/OpenMeasurement';
-import { OpenMeasurementAdViewBuilder, OpenMeasurementAdViewBuilderMock } from 'Ads/Views/OpenMeasurement/__mocks__/OpenMeasurementAdViewBuilder';
+import { OpenMeasurementMockVast, OpenMeasurementVast } from 'Ads/Views/OpenMeasurement/__mocks__/OpenMeasurement';
+import {
+    OpenMeasurementAdViewBuilder,
+    OpenMeasurementAdViewBuilderMock
+} from 'Ads/Views/OpenMeasurement/__mocks__/OpenMeasurementAdViewBuilder';
 import { ClientInfo, ClientInfoMock } from 'Core/Models/__mocks__/ClientInfo';
 import { DeviceInfo, DeviceInfoMock } from 'Core/Models/__mocks__/DeviceInfo';
 import { VastAdVerification, VastAdVerificationMock } from 'VAST/Models/__mocks__/VastAdVerification';
-import { AccessMode, AdSessionType, IContext, ISessionEvent, OMID_P, OM_JS_VERSION, PARTNER_NAME } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
+import {
+    AccessMode,
+    AdSessionType,
+    IContext,
+    ISessionEvent,
+    OM_JS_VERSION,
+    OMID_P,
+    PARTNER_NAME
+} from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
 import { VastOpenMeasurementController } from 'Ads/Views/OpenMeasurement/VastOpenMeasurementController';
 import { Platform } from 'Core/Constants/Platform';
 
@@ -81,7 +92,7 @@ import { Platform } from 'Core/Constants/Platform';
                   },
                   deviceInfo: {
                       deviceType: deviceInfo.getModel(),
-                      os: Platform[platform].toLocaleLowerCase(),
+                      os: platform === Platform.ANDROID ? 'Android' : 'iOS',
                       osVersion: deviceInfo.getOsVersion()
                   },
                   supports: ['vlid', 'clid']
