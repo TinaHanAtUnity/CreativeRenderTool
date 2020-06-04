@@ -791,7 +791,7 @@ export class AdRequestManager extends CampaignManager {
         return body;
     }
 
-    private handleError(event: LoadV5, err: unknown) {
+    private handleError(event: LoadV5, err: unknown, tags: { [key: string]: string } = {}) {
         let reason: string = 'unknown';
         if (err instanceof AdRequestManagerError) {
             reason = err.tag;
