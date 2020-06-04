@@ -5,15 +5,27 @@ import EndScreenColorBlur from 'html/mabexperimentation/EndScreenColorBlur.html'
 import { AUIMetric, SDKMetrics } from 'Ads/Utilities/SDKMetrics';
 import { ColorTheme } from 'Core/Utilities/ColorTheme';
 import { IColorTheme } from 'Performance/Utilities/Swatch';
+import { IExperimentActionChoice } from 'MabExperimentation/Models/AutomatedExperiment';
+import { ButtonAnimationsExperiment } from 'MabExperimentation/Models/AutomatedExperimentsList';
 
 export class ColorBlurEndScreen extends PerformanceEndScreen {
-    constructor(parameters: IEndScreenParameters, campaign: PerformanceCampaign, country?: string) {
+    private _ctaText: string;
+
+    constructor(combination: IExperimentActionChoice | undefined, parameters: IEndScreenParameters, campaign: PerformanceCampaign, country?: string) {
         super(parameters, campaign, country);
 
         const simpleRating = campaign.getRating().toFixed(1);
+
+        combination = this.fixupExperimentChoices(combination);
+
+        if (combination.ctaText) {
+            this._ctaText = combination.ctaText;
+        }
+
         this._templateData = {
             ...this._templateData,
-            simpleRating: simpleRating
+            simpleRating: simpleRating,
+            ctaText: this._ctaText
         };
         this._bindings.push({
             event: 'click',
@@ -22,16 +34,29 @@ export class ColorBlurEndScreen extends PerformanceEndScreen {
         });
     }
 
+    private fixupExperimentChoices(actions: IExperimentActionChoice | undefined): IExperimentActionChoice {
+        if (actions === undefined) {
+            return ButtonAnimationsExperiment.getDefaultActions();
+        }
+
+        if (actions.ctaText === undefined) {
+            SDKMetrics.reportMetricEvent(AUIMetric.InvalidCtaText);
+            return ButtonAnimationsExperiment.getDefaultActions();
+        }
+
+        return actions;
+    }
+
     public render(): void {
         super.render();
 
         ColorTheme.calculateColorThemeForEndCard(this._campaign, this._core)
-                .then((theme) => {
-                    this.applyColorTheme(theme.base);
-                })
-                .catch((error) => {
-                    SDKMetrics.reportMetricEvent(error.tag);
-                });
+            .then((theme) => {
+                this.applyColorTheme(theme.base);
+            })
+            .catch((error) => {
+                SDKMetrics.reportMetricEvent(error.tag);
+            });
     }
 
     private applyColorTheme(baseColorTheme: IColorTheme): void {

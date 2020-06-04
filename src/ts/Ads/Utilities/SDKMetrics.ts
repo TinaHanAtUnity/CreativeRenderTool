@@ -149,7 +149,8 @@ export enum AUIMetric {
     UnknownExperimentName = 'unknown_experiment_name',
     InvalidVideoOverlayMode = 'invalid_video_overlay_mode',
     UnknownCategoryProvided = 'unknown_automated_experiment_category_provided',
-    InvalidImageAssets = 'invalid_image_assets'
+    InvalidImageAssets = 'invalid_image_assets',
+    InvalidCtaText = 'invalid_cta_text'
 }
 
 export enum ExternalEndScreenMetric {
@@ -222,10 +223,26 @@ export enum ChinaAucionEndpoint {
 
 export type TimingEvent = InitializationMetric | MediationMetric | GeneralTimingMetric;
 
-export type PTSEvent = VideoMetric | TimingEvent | AuctionV6 | AdmobMetric | BannerMetric | CachingMetric | ChinaMetric | VastMetric | MraidMetric | MiscellaneousMetric | LoadMetric | ErrorMetric | OMMetric | AUIMetric | LoadV5 | ChinaAucionEndpoint | ExternalEndScreenMetric;
+export type PTSEvent =
+    | VideoMetric
+    | TimingEvent
+    | AuctionV6
+    | AdmobMetric
+    | BannerMetric
+    | CachingMetric
+    | ChinaMetric
+    | VastMetric
+    | MraidMetric
+    | MiscellaneousMetric
+    | LoadMetric
+    | ErrorMetric
+    | OMMetric
+    | AUIMetric
+    | LoadV5
+    | ChinaAucionEndpoint
+    | ExternalEndScreenMetric;
 
 export class SDKMetrics {
-
     // Setting a default value since legacy tests are relying on it.
     private static _metricInstance: IMetricInstance = new BufferedMetricInstance();
 

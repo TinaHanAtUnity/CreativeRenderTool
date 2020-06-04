@@ -25,6 +25,10 @@ export const ButtonExperimentDeclaration = {
       PINK: 'cc0099',
       RED: 'c31e25',
       UNDEFINED: undefined
+  },
+  ctaText: {
+      INSTALL_NOW: 'Install Now',
+      DOWNLOAD_FOR_FREE: 'Download For Free'
   }
 };
 
@@ -33,7 +37,8 @@ export const ButtonAnimationsExperiment = new AutomatedExperiment({
     defaultActions: {
         scheme: ButtonExperimentDeclaration.scheme.LIGHT,
         animation: ButtonExperimentDeclaration.animation.BOUNCING,
-        color: ButtonExperimentDeclaration.color.BLUE
+        color: ButtonExperimentDeclaration.color.BLUE,
+        ctaText: ButtonExperimentDeclaration.ctaText.DOWNLOAD_FOR_FREE
     },
     cacheDisabled: true
 });

@@ -37,15 +37,17 @@
 
                         <% if (data.ratingCount && data.ratingCount !== "0") { %>
                         <span class="game-rating-count">
-                            (<span class="game-rating-count-number"><%= data.ratingCount %></span>)
+                            (<span class="game-rating-count-number"><%= data.ratingCount%></span>)
                         </span>
                         <% } %>
                     </div>
                 </div>
             </div>
             <div class="install-container">
-                <span class="download-text"><%= data.t("Install Now") %></span>
+                <span class="download-text"><%= data.t(data.ctaText) %></span>
+                <% if(data.ctaText === "Install Now") { %>
                 <span class="free-text"><%= data.t("Free") %></span>
+                <% } %>
             </div>
             <div class="unityads-logo"></div>
         </div>
