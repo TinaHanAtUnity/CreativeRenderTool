@@ -1,5 +1,6 @@
 # Pending
 
+* [Open Measurement] Fix privacy pop-up not found when privacy is showing [#15714](https://github.com/Applifier/unity-ads-webview/pull/15714)
 * [Load V5] Expand experiment by adding more games [#15713](https://github.com/Applifier/unity-ads-webview/pull/15713)
 
 # Tue Jun  2 19:11:16 UTC 2020
