@@ -1,8 +1,8 @@
 import { AbstractPrivacy as Base } from 'Ads/Views/AbstractPrivacy';
-import { AdUnitContainer } from 'Ads/AdUnits/Containers/__mocks__/AdUnitContainer';
 
 export type AbstractPrivacyMock = Base & {
     addEventHandler: jest.Mock;
+    removeEventHandler: jest.Mock;
     hide: jest.Mock;
     container: jest.Mock;
     render: jest.Mock;
@@ -12,9 +12,12 @@ export type AbstractPrivacyMock = Base & {
 export const AbstractPrivacy = jest.fn(() => {
     return <AbstractPrivacyMock>{
         addEventHandler: jest.fn(),
+        removeEventHandler: jest.fn(),
         hide: jest.fn(),
         container: jest.fn().mockImplementation(() => {
-            return new AdUnitContainer();
+            const testElement = document.createElement('div');
+            testElement.id = 'test-id';
+            return testElement;
         }),
         render: jest.fn(),
         show: jest.fn()
