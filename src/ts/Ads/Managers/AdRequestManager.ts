@@ -234,7 +234,7 @@ export class AdRequestManager extends CampaignManager {
         let requestPrivacy: IRequestPrivacy;
         let legacyRequestPrivacy: ILegacyRequestPrivacy;
 
-        this.reportMetricEvent(LoadV5.LoadRequestStarted, { 'src': 'regular' });
+        this.reportMetricEvent(LoadV5.LoadRequestStarted, { 'src': 'default' });
 
         return Promise.resolve().then(() => {
             if (this.hasPreloadFailed()) {
@@ -284,7 +284,7 @@ export class AdRequestManager extends CampaignManager {
                 this.reportMetricEvent(LoadV5.LoadRequestWasCanceled);
                 return this.requestLoad(placementId);
             }
-            this.reportMetricEvent(LoadV5.LoadRequestParsingResponse, { 'src': 'regular' });
+            this.reportMetricEvent(LoadV5.LoadRequestParsingResponse, { 'src': 'default' });
             return this.parseLoadResponse(response, this._adsConfig.getPlacement(placementId), additionalPlacements);
         }).then((campaign) => {
             delete this._ongoingLoadRequests[placementId];
@@ -294,7 +294,7 @@ export class AdRequestManager extends CampaignManager {
             return campaign;
         }).catch((err) => {
             delete this._ongoingLoadRequests[placementId];
-            this.handleError(LoadV5.LoadRequestFailed, err, { 'src': 'regular' });
+            this.handleError(LoadV5.LoadRequestFailed, err, { 'src': 'default' });
             return undefined;
         });
     }
