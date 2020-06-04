@@ -6,7 +6,7 @@ import { AUIMetric, SDKMetrics } from 'Ads/Utilities/SDKMetrics';
 import { ColorTheme } from 'Core/Utilities/ColorTheme';
 import { IColorTheme } from 'Performance/Utilities/Swatch';
 import { IExperimentActionChoice } from 'MabExperimentation/Models/AutomatedExperiment';
-import { ButtonAnimationsExperiment } from 'MabExperimentation/Models/AutomatedExperimentsList';
+import { ButtonAnimationsExperiment, ButtonExperimentDeclaration } from 'MabExperimentation/Models/AutomatedExperimentsList';
 
 export class ColorBlurEndScreen extends PerformanceEndScreen {
     private _ctaText: string;
@@ -57,6 +57,13 @@ export class ColorBlurEndScreen extends PerformanceEndScreen {
             .catch((error) => {
                 SDKMetrics.reportMetricEvent(error.tag);
             });
+
+        if (this._ctaText === ButtonExperimentDeclaration.ctaText.DOWNLOAD_FOR_FREE) {
+            const installContainer: HTMLElement | null = this._container.querySelector('.install-container');
+            if (installContainer) {
+                installContainer.classList.add('cta-alt-text');
+            }
+        }
     }
 
     private applyColorTheme(baseColorTheme: IColorTheme): void {
