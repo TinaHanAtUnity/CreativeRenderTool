@@ -1,5 +1,6 @@
 # Pending
 
+* [Bug] Add missing parameter tag [#15747](https://github.com/Applifier/unity-ads-webview/pull/15747)
 * Add PopupController and event handlers for showing, rendering, and removing popups [#15428](https://github.com/Applifier/unity-ads-webview/pull/15428)
 * [Load V5] Report load request metrics from ad unit [#15716](https://github.com/Applifier/unity-ads-webview/pull/15716)
 * Revert "[Load V5] Add placement count bucket for reload request" [#15719](https://github.com/Applifier/unity-ads-webview/pull/15719)
