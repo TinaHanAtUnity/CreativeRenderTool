@@ -1,3 +1,7 @@
+# Pending
+
+* [Load V5] Expand experiment by adding more games [#15713](https://github.com/Applifier/unity-ads-webview/pull/15713)
+
 # Tue Jun  2 19:11:16 UTC 2020
 
 * [Bug] Send placement invalidation as load v5 metric [#15708](https://github.com/Applifier/unity-ads-webview/pull/15708)
