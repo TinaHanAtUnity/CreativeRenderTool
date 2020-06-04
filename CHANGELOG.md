@@ -1,4 +1,4 @@
-# Pending
+# Thu Jun  4 19:21:49 UTC 2020
 
 * [Bug] Add missing parameter tag [#15747](https://github.com/Applifier/unity-ads-webview/pull/15747)
 * Add PopupController and event handlers for showing, rendering, and removing popups [#15428](https://github.com/Applifier/unity-ads-webview/pull/15428)
