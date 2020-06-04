@@ -1,5 +1,6 @@
 # Pending
 
+* [Open Measurement] Fix event data discrepancies and add extra property for MOAT [#15718](https://github.com/Applifier/unity-ads-webview/pull/15718)
 * [Open Measurement] Fix privacy pop-up not found when privacy is showing [#15714](https://github.com/Applifier/unity-ads-webview/pull/15714)
 * [Load V5] Expand experiment by adding more games [#15713](https://github.com/Applifier/unity-ads-webview/pull/15713)
 
