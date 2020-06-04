@@ -24,19 +24,19 @@ import { Campaign, ICampaignTrackingUrls } from 'Ads/Models/Campaign';
 import { SDKMetrics, LoadV5 } from 'Ads/Utilities/SDKMetrics';
 import { IPlacementIdMap } from 'Ads/Managers/PlacementManager';
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+// eslint-disable-next-line
 const LoadV5PreloadResponse = require('json/LoadV5PreloadResponse.json');
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+// eslint-disable-next-line
 const LoadV5PreloadResponse_NoFill = require('json/LoadV5PreloadResponse_NoFill.json');
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+// eslint-disable-next-line
 const LoadV5LoadResponse = require('json/LoadV5LoadResponse.json');
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+// eslint-disable-next-line
 const LoadV5LoadResponse_2 = require('json/LoadV5LoadResponse_2.json');
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+// eslint-disable-next-line
 const LoadV5LoadResponseWithAdditionalPlacements = require('json/LoadV5LoadResponseWithAdditionalPlacements.json');
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+// eslint-disable-next-line
 const LoadV5LoadResponse_NoFill = require('json/LoadV5LoadResponse_NoFill.json');
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+// eslint-disable-next-line
 const LoadV5ReloadResponse = require('json/LoadV5ReloadResponse.json');
 
 class SatisfiesMatcher {
@@ -598,13 +598,22 @@ class SatisfiesMatcher {
                 expect(campaign).toBeUndefined();
             });
 
-            it('should have not the same campaigns in video2 and rewardedVideo', () => {
+            it('should have the same campaigns in video2 and rewardedVideo', () => {
                 const additionalCampaigns: IPlacementIdMap<INotCachedLoadedCampaign | undefined> = <IPlacementIdMap<INotCachedLoadedCampaign | undefined>>onAdditionalPlacementsReady.mock.calls[0][1];
 
                 const campaign1: Campaign = additionalCampaigns.rewardedVideo!.notCachedCampaign;
                 const campaign2: Campaign = additionalCampaigns.video2!.notCachedCampaign;
 
-                expect(campaign1).not.toBe(campaign2);
+                expect(campaign1).toBe(campaign2);
+            });
+
+            it('should have different tracking urls', () => {
+                const additionalCampaigns: IPlacementIdMap<INotCachedLoadedCampaign | undefined> = <IPlacementIdMap<INotCachedLoadedCampaign | undefined>>onAdditionalPlacementsReady.mock.calls[0][1];
+
+                const trackingUrls1: ICampaignTrackingUrls = additionalCampaigns.rewardedVideo!.notCachedTrackingUrls;
+                const trackingUrls2: ICampaignTrackingUrls = additionalCampaigns.video2!.notCachedTrackingUrls;
+
+                expect(trackingUrls1).not.toEqual(trackingUrls2);
             });
 
             it('should cache only 1 campaigns', () => {

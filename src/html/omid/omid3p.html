@@ -20,6 +20,12 @@
                     var uuid = 0;
 
                     /**
+                     * This property is required by MOAT to indicate this omid implementation
+                     * is different from web omid implementation
+                     */
+                    this.customNative = true;
+
+                    /**
                      * Flattens and runs SessionObserver for each unique key/verification client with the specified eventdata
                      * @param {Object} eventData structured data to indicate type for observer to fire
                      */

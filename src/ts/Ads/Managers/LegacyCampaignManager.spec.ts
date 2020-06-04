@@ -24,6 +24,7 @@ import { LegacyCampaignManager } from 'Ads/Managers/LegacyCampaignManager';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 
 // TODO: Update once json importing is fixed for .spec.ts
+// eslint-disable-next-line
 const AuctionV6Response = require('json/AuctionV6Response.json');
 
 [Platform.IOS, Platform.ANDROID].forEach(platform => {

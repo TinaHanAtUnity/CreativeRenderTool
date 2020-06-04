@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 ##
-# Merges master into each staging branch. Execution will pause if there is
-# a merge conflict.
+# Merges master into each staging branch.
+# Commands can be used here to aid the process of staging
 
 git checkout master
 git pull
@@ -11,31 +11,57 @@ releases="$webviewdir/tools/release-scripts/releases.txt"
 
 RED='\033[31m'
 GREEN='\033[32m'
+LIGHT_CYAN='\033[1;36m'
 RESET='\033[0m'
 
 while IFS= read -r release
 do
-    git checkout $release
-    git checkout staging/$release
-    git merge master --no-commit --no-ff
+    git checkout $release > /dev/null
+    git checkout staging/$release > /dev/null
+    git merge master --no-commit --no-ff > /dev/null
     if [ "$?" -eq "1" ]; then
-        git status | grep 'deleted by us' | sed 's/^.*deleted by us: //g' | xargs git rm
-        git status | grep 'added by them' | sed 's/^.*added by them: //g' | xargs git rm
+        # Removes diff from unincluded files from previous staging
+        $(git status | grep 'deleted by us' | sed 's/^.*deleted by us: //g' | xargs git rm) > /dev/null
+        $(git status | grep 'added by them' | sed 's/^.*added by them: //g' | xargs git rm) > /dev/null
+        echo -e "\n${RED}Merge conflicts detected. Fix the conflicts and continue to the next branch.${RESET}"
+    else
+        echo -e "\n${GREEN}No merge conflicts detected. Confirm that the changes are applied correctly.${RESET}"
+    fi
 
-        echo -e "\nCurrent Git Status:"
-        git status -s
+    echo -e "\nStaging for Webview Version: ${GREEN}$release${RESET}\nCurrent Git Status:"
+    git status -s
 
-        echo -e "\n${RED}Resolve merge conflicts then:\n\tPress 'C' to automatically commit changes\n\tPress Enter when changes were commited manually.${RESET}"
+    echo -e "\n${LIGHT_CYAN}Enter Commands now, or enter 'h' for help.\n${RESET}"
+
+    move_to_next_release_branch=false
+
+    while [ "$move_to_next_release_branch" = false ]
+    do
         read -p 'Choice:' -n 1 answer < /dev/tty
         echo -e "\n"
 
-        if [ "$answer" == "c" ]; then
-            git add -A . && git commit -m "Merged master from script after resolving issues"
-        fi
-    else
-        echo -e "\n${GREEN}Nothing to resolve. Continue if there is nothing to edit.${RESET}"
-        read answer < /dev/tty
-        git add -A . && git commit -m "Merged master from script without conflict"
-    fi
-done <"$releases"
+        case "$answer" in
+            h)
+                echo -e "\tPress 'c' to automatically commit changes"
+                echo -e "\tPress 'n' to continue to the next branch"
+                ;;
 
+            c)
+                git add -A . && git commit -m "Merged master from script after resolving issues"
+                ;;
+            
+            n)
+                # Ensures next branch isn't continued to unless all changes have been committed
+                if [[ $(git status) == *"modified"* ]]; then
+                    echo -e "\n${RED}Staged changes have not been committed. Staying on the current branch.${RESET}"
+                else
+                    move_to_next_release_branch=true
+                fi
+                ;;
+
+            *)
+                echo -e "Unknown command: $answer. Please try again."
+                ;;
+        esac
+    done
+done <"$releases"

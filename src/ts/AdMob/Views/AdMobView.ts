@@ -322,7 +322,7 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
     }
 
     private sendObstructedOMGeometryChange(om: AdmobOpenMeasurementController) {
-        const popup = <HTMLElement>document.querySelector('.pop-up');
+        const popup = <HTMLElement>document.querySelector('.view-container');
         const gdprRect = popup.getBoundingClientRect();
         const obstructionRect = OpenMeasurementUtilities.createRectangle(gdprRect.left, gdprRect.top, gdprRect.width, gdprRect.height);
 

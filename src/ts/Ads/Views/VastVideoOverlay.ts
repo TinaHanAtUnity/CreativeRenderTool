@@ -26,7 +26,7 @@ export class VastVideoOverlay extends VideoOverlay implements IPrivacyHandlerVie
     protected onPrivacyEvent(event: Event) {
         super.onPrivacyEvent(event);
 
-        const popup = <HTMLElement>document.querySelector('.pop-up');
+        const popup = <HTMLElement>document.querySelector('.view-container');
         const rect = popup.getBoundingClientRect();
         const x = rect.left;
         const y = rect.top;

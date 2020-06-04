@@ -12,7 +12,15 @@ import { ICoreApi } from 'Core/ICore';
 import { Backend } from 'Backend/Backend';
 import { VastAdVerification } from 'VAST/Models/VastAdVerification';
 import { VastVerificationResource } from 'VAST/Models/VastVerificationResource';
-import { AccessMode, ISessionEvent, IContext, AdSessionType, PARTNER_NAME, OM_JS_VERSION, OMID_P } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
+import {
+    AccessMode,
+    AdSessionType,
+    IContext,
+    ISessionEvent,
+    OM_JS_VERSION,
+    OMID_P,
+    PARTNER_NAME
+} from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
 import SimpleVast from 'xml/SimpleVast.xml';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
@@ -130,7 +138,7 @@ import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
                     },
                     deviceInfo: {
                         deviceType: deviceInfo.getModel(), //this._deviceInfo.getModel(),
-                        os: Platform[platform].toLocaleLowerCase(), //platform.toLowerCase(),
+                        os: platform === Platform.ANDROID ? 'Android' : 'iOS',
                         osVersion: deviceInfo.getOsVersion()
                     },
                     supports: ['vlid', 'clid']
