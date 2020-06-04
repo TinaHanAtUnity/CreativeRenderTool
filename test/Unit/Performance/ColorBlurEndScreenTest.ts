@@ -54,7 +54,7 @@ describe('ColorBlurEndScreenTest', () => {
         }
     });
 
-    const createColorBlurEndScreen = (language: string, ctaText: string): ColorBlurEndScreen => {
+    const createColorBlurEndScreen = (ctaText: string, language: string): ColorBlurEndScreen => {
         const privacyManager = sinon.createStubInstance(UserPrivacyManager);
         privacy = new Privacy(platform, campaign, privacyManager, false, false, 'en');
         const params: IEndScreenParameters = {
