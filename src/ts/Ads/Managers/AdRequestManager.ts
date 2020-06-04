@@ -451,22 +451,20 @@ export class AdRequestManager extends CampaignManager {
             return Promise.reject(new AdRequestManagerError('No placement', 'no_plc'));
         }
 
-        return Promise.all(
-            // Skip caching for those campaigns since we don't need them immediately
-            additionalPlacements.map((x) => this.createNotCachedLoadedCampaign(json, this._adsConfig.getPlacement(x), auctionStatusCode).catch((err) => {
-                return undefined;
-            }))
-        ).then((loadedCampaigns) => {
-            const additionalCampaigns = loadedCampaigns.reduce<IPlacementIdMap<INotCachedLoadedCampaign | undefined>>((previousValue, currentValue, currentIndex) => {
-                previousValue[additionalPlacements[currentIndex]] = currentValue;
+        const allPlacements = [
+            placement,
+            ...additionalPlacements.map((x) => this._adsConfig.getPlacement(x))
+        ];
+
+        return this.parseAllPlacements(json, allPlacements, auctionStatusCode, LoadV5.LoadRequestParseCampaignFailed).then((loadedCampaigns) => {
+            const additionalCampaigns = additionalPlacements.reduce<IPlacementIdMap<INotCachedLoadedCampaign | undefined>>((previousValue, currentValue, currentIndex) => {
+                previousValue[currentValue] = loadedCampaigns[currentValue];
                 return previousValue;
             }, {});
             this.onAdditionalPlacementsReady.trigger(placement.getAdUnitId(), additionalCampaigns);
-        }).catch(() => {
-            // Skip any errors so that we can handle actual load request
+
+            return loadedCampaigns[placement.getId()];
         }).then(
-            () => this.createNotCachedLoadedCampaign(json, placement, auctionStatusCode)
-        ).then(
             (notCachedLoadedCampaign) => this.cacheCampaign(notCachedLoadedCampaign)
         );
     }
@@ -547,13 +545,10 @@ export class AdRequestManager extends CampaignManager {
         return Promise.resolve(trackingUrls);
     }
 
-    private createNotCachedLoadedCampaign(response: IRawAuctionV5Response, placement: Placement, auctionStatusCode: AuctionStatusCode): Promise<INotCachedLoadedCampaign | undefined> {
-        return this.parseMediaAndTrackingUrls(response, placement, auctionStatusCode).then(({ mediaId, trackingId }) => {
-            return Promise.all([
-                this.parseTrackingUrls(response, trackingId, auctionStatusCode),
-                this.parseCampaign(response, mediaId, auctionStatusCode)
-            ]);
-        }).then(([trackingUrls, campaign]) => {
+    private createNotCachedLoadedCampaign(response: IRawAuctionV5Response, campaign: Campaign | undefined, trackingId: string | undefined, auctionStatusCode: AuctionStatusCode): Promise<INotCachedLoadedCampaign | undefined> {
+        return Promise.all([
+            this.parseTrackingUrls(response, trackingId, auctionStatusCode)
+        ]).then(([trackingUrls]) => {
             if (!campaign || !trackingUrls) {
                 return Promise.resolve(undefined);
             }
@@ -604,6 +599,51 @@ export class AdRequestManager extends CampaignManager {
         });
     }
 
+    private parseAllPlacements(json: IRawAuctionV5Response, allPlacements: Placement[], auctionStatusCode: AuctionStatusCode, errorMetric: LoadV5): Promise<IPlacementIdMap<INotCachedLoadedCampaign | undefined>> {
+        let allMedia: string[] = [];
+        let campaignMap: IPlacementIdMap<Campaign | undefined> = {};
+        let parsedMap: IPlacementIdMap<IParsedMediaAndTrackingIds> = {};
+
+        return Promise.all(allPlacements.map((plc) => this.parseMediaAndTrackingUrls(json, plc, auctionStatusCode))).then(medias => {
+            parsedMap = medias.reduce<IPlacementIdMap<IParsedMediaAndTrackingIds>>((previousValue, currentValue, currentIndex) => {
+                previousValue[allPlacements[currentIndex].getId()] = currentValue;
+                return previousValue;
+            }, {});
+
+            allMedia = medias.reduce<string[]>((previousValue, currentValue, currentIndex) => {
+                if (currentValue.mediaId) {
+                    previousValue.push(currentValue.mediaId);
+                }
+                return previousValue;
+            }, []);
+
+            allMedia = allMedia.filter((val, index) => allMedia.indexOf(val) === index);
+
+            return Promise.all(allMedia.map((media) => this.parseCampaign(json, media, auctionStatusCode).catch((err) => {
+                this.handleError(errorMetric, err);
+                return undefined;
+            })));
+        }).then(allCampaigns => {
+            campaignMap = allCampaigns.reduce<IPlacementIdMap<Campaign | undefined>>((previousValue, currentValue, currentIndex) => {
+                previousValue[allMedia[currentIndex]] = currentValue;
+                return previousValue;
+            }, {});
+
+            return Promise.all(
+                // Skip caching for those campaigns since we don't need them immediately
+                allPlacements.map((x) => this.createNotCachedLoadedCampaign(json, parsedMap[x.getId()].mediaId === undefined ? undefined : campaignMap[parsedMap[x.getId()].mediaId!], parsedMap[x.getId()].trackingId, auctionStatusCode).catch((err) => {
+                    this.handleError(errorMetric, err);
+                    return undefined;
+                }
+            )));
+        }).then((loadedCampaigns) => {
+            return loadedCampaigns.reduce<IPlacementIdMap<INotCachedLoadedCampaign | undefined>>((previousValue, currentValue, currentIndex) => {
+                previousValue[allPlacements[currentIndex].getId()] = currentValue;
+                return previousValue;
+            }, {});
+        });
+    }
+
     private parseReloadResponse(response: INativeResponse, placementsToLoad: Placement[], gameSessionCounters: IGameSessionCounters, requestPrivacy?: IRequestPrivacy | undefined, legacyRequestPrivacy?: ILegacyRequestPrivacy): Promise<void> {
         let json: IRawAuctionV5Response;
         try {
@@ -633,16 +673,13 @@ export class AdRequestManager extends CampaignManager {
             return Promise.resolve();
         }
 
-        return Promise.all(
-            placementsToLoad.map(
-                (x) => this.createNotCachedLoadedCampaign(json, x, auctionStatusCode)
-                    .then((loadedCampaign) => this.cacheCampaign(loadedCampaign)).catch((err) => {
-                        this.handleError(LoadV5.ReloadRequestParseCampaignFailed, err);
-                        return undefined;
-                    }
-                )
-            )
-        ).then((loadedCampaigns) => {
+        return this.parseAllPlacements(json, placementsToLoad, auctionStatusCode, LoadV5.ReloadRequestParseCampaignFailed)
+        .then((notCachedLoadedCampaigns) => {
+            return Promise.all(placementsToLoad.map((placement) => {
+                const placementId = placement.getId();
+                return this.cacheCampaign(notCachedLoadedCampaigns[placementId]);
+            }));
+        }).then((loadedCampaigns) => {
             loadedCampaigns.forEach((loadedCampaign, index) => {
                 const placementId = placementsToLoad[index].getId();
                 if (loadedCampaign !== undefined) {
