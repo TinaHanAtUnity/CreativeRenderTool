@@ -1,5 +1,6 @@
 # Pending
 
+* Add PopupController and event handlers for showing, rendering, and removing popups [#15428](https://github.com/Applifier/unity-ads-webview/pull/15428)
 * [Load V5] Report load request metrics from ad unit [#15716](https://github.com/Applifier/unity-ads-webview/pull/15716)
 * Revert "[Load V5] Add placement count bucket for reload request" [#15719](https://github.com/Applifier/unity-ads-webview/pull/15719)
 * [Load V5] Do not attempt to cache already cached campaign [#15715](https://github.com/Applifier/unity-ads-webview/pull/15715)
