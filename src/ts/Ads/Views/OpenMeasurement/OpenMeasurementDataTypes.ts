@@ -114,7 +114,7 @@ export interface IImpressionValues {
 export interface IVastProperties {
     skippable: boolean;
     skipOffset: number;
-    isAutoplay: boolean;
+    autoplay: boolean;
     position: VideoPosition;
 }
 
