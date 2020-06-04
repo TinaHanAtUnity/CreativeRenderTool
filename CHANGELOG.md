@@ -1,5 +1,6 @@
 # Pending
 
+* Revert "[Load V5] Add placement count bucket for reload request" [#15719](https://github.com/Applifier/unity-ads-webview/pull/15719)
 * [Load V5] Do not attempt to cache already cached campaign [#15715](https://github.com/Applifier/unity-ads-webview/pull/15715)
 * [Load V5] Refactor parse campaign algorithm [#15529](https://github.com/Applifier/unity-ads-webview/pull/15529)
 * [Open Measurement] Fix event data discrepancies and add extra property for MOAT [#15718](https://github.com/Applifier/unity-ads-webview/pull/15718)
