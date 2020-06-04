@@ -226,6 +226,7 @@ export type TimingEvent = InitializationMetric | MediationMetric | GeneralTiming
 export type PTSEvent = VideoMetric | TimingEvent | AuctionV6 | AdmobMetric | BannerMetric | CachingMetric | ChinaMetric | VastMetric | MraidMetric | MiscellaneousMetric | LoadMetric | ErrorMetric | OMMetric | AUIMetric | LoadV5 | ChinaAucionEndpoint | ExternalEndScreenMetric;
 
 export class SDKMetrics {
+
     // Setting a default value since legacy tests are relying on it.
     private static _metricInstance: IMetricInstance = new BufferedMetricInstance();
 
