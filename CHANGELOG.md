@@ -1,3 +1,7 @@
+# Pending
+
+* [AUI] Tweak ColorBlur experiment by improving clickable area [#15754](https://github.com/Applifier/unity-ads-webview/pull/15754)
+
 # Thu Jun  4 19:21:49 UTC 2020
 
 * [Bug] Add missing parameter tag [#15747](https://github.com/Applifier/unity-ads-webview/pull/15747)
