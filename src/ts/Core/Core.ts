@@ -251,16 +251,17 @@ export class Core implements ICore {
                 IsMadeWithUnity.sendIsMadeWithUnity(this.Api.Storage, this.SdkDetectionInfo);
             });
         }).catch((error: { message: string; name: unknown }) => {
-            let errorMessage = error.message;
+            let errorMessage = 'Unity Ads SDK fail to initialize due to webview not initialized';
             let errorCode: InitErrorCode = InitErrorCode.Unknown;
 
             if (error instanceof Error && error.name === 'DisabledGame') {
+                errorMessage = error.message;
                 errorCode = InitErrorCode.GameIdDisabled;
             }
 
             if (error instanceof ConfigError) {
-                errorMessage = 'Unity Ads SDK fail to initialize due to configuration not found.';
-                errorCode = InitErrorCode.ConfigurationNotFound;
+                errorMessage = 'Unity Ads SDK fail to initialize due to configuration error.';
+                errorCode = InitErrorCode.ConfigurationError;
             }
 
                 this.Api.Sdk.initError(errorMessage, errorCode);
