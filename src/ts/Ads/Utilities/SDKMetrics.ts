@@ -1,5 +1,6 @@
 import { IMetricInstance } from 'Ads/Networking/MetricInstance';
 import { BufferedMetricInstance } from 'Ads/Networking/BufferedMetricInstance';
+import { InitErrorCode } from 'src/ts/Core/Native/Sdk';
 
 export enum ErrorMetric {
     TooLargeFile = 'too_large_file', // a file 20mb and over are considered too large
@@ -215,9 +216,13 @@ export enum ChinaAucionEndpoint {
     AuctionResponse = 'china_user_auction_response'
 }
 
+export enum InitializationFailureMetric {
+    InitializeFailed = 'webview_fail_to_initialize'
+}
+
 export type TimingEvent = InitializationMetric | MediationMetric | GeneralTimingMetric;
 
-export type PTSEvent = VideoMetric | TimingEvent | AuctionV6 | AdmobMetric | BannerMetric | CachingMetric | ChinaMetric | VastMetric | MraidMetric | MiscellaneousMetric | LoadMetric | ErrorMetric | OMMetric | AUIMetric | LoadV5 | ChinaAucionEndpoint;
+export type PTSEvent = VideoMetric | TimingEvent | AuctionV6 | AdmobMetric | BannerMetric | CachingMetric | ChinaMetric | VastMetric | MraidMetric | MiscellaneousMetric | LoadMetric | ErrorMetric | OMMetric | AUIMetric | LoadV5 | ChinaAucionEndpoint | InitializationFailureMetric;
 
 export class SDKMetrics {
 

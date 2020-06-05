@@ -47,7 +47,7 @@ import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
 import CreativeUrlConfiguration from 'json/CreativeUrlConfiguration.json';
 import { NativeErrorApi } from 'Core/Api/NativeErrorApi';
 import { DeviceIdManager } from 'Core/Managers/DeviceIdManager';
-import { SDKMetrics, InitializationMetric } from 'Ads/Utilities/SDKMetrics';
+import { SDKMetrics, InitializationMetric, InitializationFailureMetric } from 'Ads/Utilities/SDKMetrics';
 import { SdkDetectionInfo } from 'Core/Models/SdkDetectionInfo';
 import { ClassDetectionApi } from 'Core/Native/ClassDetection';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
@@ -267,7 +267,7 @@ export class Core implements ICore {
                 this.Api.Sdk.initError(errorMessage, errorCode);
                 this.Api.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.INITIALIZE_FAILED], errorMessage);
                 this.Api.Sdk.logError(`Initialization error: ${error.message}`);
-                Diagnostics.trigger('initialization_error', error);
+                SDKMetrics.reportMetricEventWithTags(InitializationFailureMetric.InitializeFailed, {'error': error.message});
         });
     }
 
