@@ -264,10 +264,10 @@ export class Core implements ICore {
                 errorCode = InitErrorCode.ConfigurationError;
             }
 
-                this.Api.Sdk.initError(errorMessage, errorCode);
-                this.Api.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.INITIALIZE_FAILED], errorMessage);
-                this.Api.Sdk.logError(`Initialization error: ${error.message}`);
-                SDKMetrics.reportMetricEventWithTags(InitializationFailureMetric.InitializeFailed, {'error': error.message});
+            this.Api.Sdk.initError(errorMessage, errorCode);
+            this.Api.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.INITIALIZE_FAILED], errorMessage);
+            this.Api.Sdk.logError(`Initialization error: ${error.message}`);
+            SDKMetrics.reportMetricEventWithTags(InitializationFailureMetric.InitializeFailed, { 'error': error.message });
         });
     }
 
