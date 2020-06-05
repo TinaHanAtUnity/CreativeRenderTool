@@ -223,4 +223,8 @@ export class CustomFeatures {
     public static shouldVideoOverlayRemainVisible(orgId: string | undefined): boolean {
         return orgId === '2878851';
     }
+
+    public static skipSupportedOrientationCheck(gameId: string): boolean {
+        return gameId === '1636888' // Blowfire
+    }
 }
