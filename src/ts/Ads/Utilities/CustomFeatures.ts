@@ -225,6 +225,6 @@ export class CustomFeatures {
     }
 
     public static skipSupportedOrientationCheck(gameId: string): boolean {
-        return gameId === '1636888' // Blowfire
+        return gameId === '1636888'; // Blowfire
     }
 }
