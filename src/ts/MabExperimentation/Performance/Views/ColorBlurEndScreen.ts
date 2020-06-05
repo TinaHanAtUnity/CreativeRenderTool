@@ -15,10 +15,10 @@ export class ColorBlurEndScreen extends PerformanceEndScreen {
             ...this._templateData,
             simpleRating: simpleRating
         };
-        this._bindings.push({
+        this._bindings.splice(0, 1, {
             event: 'click',
             listener: (event: Event) => this.onDownloadEvent(event),
-            selector: '.end-screen-image, .install-container'
+            selector: '.end-screen-image, .install-container, .game-info-container'
         });
     }
 
@@ -26,12 +26,12 @@ export class ColorBlurEndScreen extends PerformanceEndScreen {
         super.render();
 
         ColorTheme.calculateColorThemeForEndCard(this._campaign, this._core)
-                .then((theme) => {
-                    this.applyColorTheme(theme.base);
-                })
-                .catch((error) => {
-                    SDKMetrics.reportMetricEvent(error.tag);
-                });
+            .then((theme) => {
+                this.applyColorTheme(theme.base);
+            })
+            .catch((error) => {
+                SDKMetrics.reportMetricEvent(error.tag);
+            });
     }
 
     private applyColorTheme(baseColorTheme: IColorTheme): void {
