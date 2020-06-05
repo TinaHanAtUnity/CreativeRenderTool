@@ -224,7 +224,7 @@ export class CustomFeatures {
         return orgId === '2878851';
     }
 
-    public static skipSupportedOrientationCheck(gameId: string): boolean {
-        return gameId === '1636888'; // Blowfire
+    public static allowSupportedOrientationCheck(gameId: string): boolean {
+        return gameId !== '1636888'; // Blowfire
     }
 }

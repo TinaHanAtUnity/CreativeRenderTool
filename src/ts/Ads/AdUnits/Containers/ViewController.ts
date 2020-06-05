@@ -190,7 +190,7 @@ export class ViewController extends AdUnitContainer {
             }
         }
         // safety check
-        if (!CustomFeatures.skipSupportedOrientationCheck(this._clientInfo.getGameId()) && (options.supportedOrientations & orientation) !== orientation) {
+        if (CustomFeatures.allowSupportedOrientationCheck(this._clientInfo.getGameId()) && (options.supportedOrientations & orientation) !== orientation) {
             orientation = options.supportedOrientations;
         }
 
