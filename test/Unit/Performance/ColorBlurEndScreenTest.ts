@@ -14,6 +14,7 @@ import { SDKMetrics } from 'Ads/Utilities/SDKMetrics';
 import { ColorBlurEndScreen } from 'MabExperimentation/Performance/Views/ColorBlurEndScreen';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { Localization } from 'Core/Utilities/Localization';
+import { ButtonExperimentDeclaration } from 'MabExperimentation/Models/AutomatedExperimentsList';
 
 describe('ColorBlurEndScreenTest', () => {
     let platform: Platform;
@@ -172,6 +173,32 @@ describe('ColorBlurEndScreenTest', () => {
 
         it('should render with the same color for game info container background and install container text', () => {
             validateColorTheme(createColorBlurEndScreen('Install Now', 'en'));
+        });
+    });
+
+    describe('Alternate CTA text', () => {
+        const validateCtaText = (endScreen: ColorBlurEndScreen, ctaText: string) => {
+            endScreen.render();
+
+            const downloadElement = <HTMLElement>endScreen.container().querySelectorAll('.download-text')[0];
+            const downloadElementText = downloadElement.innerHTML;
+
+            assert.isNotNull(downloadElementText);
+            assert.equal(downloadElementText, ctaText);
+
+            if (ctaText === ButtonExperimentDeclaration.ctaText.DOWNLOAD_FOR_FREE) {
+                const installBtnClasses = endScreen.container().querySelectorAll('.install-container')[0].className;
+
+                assert.include(installBtnClasses, 'cta-alt-text');
+            }
+        };
+
+        it('should render Install Now', () => {
+            validateCtaText(createColorBlurEndScreen(ButtonExperimentDeclaration.ctaText.INSTALL_NOW, 'en'), 'Install Now');
+        });
+
+        it('should render Download For Free', () => {
+            validateCtaText(createColorBlurEndScreen(ButtonExperimentDeclaration.ctaText.DOWNLOAD_FOR_FREE, 'en'), 'Download For Free');
         });
     });
 });
