@@ -83,7 +83,8 @@ describe('EndScreenTest', () => {
         const experimentDescription = {
             scheme: scheme,
             color: buttonColor,
-            animation: ButtonExperimentDeclaration.animation.BOUNCING
+            animation: ButtonExperimentDeclaration.animation.BOUNCING,
+            ctaText: ButtonExperimentDeclaration.ctaText.DOWNLOAD_FOR_FREE
         };
         return new AnimatedDownloadButtonEndScreen(experimentDescription, params, campaign);
     };
