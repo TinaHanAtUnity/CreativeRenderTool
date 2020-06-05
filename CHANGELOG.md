@@ -1,3 +1,7 @@
+# Pending
+
+* Fix iOS crash when orientation doees not match supported. [#15755](https://github.com/Applifier/unity-ads-webview/pull/15755)
+
 # Fri Jun  5 18:52:31 UTC 2020
 
 * [Bug] Add extra tags in AdRequestManager.handleError [#15751](https://github.com/Applifier/unity-ads-webview/pull/15751)
