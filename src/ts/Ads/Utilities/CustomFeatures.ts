@@ -224,7 +224,13 @@ export class CustomFeatures {
         return orgId === '2878851';
     }
 
+    // Enable skipping the orientation safety check on iOS as in some cases it
+    // can causes crashes for publishers: https://jira.unity3d.com/browse/ABT-1080
     public static allowSupportedOrientationCheck(gameId: string): boolean {
-        return gameId !== '1636888'; // Blowfire
+        const skipCheckGameIds = [
+            '1636888' // Blowfire
+        ];
+        // return true if not in list.
+        return !this.existsInList(skipCheckGameIds, gameId);
     }
 }
