@@ -1,5 +1,6 @@
 # Pending
 
+* [Bug] Add loadV5Support flag to load v4 [#15750](https://github.com/Applifier/unity-ads-webview/pull/15750)
 * [AUI] Tweak ColorBlur experiment by improving clickable area [#15754](https://github.com/Applifier/unity-ads-webview/pull/15754)
 
 # Thu Jun  4 19:21:49 UTC 2020
