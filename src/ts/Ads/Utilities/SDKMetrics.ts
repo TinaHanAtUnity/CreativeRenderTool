@@ -1,6 +1,5 @@
 import { IMetricInstance } from 'Ads/Networking/MetricInstance';
 import { BufferedMetricInstance } from 'Ads/Networking/BufferedMetricInstance';
-import { InitErrorCode } from 'src/ts/Core/Native/Sdk';
 
 export enum ErrorMetric {
     TooLargeFile = 'too_large_file', // a file 20mb and over are considered too large
