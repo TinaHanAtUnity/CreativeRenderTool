@@ -6,7 +6,8 @@ export type ClientInfoData = [string, boolean, string, string, number, string, b
 export enum InitErrorCode {
     Unknown = 0,
     GameIdDisabled = 1,
-    ConfigurationNotFound = 2
+    ConfigurationNotFound = 2,
+    InvalidArgument = 3
 }
 
 export interface IErrorLogger {

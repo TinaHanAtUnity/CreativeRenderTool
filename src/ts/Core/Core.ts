@@ -137,7 +137,7 @@ export class Core implements ICore {
             if (!/^\d+$/.test(this.ClientInfo.getGameId())) {
                 const message = `Unity Ads SDK fail to initialize due to provided Game ID '${this.ClientInfo.getGameId()}' is invalid. Game ID may contain only digits (0-9).`;
                 this.Api.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.INVALID_ARGUMENT], message);
-                this.Api.Sdk.initError(message, InitErrorCode.ConfigurationNotFound);
+                this.Api.Sdk.initError(message, InitErrorCode.InvalidArgument);
                 return Promise.reject(message);
             }
 
