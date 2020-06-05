@@ -803,7 +803,7 @@ export class AdRequestManager extends CampaignManager {
             }
         }
 
-        this.reportMetricEvent(event, { 'rsn': reason });
+        this.reportMetricEvent(event, { 'rsn': reason, ...tags });
     }
 
     public reportMetricEvent(metric: LoadV5, tags: { [key: string]: string } = {}) {
