@@ -4,7 +4,9 @@ import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 export type ClientInfoData = [string, boolean, string, string, number, string, boolean, string, string, string | null, string | null, number, boolean, boolean];
 
 export enum InitErrorCode {
-    Unknown = 0
+    Unknown = 0,
+    GameIdDisabled = 1,
+    ConfigurationNotFound = 2
 }
 
 export interface IErrorLogger {

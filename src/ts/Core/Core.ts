@@ -135,8 +135,9 @@ export class Core implements ICore {
             this.ClientInfo = new ClientInfo(data);
 
             if (!/^\d+$/.test(this.ClientInfo.getGameId())) {
-                const message = `Provided Game ID '${this.ClientInfo.getGameId()}' is invalid. Game ID may contain only digits (0-9).`;
+                const message = `Unity Ads SDK fail to initialize due to provided Game ID '${this.ClientInfo.getGameId()}' is invalid. Game ID may contain only digits (0-9).`;
                 this.Api.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.INVALID_ARGUMENT], message);
+                this.Api.Sdk.initError(message, InitErrorCode.ConfigurationNotFound);
                 return Promise.reject(message);
             }
 
@@ -236,7 +237,7 @@ export class Core implements ICore {
             this.JaegerManager.setJaegerTracingEnabled(this.Config.isJaegerTracingEnabled());
 
             if (!this.Config.isEnabled()) {
-                const error = new Error('Game with ID ' + this.ClientInfo.getGameId() + ' is not enabled');
+                const error = new Error('Unity Ads SDK fail to initialize due to game with ID ' + this.ClientInfo.getGameId() + ' is not enabled');
                 error.name = 'DisabledGame';
                 throw error;
             }
@@ -250,17 +251,22 @@ export class Core implements ICore {
                 IsMadeWithUnity.sendIsMadeWithUnity(this.Api.Storage, this.SdkDetectionInfo);
             });
         }).catch((error: { message: string; name: unknown }) => {
-            if (error instanceof ConfigError) {
-                // tslint:disable-next-line
-                error = { 'message': error.message, 'name': error.name };
-                this.Api.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.INITIALIZE_FAILED], error.message);
-            } else if (error instanceof Error && error.name === 'DisabledGame') {
-                return;
+            let errorMessage = error.message;
+            let errorCode: InitErrorCode = InitErrorCode.Unknown;
+
+            if (error instanceof Error && error.name === 'DisabledGame') {
+                errorCode = InitErrorCode.DisabledGame;
             }
 
-            this.Api.Sdk.initError(error.message, InitErrorCode.Unknown);
-            this.Api.Sdk.logError(`Initialization error: ${error.message}`);
-            Diagnostics.trigger('initialization_error', error);
+            if (error instanceof ConfigError) {
+                errorMessage = 'Unity Ads SDK fail to initialize due to configuration not found.';
+                errorCode = InitErrorCode.ConfigurationNotFound;
+            }
+
+                this.Api.Sdk.initError(errorMessage, errorCode);
+                this.Api.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.INITIALIZE_FAILED], errorMessage);
+                this.Api.Sdk.logError(`Initialization error: ${error.message}`);
+                Diagnostics.trigger('initialization_error', error);
         });
     }
 
