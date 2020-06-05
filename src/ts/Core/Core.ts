@@ -255,7 +255,7 @@ export class Core implements ICore {
             let errorCode: InitErrorCode = InitErrorCode.Unknown;
 
             if (error instanceof Error && error.name === 'DisabledGame') {
-                errorCode = InitErrorCode.DisabledGame;
+                errorCode = InitErrorCode.GameIdDisabled;
             }
 
             if (error instanceof ConfigError) {
