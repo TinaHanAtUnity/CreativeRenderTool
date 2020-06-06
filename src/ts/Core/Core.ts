@@ -138,6 +138,7 @@ export class Core implements ICore {
                 const message = `Unity Ads SDK fail to initialize due to provided Game ID '${this.ClientInfo.getGameId()}' is invalid. Game ID may contain only digits (0-9).`;
                 this.Api.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.INVALID_ARGUMENT], message);
                 this.Api.Sdk.initError(message, InitErrorCode.InvalidArgument);
+                SDKMetrics.reportMetricEvent(InitializationFailureMetric.InitializeFailed);
                 return Promise.reject(message);
             }
 
@@ -267,7 +268,7 @@ export class Core implements ICore {
             this.Api.Sdk.initError(errorMessage, errorCode);
             this.Api.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.INITIALIZE_FAILED], errorMessage);
             this.Api.Sdk.logError(`Initialization error: ${error.message}`);
-            SDKMetrics.reportMetricEventWithTags(InitializationFailureMetric.InitializeFailed, { 'error': error.message });
+            SDKMetrics.reportMetricEvent(InitializationFailureMetric.InitializeFailed);
         });
     }
 
