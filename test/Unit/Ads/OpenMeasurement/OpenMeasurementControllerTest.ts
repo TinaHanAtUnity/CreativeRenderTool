@@ -83,13 +83,13 @@ import { VastCampaign } from 'VAST/Models/VastCampaign';
 
             it('should fire multiple loaded events regardless of state', () => {
                 const vastProperties: IVastProperties = {
-                    isSkippable: false,
+                    skippable: false,
                     skipOffset: 10,
-                    isAutoplay: true, // Always autoplay for video
+                    autoplay: true, // Always autoplay for video
                     position: VideoPosition.STANDALONE // Always standalone video
                 };
                 omManager.loaded(vastProperties);
-                sinon.assert.calledWith(<sinon.SinonStub>openMeasurement.triggerVideoEvent, 'omidLoaded', { vastProperties });
+                sinon.assert.calledWith(<sinon.SinonStub>openMeasurement.triggerVideoEvent, 'omidLoaded', vastProperties);
                 sinon.assert.calledTwice(<sinon.SinonStub>openMeasurement.triggerVideoEvent);
             });
 
@@ -185,7 +185,7 @@ import { VastCampaign } from 'VAST/Models/VastCampaign';
             });
             it('adUserInteraction', () => {
                 omManager.adUserInteraction(InteractionType.CLICK);
-                sinon.assert.calledWith(<sinon.SinonStub>openMeasurement.triggerVideoEvent, 'omidAdUserInteraction', 'click');
+                sinon.assert.calledWith(<sinon.SinonStub>openMeasurement.triggerVideoEvent, 'omidAdUserInteraction', { interactionType: InteractionType.CLICK });
                 sinon.assert.calledTwice(<sinon.SinonStub>openMeasurement.triggerVideoEvent);
             });
             it('should fire multiple bufferStart regardless of state', () => {

@@ -1,10 +1,21 @@
 import { Placement, PlacementMock } from 'Ads/Models/__mocks__/Placement';
-import { OpenMeasurementVast, OpenMeasurementMockVast } from 'Ads/Views/OpenMeasurement/__mocks__/OpenMeasurement';
-import { OpenMeasurementAdViewBuilder, OpenMeasurementAdViewBuilderMock } from 'Ads/Views/OpenMeasurement/__mocks__/OpenMeasurementAdViewBuilder';
+import { OpenMeasurementMockVast, OpenMeasurementVast } from 'Ads/Views/OpenMeasurement/__mocks__/OpenMeasurement';
+import {
+    OpenMeasurementAdViewBuilder,
+    OpenMeasurementAdViewBuilderMock
+} from 'Ads/Views/OpenMeasurement/__mocks__/OpenMeasurementAdViewBuilder';
 import { ClientInfo, ClientInfoMock } from 'Core/Models/__mocks__/ClientInfo';
 import { DeviceInfo, DeviceInfoMock } from 'Core/Models/__mocks__/DeviceInfo';
 import { VastAdVerification, VastAdVerificationMock } from 'VAST/Models/__mocks__/VastAdVerification';
-import { AccessMode, AdSessionType, IContext, ISessionEvent, OMID_P, OM_JS_VERSION, PARTNER_NAME } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
+import {
+    AccessMode,
+    AdSessionType,
+    IContext,
+    ISessionEvent,
+    OM_JS_VERSION,
+    OMID_P,
+    PARTNER_NAME
+} from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
 import { VastOpenMeasurementController } from 'Ads/Views/OpenMeasurement/VastOpenMeasurementController';
 import { Platform } from 'Core/Constants/Platform';
 
@@ -22,6 +33,15 @@ import { Platform } from 'Core/Constants/Platform';
           adViewBuilder = new OpenMeasurementAdViewBuilder();
           return new VastOpenMeasurementController(platform, placement, om, adViewBuilder, clientInfo, deviceInfo);
       };
+
+      describe('when controller triggers video start event', () => {
+          it('the duration time in event data should be integer', () => {
+              const openMeasurementInstance = new OpenMeasurementVast();
+              const omController = initOMManager([openMeasurementInstance]);
+              omController.start(5120);
+              expect(openMeasurementInstance.triggerVideoEvent).toHaveBeenCalledWith('omidStart', { duration: 5, videoPlayerVolume: 1, deviceVolume: undefined });
+          });
+      });
 
       describe('session start', () => {
           let omManager: VastOpenMeasurementController;
@@ -54,15 +74,15 @@ import { Platform } from 'Core/Constants/Platform';
                   apiVersion: OMID_P,
                   environment: 'app',
                   accessMode: AccessMode.LIMITED,
-                  adSessionType: AdSessionType.HTML,
+                  adSessionType: AdSessionType.NATIVE,
                   omidNativeInfo: {
                       partnerName: PARTNER_NAME,
                       partnerVersion: ''
                   },
                   omidJsInfo: {
                       omidImplementer: PARTNER_NAME,
-                      serviceVersion: '',
-                      sessionClientVersion: OMID_P,
+                      serviceVersion: '1.2.10',
+                      sessionClientVersion: '1.2.10',
                       partnerName: PARTNER_NAME,
                       partnerVersion: ''
                   },
@@ -72,7 +92,7 @@ import { Platform } from 'Core/Constants/Platform';
                   },
                   deviceInfo: {
                       deviceType: deviceInfo.getModel(),
-                      os: Platform[platform].toLocaleLowerCase(),
+                      os: platform === Platform.ANDROID ? 'Android' : 'iOS',
                       osVersion: deviceInfo.getOsVersion()
                   },
                   supports: ['vlid', 'clid']

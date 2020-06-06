@@ -621,5 +621,12 @@
     "description": "Preload Data for all placements received in configuration",
     "provider": "SDK",
     "platforms": "all"
+  },
+  {
+    "key": "loadV5Support",
+    "type": "boolean",
+    "description": "Indicates if client can work with Load V5 or not",
+    "provider": "SDK",
+    "platforms": "all"
   }
 ]

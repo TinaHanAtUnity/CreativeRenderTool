@@ -2,7 +2,10 @@ import { AdMobCampaign, AdMobCampaignMock } from 'AdMob/Models/__mocks__/AdMobCa
 import { ThirdPartyEventManager, ThirdPartyEventManagerMock } from 'Ads/Managers/__mocks__/ThirdPartyEventManager';
 import { Placement, PlacementMock } from 'Ads/Models/__mocks__/Placement';
 import { OpenMeasurementAdmob, OpenMeasurementMockAdmob } from 'Ads/Views/OpenMeasurement/__mocks__/OpenMeasurement';
-import { OpenMeasurementAdViewBuilder, OpenMeasurementAdViewBuilderMock } from 'Ads/Views/OpenMeasurement/__mocks__/OpenMeasurementAdViewBuilder';
+import {
+    OpenMeasurementAdViewBuilder,
+    OpenMeasurementAdViewBuilderMock
+} from 'Ads/Views/OpenMeasurement/__mocks__/OpenMeasurementAdViewBuilder';
 import { RequestManager, RequestManagerMock } from 'Core/Managers/__mocks__/RequestManager';
 import { ClientInfo, ClientInfoMock } from 'Core/Models/__mocks__/ClientInfo';
 import { DeviceInfo, DeviceInfoMock } from 'Core/Models/__mocks__/DeviceInfo';
@@ -11,7 +14,6 @@ import { Core } from 'Core/__mocks__/Core';
 import { AdmobOpenMeasurementController } from 'Ads/Views/OpenMeasurement/AdmobOpenMeasurementController';
 import { ISessionEvent, VideoPosition } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
 import { Platform } from 'Core/Constants/Platform';
-import { SDKMetrics, AdmobMetric } from 'Ads/Utilities/SDKMetrics';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe(`${platform} AdmobOpenMeasurementContoller`, () => {
@@ -103,66 +105,5 @@ import { SDKMetrics, AdmobMetric } from 'Ads/Utilities/SDKMetrics';
                 expect(openMeasurement1.sessionStart).toHaveBeenCalledWith(event1);
             });
         });
-
-        describe('start and loaded race condition', () => {
-            let omManager: AdmobOpenMeasurementController;
-
-            beforeEach(() => {
-                omManager = initAdMobOMManager();
-            });
-
-            describe('start called first', () => {
-                beforeEach(() => {
-                    omManager.start(10);
-                    omManager.loaded({
-                        isSkippable: false,
-                        skipOffset: 1,
-                        isAutoplay: false,
-                        position: VideoPosition.STANDALONE
-                    });
-                });
-
-                it('should only fire start called first metric on Android', () => {
-                    if (platform === Platform.ANDROID) {
-                        expect(SDKMetrics.reportMetricEvent).toHaveBeenCalledWith(AdmobMetric.AdmobOMStartFirst);
-                        expect(SDKMetrics.reportMetricEvent).not.toHaveBeenCalledWith(AdmobMetric.AdmobOMLoadedFirst);
-                        expect(SDKMetrics.reportMetricEvent).toHaveBeenCalledTimes(1);
-                    }
-                });
-
-                it('should not fire any metric events on IOS', () => {
-                    if (platform === Platform.IOS) {
-                        expect(SDKMetrics.reportMetricEvent).toHaveBeenCalledTimes(0);
-                    }
-                });
-            });
-
-            describe('load called first', () => {
-                beforeEach(() => {
-                    omManager.loaded({
-                        isSkippable: false,
-                        skipOffset: 1,
-                        isAutoplay: false,
-                        position: VideoPosition.STANDALONE
-                    });
-                    omManager.start(10);
-                });
-
-                it('should only fire load called first metric', () => {
-                    if (platform === Platform.ANDROID) {
-                        expect(SDKMetrics.reportMetricEvent).not.toHaveBeenCalledWith(AdmobMetric.AdmobOMStartFirst);
-                        expect(SDKMetrics.reportMetricEvent).toHaveBeenCalledWith(AdmobMetric.AdmobOMLoadedFirst);
-                        expect(SDKMetrics.reportMetricEvent).toHaveBeenCalledTimes(1);
-                    }
-                });
-
-                it('should not fire any metric events on IOS', () => {
-                    if (platform === Platform.IOS) {
-                        expect(SDKMetrics.reportMetricEvent).toHaveBeenCalledTimes(0);
-                    }
-                });
-            });
-        });
-
     });
 });

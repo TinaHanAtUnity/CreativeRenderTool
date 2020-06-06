@@ -28,6 +28,8 @@ import { SDKMetrics, LoadV5 } from 'Ads/Utilities/SDKMetrics';
 import { RequestError } from 'Core/Errors/RequestError';
 import { SdkStats } from 'Ads/Utilities/SdkStats';
 import { Observable2 } from 'Core/Utilities/Observable';
+import { CampaignAssetInfo } from 'Ads/Utilities/CampaignAssetInfo';
+import { FileInfo } from 'Core/Utilities/FileInfo';
 
 export interface INotCachedLoadedCampaign {
     notCachedCampaign: Campaign;
@@ -63,6 +65,12 @@ class AdRequestManagerError extends Error {
     }
 }
 
+export enum LoadV5ExperimentType {
+    None = 'none',
+    AdUnit = 'adunit',
+    BaseAdUnit = 'base_adunit'
+}
+
 export class AdRequestManager extends CampaignManager {
     protected static LoadV5BaseUrl: string = 'https://auction-load.unityads.unity3d.com/v5/games';
 
@@ -76,6 +84,7 @@ export class AdRequestManager extends CampaignManager {
     private _reloadResults: { [key: string]: ILoadedCampaign };
     private _preloadFailed: boolean;
     private _activePreload: boolean;
+    private _currentExperiment: LoadV5ExperimentType;
 
     protected _platform: Platform;
     protected _core: ICoreApi;
@@ -98,7 +107,7 @@ export class AdRequestManager extends CampaignManager {
 
     public readonly onAdditionalPlacementsReady = new Observable2<string | undefined, IPlacementIdMap<INotCachedLoadedCampaign | undefined>>();
 
-    constructor(platform: Platform, core: ICore, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, assetManager: AssetManager, sessionManager: SessionManager, adMobSignalFactory: AdMobSignalFactory, request: RequestManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager, cacheBookkeeping: CacheBookkeepingManager, contentTypeHandlerManager: ContentTypeHandlerManager, privacySDK: PrivacySDK, userPrivacyManager: UserPrivacyManager) {
+    constructor(platform: Platform, core: ICore, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, assetManager: AssetManager, sessionManager: SessionManager, adMobSignalFactory: AdMobSignalFactory, request: RequestManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager, cacheBookkeeping: CacheBookkeepingManager, contentTypeHandlerManager: ContentTypeHandlerManager, privacySDK: PrivacySDK, userPrivacyManager: UserPrivacyManager, experiment: LoadV5ExperimentType) {
         super();
 
         this._platform = platform;
@@ -123,6 +132,7 @@ export class AdRequestManager extends CampaignManager {
         this._preloadFailed = false;
         this._ongoingPreloadRequest = new Promise((resolve) => { this._ongoingPreloadRequestResolve = resolve; });
         this._activePreload = false;
+        this._currentExperiment = experiment;
     }
 
     public requestPreload(): Promise<void> {
@@ -133,7 +143,7 @@ export class AdRequestManager extends CampaignManager {
         }
 
         if (this._activePreload) {
-            SDKMetrics.reportMetricEvent(LoadV5.PreloadRequestAlreadyActive);
+            this.reportMetricEvent(LoadV5.PreloadRequestAlreadyActive);
 
             let promiseResolve: () => void;
             const promise = new Promise<void>((resolve) => { promiseResolve = resolve; });
@@ -147,7 +157,7 @@ export class AdRequestManager extends CampaignManager {
         let requestPrivacy: IRequestPrivacy;
         let legacyRequestPrivacy: ILegacyRequestPrivacy;
 
-        SDKMetrics.reportMetricEvent(LoadV5.PreloadRequestStarted);
+        this.reportMetricEvent(LoadV5.PreloadRequestStarted);
 
         this._preloadData = null;
         this._currentSession = null;
@@ -169,20 +179,20 @@ export class AdRequestManager extends CampaignManager {
             this._deviceFreeSpace = freeSpace;
             return Promise.all<string, unknown>([
                 CampaignManager.createRequestUrl(this.getBaseUrl(), this._platform, this._clientInfo, this._deviceInfo, this._coreConfig, this._lastAuctionId, false),
-                CampaignManager.createRequestBody(this._clientInfo, this._coreConfig, this._deviceInfo, this._userPrivacyManager, this._sessionManager, this._privacy, countersForOperativeEvents, fullyCachedCampaignIds, versionCode, this._adMobSignalFactory, freeSpace, this._metaDataManager, this._adsConfig, true, this.getPreviousPlacementId(), requestPrivacy, legacyRequestPrivacy, false)
+                CampaignManager.createRequestBody(this._clientInfo, this._coreConfig, this._deviceInfo, this._userPrivacyManager, this._sessionManager, this._privacy, countersForOperativeEvents, fullyCachedCampaignIds, versionCode, this._adMobSignalFactory, freeSpace, this._metaDataManager, this._adsConfig, true, this.getPreviousPlacementId(), requestPrivacy, legacyRequestPrivacy, false, undefined, true)
             ]);
         }).then(([requestUrl, requestBody]) => this._request.post(requestUrl, JSON.stringify(this.makePreloadBody(<ILoadV5BodyExtra>requestBody)), [], {
-            retries: 0,
+            retries: 1,
             retryDelay: 0,
             followRedirects: false,
             retryWithConnectionEvents: false,
-            timeout: 20000
+            timeout: 10000
         })).then((response) => {
             if (response) {
                 SdkStats.increaseAdRequestOrdinal();
             }
 
-            SDKMetrics.reportMetricEvent(LoadV5.PreloadRequestParsingResponse);
+            this.reportMetricEvent(LoadV5.PreloadRequestParsingResponse);
             return this.parsePreloadResponse(response, countersForOperativeEvents, requestPrivacy, legacyRequestPrivacy);
         }).catch((err) => {
             this._preloadFailed = true;
@@ -226,7 +236,7 @@ export class AdRequestManager extends CampaignManager {
         let requestPrivacy: IRequestPrivacy;
         let legacyRequestPrivacy: ILegacyRequestPrivacy;
 
-        SDKMetrics.reportMetricEvent(LoadV5.LoadRequestStarted);
+        this.reportMetricEvent(LoadV5.LoadRequestStarted, { 'src': 'default' });
 
         return Promise.resolve().then(() => {
             if (this.hasPreloadFailed()) {
@@ -259,7 +269,7 @@ export class AdRequestManager extends CampaignManager {
             this._deviceFreeSpace = freeSpace;
             return Promise.all<string, unknown>([
                 CampaignManager.createRequestUrl(this.getBaseUrl(), this._platform, this._clientInfo, this._deviceInfo, this._coreConfig, this._lastAuctionId, false),
-                CampaignManager.createRequestBody(this._clientInfo, this._coreConfig, this._deviceInfo, this._userPrivacyManager, this._sessionManager, this._privacy, undefined, fullyCachedCampaignIds, versionCode, this._adMobSignalFactory, freeSpace, this._metaDataManager, this._adsConfig, true, this.getPreviousPlacementId(), requestPrivacy, legacyRequestPrivacy, false, this._adsConfig.getPlacement(placementId))
+                CampaignManager.createRequestBody(this._clientInfo, this._coreConfig, this._deviceInfo, this._userPrivacyManager, this._sessionManager, this._privacy, undefined, fullyCachedCampaignIds, versionCode, this._adMobSignalFactory, freeSpace, this._metaDataManager, this._adsConfig, true, this.getPreviousPlacementId(), requestPrivacy, legacyRequestPrivacy, false, this._adsConfig.getPlacement(placementId), true)
             ]);
         }).then(([requestUrl, requestBody]) => this._request.post(requestUrl, JSON.stringify(this.makeLoadBody(<ILoadV5BodyExtra>requestBody, placementId, additionalPlacements)), [], {
             retries: 0,
@@ -273,20 +283,20 @@ export class AdRequestManager extends CampaignManager {
                 if (this._reloadResults[placementId] !== undefined) {
                     return Promise.resolve(this._reloadResults[placementId]);
                 }
-                SDKMetrics.reportMetricEvent(LoadV5.LoadRequestWasCanceled);
+                this.reportMetricEvent(LoadV5.LoadRequestWasCanceled);
                 return this.requestLoad(placementId);
             }
-            SDKMetrics.reportMetricEvent(LoadV5.LoadRequestParsingResponse);
+            this.reportMetricEvent(LoadV5.LoadRequestParsingResponse, { 'src': 'default' });
             return this.parseLoadResponse(response, this._adsConfig.getPlacement(placementId), additionalPlacements);
         }).then((campaign) => {
             delete this._ongoingLoadRequests[placementId];
             if (campaign) {
-                SDKMetrics.reportMetricEvent(LoadV5.LoadRequestFill);
+                this.reportMetricEvent(LoadV5.LoadRequestFill);
             }
             return campaign;
         }).catch((err) => {
             delete this._ongoingLoadRequests[placementId];
-            this.handleError(LoadV5.LoadRequestFailed, err);
+            this.handleError(LoadV5.LoadRequestFailed, err, { 'src': 'default' });
             return undefined;
         });
     }
@@ -300,7 +310,7 @@ export class AdRequestManager extends CampaignManager {
         let requestPrivacy: IRequestPrivacy;
         let legacyRequestPrivacy: ILegacyRequestPrivacy;
 
-        SDKMetrics.reportMetricEvent(LoadV5.ReloadRequestStarted);
+        this.reportMetricEvent(LoadV5.ReloadRequestStarted);
 
         let promiseResolve: () => void;
         this._ongoingReloadRequest = new Promise((resolve) => { promiseResolve = resolve; });
@@ -329,11 +339,11 @@ export class AdRequestManager extends CampaignManager {
             this._deviceFreeSpace = freeSpace;
             return Promise.all<string, unknown>([
                 CampaignManager.createRequestUrl(this.getBaseUrl(), this._platform, this._clientInfo, this._deviceInfo, this._coreConfig, this._lastAuctionId, false),
-                CampaignManager.createRequestBody(this._clientInfo, this._coreConfig, this._deviceInfo, this._userPrivacyManager, this._sessionManager, this._privacy, countersForOperativeEvents, fullyCachedCampaignIds, versionCode, this._adMobSignalFactory, freeSpace, this._metaDataManager, this._adsConfig, true, this.getPreviousPlacementId(), requestPrivacy, legacyRequestPrivacy, false)
+                CampaignManager.createRequestBody(this._clientInfo, this._coreConfig, this._deviceInfo, this._userPrivacyManager, this._sessionManager, this._privacy, countersForOperativeEvents, fullyCachedCampaignIds, versionCode, this._adMobSignalFactory, freeSpace, this._metaDataManager, this._adsConfig, true, this.getPreviousPlacementId(), requestPrivacy, legacyRequestPrivacy, false, undefined, true)
             ]);
         }).then(([requestUrl, requestBody]) => this._request.post(requestUrl, JSON.stringify(this.makeReloadBody(<ILoadV5BodyExtra>requestBody, placementsToLoad.map((placementId) => this._adsConfig.getPlacement(placementId)))), [], {
-            retries: 0,
-            retryDelay: 0,
+            retries: 3,
+            retryDelay: 1000,
             followRedirects: false,
             retryWithConnectionEvents: false,
             timeout: 20000
@@ -342,7 +352,7 @@ export class AdRequestManager extends CampaignManager {
                 SdkStats.increaseAdRequestOrdinal();
             }
 
-            SDKMetrics.reportMetricEvent(LoadV5.ReloadRequestParsingResponse);
+            this.reportMetricEvent(LoadV5.ReloadRequestParsingResponse);
             return this.parseReloadResponse(response, placementsToLoad.map((placementId) => this._adsConfig.getPlacement(placementId)), countersForOperativeEvents, requestPrivacy, legacyRequestPrivacy);
         }).catch((err) => {
             this._preloadFailed = true;
@@ -437,22 +447,20 @@ export class AdRequestManager extends CampaignManager {
             return Promise.reject(new AdRequestManagerError('No placement', 'no_plc'));
         }
 
-        return Promise.all(
-            // Skip caching for those campaigns since we don't need them immediately
-            additionalPlacements.map((x) => this.createNotCachedLoadedCampaign(json, this._adsConfig.getPlacement(x), auctionStatusCode).catch((err) => {
-                return undefined;
-            }))
-        ).then((loadedCampaigns) => {
-            const additionalCampaigns = loadedCampaigns.reduce<IPlacementIdMap<INotCachedLoadedCampaign | undefined>>((previousValue, currentValue, currentIndex) => {
-                previousValue[additionalPlacements[currentIndex]] = currentValue;
+        const allPlacements = [
+            placement,
+            ...additionalPlacements.map((x) => this._adsConfig.getPlacement(x))
+        ];
+
+        return this.parseAllPlacements(json, allPlacements, auctionStatusCode, LoadV5.LoadRequestParseCampaignFailed).then((loadedCampaigns) => {
+            const additionalCampaigns = additionalPlacements.reduce<IPlacementIdMap<INotCachedLoadedCampaign | undefined>>((previousValue, currentValue, currentIndex) => {
+                previousValue[currentValue] = loadedCampaigns[currentValue];
                 return previousValue;
             }, {});
             this.onAdditionalPlacementsReady.trigger(placement.getAdUnitId(), additionalCampaigns);
-        }).catch(() => {
-            // Skip any errors so that we can handle actual load request
+
+            return loadedCampaigns[placement.getId()];
         }).then(
-            () => this.createNotCachedLoadedCampaign(json, placement, auctionStatusCode)
-        ).then(
             (notCachedLoadedCampaign) => this.cacheCampaign(notCachedLoadedCampaign)
         );
     }
@@ -533,13 +541,10 @@ export class AdRequestManager extends CampaignManager {
         return Promise.resolve(trackingUrls);
     }
 
-    private createNotCachedLoadedCampaign(response: IRawAuctionV5Response, placement: Placement, auctionStatusCode: AuctionStatusCode): Promise<INotCachedLoadedCampaign | undefined> {
-        return this.parseMediaAndTrackingUrls(response, placement, auctionStatusCode).then(({ mediaId, trackingId }) => {
-            return Promise.all([
-                this.parseTrackingUrls(response, trackingId, auctionStatusCode),
-                this.parseCampaign(response, mediaId, auctionStatusCode)
-            ]);
-        }).then(([trackingUrls, campaign]) => {
+    private createNotCachedLoadedCampaign(response: IRawAuctionV5Response, campaign: Campaign | undefined, trackingId: string | undefined, auctionStatusCode: AuctionStatusCode): Promise<INotCachedLoadedCampaign | undefined> {
+        return Promise.all([
+            this.parseTrackingUrls(response, trackingId, auctionStatusCode)
+        ]).then(([trackingUrls]) => {
             if (!campaign || !trackingUrls) {
                 return Promise.resolve(undefined);
             }
@@ -579,6 +584,13 @@ export class AdRequestManager extends CampaignManager {
             return Promise.resolve(undefined);
         }
 
+        if (CampaignAssetInfo.isCached(notCachedLoadedCampaign.notCachedCampaign)) {
+            return Promise.resolve({
+                campaign: notCachedLoadedCampaign.notCachedCampaign,
+                trackingUrls: notCachedLoadedCampaign.notCachedTrackingUrls
+            });
+        }
+
         return this._assetManager.setup(notCachedLoadedCampaign.notCachedCampaign).catch((err) => {
             // If caching failed, we still can stream an ad.
             return notCachedLoadedCampaign.notCachedCampaign;
@@ -587,6 +599,51 @@ export class AdRequestManager extends CampaignManager {
                 campaign: campaign,
                 trackingUrls: notCachedLoadedCampaign.notCachedTrackingUrls
             };
+        });
+    }
+
+    private parseAllPlacements(json: IRawAuctionV5Response, allPlacements: Placement[], auctionStatusCode: AuctionStatusCode, errorMetric: LoadV5): Promise<IPlacementIdMap<INotCachedLoadedCampaign | undefined>> {
+        let allMedia: string[] = [];
+        let campaignMap: IPlacementIdMap<Campaign | undefined> = {};
+        let parsedMap: IPlacementIdMap<IParsedMediaAndTrackingIds> = {};
+
+        return Promise.all(allPlacements.map((plc) => this.parseMediaAndTrackingUrls(json, plc, auctionStatusCode))).then(medias => {
+            parsedMap = medias.reduce<IPlacementIdMap<IParsedMediaAndTrackingIds>>((previousValue, currentValue, currentIndex) => {
+                previousValue[allPlacements[currentIndex].getId()] = currentValue;
+                return previousValue;
+            }, {});
+
+            allMedia = medias.reduce<string[]>((previousValue, currentValue, currentIndex) => {
+                if (currentValue.mediaId) {
+                    previousValue.push(currentValue.mediaId);
+                }
+                return previousValue;
+            }, []);
+
+            allMedia = allMedia.filter((val, index) => allMedia.indexOf(val) === index);
+
+            return Promise.all(allMedia.map((media) => this.parseCampaign(json, media, auctionStatusCode).catch((err) => {
+                this.handleError(errorMetric, err);
+                return undefined;
+            })));
+        }).then(allCampaigns => {
+            campaignMap = allCampaigns.reduce<IPlacementIdMap<Campaign | undefined>>((previousValue, currentValue, currentIndex) => {
+                previousValue[allMedia[currentIndex]] = currentValue;
+                return previousValue;
+            }, {});
+
+            return Promise.all(
+                // Skip caching for those campaigns since we don't need them immediately
+                allPlacements.map((x) => this.createNotCachedLoadedCampaign(json, parsedMap[x.getId()].mediaId === undefined ? undefined : campaignMap[parsedMap[x.getId()].mediaId!], parsedMap[x.getId()].trackingId, auctionStatusCode).catch((err) => {
+                    this.handleError(errorMetric, err);
+                    return undefined;
+                }
+            )));
+        }).then((loadedCampaigns) => {
+            return loadedCampaigns.reduce<IPlacementIdMap<INotCachedLoadedCampaign | undefined>>((previousValue, currentValue, currentIndex) => {
+                previousValue[allPlacements[currentIndex].getId()] = currentValue;
+                return previousValue;
+            }, {});
         });
     }
 
@@ -619,16 +676,13 @@ export class AdRequestManager extends CampaignManager {
             return Promise.resolve();
         }
 
-        return Promise.all(
-            placementsToLoad.map(
-                (x) => this.createNotCachedLoadedCampaign(json, x, auctionStatusCode)
-                    .then((loadedCampaign) => this.cacheCampaign(loadedCampaign)).catch((err) => {
-                        this.handleError(LoadV5.ReloadRequestParseCampaignFailed, err);
-                        return undefined;
-                    }
-                )
-            )
-        ).then((loadedCampaigns) => {
+        return this.parseAllPlacements(json, placementsToLoad, auctionStatusCode, LoadV5.ReloadRequestParseCampaignFailed)
+        .then((notCachedLoadedCampaigns) => {
+            return Promise.all(placementsToLoad.map((placement) => {
+                const placementId = placement.getId();
+                return this.cacheCampaign(notCachedLoadedCampaigns[placementId]);
+            }));
+        }).then((loadedCampaigns) => {
             loadedCampaigns.forEach((loadedCampaign, index) => {
                 const placementId = placementsToLoad[index].getId();
                 if (loadedCampaign !== undefined) {
@@ -737,7 +791,7 @@ export class AdRequestManager extends CampaignManager {
         return body;
     }
 
-    private handleError(event: LoadV5, err: unknown) {
+    private handleError(event: LoadV5, err: unknown, tags: { [key: string]: string } = {}) {
         let reason: string = 'unknown';
         if (err instanceof AdRequestManagerError) {
             reason = err.tag;
@@ -749,6 +803,13 @@ export class AdRequestManager extends CampaignManager {
             }
         }
 
-        SDKMetrics.reportMetricEventWithTags(event, { 'rsn': reason });
+        this.reportMetricEvent(event, { 'rsn': reason, ...tags });
+    }
+
+    public reportMetricEvent(metric: LoadV5, tags: { [key: string]: string } = {}) {
+        SDKMetrics.reportMetricEventWithTags(metric, {
+            ...tags,
+            'exp': this._currentExperiment
+        });
     }
 }

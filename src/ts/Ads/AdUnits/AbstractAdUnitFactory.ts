@@ -23,8 +23,8 @@ export abstract class AbstractAdUnitFactory<T extends Campaign, Params extends I
         this._adUnitParametersFactory = parametersFactory;
     }
 
-    public create(campaign: T, placement: Placement, orientation: Orientation, gamerServerId: string, options: unknown) {
-        const params = this._adUnitParametersFactory.create(campaign, placement, orientation, gamerServerId, options);
+    public create(campaign: T, placement: Placement, orientation: Orientation, gamerServerId: string, options: unknown, loadV5Support: boolean) {
+        const params = this._adUnitParametersFactory.create(campaign, placement, orientation, gamerServerId, options, loadV5Support);
         const adUnit = this.createAdUnit(params);
         params.privacy.setupReportListener(adUnit);
         return adUnit;

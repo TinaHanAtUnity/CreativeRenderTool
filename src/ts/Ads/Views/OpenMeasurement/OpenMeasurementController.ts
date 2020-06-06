@@ -67,7 +67,7 @@ export abstract class OpenMeasurementController implements IOMController {
      */
     public loaded(vastProperties: IVastProperties) {
         this._omInstances.forEach((om) => {
-            om.triggerVideoEvent(OMID3pEvents.OMID_LOADED, { vastProperties });
+            om.triggerVideoEvent(OMID3pEvents.OMID_LOADED, vastProperties);
         });
     }
 
@@ -82,7 +82,7 @@ export abstract class OpenMeasurementController implements IOMController {
 
             this._omInstances.forEach((om) => {
                     om.triggerVideoEvent(OMID3pEvents.OMID_START, {
-                    duration: duration,
+                    duration: Math.trunc(duration / 1000),
                     videoPlayerVolume: this._placement.muteVideo() ? 0 : 1,
                     deviceVolume: this._deviceVolume
                 });
@@ -177,7 +177,7 @@ export abstract class OpenMeasurementController implements IOMController {
      */
     public adUserInteraction(interactionType: InteractionType) {
         this._omInstances.forEach((om) => {
-            om.triggerVideoEvent(OMID3pEvents.OMID_AD_USER_INTERACTION, interactionType);
+            om.triggerVideoEvent(OMID3pEvents.OMID_AD_USER_INTERACTION, { interactionType: interactionType });
         });
     }
 
@@ -202,10 +202,10 @@ export abstract class OpenMeasurementController implements IOMController {
      * Current Calculation Locations: VastAdUnit onContainerBackground, onContainerForeground
      * TODO: Calculate Geometry change for Privacy coverage
      */
-    public geometryChange(viewPort: IViewPort, adView: IAdView) {
+    public geometryChange(viewport: IViewPort, adView: IAdView) {
         if (this.getState() !== OMState.STOPPED && (this.getState() === OMState.PAUSED || this.getState() === OMState.PLAYING)) {
             this._omInstances.forEach((om) => {
-                om.triggerAdEvent(OMID3pEvents.OMID_GEOMETRY_CHANGE, { viewPort, adView });
+                om.triggerAdEvent(OMID3pEvents.OMID_GEOMETRY_CHANGE, { viewport, adView });
             });
         }
     }

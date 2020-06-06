@@ -13,6 +13,8 @@ export type AdRequestManagerMock = Base & {
     hasPreloadFailed: jest.Mock<boolean>;
     onAdditionalPlacementsReady: ObservableMock;
     cacheCampaign: jest.Mock<Promise<ILoadedCampaign>>;
+    loadCampaignWithAdditionalPlacement: jest.Mock;
+    reportMetricEvent: jest.Mock;
 };
 
 export const AdRequestManager = jest.fn(() => {
@@ -29,6 +31,8 @@ export const AdRequestManager = jest.fn(() => {
         cacheCampaign: jest.fn().mockImplementation((notCachedLoadedCampaign: INotCachedLoadedCampaign) => Promise.resolve({
             campaign: notCachedLoadedCampaign.notCachedCampaign,
             trackingUrl: notCachedLoadedCampaign.notCachedTrackingUrls
-        }))
+        })),
+        loadCampaignWithAdditionalPlacement: jest.fn().mockImplementation(() => Promise.resolve()),
+        reportMetricEvent: jest.fn()
     };
 });

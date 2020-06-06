@@ -4,7 +4,6 @@ import NestedIframePlayableCreativeJson from 'json/custom_features/NestedIframeP
 import Game7GamesJson from 'json/custom_features/Game7Games.json';
 import LionStudiosGamesJson from 'json/custom_features/LionStudiosGames.json';
 import MobilityWareGamesJson from 'json/custom_features/MobilityWareGames.json';
-import LoadWhitelist from 'json/custom_features/LoadWhitelist.json';
 import CacheModeAllowedExperimentGames from 'json/custom_features/CacheModeAllowedExperimentGames.json';
 
 export class CustomFeatures {
@@ -115,13 +114,6 @@ export class CustomFeatures {
         return this.existsInList(wordsWithFriends, gameId) || this.existsInList(zyngaSolitaire, gameId);
     }
 
-    /**
-     * Includes the list of games for the 3.2 Load API Whitelist on the 10/90 Load AB Test
-     */
-    public static isWhiteListedForLoadApi(gameId: string): boolean {
-        return this.existsInList(LoadWhitelist, gameId);
-    }
-
     public static isMopubTestGameForLoad(gameId: string): boolean {
         if (gameId === '1926039' || gameId === '1732577' || gameId === '3206806' || gameId === '2788221') {
             return true;
@@ -150,7 +142,23 @@ export class CustomFeatures {
             '1434564', '3079031', '3334336', '3211592', '1566453', '3334337', // First batch
             '56659', '1514842', '3486364', '3475665', '3334339', '1346246', '1658494', // Second batch
             '1548038', '3250882', '1783251', '3464560', '1551176', '1565348', '3250883', // Second batch
-            '3334338', '3486365', '3475664', '131622009', '1551177', '3464561' // Second batch
+            '3334338', '3486365', '3475664', '131622009', '1551177', '3464561', // Second batch
+            '3147786', '3147787', // Voodoo Games
+            '2830470', '2830469', '1550799', '1550800', '1448936', '1448937', '1781085', // Etermax Games
+            '1781084', '1178247', '2242221', '3532036', '3532037', '2115428', // Etermax Games
+            '20723', '20721', '2337355', '89610', '89611', '3532028', '3532029', // Etermax Games
+            '3532031', '3532030', '3532021', '3532020', // Etermax Games
+            '1616156', '3514607', '1455064', '1104777', '3532356', '3239880', '1712122', '3544375', '3587590',
+            '12723', '3397999', '3493681', '2608915', '3409976', '3541918', '1500889', '3018278', '3157462',
+            '1662635', '3320399'
+        ];
+
+        return this.existsInList(gameIds, gameId) || CustomFeatures.isZyngaDealGame(gameId);
+    }
+
+    public static useAdUnitSupport(gameId: string): boolean {
+        const gameIds = [
+            '3578767', '3578766', '3486365', '3486364', '3211592', '3079031', '1566453', '1434564'
         ];
 
         return this.existsInList(gameIds, gameId);
@@ -214,5 +222,15 @@ export class CustomFeatures {
 
     public static shouldVideoOverlayRemainVisible(orgId: string | undefined): boolean {
         return orgId === '2878851';
+    }
+
+    // Enable skipping the orientation safety check on iOS as in some cases it
+    // can causes crashes for publishers: https://jira.unity3d.com/browse/ABT-1080
+    public static allowSupportedOrientationCheck(gameId: string): boolean {
+        const skipCheckGameIds = [
+            '1636888' // Blowfire
+        ];
+        // return true if not in list.
+        return !this.existsInList(skipCheckGameIds, gameId);
     }
 }

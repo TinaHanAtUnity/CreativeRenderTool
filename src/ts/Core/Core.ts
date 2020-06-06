@@ -53,7 +53,7 @@ import { ClassDetectionApi } from 'Core/Native/ClassDetection';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { NoGzipCacheManager } from 'Core/Managers/NoGzipCacheManager';
 import { createMetricInstance } from 'Ads/Networking/MetricInstance';
-import { createMeasurementsInstance } from 'Core/Utilities/TimeMeasurements';
+import { createStopwatch } from 'Core/Utilities/Stopwatch';
 import { IsMadeWithUnity } from 'Ads/Utilities/IsMadeWithUnity';
 
 export class Core implements ICore {
@@ -128,9 +128,7 @@ export class Core implements ICore {
         if (performance && performance.now) {
             loadTime = performance.now();
         }
-        let measurements = createMeasurementsInstance(InitializationMetric.WebviewInitializationPhases, {
-            'wel': 'undefined'
-        });
+        const measurements = createStopwatch();
         return this.Api.Sdk.loadComplete().then((data) => {
             this.ClientInfo = new ClientInfo(data);
 
@@ -169,13 +167,16 @@ export class Core implements ICore {
 
             this.Api.Request.setConcurrentRequestCount(8);
 
-            measurements = createMeasurementsInstance(InitializationMetric.WebviewInitializationPhases, {
-                'wel': 'undefined'
-            });
+            measurements.reset();
+            measurements.start();
 
             return Promise.all([this.DeviceInfo.fetch(), this.SdkDetectionInfo.detectSdks(), this.UnityInfo.fetch(this.ClientInfo.getApplicationName()), this.setupTestEnvironment()]);
         }).then(() => {
-            measurements.measure('device_info_collection');
+            measurements.stopAndSend(
+                InitializationMetric.WebviewInitializationPhases, {
+                'wel': 'undefined',
+                'stg': 'device_info_collection'
+            });
             HttpKafka.setDeviceInfo(this.DeviceInfo);
             this.WakeUpManager.setListenConnectivity(true);
             this.Api.Sdk.logInfo('mediation detection is:' + this.SdkDetectionInfo.getSdkDetectionJSON());
@@ -189,9 +190,9 @@ export class Core implements ICore {
 
             this.ConfigManager = new ConfigManager(this.NativeBridge.getPlatform(), this.Api, this.MetaDataManager, this.ClientInfo, this.DeviceInfo, this.UnityInfo, this.RequestManager);
 
-            measurements = createMeasurementsInstance(InitializationMetric.WebviewInitializationPhases, {
-                'wel': 'undefined'
-            });
+            measurements.reset();
+            measurements.start();
+
             let configPromise: Promise<unknown>;
             if (TestEnvironment.get('creativeUrl')) {
                 configPromise = Promise.resolve(CreativeUrlConfiguration);
@@ -200,7 +201,11 @@ export class Core implements ICore {
             }
 
             configPromise = configPromise.then((configJson: unknown): [unknown, CoreConfiguration] => {
-                measurements.measure('config_request_received');
+                measurements.stopAndSend(
+                    InitializationMetric.WebviewInitializationPhases, {
+                    'wel': 'undefined',
+                    'stg': 'config_request_received'
+                });
                 const coreConfig = CoreConfigurationParser.parse(<IRawCoreConfiguration>configJson);
                 this.Api.Sdk.logInfo('Received configuration for token ' + coreConfig.getToken() + ' (A/B group ' + JSON.stringify(coreConfig.getAbGroup()) + ')');
                 if (this.NativeBridge.getPlatform() === Platform.IOS && this.DeviceInfo.getLimitAdTracking()) {

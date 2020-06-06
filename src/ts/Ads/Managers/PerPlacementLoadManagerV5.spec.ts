@@ -7,7 +7,7 @@ import { FocusManagerMock, FocusManager } from 'Core/Managers/__mocks__/FocusMan
 import { ClientInfoMock, ClientInfo } from 'Core/Models/__mocks__/ClientInfo';
 import { AdRequestManagerMock, AdRequestManager } from 'Ads/Managers/__mocks__/AdRequestManager';
 import { Ads } from 'Ads/__mocks__/Ads';
-import { Placement, PlacementMock } from 'Ads/Models/__mocks__/Placement';
+import { Placement, PlacementMock, withAdUnit } from 'Ads/Models/__mocks__/Placement';
 import { PlacementState } from 'Ads/Models/Placement';
 import { Campaign, CampaignMock } from 'Ads/Models/__mocks__/Campaign';
 import { AbstractAdUnitMock, AbstractAdUnit } from 'Ads/AdUnits/__mocks__/AbstractAdUnit';
@@ -33,7 +33,7 @@ import { ProgrammaticMraidParser } from 'MRAID/Parsers/ProgrammaticMraidParser';
             clientInfo = ClientInfo();
             focusManager = FocusManager();
 
-            refreshManager = new PerPlacementLoadManagerV5(adsApi, adsConfiguration, coreConfiguration, adRequestManager, clientInfo, focusManager);
+            refreshManager = new PerPlacementLoadManagerV5(adsApi, adsConfiguration, coreConfiguration, adRequestManager, clientInfo, focusManager, false);
         });
 
         describe('initialization', () => {
@@ -180,11 +180,11 @@ import { ProgrammaticMraidParser } from 'MRAID/Parsers/ProgrammaticMraidParser';
             });
 
             it('should set invalidation pending for placements', () => {
-                expect(placements['video_5'].setInvalidationPending).toBeCalledTimes(1);
-                expect(placements['video_5'].setInvalidationPending).toHaveBeenNthCalledWith(1, true);
+                expect(placements.video_5.setInvalidationPending).toBeCalledTimes(1);
+                expect(placements.video_5.setInvalidationPending).toHaveBeenNthCalledWith(1, true);
 
-                expect(placements['video_6'].setInvalidationPending).toBeCalledTimes(1);
-                expect(placements['video_6'].setInvalidationPending).toHaveBeenNthCalledWith(1, true);
+                expect(placements.video_6.setInvalidationPending).toBeCalledTimes(1);
+                expect(placements.video_6.setInvalidationPending).toHaveBeenNthCalledWith(1, true);
             });
         });
 
@@ -218,11 +218,11 @@ import { ProgrammaticMraidParser } from 'MRAID/Parsers/ProgrammaticMraidParser';
             });
 
             it('should set invalidation pending for placements', () => {
-                expect(placements['video_5'].setInvalidationPending).toBeCalledTimes(1);
-                expect(placements['video_5'].setInvalidationPending).toHaveBeenNthCalledWith(1, true);
+                expect(placements.video_5.setInvalidationPending).toBeCalledTimes(1);
+                expect(placements.video_5.setInvalidationPending).toHaveBeenNthCalledWith(1, true);
 
-                expect(placements['video_6'].setInvalidationPending).toBeCalledTimes(1);
-                expect(placements['video_6'].setInvalidationPending).toHaveBeenNthCalledWith(1, true);
+                expect(placements.video_6.setInvalidationPending).toBeCalledTimes(1);
+                expect(placements.video_6.setInvalidationPending).toHaveBeenNthCalledWith(1, true);
             });
         });
 
@@ -256,11 +256,11 @@ import { ProgrammaticMraidParser } from 'MRAID/Parsers/ProgrammaticMraidParser';
             });
 
             it('should set invalidation pending for placements', () => {
-                expect(placements['video_5'].setInvalidationPending).toBeCalledTimes(1);
-                expect(placements['video_5'].setInvalidationPending).toHaveBeenNthCalledWith(1, true);
+                expect(placements.video_5.setInvalidationPending).toBeCalledTimes(1);
+                expect(placements.video_5.setInvalidationPending).toHaveBeenNthCalledWith(1, true);
 
-                expect(placements['video_6'].setInvalidationPending).toBeCalledTimes(1);
-                expect(placements['video_6'].setInvalidationPending).toHaveBeenNthCalledWith(1, true);
+                expect(placements.video_6.setInvalidationPending).toBeCalledTimes(1);
+                expect(placements.video_6.setInvalidationPending).toHaveBeenNthCalledWith(1, true);
             });
         });
 
@@ -501,7 +501,7 @@ import { ProgrammaticMraidParser } from 'MRAID/Parsers/ProgrammaticMraidParser';
 
             it('should call loadCampaign', () => {
                 expect(adRequestManager.loadCampaign).toBeCalledTimes(1);
-                expect(adRequestManager.loadCampaign).toBeCalledWith(placements['video_2']);
+                expect(adRequestManager.loadCampaign).toBeCalledWith(placements.video_2);
             });
 
             it('should call requestReload', () => {
@@ -526,6 +526,185 @@ import { ProgrammaticMraidParser } from 'MRAID/Parsers/ProgrammaticMraidParser';
                 expect(adsApi.Listener.sendPlacementStateChangedEvent).toBeCalledTimes(2);
                 expect(adsApi.Listener.sendPlacementStateChangedEvent).toBeCalledWith('video_2', 'NOT_AVAILABLE', 'WAITING');
                 expect(adsApi.Listener.sendPlacementStateChangedEvent).toBeCalledWith('video_2', 'WAITING', 'READY');
+            });
+        });
+
+        describe('with ad units', () => {
+            beforeEach(() => {
+                adsApi = Ads().Api;
+                adsConfiguration = AdsConfiguration();
+                coreConfiguration = CoreConfiguration();
+                adRequestManager = AdRequestManager();
+                clientInfo = ClientInfo();
+                focusManager = FocusManager();
+
+                refreshManager = new PerPlacementLoadManagerV5(adsApi, adsConfiguration, coreConfiguration, adRequestManager, clientInfo, focusManager, true);
+            });
+
+            describe('load placement which was load as additional placements', () => {
+                let placements: {[key: string]: PlacementMock};
+                let campaign: CampaignMock;
+
+                beforeEach(async () => {
+                    campaign = Campaign();
+
+                    placements = {
+                        'video_1': withAdUnit(Placement('video_1', PlacementState.NOT_AVAILABLE, campaign), 'ad_unit'),
+                        'video_2': withAdUnit(Placement('video_2', PlacementState.NOT_AVAILABLE, campaign), 'ad_unit'),
+                        'video_3': withAdUnit(Placement('video_3', PlacementState.NOT_AVAILABLE, campaign), 'ad_unit')
+                    };
+
+                    adsConfiguration.getPlacementIds.mockReturnValue(['video_1', 'video_2', 'video_3', 'video_4', 'video_5', 'video_6']);
+                    adsConfiguration.getPlacement.mockImplementation((x) => placements[x]);
+
+                    adRequestManager.hasPreloadFailed.mockReturnValue(false);
+                    adRequestManager.loadCampaign.mockResolvedValueOnce({
+                        campaign: campaign,
+                        trackingUrls: {}
+                    });
+                    adRequestManager.loadCampaignWithAdditionalPlacement.mockResolvedValueOnce({
+                        campaign: campaign,
+                        trackingUrls: {}
+                    });
+
+                    (<ObservableMock>adsApi.LoadApi.onLoad).subscribe.mock.calls[0][0]({ 'video_1': 1 });
+
+                    (<ObservableMock>adRequestManager.onAdditionalPlacementsReady).subscribe.mock.calls[0][0]('ad_unit', {
+                        'video_2': {
+                        campaign: campaign,
+                        trackingUrl: {}
+                        },
+                        'video_3': undefined
+                    });
+
+                    (<ObservableMock>adsApi.LoadApi.onLoad).subscribe.mock.calls[0][0]({ 'video_2': 1 });
+                    (<ObservableMock>adsApi.LoadApi.onLoad).subscribe.mock.calls[0][0]({ 'video_3': 1 });
+                });
+
+                it('should call loadCampaign', () => {
+                    expect(adRequestManager.loadCampaignWithAdditionalPlacement).toBeCalledTimes(1);
+                    expect(adRequestManager.loadCampaignWithAdditionalPlacement).toBeCalledWith(placements.video_1);
+                });
+
+                it('should not call requestPreload', () => {
+                    expect(adRequestManager.requestPreload).not.toBeCalled();
+                });
+
+                it('should call sendPlacementStateChangedEvent expected amount of times', () => {
+                    expect(adsApi.Listener.sendPlacementStateChangedEvent).toBeCalledTimes(6);
+                });
+
+                it('should set state to fill for video_1', () => {
+                    expect(adsApi.Listener.sendPlacementStateChangedEvent).toBeCalledWith('video_1', 'NOT_AVAILABLE', 'WAITING');
+                    expect(adsApi.Listener.sendPlacementStateChangedEvent).toBeCalledWith('video_1', 'WAITING', 'READY');
+                });
+
+                it('should set state to fill for video_2', () => {
+                    expect(adsApi.Listener.sendPlacementStateChangedEvent).toBeCalledWith('video_2', 'NOT_AVAILABLE', 'WAITING');
+                    expect(adsApi.Listener.sendPlacementStateChangedEvent).toBeCalledWith('video_2', 'WAITING', 'READY');
+                });
+
+                it('should set state to fill for video_3', () => {
+                    expect(adsApi.Listener.sendPlacementStateChangedEvent).toBeCalledWith('video_3', 'NOT_AVAILABLE', 'WAITING');
+                    expect(adsApi.Listener.sendPlacementStateChangedEvent).toBeCalledWith('video_3', 'WAITING', 'NO_FILL');
+                });
+            });
+
+            describe('clean up additional campaign for ad unit: on finish', () => {
+                let placements: {[key: string]: PlacementMock};
+                let campaign1: CampaignMock;
+                let campaign2: CampaignMock;
+                let adUnit: AbstractAdUnitMock;
+
+                beforeEach(async () => {
+                    adUnit = AbstractAdUnit();
+                    campaign1 = Campaign();
+                    campaign2 = Campaign();
+
+                    placements = {
+                        'video_1': withAdUnit(Placement('video_1', PlacementState.NOT_AVAILABLE), 'ad_unit'),
+                        'video_2': withAdUnit(Placement('video_2', PlacementState.NOT_AVAILABLE), 'ad_unit'),
+                        'video_3': withAdUnit(Placement('video_3', PlacementState.NOT_AVAILABLE), 'ad_unit')
+                    };
+
+                    adsConfiguration.getPlacementIds.mockReturnValue(['video_1', 'video_2', 'video_3']);
+                    adsConfiguration.getPlacement.mockImplementation((x) => placements[x]);
+
+                    adRequestManager.hasPreloadFailed.mockReturnValue(false);
+                    adRequestManager.loadCampaignWithAdditionalPlacement.mockResolvedValueOnce({
+                        campaign: campaign1,
+                        trackingUrls: {}
+                    });
+                    adRequestManager.loadCampaignWithAdditionalPlacement.mockResolvedValueOnce({
+                        campaign: campaign2,
+                        trackingUrls: {}
+                    });
+
+                    (<ObservableMock>adsApi.LoadApi.onLoad).subscribe.mock.calls[0][0]({ 'video_1': 1 });
+
+                    (<ObservableMock>adRequestManager.onAdditionalPlacementsReady).subscribe.mock.calls[0][0]('ad_unit', {
+                        'video_2': {
+                            campaign: campaign1,
+                            trackingUrl: {}
+                        },
+                        'video_3': {
+                            campaign: campaign1,
+                            trackingUrl: {}
+                        }
+                    });
+
+                    (<ObservableMock>adsApi.LoadApi.onLoad).subscribe.mock.calls[0][0]({ 'video_3': 1 });
+
+                    refreshManager.setCurrentAdUnit(adUnit, placements.video_1);
+                    adUnit.onFinish.subscribe.mock.calls[0][0]();
+
+                    (<ObservableMock>adsApi.LoadApi.onLoad).subscribe.mock.calls[0][0]({ 'video_2': 1 });
+                });
+
+                it('should call loadCampaign', () => {
+                    expect(adRequestManager.loadCampaignWithAdditionalPlacement).toBeCalledTimes(2);
+                    expect(adRequestManager.loadCampaignWithAdditionalPlacement).toBeCalledWith(placements.video_1);
+                    expect(adRequestManager.loadCampaignWithAdditionalPlacement).toBeCalledWith(placements.video_2);
+                });
+
+                it('should make reload request', () => {
+                    expect(adRequestManager.requestReload).toBeCalledTimes(1);
+                    expect(adRequestManager.requestReload).toBeCalledWith(['video_3']);
+                });
+
+                it('should have correct campaign in placement video_2', () => {
+                    expect(placements.video_2.setCurrentCampaign).toBeCalledWith(campaign2);
+                });
+            });
+
+            describe('invalidate programmatic campaigns', () => {
+                let placement: PlacementMock;
+
+                beforeEach(async () => {
+                    placement = Placement();
+
+                    placement.getCurrentCampaign.mockReturnValue(Campaign(ProgrammaticMraidParser.ContentType));
+                    adsConfiguration.getPlacement.mockReturnValue(placement);
+
+                    await refreshManager.initialize();
+
+                    adRequestManager.onNoFill.subscribe.mock.calls[0][0]('video');
+                });
+
+                it('should reset campaign', () => {
+                    expect(placement.setCurrentCampaign).toBeCalledTimes(1);
+                    expect(placement.setCurrentCampaign).toBeCalledWith(undefined);
+                });
+
+                it('should reset tracking urls', () => {
+                    expect(placement.setCurrentTrackingUrls).toBeCalledTimes(1);
+                    expect(placement.setCurrentTrackingUrls).toBeCalledWith(undefined);
+                });
+
+                it('should reset invalidation pending', () => {
+                    expect(placement.setInvalidationPending).toBeCalledTimes(1);
+                    expect(placement.setInvalidationPending).toHaveBeenNthCalledWith(1, false);
+                });
             });
         });
     });

@@ -24,11 +24,11 @@
         },
         "rewardedVideo": {
             "mediaId": "load_v5_second",
-            "trackingId": "0"
+            "trackingId": "1"
         },
         "video2": {
             "mediaId": "load_v5_second",
-            "trackingId": "0"
+            "trackingId": "2"
         },
         "video3": {}
     },
@@ -36,41 +36,119 @@
     "tracking": {
         "0": {
             "click": [
-                "https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=click&test=0"
+                "https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=click&test=0"
             ],
             "complete": [
-                "https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=complete&test=0"
+                "https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=complete&test=0"
             ],
             "error": [
-                "https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=error&test=0"
+                "https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=error&test=0"
             ],
             "firstQuartile": [
-                "https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=firstQuartile&test=0"
+                "https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=firstQuartile&test=0"
             ],
             "loaded": [
-                "https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=loaded&test=0"
+                "https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=loaded&test=0"
             ],
             "midpoint": [
-                "https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=midpoint&test=0"
+                "https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=midpoint&test=0"
             ],
             "show": [
-                "https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=skip&test=0"
+                "https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=skip&test=0"
             ],
             "skip": [
-                "https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=skip&test=0"
+                "https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=skip&test=0"
             ],
             "stalled": [
-                "https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=stalled&test=0"
+                "https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=stalled&test=0"
             ],
             "start": [
-                "https://tracking.prd.mz.internal.unity3d.com/impression/%ZONE%?data=randomData&test=0",
-                "https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=start&test=0"
+                "https://tracking.stg.mz.internal.unity3d.com/impression/%ZONE%?data=randomData&test=0",
+                "https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=start&test=0"
             ],
             "thirdQuartile": [
-                "https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=thirdQuartile&test=0"
+                "https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=thirdQuartile&test=0"
             ],
             "videoEndCardClick": [
-                "https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=videoEndCardClick&test=0"
+                "https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=videoEndCardClick&test=0"
+            ]
+        },
+        "1": {
+            "click": [
+                "https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=click&test=0&rewardedVideo"
+            ],
+            "complete": [
+                "https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=complete&test=0&rewardedVideo"
+            ],
+            "error": [
+                "https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=error&test=0&rewardedVideo"
+            ],
+            "firstQuartile": [
+                "https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=firstQuartile&test=0&rewardedVideo"
+            ],
+            "loaded": [
+                "https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=loaded&test=0&rewardedVideo"
+            ],
+            "midpoint": [
+                "https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=midpoint&test=0&rewardedVideo"
+            ],
+            "show": [
+                "https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=skip&test=0&rewardedVideo"
+            ],
+            "skip": [
+                "https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=skip&test=0&rewardedVideo"
+            ],
+            "stalled": [
+                "https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=stalled&test=0&rewardedVideo"
+            ],
+            "start": [
+                "https://tracking.stg.mz.internal.unity3d.com/impression/%ZONE%?data=randomData&test=0&rewardedVideo",
+                "https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=start&test=0&rewardedVideo"
+            ],
+            "thirdQuartile": [
+                "https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=thirdQuartile&test=0&rewardedVideo"
+            ],
+            "videoEndCardClick": [
+                "https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=videoEndCardClick&test=0&rewardedVideo"
+            ]
+        },
+        "2": {
+            "click": [
+                "https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=click&test=0&video2"
+            ],
+            "complete": [
+                "https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=complete&test=0&video2"
+            ],
+            "error": [
+                "https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=error&test=0&video2"
+            ],
+            "firstQuartile": [
+                "https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=firstQuartile&test=0&video2"
+            ],
+            "loaded": [
+                "https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=loaded&test=0&video2"
+            ],
+            "midpoint": [
+                "https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=midpoint&test=0&video2"
+            ],
+            "show": [
+                "https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=skip&test=0&video2"
+            ],
+            "skip": [
+                "https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=skip&test=0&video2"
+            ],
+            "stalled": [
+                "https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=stalled&test=0&video2"
+            ],
+            "start": [
+                "https://tracking.stg.mz.internal.unity3d.com/impression/%ZONE%?data=randomData&test=0&video2",
+                "https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=start&test=0&video2"
+            ],
+            "thirdQuartile": [
+                "https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=thirdQuartile&test=0&video2"
+            ],
+            "videoEndCardClick": [
+                "https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=videoEndCardClick&test=0&video2"
             ]
         }
     }

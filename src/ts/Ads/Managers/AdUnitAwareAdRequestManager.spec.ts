@@ -16,6 +16,11 @@ describe(`AdUnitAwareAdRequestManager`, () => {
         adRequestManager = AdRequestManager();
         adUnitAwareAdRequestManager = new AdUnitAwareAdRequestManager(adRequestManager);
 
+        adRequestManager.loadCampaignWithAdditionalPlacement.mockResolvedValue({
+            campaign: Campaign('', 'original'),
+            trackingUrl: {}
+        });
+
         adRequestManager.loadCampaign.mockResolvedValue({
             campaign: Campaign('', 'original'),
             trackingUrl: {}
@@ -36,7 +41,6 @@ describe(`AdUnitAwareAdRequestManager`, () => {
             expect(adRequestManager.request).toBeCalledTimes(1);
         });
     });
-
 
     describe('load campaign with placement without ad unit', () => {
         beforeEach(async () => {
@@ -72,8 +76,8 @@ describe(`AdUnitAwareAdRequestManager`, () => {
         });
 
         it('should forward call to AdRequestManager', () => {
-            expect(adRequestManager.loadCampaign).toBeCalledTimes(1);
-            expect(adRequestManager.loadCampaign).toBeCalledWith(placement);
+            expect(adRequestManager.loadCampaignWithAdditionalPlacement).toBeCalledTimes(1);
+            expect(adRequestManager.loadCampaignWithAdditionalPlacement).toBeCalledWith(placement);
         });
     });
 
@@ -89,7 +93,7 @@ describe(`AdUnitAwareAdRequestManager`, () => {
 
             adRequestManager.onAdditionalPlacementsReady.subscribe.mock.calls[0][0]('test', {
                 video: notCachedCampaign
-            })
+            });
 
             loadedCampaign = await adUnitAwareAdRequestManager.loadCampaign(placement);
         });
@@ -124,7 +128,7 @@ describe(`AdUnitAwareAdRequestManager`, () => {
 
             adRequestManager.onAdditionalPlacementsReady.subscribe.mock.calls[0][0]('test', {
                 video_2: notCachedCampaign
-            })
+            });
 
             loadedCampaign = await adUnitAwareAdRequestManager.loadCampaign(placement);
         });
@@ -138,8 +142,8 @@ describe(`AdUnitAwareAdRequestManager`, () => {
         });
 
         it('should not forward call to AdRequestManager', () => {
-            expect(adRequestManager.loadCampaign).toBeCalledTimes(1);
-            expect(adRequestManager.loadCampaign).toBeCalledWith(placement);
+            expect(adRequestManager.loadCampaignWithAdditionalPlacement).toBeCalledTimes(1);
+            expect(adRequestManager.loadCampaignWithAdditionalPlacement).toBeCalledWith(placement);
         });
 
         it('should call cacheCampaign', () => {
@@ -153,7 +157,7 @@ describe(`AdUnitAwareAdRequestManager`, () => {
 
             adRequestManager.onAdditionalPlacementsReady.subscribe.mock.calls[0][0]('test', {
                 video: undefined
-            })
+            });
 
             loadedCampaign = await adUnitAwareAdRequestManager.loadCampaign(placement);
         });
@@ -163,7 +167,7 @@ describe(`AdUnitAwareAdRequestManager`, () => {
         });
 
         it('should not forward call to AdRequestManager', () => {
-            expect(adRequestManager.loadCampaign).toBeCalledTimes(0);
+            expect(adRequestManager.loadCampaignWithAdditionalPlacement).toBeCalledTimes(0);
         });
 
         it('should not call cacheCampaign', () => {
@@ -183,7 +187,7 @@ describe(`AdUnitAwareAdRequestManager`, () => {
 
             adRequestManager.onAdditionalPlacementsReady.subscribe.mock.calls[0][0]('test', {
                 video: notCachedCampaign
-            })
+            });
 
             adUnitAwareAdRequestManager.invalidate();
 
@@ -199,7 +203,7 @@ describe(`AdUnitAwareAdRequestManager`, () => {
         });
 
         it('should forward call to AdRequestManager', () => {
-            expect(adRequestManager.loadCampaign).toBeCalledTimes(1);
+            expect(adRequestManager.loadCampaignWithAdditionalPlacement).toBeCalledTimes(1);
         });
 
         it('should not call cacheCampaign', () => {

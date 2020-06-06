@@ -16,14 +16,16 @@ import { UserPrivacyManager } from 'Ads/Managers/__mocks__/UserPrivacyManager';
 import { AbstractPrivacy } from 'Ads/Views/__mocks__/AbstractPrivacy';
 import { PrivacySDK } from 'Privacy/__mocks__/PrivacySDK';
 import { Store } from 'Store/__mocks__/Store';
-import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
+import { IVideoAdUnitParameters } from 'Ads/AdUnits/VideoAdUnit';
 import { Core } from 'Core/__mocks__/Core';
 import { VastAdUnit } from 'VAST/AdUnits/__mocks__/VastAdUnit';
 import { TencentVastOverlayEventHandler } from 'VAST/EventHandlers/TencentVastOverlayEventHandler';
+import { Video } from 'Ads/Models/Assets/__mocks__/Video';
+import { AbstractVideoOverlay } from 'Ads/Views/__mocks__/AbstractVideoOverlay';
 
 describe('TencentVastOverlayEventHandler', () => {
     let vastTencentOverlayHandler: TencentVastOverlayEventHandler;
-    let baseParams: IAdUnitParameters<VastCampaignMock>;
+    let baseParams: IVideoAdUnitParameters<VastCampaignMock>;
     beforeEach(() => {
         baseParams = {
             forceOrientation: Orientation.LANDSCAPE,
@@ -46,7 +48,9 @@ describe('TencentVastOverlayEventHandler', () => {
             privacyManager: new UserPrivacyManager(),
             gameSessionId: 0,
             privacy: new AbstractPrivacy(),
-            privacySDK: new PrivacySDK()
+            privacySDK: new PrivacySDK(),
+            video: new Video(),
+            overlay: new AbstractVideoOverlay()
         };
     });
 

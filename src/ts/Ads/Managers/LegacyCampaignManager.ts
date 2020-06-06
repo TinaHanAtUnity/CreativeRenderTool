@@ -39,7 +39,7 @@ import { BlockingReason, CreativeBlocking } from 'Core/Utilities/CreativeBlockin
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 import { JsonParser } from 'Core/Utilities/JsonParser';
-import { createMeasurementsInstance, ITimeMeasurements } from 'Core/Utilities/TimeMeasurements';
+import { IStopwatch, createStopwatch } from 'Core/Utilities/Stopwatch';
 import { XHRequest } from 'Core/Utilities/XHRequest';
 import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCampaign';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
@@ -75,8 +75,9 @@ export class LegacyCampaignManager extends CampaignManager {
     private _userPrivacyManager: UserPrivacyManager;
     private _mediationLoadTracking: MediationLoadTrackingManager | undefined;
     private _useChinaAuctionEndpoint: boolean | undefined = false;
+    private _loadV5Support: boolean | undefined;
 
-    constructor(platform: Platform, core: ICore, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, assetManager: AssetManager, sessionManager: SessionManager, adMobSignalFactory: AdMobSignalFactory, request: RequestManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager, cacheBookkeeping: CacheBookkeepingManager, contentTypeHandlerManager: ContentTypeHandlerManager, privacySDK: PrivacySDK, userPrivacyManager: UserPrivacyManager, mediationLoadTracking?: MediationLoadTrackingManager | undefined) {
+    constructor(platform: Platform, core: ICore, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, assetManager: AssetManager, sessionManager: SessionManager, adMobSignalFactory: AdMobSignalFactory, request: RequestManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager, cacheBookkeeping: CacheBookkeepingManager, contentTypeHandlerManager: ContentTypeHandlerManager, privacySDK: PrivacySDK, userPrivacyManager: UserPrivacyManager, mediationLoadTracking?: MediationLoadTrackingManager | undefined, loadV5Support?: boolean | undefined) {
         super();
 
         this._platform = platform;
@@ -98,11 +99,12 @@ export class LegacyCampaignManager extends CampaignManager {
         this._userPrivacyManager = userPrivacyManager;
         this._mediationLoadTracking = mediationLoadTracking;
         this._useChinaAuctionEndpoint = (CustomFeatures.sampleAtGivenPercent(20) && coreConfig.getCountry() === 'CN');
+        this._loadV5Support = loadV5Support;
     }
 
     public request(nofillRetry?: boolean): Promise<INativeResponse | void> {
         const requestStartTime = this.getTime();
-        let measurement: ITimeMeasurements;
+        let measurement: IStopwatch;
         this._isLoadEnabled = false;
         // prevent having more then one ad request in flight
         if (this._requesting) {
@@ -140,19 +142,17 @@ export class LegacyCampaignManager extends CampaignManager {
             this._deviceFreeSpace = freeSpace;
             return Promise.all<string, unknown>([
                 CampaignManager.createRequestUrl(this.getBaseUrl(), this._platform, this._clientInfo, this._deviceInfo, this._coreConfig, this._lastAuctionId, nofillRetry),
-                CampaignManager.createRequestBody(this._clientInfo, this._coreConfig, this._deviceInfo, this._userPrivacyManager, this._sessionManager, this._privacy, countersForOperativeEvents, fullyCachedCampaignIds, versionCode, this._adMobSignalFactory, freeSpace, this._metaDataManager, this._adsConfig, this._isLoadEnabled, this.getPreviousPlacementId(), requestPrivacy, legacyRequestPrivacy, nofillRetry)
+                CampaignManager.createRequestBody(this._clientInfo, this._coreConfig, this._deviceInfo, this._userPrivacyManager, this._sessionManager, this._privacy, countersForOperativeEvents, fullyCachedCampaignIds, versionCode, this._adMobSignalFactory, freeSpace, this._metaDataManager, this._adsConfig, this._isLoadEnabled, this.getPreviousPlacementId(), requestPrivacy, legacyRequestPrivacy, nofillRetry, undefined, this._loadV5Support)
             ]);
         }).then(([requestUrl, requestBody]) => {
-            measurement = createMeasurementsInstance(GeneralTimingMetric.AuctionRequest, {
-                'wel': 'false',
-                'iar': `${GameSessionCounters.getCurrentCounters().adRequests === 1}`
-            });
             this._core.Sdk.logInfo('Requesting ad plan from ' + requestUrl);
 
             if (this._useChinaAuctionEndpoint) {
                 SDKMetrics.reportMetricEvent(ChinaAucionEndpoint.AuctionRequest);
             }
 
+            measurement = createStopwatch();
+            measurement.start();
             if (this._mediationLoadTracking && this._mediationLoadTracking.getCurrentExperiment() === MediationExperimentType.AuctionXHR) {
                 return XHRequest.post(requestUrl, JSON.stringify(requestBody)).then((resp: string) => {
                     return {
@@ -188,12 +188,16 @@ export class LegacyCampaignManager extends CampaignManager {
                 'wel': 'false',
                 'iar': `${GameSessionCounters.getCurrentCounters().adRequests === 1}`
             });
+            measurement.stopAndSend(GeneralTimingMetric.AuctionRequest, {
+                'wel': 'false',
+                'iar': `${GameSessionCounters.getCurrentCounters().adRequests === 1}`,
+                'stg': 'auction_response'
+            });
 
             if (this._useChinaAuctionEndpoint) {
                 SDKMetrics.reportMetricEvent(ChinaAucionEndpoint.AuctionResponse);
             }
 
-            measurement.measure('auction_response');
             const cachingTime = this.getTime();
             if (this._mediationLoadTracking && performance && performance.now) {
                 this._mediationLoadTracking.reportAuctionRequest(this.getTime() - requestStartTime, true);
@@ -273,7 +277,7 @@ export class LegacyCampaignManager extends CampaignManager {
             return Promise.all<string, unknown>([
                 // TODO: Utilize this.getBaseUrl() after V6 is supported for load
                 CampaignManager.createRequestUrl(this.constructBaseUrl(CampaignManager.AuctionV5BaseUrl), this._platform, this._clientInfo, this._deviceInfo, this._coreConfig, this._lastAuctionId, false),
-                CampaignManager.createRequestBody(this._clientInfo, this._coreConfig, this._deviceInfo, this._userPrivacyManager, this._sessionManager, this._privacy, countersForOperativeEvents, fullyCachedCampaignIds, versionCode, this._adMobSignalFactory, freeSpace, this._metaDataManager, this._adsConfig, this._isLoadEnabled, this.getPreviousPlacementId(), requestPrivacy, legacyRequestPrivacy, false, placement)
+                CampaignManager.createRequestBody(this._clientInfo, this._coreConfig, this._deviceInfo, this._userPrivacyManager, this._sessionManager, this._privacy, countersForOperativeEvents, fullyCachedCampaignIds, versionCode, this._adMobSignalFactory, freeSpace, this._metaDataManager, this._adsConfig, this._isLoadEnabled, this.getPreviousPlacementId(), requestPrivacy, legacyRequestPrivacy, false, placement, this._loadV5Support)
             ]);
         }).then(([requestUrl, requestBody]) => {
             this._core.Sdk.logInfo('Loading placement ' + placement.getId() + ' from ' + requestUrl);
@@ -502,7 +506,6 @@ export class LegacyCampaignManager extends CampaignManager {
     }
 
     private parseAuctionV5Campaigns(response: INativeResponse, gameSessionCounters: IGameSessionCounters, requestPrivacy?: IRequestPrivacy, legacyRequestPrivacy?: ILegacyRequestPrivacy): Promise<void[]> {
-        const measurement = createMeasurementsInstance(GeneralTimingMetric.AuctionRequest);
         let json;
         try {
             json = JsonParser.parse<IRawAuctionV5Response>(response.response);
@@ -617,7 +620,6 @@ export class LegacyCampaignManager extends CampaignManager {
         this._core.Sdk.logInfo('AdPlan received with ' + campaignCount + ' campaigns and refreshDelay ' + refreshDelay);
         this.onAdPlanReceived.trigger(refreshDelay, campaignCount, auctionStatusCode);
 
-        measurement.measure('parse_response');
         for (const mediaId in campaigns) {
             if (campaigns.hasOwnProperty(mediaId)) {
                 let auctionResponse: AuctionResponse;

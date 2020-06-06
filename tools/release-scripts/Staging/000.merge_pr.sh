@@ -5,13 +5,14 @@
 pr=$1
 
 echo -e "Fetching infromation for PR $pr..."
-info=$(hub pr show -f '%sH %pS %U %H' $pr)
+info=$(hub pr show -f '%sH %pS %U %H ^%t^' $pr)
 labels=$(hub pr show -f '%L' $pr)
 
 head=$(echo $info | awk '{print $1}')
 state=$(echo $info | awk '{print $2}')
 url=$(echo $info | awk '{print $3}')
 branch=$(echo $info | awk '{print $4}')
+title=$(echo $info | awk -F^ '{print $2}')
 
 if [ "$state" != "open" ]; then
     echo "PR should be opened before it can be merged, current PR state: $state"
@@ -79,4 +80,46 @@ sleep 5
 echo "Deleting remote branch..."
 git push origin --delete $branch
 
+echo "Sending slack notification..."
+if [ ! -f ".staginglock" ]; then
+    author=$(git config --get user.name)
+    authorPhrase="\"By: $author\""
+    slackjson=$(cat <<EOF
+{
+	"channel": "GDTR512F2",
+	"text": "WebView staging started, all staged PRs will appear in a thread.",
+	"attachments": [{
+		"color": "good",
+		"author_name": $authorPhrase
+	}]
+}
+EOF
+)
+    # ads-sdk-devs slack channel
+    curl -X POST \
+        -H 'Content-type: application/json' \
+        -H "Authorization: Bearer xoxp-6355312211-143460327904-1105938830800-c62d727b3197062e78ff08fec369fe8b" \
+        --data "$slackjson" \
+        -o .staginglock \
+        https://slack.com/api/chat.postMessage
+fi
+
+
+if [ -f ".staginglock" ]; then
+    ts=$(cat .staginglock | jq '.message.ts')
+    slackjson=$(cat <<EOF
+{
+    "channel": "GDTR512F2",
+    "text": "<${url}|#${pr}> (${title}) was merged to master and will be staged",
+    "thread_ts": $ts
+}
+EOF
+)
+    # ads-sdk-devs slack channel
+    curl -X POST \
+        -H 'Content-type: application/json' \
+        -H "Authorization: Bearer xoxp-6355312211-143460327904-1105938830800-c62d727b3197062e78ff08fec369fe8b" \
+        --data "$slackjson" \
+        https://slack.com/api/chat.postMessage
+fi
 echo "Done."

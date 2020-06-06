@@ -3,6 +3,7 @@ import { AdRequestManager, INotCachedLoadedCampaign } from 'Ads/Managers/AdReque
 import { IPlacementIdMap } from 'Ads/Managers/PlacementManager';
 import { INativeResponse } from 'Core/Managers/RequestManager';
 import { Placement } from 'Ads/Models/Placement';
+import { LoadV5 } from 'Ads/Utilities/SDKMetrics';
 
 export class AdUnitAwareAdRequestManager extends CampaignManager {
     private _adRequestManager: AdRequestManager;
@@ -30,18 +31,23 @@ export class AdUnitAwareAdRequestManager extends CampaignManager {
         }
 
         if (!(adUnitId in this._adUnitPlacements)) {
-             return this._adRequestManager.loadCampaign(placement);
+             return this._adRequestManager.loadCampaignWithAdditionalPlacement(placement);
         }
 
         const additionalPlacements = this._adUnitPlacements[adUnitId];
         if (!(placement.getId() in additionalPlacements)) {
-             return this._adRequestManager.loadCampaign(placement);
+             return this._adRequestManager.loadCampaignWithAdditionalPlacement(placement);
         }
+
+        this._adRequestManager.reportMetricEvent(LoadV5.LoadRequestStarted, { 'src': 'adunit' });
+        this._adRequestManager.reportMetricEvent(LoadV5.LoadRequestParsingResponse, { 'src': 'adunit' });
 
         const notCachedLoadedCampaign = additionalPlacements[placement.getId()];
         if (notCachedLoadedCampaign === undefined) {
             return Promise.resolve(undefined);
         }
+
+        this._adRequestManager.reportMetricEvent(LoadV5.LoadRequestFill, { 'src': 'adunit' });
 
         return this._adRequestManager.cacheCampaign(notCachedLoadedCampaign);
     }
