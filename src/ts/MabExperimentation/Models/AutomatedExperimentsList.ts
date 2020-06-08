@@ -6,7 +6,7 @@ export enum AutomatedExperimentsCategories {
     VIDEO_OVERLAY = 'webview-video-overlay'
 }
 
-export const ButtonExperimentDeclaration = {
+export const EndScreenExperimentDeclaration = {
   scheme: {
       DARK: 'dark',
       LIGHT: 'light',
@@ -28,19 +28,19 @@ export const ButtonExperimentDeclaration = {
   }
 };
 
-export const ButtonAnimationsExperiment = new AutomatedExperiment({
-    actions: ButtonExperimentDeclaration,
+export const EndScreenExperiment = new AutomatedExperiment({
+    actions: EndScreenExperimentDeclaration,
     defaultActions: {
-        scheme: ButtonExperimentDeclaration.scheme.LIGHT,
-        animation: ButtonExperimentDeclaration.animation.BOUNCING,
-        color: ButtonExperimentDeclaration.color.BLUE
+        scheme: EndScreenExperimentDeclaration.scheme.LIGHT,
+        animation: EndScreenExperimentDeclaration.animation.BOUNCING,
+        color: EndScreenExperimentDeclaration.color.BLUE
     },
     cacheDisabled: true
 });
 
 // AR Ads
 
-export const ArAvailableButtonExperimentDeclaration = {
+export const ArAvailableEndScreenExperimentDeclaration = {
     skip: {
         YES: 'true',
         NO: 'false'
@@ -54,10 +54,10 @@ export const ArAvailableButtonExperimentDeclaration = {
 };
 
 export const ArAvailableButtonExperiment = new AutomatedExperiment({
-    actions: ArAvailableButtonExperimentDeclaration,
+    actions: ArAvailableEndScreenExperimentDeclaration,
     defaultActions: {
-        color: ArAvailableButtonExperimentDeclaration.color.BLACK,
-        skip: ArAvailableButtonExperimentDeclaration.skip.NO
+        color: ArAvailableEndScreenExperimentDeclaration.color.BLACK,
+        skip: ArAvailableEndScreenExperimentDeclaration.skip.NO
     },
     cacheDisabled: true
 });

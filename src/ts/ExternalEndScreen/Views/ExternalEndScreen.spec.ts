@@ -13,7 +13,7 @@ import { AbstractPrivacy } from 'Ads/Views/__mocks__/AbstractPrivacy';
 import { Core } from 'Core/__mocks__/Core';
 import { IEndScreenHandler, IEndScreenParameters } from 'Ads/Views/EndScreen';
 import { ExternalEndScreen } from 'ExternalEndScreen/Views/ExternalEndScreen';
-import { ButtonExperimentDeclaration } from 'MabExperimentation/Models/AutomatedExperimentsList';
+import { EndScreenExperimentDeclaration } from 'MabExperimentation/Models/AutomatedExperimentsList';
 import { PerformanceCampaign } from 'Performance/Models/__mocks__/PerformanceCampaign';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
@@ -31,7 +31,7 @@ import { PerformanceCampaign } from 'Performance/Models/__mocks__/PerformanceCam
         const endScreenUrl = '/iframe-end-screen.html';
         const experimentDescription = {
             color: '',
-            animation: ButtonExperimentDeclaration.animation.BOUNCING
+            animation: EndScreenExperimentDeclaration.animation.BOUNCING
         };
 
         let externalEndScreen: ExternalEndScreen;
