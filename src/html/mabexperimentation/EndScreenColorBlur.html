@@ -44,10 +44,14 @@
                 </div>
             </div>
             <div class="install-container">
-                <span class="download-text"><%= data.t(data.ctaText) %></span>
-                <% if(data.ctaText === "Install Now") { %>
-                <span class="free-text"><%= data.t("Free") %></span>
-                <% } %>
+            <% if (data.isEnglish) { %>
+            <span class="download-text"><%= data.t(data.ctaText) %></span>
+            <% } else { %>
+            <span class="download-text"><%= data.t("Download For Free") %></span>
+            <% } %>
+            <% if(data.ctaText !== "Download For Free") { %>
+            <span class="free-text"><%= data.t("Free") %></span>
+            <% } %>
             </div>
             <div class="unityads-logo"></div>
         </div>

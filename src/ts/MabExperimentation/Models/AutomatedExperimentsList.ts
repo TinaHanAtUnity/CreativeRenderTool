@@ -7,29 +7,33 @@ export enum AutomatedExperimentsCategories {
 }
 
 export const ButtonExperimentDeclaration = {
-  scheme: {
-      DARK: 'dark',
-      LIGHT: 'light',
-      COLORMATCHING: 'color_matching',
-      COLORBLUR: 'color_blur'
-  },
-  animation: {
-      STATIC: 'static',
-      HEARTBEATING: 'heartbeating',
-      BOUNCING: 'bouncing',
-      SHINING: 'shining'
-  },
-  color: {
-      BLUE: '167dfb',
-      GREEN: '33cc00',
-      PINK: 'cc0099',
-      RED: 'c31e25',
-      UNDEFINED: undefined
-  },
-  ctaText: {
-      INSTALL_NOW: 'Install Now',
-      DOWNLOAD_FOR_FREE: 'Download For Free'
-  }
+    scheme: {
+        DARK: 'dark',
+        LIGHT: 'light',
+        COLORMATCHING: 'color_matching',
+        COLORBLUR: 'color_blur'
+    },
+    animation: {
+        STATIC: 'static',
+        HEARTBEATING: 'heartbeating',
+        BOUNCING: 'bouncing',
+        SHINING: 'shining'
+    },
+    color: {
+        BLUE: '167dfb',
+        GREEN: '33cc00',
+        PINK: 'cc0099',
+        RED: 'c31e25',
+        UNDEFINED: undefined
+    },
+    ctaText: {
+        DOWNLOAD_FOR_FREE: 'Download For Free',
+        INSTALL_NOW: 'Install Now',
+        GET: 'Get',
+        LETS_TRY_IT: `Let's try it!`,
+        OK: 'OK!',
+        DOWNLOAD: 'Download'
+    }
 };
 
 export const ButtonAnimationsExperiment = new AutomatedExperiment({

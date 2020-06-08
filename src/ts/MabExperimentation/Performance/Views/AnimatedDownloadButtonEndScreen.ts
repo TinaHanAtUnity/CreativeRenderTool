@@ -15,6 +15,8 @@ export class AnimatedDownloadButtonEndScreen extends PerformanceEndScreen {
     private _downloadButtonColor: string;
     private _darkMode: boolean;
     private _tintColor: boolean;
+    private _ctaText: string;
+    private _language: string;
 
     constructor(combination: IExperimentActionChoice | undefined, parameters: IEndScreenParameters, campaign: PerformanceCampaign, country?: string) {
         super(parameters, campaign, country);
@@ -36,11 +38,18 @@ export class AnimatedDownloadButtonEndScreen extends PerformanceEndScreen {
             default:
         }
 
+        if (combination.ctaText) {
+            this._ctaText = combination.ctaText;
+        }
+
         // combination.animation will be defined at this point
         this._animation = combination.animation!;
+        this._language = parameters.language;
         this._templateData = {
             ...this._templateData,
-            'hasShadow': this._animation === ButtonExperimentDeclaration.animation.BOUNCING
+            hasShadow: this._animation === ButtonExperimentDeclaration.animation.BOUNCING,
+            ctaText: this._ctaText,
+            isEnglish: this._language.indexOf('en') !== -1
         };
     }
 
@@ -70,7 +79,7 @@ export class AnimatedDownloadButtonEndScreen extends PerformanceEndScreen {
             this._container.classList.add(`${this._animation}-download-button-end-screen-square`);
         }
         if (this._downloadButtonColor) {
-            const ctaButton = <HTMLElement> this._container.querySelector('.download-container');
+            const ctaButton = <HTMLElement>this._container.querySelector('.download-container');
             if (ctaButton !== null) {
                 ctaButton.style.backgroundColor = this._downloadButtonColor;
             }
@@ -91,8 +100,7 @@ export class AnimatedDownloadButtonEndScreen extends PerformanceEndScreen {
     }
 
     private applyColorTheme(baseColorTheme: IColorTheme, secondaryColorTheme: IColorTheme): void {
-        if (!baseColorTheme.light || !baseColorTheme.medium || !baseColorTheme.dark ||
-            !secondaryColorTheme.light || !secondaryColorTheme.medium || !secondaryColorTheme.dark) {
+        if (!baseColorTheme.light || !baseColorTheme.medium || !baseColorTheme.dark || !secondaryColorTheme.light || !secondaryColorTheme.medium || !secondaryColorTheme.dark) {
             SDKMetrics.reportMetricEvent(AUIMetric.InvalidEndscreenColorTintTheme);
             return;
         }
@@ -144,7 +152,7 @@ export class AnimatedDownloadButtonEndScreen extends PerformanceEndScreen {
     }
 
     private handleResize() {
-        const element = <HTMLElement> document.getElementById('end-screen');
+        const element = <HTMLElement>document.getElementById('end-screen');
         if (element == null) {
             return;
         }

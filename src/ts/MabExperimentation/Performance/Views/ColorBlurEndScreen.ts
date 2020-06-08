@@ -10,6 +10,7 @@ import { ButtonAnimationsExperiment, ButtonExperimentDeclaration } from 'MabExpe
 
 export class ColorBlurEndScreen extends PerformanceEndScreen {
     private _ctaText: string;
+    private _language: string;
 
     constructor(combination: IExperimentActionChoice | undefined, parameters: IEndScreenParameters, campaign: PerformanceCampaign, country?: string) {
         super(parameters, campaign, country);
@@ -22,10 +23,12 @@ export class ColorBlurEndScreen extends PerformanceEndScreen {
             this._ctaText = combination.ctaText;
         }
 
+        this._language = parameters.language;
         this._templateData = {
             ...this._templateData,
             simpleRating: simpleRating,
-            ctaText: this._ctaText
+            ctaText: this._ctaText,
+            isEnglish: this._language.indexOf('en') !== -1
         };
         this._bindings.push({
             event: 'click',
