@@ -79,7 +79,7 @@ export class AnimatedDownloadButtonEndScreen extends PerformanceEndScreen {
             this._container.classList.add(`${this._animation}-download-button-end-screen-square`);
         }
         if (this._downloadButtonColor) {
-            const ctaButton = <HTMLElement>this._container.querySelector('.download-container');
+            const ctaButton = <HTMLElement> this._container.querySelector('.download-container');
             if (ctaButton !== null) {
                 ctaButton.style.backgroundColor = this._downloadButtonColor;
             }
