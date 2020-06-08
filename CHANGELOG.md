@@ -1,3 +1,21 @@
+# Fri Jun  5 18:52:31 UTC 2020
+
+* [Bug] Add extra tags in AdRequestManager.handleError [#15751](https://github.com/Applifier/unity-ads-webview/pull/15751)
+* [Bug] Add loadV5Support flag to load v4 [#15750](https://github.com/Applifier/unity-ads-webview/pull/15750)
+* [AUI] Tweak ColorBlur experiment by improving clickable area [#15754](https://github.com/Applifier/unity-ads-webview/pull/15754)
+
+# Thu Jun  4 19:21:49 UTC 2020
+
+* [Bug] Add missing parameter tag [#15747](https://github.com/Applifier/unity-ads-webview/pull/15747)
+* Add PopupController and event handlers for showing, rendering, and removing popups [#15428](https://github.com/Applifier/unity-ads-webview/pull/15428)
+* [Load V5] Report load request metrics from ad unit [#15716](https://github.com/Applifier/unity-ads-webview/pull/15716)
+* Revert "[Load V5] Add placement count bucket for reload request" [#15719](https://github.com/Applifier/unity-ads-webview/pull/15719)
+* [Load V5] Do not attempt to cache already cached campaign [#15715](https://github.com/Applifier/unity-ads-webview/pull/15715)
+* [Load V5] Refactor parse campaign algorithm [#15529](https://github.com/Applifier/unity-ads-webview/pull/15529)
+* [Open Measurement] Fix event data discrepancies and add extra property for MOAT [#15718](https://github.com/Applifier/unity-ads-webview/pull/15718)
+* [Open Measurement] Fix privacy pop-up not found when privacy is showing [#15714](https://github.com/Applifier/unity-ads-webview/pull/15714)
+* [Load V5] Expand experiment by adding more games [#15713](https://github.com/Applifier/unity-ads-webview/pull/15713)
+
 # Tue Jun  2 19:11:16 UTC 2020
 
 * [Bug] Send placement invalidation as load v5 metric [#15708](https://github.com/Applifier/unity-ads-webview/pull/15708)

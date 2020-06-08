@@ -30,10 +30,10 @@ export class ColorBlurEndScreen extends PerformanceEndScreen {
             ctaText: this._ctaText,
             isEnglish: this._language.indexOf('en') !== -1
         };
-        this._bindings.push({
+        this._bindings.splice(0, 1, {
             event: 'click',
             listener: (event: Event) => this.onDownloadEvent(event),
-            selector: '.end-screen-image, .install-container'
+            selector: '.end-screen-image, .install-container, .game-info-container'
         });
     }
 

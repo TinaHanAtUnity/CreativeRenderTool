@@ -10,6 +10,10 @@ export type VastAdUnitMock = Base & {
     hasImpressionOccurred: jest.Mock<boolean>;
     sendTrackingEvent: jest.Mock;
     getOpenMeasurementController: jest.Mock;
+    isShowing: jest.Mock;
+    canPlayVideo: jest.Mock;
+    canShowVideo: jest.Mock;
+    setVideoState: jest.Mock;
 };
 
 export const VastAdUnit = jest.fn(() => {
@@ -20,6 +24,10 @@ export const VastAdUnit = jest.fn(() => {
         hasImpressionOccurred: jest.fn().mockReturnValue(true),
         sendTrackingEvent: jest.fn(),
         getOverlay: jest.fn().mockReturnValue(new AbstractVideoOverlay()),
-        getOpenMeasurementController: jest.fn()
+        getOpenMeasurementController: jest.fn(),
+        isShowing: jest.fn().mockReturnValue(true),
+        canPlayVideo: jest.fn().mockReturnValue(true),
+        canShowVideo: jest.fn().mockReturnValue(true),
+        setVideoState: jest.fn()
     };
 });
