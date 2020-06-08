@@ -32,7 +32,8 @@ export const ButtonExperimentDeclaration = {
         GET: 'Get',
         LETS_TRY_IT: `Let's try it!`,
         OK: 'OK!',
-        DOWNLOAD: 'Download'
+        DOWNLOAD: 'Download',
+        GET_STARTED: 'Get Started!'
     }
 };
 
