@@ -9,7 +9,7 @@ import { IExperimentActionChoice } from 'MabExperimentation/Models/AutomatedExpe
 import { ButtonAnimationsExperiment, ButtonExperimentDeclaration } from 'MabExperimentation/Models/AutomatedExperimentsList';
 
 export class ColorBlurEndScreen extends PerformanceEndScreen {
-    private _ctaText: string;
+    private _ctaAlternativeText: string;
     private _language: string;
 
     constructor(combination: IExperimentActionChoice | undefined, parameters: IEndScreenParameters, campaign: PerformanceCampaign, country?: string) {
@@ -20,14 +20,14 @@ export class ColorBlurEndScreen extends PerformanceEndScreen {
         combination = this.fixupExperimentChoices(combination);
 
         if (combination.ctaText) {
-            this._ctaText = combination.ctaText;
+            this._ctaAlternativeText = combination.ctaText;
         }
 
         this._language = parameters.language;
         this._templateData = {
             ...this._templateData,
             simpleRating: simpleRating,
-            ctaText: this._ctaText,
+            ctaText: this._ctaAlternativeText,
             isEnglish: this._language.indexOf('en') !== -1
         };
         this._bindings.splice(0, 1, {
@@ -61,7 +61,7 @@ export class ColorBlurEndScreen extends PerformanceEndScreen {
                 SDKMetrics.reportMetricEvent(error.tag);
             });
 
-        if (this._ctaText === ButtonExperimentDeclaration.ctaText.DOWNLOAD_FOR_FREE) {
+        if (this._ctaAlternativeText === ButtonExperimentDeclaration.ctaText.DOWNLOAD_FOR_FREE) {
             const installContainer: HTMLElement | null = this._container.querySelector('.install-container');
             if (installContainer) {
                 installContainer.classList.add('cta-alt-text');

@@ -15,7 +15,7 @@ export class AnimatedDownloadButtonEndScreen extends PerformanceEndScreen {
     private _downloadButtonColor: string;
     private _darkMode: boolean;
     private _tintColor: boolean;
-    private _ctaText: string;
+    private _ctaAlternativeText: string;
     private _language: string;
 
     constructor(combination: IExperimentActionChoice | undefined, parameters: IEndScreenParameters, campaign: PerformanceCampaign, country?: string) {
@@ -39,7 +39,7 @@ export class AnimatedDownloadButtonEndScreen extends PerformanceEndScreen {
         }
 
         if (combination.ctaText) {
-            this._ctaText = combination.ctaText;
+            this._ctaAlternativeText = combination.ctaText;
         }
 
         // combination.animation will be defined at this point
@@ -48,7 +48,7 @@ export class AnimatedDownloadButtonEndScreen extends PerformanceEndScreen {
         this._templateData = {
             ...this._templateData,
             hasShadow: this._animation === ButtonExperimentDeclaration.animation.BOUNCING,
-            ctaText: this._ctaText,
+            ctaText: this._ctaAlternativeText,
             isEnglish: this._language.indexOf('en') !== -1
         };
     }
