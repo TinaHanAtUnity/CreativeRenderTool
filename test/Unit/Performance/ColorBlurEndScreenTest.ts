@@ -55,7 +55,7 @@ describe('ColorBlurEndScreenTest', () => {
         }
     });
 
-    const createColorBlurEndScreen = (ctaText: string, language: string): ColorBlurEndScreen => {
+    const createColorBlurEndScreen = (ctaText: string | undefined, language: string): ColorBlurEndScreen => {
         const privacyManager = sinon.createStubInstance(UserPrivacyManager);
         privacy = new Privacy(platform, campaign, privacyManager, false, false, 'en');
         const params: IEndScreenParameters = {
@@ -177,7 +177,7 @@ describe('ColorBlurEndScreenTest', () => {
     });
 
     describe('Alternate CTA text', () => {
-        const validateCtaText = (endScreen: ColorBlurEndScreen, ctaText: string) => {
+        const validateCtaText = (endScreen: ColorBlurEndScreen, ctaText: string | undefined) => {
             endScreen.render();
 
             const downloadElement = <HTMLElement>endScreen.container().querySelectorAll('.download-text')[0];
@@ -193,12 +193,10 @@ describe('ColorBlurEndScreenTest', () => {
             }
         };
 
-        it('should render Install Now', () => {
-            validateCtaText(createColorBlurEndScreen(ButtonExperimentDeclaration.ctaText.INSTALL_NOW, 'en'), 'Install Now');
-        });
-
-        it('should render Download For Free', () => {
-            validateCtaText(createColorBlurEndScreen(ButtonExperimentDeclaration.ctaText.DOWNLOAD_FOR_FREE, 'en'), 'Download For Free');
+        Object.values(ButtonExperimentDeclaration.ctaText).forEach((cta: string | undefined) => {
+            it(`should render ${cta}`, () => {
+                validateCtaText(createColorBlurEndScreen(cta, 'en'), cta);
+            });
         });
     });
 });

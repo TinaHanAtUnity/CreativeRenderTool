@@ -30,6 +30,7 @@ export const ButtonExperimentDeclaration = {
         DOWNLOAD: 'Download',
         DOWNLOAD_FOR_FREE: 'Download For Free',
         DOWNLOAD_NOW: 'Download Now!',
+        DOWNLOAD_NOW_FIRE: '🔥 Download Now 🔥',
         GET: 'Get',
         GET_STARTED: 'Get Started!',
         INSTALL_NOW: 'Install Now',
@@ -44,7 +45,7 @@ export const ButtonAnimationsExperiment = new AutomatedExperiment({
         scheme: ButtonExperimentDeclaration.scheme.LIGHT,
         animation: ButtonExperimentDeclaration.animation.BOUNCING,
         color: ButtonExperimentDeclaration.color.BLUE,
-        ctaText: ButtonExperimentDeclaration.ctaText.DOWNLOAD_NOW
+        ctaText: ButtonExperimentDeclaration.ctaText.DOWNLOAD_FOR_FREE
     },
     cacheDisabled: true
 });

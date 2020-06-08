@@ -64,7 +64,7 @@ describe('EndScreenTest', () => {
         return new PerformanceEndScreen(params, campaign);
     };
 
-    const createAnimatedDownloadButtonEndScreen = (language: string, scheme: string | undefined, buttonColor: string | undefined): AnimatedDownloadButtonEndScreen => {
+    const createAnimatedDownloadButtonEndScreen = (language: string, scheme: string | undefined, buttonColor: string | undefined, ctaText: string | undefined): AnimatedDownloadButtonEndScreen => {
         const privacyManager = sinon.createStubInstance(UserPrivacyManager);
         const campaign = TestFixtures.getCampaign();
         privacy = new Privacy(platform, campaign, privacyManager, false, false, 'en');
@@ -84,7 +84,7 @@ describe('EndScreenTest', () => {
             scheme: scheme,
             color: buttonColor,
             animation: ButtonExperimentDeclaration.animation.BOUNCING,
-            ctaText: ButtonExperimentDeclaration.ctaText.DOWNLOAD_FOR_FREE
+            ctaText: ctaText
         };
         return new AnimatedDownloadButtonEndScreen(experimentDescription, params, campaign);
     };
@@ -109,7 +109,7 @@ describe('EndScreenTest', () => {
         };
 
         validateTranslation(createEndScreen('fi'));
-        validateTranslation(createAnimatedDownloadButtonEndScreen('fi', ButtonExperimentDeclaration.scheme.LIGHT, ButtonExperimentDeclaration.color.RED));
+        validateTranslation(createAnimatedDownloadButtonEndScreen('fi', ButtonExperimentDeclaration.scheme.LIGHT, ButtonExperimentDeclaration.color.RED, ButtonExperimentDeclaration.ctaText.DOWNLOAD_FOR_FREE));
     });
 
     it('should render correct experiment attributes', () => {
@@ -146,13 +146,44 @@ describe('EndScreenTest', () => {
 
         Object.values(ButtonExperimentDeclaration.color).forEach((c: string | undefined) => {
             if (c === undefined) {
-                validateExperimentAttributes(createAnimatedDownloadButtonEndScreen('fi', ButtonExperimentDeclaration.scheme.LIGHT, c), ButtonExperimentDeclaration.color.BLUE);
+                validateExperimentAttributes(createAnimatedDownloadButtonEndScreen('fi', ButtonExperimentDeclaration.scheme.LIGHT, c, ButtonExperimentDeclaration.ctaText.DOWNLOAD_FOR_FREE), ButtonExperimentDeclaration.color.BLUE);
             } else {
-                validateExperimentAttributes(createAnimatedDownloadButtonEndScreen('fi', ButtonExperimentDeclaration.scheme.LIGHT, c), c);
+                validateExperimentAttributes(createAnimatedDownloadButtonEndScreen('fi', ButtonExperimentDeclaration.scheme.LIGHT, c, ButtonExperimentDeclaration.ctaText.DOWNLOAD_FOR_FREE), c);
             }
         });
 
         //Dark mode should ignore the color of the button, and set it to '#2ba3ff'
-        validateExperimentAttributes(createAnimatedDownloadButtonEndScreen('fi', ButtonExperimentDeclaration.scheme.DARK, ButtonExperimentDeclaration.color.RED), '2ba3ff');
+        validateExperimentAttributes(createAnimatedDownloadButtonEndScreen('fi', ButtonExperimentDeclaration.scheme.DARK, ButtonExperimentDeclaration.color.RED, ButtonExperimentDeclaration.ctaText.DOWNLOAD_FOR_FREE), '2ba3ff');
+    });
+
+    describe('CTA text variants', () => {
+        const validateCtaText = (endScreen: PerformanceEndScreen, ctaText: string | undefined) => {
+            endScreen.render();
+
+            const downloadElement = <HTMLElement>endScreen.container().querySelectorAll('.download-text')[0];
+            const downloadElementText = downloadElement.innerHTML;
+
+            assert.isNotNull(downloadElementText);
+            assert.equal(downloadElementText, ctaText);
+
+            const container = privacy.container();
+            if (container && container.parentElement) {
+                container.parentElement.removeChild(container);
+            }
+        };
+
+        describe('For English language', () => {
+            Object.values(ButtonExperimentDeclaration.ctaText).forEach((cta: string | undefined) => {
+                it(`should render ${cta}`, () => {
+                    validateCtaText(createAnimatedDownloadButtonEndScreen('en', ButtonExperimentDeclaration.scheme.LIGHT, ButtonExperimentDeclaration.color.BLUE, cta), cta);
+                });
+            });
+        });
+
+        describe('For other languages', () => {
+            it('should ignore the ctaText provided, default to Download For Free and localize it', () => {
+                validateCtaText(createAnimatedDownloadButtonEndScreen('fi', ButtonExperimentDeclaration.scheme.LIGHT, ButtonExperimentDeclaration.color.BLUE, ButtonExperimentDeclaration.ctaText.DOWNLOAD_NOW_FIRE), 'Lataa ilmaiseksi');
+            });
+        });
     });
 });
