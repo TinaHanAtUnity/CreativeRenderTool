@@ -1,4 +1,4 @@
-# Pending
+# Mon Jun  8 19:57:01 UTC 2020
 
 * Add more game IDs to skip orientation check [#15812](https://github.com/Applifier/unity-ads-webview/pull/15812)
 * Fix iOS crash when orientation doees not match supported. [#15755](https://github.com/Applifier/unity-ads-webview/pull/15755)
