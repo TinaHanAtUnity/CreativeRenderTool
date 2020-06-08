@@ -27,14 +27,14 @@ export const ButtonExperimentDeclaration = {
         UNDEFINED: undefined
     },
     ctaText: {
-        DOWNLOAD_FOR_FREE: 'Download For Free',
-        INSTALL_NOW: 'Install Now',
-        GET: 'Get',
-        LETS_TRY_IT: `Let's try it!`,
-        OK: 'OK!',
         DOWNLOAD: 'Download',
+        DOWNLOAD_FOR_FREE: 'Download For Free',
+        DOWNLOAD_NOW: 'Download Now!',
+        GET: 'Get',
         GET_STARTED: 'Get Started!',
-        DOWNLOAD_NOW: '🔥 Download Now 🔥'
+        INSTALL_NOW: 'Install Now',
+        LETS_TRY_IT: `Let's try it!`,
+        OK: 'OK!'
     }
 };
 
