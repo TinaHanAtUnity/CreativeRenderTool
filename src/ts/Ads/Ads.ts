@@ -83,7 +83,7 @@ import { Analytics } from 'Analytics/Analytics';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { PrivacyParser } from 'Privacy/Parsers/PrivacyParser';
 import { Promises } from 'Core/Utilities/Promises';
-import { MediationCacheModeAllowedTest, AuctionXHR, LoadV5, BaseLineLoadV5, LoadV5AdUnit, LoadV5NoInvalidation } from 'Core/Models/ABGroup';
+import { MediationCacheModeAllowedTest, AuctionXHR, LoadV5, LoadV5AdUnit, LoadV5NoInvalidation } from 'Core/Models/ABGroup';
 import { PerPlacementLoadManagerV4 } from 'Ads/Managers/PerPlacementLoadManagerV4';
 import { PrivacyMetrics } from 'Privacy/PrivacyMetrics';
 import { PrivacySDKUnit } from 'Ads/AdUnits/PrivacySDKUnit';
@@ -631,8 +631,6 @@ export class Ads implements IAds {
                 // AdRequestManager is valid only if Load V5 is enabled
                 if (this.AdRequestManager) {
                     this.AdRequestManager.reportMetricEvent(LoadV5Metrics.Show);
-                } else if (this._loadApiEnabled && BaseLineLoadV5.isValid(this._core.Config.getAbGroup()) && CustomFeatures.isLoadV5Game(this._core.ClientInfo.getGameId())) {
-                    SDKMetrics.reportMetricEvent(LoadV5Metrics.Show);
                 }
 
                 if (this.MediationLoadTrackingManager) {
