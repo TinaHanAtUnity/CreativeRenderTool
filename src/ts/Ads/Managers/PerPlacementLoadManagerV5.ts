@@ -152,7 +152,7 @@ export class PerPlacementLoadManagerV5 extends PerPlacementLoadManager {
         }
     }
 
-    private onNoFill(placementId: string): void {
+    protected onNoFill(placementId: string): void {
         const placement = this._adsConfig.getPlacement(placementId);
 
         if (placement) {
