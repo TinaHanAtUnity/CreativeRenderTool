@@ -2,7 +2,7 @@ import { IEndScreenParameters } from 'Ads/Views/EndScreen';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { PerformanceEndScreen, SQUARE_END_SCREEN } from 'Performance/Views/PerformanceEndScreen';
 import ExperimentEndScreenTemplate from 'html/mabexperimentation/ExperimentEndScreenTemplate.html';
-import ExperimentSquareEndScreenTemplateTemplate from 'html/mabexperimentation/ExperimentSquareEndScreenTemplate.html';
+import ExperimentSquareEndScreenTemplate from 'html/mabexperimentation/ExperimentSquareEndScreenTemplate.html';
 import { IExperimentActionChoice } from 'MabExperimentation/Models/AutomatedExperiment';
 import { EndScreenExperimentDeclaration, EndScreenExperiment } from 'MabExperimentation/Models/AutomatedExperimentsList';
 import { AUIMetric, SDKMetrics } from 'Ads/Utilities/SDKMetrics';
@@ -138,7 +138,7 @@ export class ExperimentEndScreen extends PerformanceEndScreen {
 
     protected getTemplate() {
         if (this.getEndscreenAlt() === SQUARE_END_SCREEN) {
-            return ExperimentSquareEndScreenTemplateTemplate;
+            return ExperimentSquareEndScreenTemplate;
         }
         return ExperimentEndScreenTemplate;
     }
