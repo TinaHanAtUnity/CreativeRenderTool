@@ -193,10 +193,12 @@ describe('ColorBlurEndScreenTest', () => {
             }
         };
 
-        Object.values(ButtonExperimentDeclaration.ctaText).forEach((cta: string | undefined) => {
-            it(`should render ${cta}`, () => {
-                validateCtaText(createColorBlurEndScreen(cta, 'en'), cta);
-            });
+        it(`should render Install Now`, () => {
+            validateCtaText(createColorBlurEndScreen(ButtonExperimentDeclaration.ctaText.INSTALL_NOW, 'en'), ButtonExperimentDeclaration.ctaText.INSTALL_NOW);
+        });
+
+        it(`should render Download For Free`, () => {
+            validateCtaText(createColorBlurEndScreen(ButtonExperimentDeclaration.ctaText.DOWNLOAD_FOR_FREE, 'en'), ButtonExperimentDeclaration.ctaText.DOWNLOAD_FOR_FREE);
         });
     });
 });
