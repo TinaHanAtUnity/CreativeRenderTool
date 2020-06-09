@@ -34,7 +34,6 @@ import { SensorInfoApi } from 'Core/Native/SensorInfo';
 import { StorageApi } from 'Core/Native/Storage';
 import { StorageBridge } from 'Core/Utilities/StorageBridge';
 import { NativeErrorApi } from 'Core/Api/NativeErrorApi';
-import { DeviceIdManager } from 'Core/Managers/DeviceIdManager';
 import { ClassDetectionApi } from 'Core/Native/ClassDetection';
 import { SdkDetectionInfo } from 'Core/Models/SdkDetectionInfo';
 
@@ -78,7 +77,6 @@ export interface ICore extends IApiModule {
     RequestManager: RequestManager;
     CacheManager: CacheManager;
     JaegerManager: JaegerManager;
-    DeviceIdManager: DeviceIdManager;
     ClientInfo: ClientInfo;
     DeviceInfo: DeviceInfo;
     Config: CoreConfiguration;

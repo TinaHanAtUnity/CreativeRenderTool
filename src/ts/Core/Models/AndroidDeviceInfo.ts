@@ -96,10 +96,10 @@ export class AndroidDeviceInfo extends DeviceInfo<IAndroidDeviceInfo> {
             promises.push(this._core.DeviceInfo.Android!.getScreenDensity().then(screenDensity => this.set('screenDensity', screenDensity)).catch(err => this.handleDeviceInfoError(err)));
             promises.push(this._core.DeviceInfo.Android!.getDisplayMetricDensity().then(displayMetricDensity => this.set('displayMetricDensity', displayMetricDensity)).catch(err => this.handleDeviceInfoError(err)));
             promises.push(this._core.DeviceInfo.Android!.getScreenLayout().then(screenLayout => this.set('screenLayout', screenLayout)).catch(err => this.handleDeviceInfoError(err)));
-            promises.push(this._core.DeviceInfo.Android!.isAppInstalled(AndroidDeviceInfo.GooglePlayPackageName).then(isGoogleInstalled => this.set('isGoogleStoreInstalled', isGoogleInstalled)).catch(err => this.handleDeviceInfoError(err)));
-            promises.push(this._core.DeviceInfo.Android!.isAppInstalled(AndroidDeviceInfo.XiaomiPackageName).then(isXiaomiInstalled => this.set('isXiaomiStoreInstalled', isXiaomiInstalled)).catch(err => this.handleDeviceInfoError(err)));
-            promises.push(this._core.DeviceInfo.Android!.isAppInstalled(AndroidDeviceInfo.GoogleMapsPackageName).then(isGoogleMapsInstalled => this.set('isGoogleMapsInstalled', isGoogleMapsInstalled)).catch(err => this.handleDeviceInfoError(err)));
-            promises.push(this._core.DeviceInfo.Android!.isAppInstalled(AndroidDeviceInfo.TelephonyPackageName).then(isTelephonyInstalled => this.set('isTelephonyInstalled', isTelephonyInstalled)).catch(err => this.handleDeviceInfoError(err)));
+            this.set('isGoogleStoreInstalled', false);
+            this.set('isXiaomiStoreInstalled', false);
+            this.set('isGoogleMapsInstalled', false);
+            this.set('isTelephonyInstalled', false);
             promises.push(this._core.DeviceInfo.Android!.getDeviceMaxVolume(StreamType.STREAM_MUSIC).then(maxVolume => this.set('maxVolume', maxVolume)).catch(err => this.handleDeviceInfoError(err)));
             // only add this to 2.2.1 and above
             promises.push(this._core.DeviceInfo.Android!.getApkDigest().then(apkDigest => this.set('apkDigest', apkDigest)).catch(err => this.handleDeviceInfoError(err)));
@@ -116,11 +116,6 @@ export class AndroidDeviceInfo extends DeviceInfo<IAndroidDeviceInfo> {
 
             return Promise.all(promises);
         });
-    }
-
-    public setDeviceIds(deviceId1: string, deviceId2: string) {
-        this.set('deviceId1', deviceId1);
-        this.set('deviceId2', deviceId2);
     }
 
     public getStores(): string {
@@ -154,14 +149,6 @@ export class AndroidDeviceInfo extends DeviceInfo<IAndroidDeviceInfo> {
 
     public getAndroidId(): string {
         return this.get('androidId');
-    }
-
-    public getDeviceId1(): string {
-        return this.get('deviceId1');
-    }
-
-    public getDeviceId2(): string {
-        return this.get('deviceId2');
     }
 
     public getApiLevel(): number {
@@ -304,11 +291,6 @@ export class AndroidDeviceInfo extends DeviceInfo<IAndroidDeviceInfo> {
                 dto.androidId = this.getAndroidId();
             }
 
-            if (this.getDeviceId1() && this.getDeviceId2()) {
-                dto.deviceId1 = this.getDeviceId1();
-                dto.deviceId2 = this.getDeviceId2();
-            }
-
             return Promise.all([
                 this.getFreeSpaceExternal().catch(err => this.handleDeviceInfoError(err)),
                 this.getRingerMode().catch(err => this.handleDeviceInfoError(err)),
@@ -370,11 +352,6 @@ export class AndroidDeviceInfo extends DeviceInfo<IAndroidDeviceInfo> {
 
         if (!this.getAdvertisingIdentifier()) {
             dto.androidId = this.getAndroidId();
-        }
-
-        if (this.getDeviceId1() && this.getDeviceId2()) {
-            dto.deviceId1 = this.getDeviceId1();
-            dto.deviceId2 = this.getDeviceId2();
         }
 
         return dto;

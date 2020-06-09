@@ -61,14 +61,6 @@ export class AndroidDeviceInfoApi extends NativeApi {
         return this._nativeBridge.invoke<number>(this._fullApiClassName, 'getScreenDensity');
     }
 
-    public isAppInstalled(packageName: string): Promise<boolean> {
-        return this._nativeBridge.invoke<boolean>(this._fullApiClassName, 'isAppInstalled', [packageName]);
-    }
-
-    public getInstalledPackages(md5: boolean): Promise<string[]> {
-        return this._nativeBridge.invoke<string[]>(this._fullApiClassName, 'getInstalledPackages', [md5]);
-    }
-
     public getPackageInfo(packageName: string): Promise<IPackageInfo> {
         return this._nativeBridge.invoke<IPackageInfo>(this._fullApiClassName, 'getPackageInfo', [packageName]);
     }
@@ -179,14 +171,6 @@ export class AndroidDeviceInfoApi extends NativeApi {
 
     public getNetworkMetered(): Promise<boolean> {
         return this._nativeBridge.invoke<boolean>(this._fullApiClassName, 'getNetworkMetered');
-    }
-
-    public getDeviceId(): Promise<string> {
-        return this._nativeBridge.invoke<string>(this._fullApiClassName, 'getDeviceId');
-    }
-
-    public getDeviceIdWithSlot(slotIndex: number): Promise<string> {
-        return this._nativeBridge.invoke<string>(this._fullApiClassName, 'getDeviceIdWithSlot', [slotIndex]);
     }
 
     public handleEvent(event: string, parameters: unknown[]): void {

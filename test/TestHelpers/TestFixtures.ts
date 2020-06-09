@@ -1184,8 +1184,6 @@ export class TestFixtures {
     public static getFakeNativeAndroidDeviceInfo(): any {
         return {
             getAndroidId: sinon.stub().returns(Promise.resolve('17')),
-            getDeviceId: sinon.stub().returns(Promise.resolve('17')),
-            getDeviceIdWithSlot: sinon.stub().returns(Promise.resolve('17')),
             getApiLevel: sinon.stub().returns(Promise.resolve(16)),
             getManufacturer: sinon.stub().returns(Promise.resolve('N')),
             getDisplayMetricDensity: sinon.stub().returns(Promise.resolve(1)),

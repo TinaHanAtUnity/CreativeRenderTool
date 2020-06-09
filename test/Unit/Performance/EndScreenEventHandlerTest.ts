@@ -38,7 +38,6 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { IStoreHandler, IStoreHandlerParameters } from 'Ads/EventHandlers/StoreHandlers/StoreHandler';
 import { StoreHandlerFactory } from 'Ads/EventHandlers/StoreHandlers/StoreHandlerFactory';
 import { Campaign } from 'Ads/Models/Campaign';
-import { DeviceIdManager } from 'Core/Managers/DeviceIdManager';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { IStoreApi } from 'Store/IStore';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
