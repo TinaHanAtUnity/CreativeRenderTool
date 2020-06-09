@@ -1,5 +1,6 @@
 # Pending
 
+* [Load V5] Skip invalidation for no fill in RELOAD request [#15709](https://github.com/Applifier/unity-ads-webview/pull/15709)
 * Merge 3.4.6 to Master [#15784](https://github.com/Applifier/unity-ads-webview/pull/15784)
 
 # Mon Jun  8 19:57:01 UTC 2020
