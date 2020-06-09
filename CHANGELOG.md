@@ -1,3 +1,7 @@
+# Pending
+
+* Merge 3.4.6 to Master [#15784](https://github.com/Applifier/unity-ads-webview/pull/15784)
+
 # Mon Jun  8 19:57:01 UTC 2020
 
 * Add more game IDs to skip orientation check [#15812](https://github.com/Applifier/unity-ads-webview/pull/15812)
