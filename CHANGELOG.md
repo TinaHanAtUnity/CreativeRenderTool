@@ -1,3 +1,12 @@
+# Pending
+
+* Merge 3.4.6 to Master [#15784](https://github.com/Applifier/unity-ads-webview/pull/15784)
+
+# Mon Jun  8 19:57:01 UTC 2020
+
+* Add more game IDs to skip orientation check [#15812](https://github.com/Applifier/unity-ads-webview/pull/15812)
+* Fix iOS crash when orientation doees not match supported. [#15755](https://github.com/Applifier/unity-ads-webview/pull/15755)
+
 # Fri Jun  5 18:52:31 UTC 2020
 
 * [Bug] Add extra tags in AdRequestManager.handleError [#15751](https://github.com/Applifier/unity-ads-webview/pull/15751)

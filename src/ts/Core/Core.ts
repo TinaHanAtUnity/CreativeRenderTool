@@ -46,7 +46,6 @@ import { StorageBridge } from 'Core/Utilities/StorageBridge';
 import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
 import CreativeUrlConfiguration from 'json/CreativeUrlConfiguration.json';
 import { NativeErrorApi } from 'Core/Api/NativeErrorApi';
-import { DeviceIdManager } from 'Core/Managers/DeviceIdManager';
 import { SDKMetrics, InitializationMetric } from 'Ads/Utilities/SDKMetrics';
 import { SdkDetectionInfo } from 'Core/Models/SdkDetectionInfo';
 import { ClassDetectionApi } from 'Core/Native/ClassDetection';
@@ -73,7 +72,6 @@ export class Core implements ICore {
     public RequestManager: RequestManager;
     public CacheManager: CacheManager;
     public JaegerManager: JaegerManager;
-    public DeviceIdManager: DeviceIdManager;
     public ClientInfo: ClientInfo;
     public DeviceInfo: DeviceInfo;
     public SdkDetectionInfo: SdkDetectionInfo;
@@ -141,7 +139,6 @@ export class Core implements ICore {
             if (this.NativeBridge.getPlatform() === Platform.ANDROID) {
                 this.DeviceInfo = new AndroidDeviceInfo(this.Api);
                 this.RequestManager = new RequestManager(this.NativeBridge.getPlatform(), this.Api, this.WakeUpManager, <AndroidDeviceInfo> this.DeviceInfo);
-                this.DeviceIdManager = new DeviceIdManager(this.Api, <AndroidDeviceInfo> this.DeviceInfo);
             } else if (this.NativeBridge.getPlatform() === Platform.IOS) {
                 this.DeviceInfo = new IosDeviceInfo(this.Api);
                 this.RequestManager = new RequestManager(this.NativeBridge.getPlatform(), this.Api, this.WakeUpManager);
