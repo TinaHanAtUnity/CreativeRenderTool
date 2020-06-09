@@ -41,12 +41,6 @@ export interface IAndroidDeviceInfo extends IDeviceInfo {
 }
 
 export class AndroidDeviceInfo extends DeviceInfo<IAndroidDeviceInfo> {
-
-    public static GooglePlayPackageName = 'com.android.vending';
-    public static XiaomiPackageName = 'com.xiaomi.gamecenter';
-    public static GoogleMapsPackageName = 'com.google.android.gms.maps';
-    public static TelephonyPackageName = 'com.android.telephony';
-
     constructor(core: ICoreApi) {
         super('AndroidDeviceInfo', {
             ... DeviceInfo.Schema,
@@ -96,7 +90,8 @@ export class AndroidDeviceInfo extends DeviceInfo<IAndroidDeviceInfo> {
             promises.push(this._core.DeviceInfo.Android!.getScreenDensity().then(screenDensity => this.set('screenDensity', screenDensity)).catch(err => this.handleDeviceInfoError(err)));
             promises.push(this._core.DeviceInfo.Android!.getDisplayMetricDensity().then(displayMetricDensity => this.set('displayMetricDensity', displayMetricDensity)).catch(err => this.handleDeviceInfoError(err)));
             promises.push(this._core.DeviceInfo.Android!.getScreenLayout().then(screenLayout => this.set('screenLayout', screenLayout)).catch(err => this.handleDeviceInfoError(err)));
-            this.set('isGoogleStoreInstalled', false);
+            // Workaround for 3.4.6+ - Detection based on if Google Advertising gather by super.fetch() call exists
+            this.set('isGoogleStoreInstalled', !!this.get('advertisingIdentifier'));
             this.set('isXiaomiStoreInstalled', false);
             this.set('isGoogleMapsInstalled', false);
             this.set('isTelephonyInstalled', false);
