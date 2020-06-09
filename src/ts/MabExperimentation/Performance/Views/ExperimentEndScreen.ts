@@ -1,16 +1,16 @@
 import { IEndScreenParameters } from 'Ads/Views/EndScreen';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { PerformanceEndScreen, SQUARE_END_SCREEN } from 'Performance/Views/PerformanceEndScreen';
-import EndScreenAnimatedDownloadButton from 'html/mabexperimentation/EndScreenAnimatedDownloadButton.html';
-import SquareEndScreenAnimatedDownloadButtonTemplate from 'html/mabexperimentation/SquareEndScreenAnimatedDownloadButton.html';
+import ExperimentEndScreenTemplate from 'html/mabexperimentation/ExperimentEndScreenTemplate.html';
+import ExperimentSquareEndScreenTemplate from 'html/mabexperimentation/ExperimentSquareEndScreenTemplate.html';
 import { IExperimentActionChoice } from 'MabExperimentation/Models/AutomatedExperiment';
-import { ButtonExperimentDeclaration, ButtonAnimationsExperiment } from 'MabExperimentation/Models/AutomatedExperimentsList';
+import { EndScreenExperimentDeclaration, EndScreenExperiment } from 'MabExperimentation/Models/AutomatedExperimentsList';
 import { AUIMetric, SDKMetrics } from 'Ads/Utilities/SDKMetrics';
 import { Color } from 'Core/Utilities/Color';
 import { IColorTheme } from 'Performance/Utilities/Swatch';
 import { ColorTheme } from 'Core/Utilities/ColorTheme';
 
-export class AnimatedDownloadButtonEndScreen extends PerformanceEndScreen {
+export class ExperimentEndScreen extends PerformanceEndScreen {
     private _animation: string;
     private _downloadButtonColor: string;
     private _darkMode: boolean;
@@ -22,15 +22,15 @@ export class AnimatedDownloadButtonEndScreen extends PerformanceEndScreen {
         combination = this.fixupExperimentChoices(combination);
 
         switch (combination.scheme) {
-            case ButtonExperimentDeclaration.scheme.LIGHT:
+            case EndScreenExperimentDeclaration.scheme.LIGHT:
                 this._downloadButtonColor = Color.hexToCssRgba(combination.color);
                 break;
-            case ButtonExperimentDeclaration.scheme.DARK:
+            case EndScreenExperimentDeclaration.scheme.DARK:
                 // This is "pastel blue", to be cohesive with dark mode
                 this._downloadButtonColor = Color.hexToCssRgba('#2ba3ff');
                 this._darkMode = true;
                 break;
-            case ButtonExperimentDeclaration.scheme.COLORMATCHING:
+            case EndScreenExperimentDeclaration.scheme.COLORMATCHING:
                 this._tintColor = true;
                 break;
             default:
@@ -40,24 +40,24 @@ export class AnimatedDownloadButtonEndScreen extends PerformanceEndScreen {
         this._animation = combination.animation!;
         this._templateData = {
             ...this._templateData,
-            'hasShadow': this._animation === ButtonExperimentDeclaration.animation.BOUNCING
+            'hasShadow': this._animation === EndScreenExperimentDeclaration.animation.BOUNCING
         };
     }
 
     private fixupExperimentChoices(actions: IExperimentActionChoice | undefined): IExperimentActionChoice {
         if (actions === undefined) {
-            return ButtonAnimationsExperiment.getDefaultActions();
+            return EndScreenExperiment.getDefaultActions();
         }
 
         // light scheme must include a color
-        if (actions.scheme === ButtonExperimentDeclaration.scheme.LIGHT && actions.color === undefined) {
+        if (actions.scheme === EndScreenExperimentDeclaration.scheme.LIGHT && actions.color === undefined) {
             SDKMetrics.reportMetricEvent(AUIMetric.InvalidEndscreenAnimation);
-            return ButtonAnimationsExperiment.getDefaultActions();
+            return EndScreenExperiment.getDefaultActions();
         }
 
-        if (!ButtonAnimationsExperiment.isValid(actions)) {
+        if (!EndScreenExperiment.isValid(actions)) {
             SDKMetrics.reportMetricEvent(AUIMetric.InvalidEndscreenAnimation);
-            return ButtonAnimationsExperiment.getDefaultActions();
+            return EndScreenExperiment.getDefaultActions();
         }
 
         return actions;
@@ -138,9 +138,9 @@ export class AnimatedDownloadButtonEndScreen extends PerformanceEndScreen {
 
     protected getTemplate() {
         if (this.getEndscreenAlt() === SQUARE_END_SCREEN) {
-            return SquareEndScreenAnimatedDownloadButtonTemplate;
+            return ExperimentSquareEndScreenTemplate;
         }
-        return EndScreenAnimatedDownloadButton;
+        return ExperimentEndScreenTemplate;
     }
 
     private handleResize() {

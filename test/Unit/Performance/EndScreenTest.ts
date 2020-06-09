@@ -15,8 +15,8 @@ import 'mocha';
 import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { AnimatedDownloadButtonEndScreen } from 'MabExperimentation/Performance/Views/AnimatedDownloadButtonEndScreen';
-import { ButtonExperimentDeclaration } from 'MabExperimentation/Models/AutomatedExperimentsList';
+import { ExperimentEndScreen } from 'MabExperimentation/Performance/Views/ExperimentEndScreen';
+import { EndScreenExperimentDeclaration } from 'MabExperimentation/Models/AutomatedExperimentsList';
 import { SDKMetrics } from 'Ads/Utilities/SDKMetrics';
 
 describe('EndScreenTest', () => {
@@ -64,7 +64,7 @@ describe('EndScreenTest', () => {
         return new PerformanceEndScreen(params, campaign);
     };
 
-    const createAnimatedDownloadButtonEndScreen = (language: string, scheme: string | undefined, buttonColor: string | undefined): AnimatedDownloadButtonEndScreen => {
+    const createExperimentEndScreen = (language: string, scheme: string | undefined, buttonColor: string | undefined): ExperimentEndScreen => {
         const privacyManager = sinon.createStubInstance(UserPrivacyManager);
         const campaign = TestFixtures.getCampaign();
         privacy = new Privacy(platform, campaign, privacyManager, false, false, 'en');
@@ -83,9 +83,9 @@ describe('EndScreenTest', () => {
         const experimentDescription = {
             scheme: scheme,
             color: buttonColor,
-            animation: ButtonExperimentDeclaration.animation.BOUNCING
+            animation: EndScreenExperimentDeclaration.animation.BOUNCING
         };
-        return new AnimatedDownloadButtonEndScreen(experimentDescription, params, campaign);
+        return new ExperimentEndScreen(experimentDescription, params, campaign);
     };
 
     xit('should render', () => {
@@ -108,7 +108,7 @@ describe('EndScreenTest', () => {
         };
 
         validateTranslation(createEndScreen('fi'));
-        validateTranslation(createAnimatedDownloadButtonEndScreen('fi', ButtonExperimentDeclaration.scheme.LIGHT, ButtonExperimentDeclaration.color.RED));
+        validateTranslation(createExperimentEndScreen('fi', EndScreenExperimentDeclaration.scheme.LIGHT, EndScreenExperimentDeclaration.color.RED));
     });
 
     it('should render correct experiment attributes', () => {
@@ -143,15 +143,15 @@ describe('EndScreenTest', () => {
             }
         };
 
-        Object.values(ButtonExperimentDeclaration.color).forEach((c: string | undefined) => {
+        Object.values(EndScreenExperimentDeclaration.color).forEach((c: string | undefined) => {
             if (c === undefined) {
-                validateExperimentAttributes(createAnimatedDownloadButtonEndScreen('fi', ButtonExperimentDeclaration.scheme.LIGHT, c), ButtonExperimentDeclaration.color.BLUE);
+                validateExperimentAttributes(createExperimentEndScreen('fi', EndScreenExperimentDeclaration.scheme.LIGHT, c), EndScreenExperimentDeclaration.color.BLUE);
             } else {
-                validateExperimentAttributes(createAnimatedDownloadButtonEndScreen('fi', ButtonExperimentDeclaration.scheme.LIGHT, c), c);
+                validateExperimentAttributes(createExperimentEndScreen('fi', EndScreenExperimentDeclaration.scheme.LIGHT, c), c);
             }
         });
 
         //Dark mode should ignore the color of the button, and set it to '#2ba3ff'
-        validateExperimentAttributes(createAnimatedDownloadButtonEndScreen('fi', ButtonExperimentDeclaration.scheme.DARK, ButtonExperimentDeclaration.color.RED), '2ba3ff');
+        validateExperimentAttributes(createExperimentEndScreen('fi', EndScreenExperimentDeclaration.scheme.DARK, EndScreenExperimentDeclaration.color.RED), '2ba3ff');
     });
 });
