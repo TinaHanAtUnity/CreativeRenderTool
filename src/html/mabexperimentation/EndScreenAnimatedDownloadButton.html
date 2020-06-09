@@ -53,7 +53,7 @@
           <% } %>
         </div>
         <div class="download-container">
-          <% if (data.isEnglish) { %>
+          <% if (data.ctaText && data.isEnglish) { %>
           <span class="download-text"><%= data.ctaText %></span>
           <% } else { %>
           <span class="download-text"><%= data.t("Download For Free") %></span>
