@@ -40,7 +40,7 @@ export const EndScreenExperiment = new AutomatedExperiment({
 
 // AR Ads
 
-export const ArAvailableEndScreenExperimentDeclaration = {
+export const ArAvailableButtonExperimentDeclaration = {
     skip: {
         YES: 'true',
         NO: 'false'
@@ -54,10 +54,10 @@ export const ArAvailableEndScreenExperimentDeclaration = {
 };
 
 export const ArAvailableButtonExperiment = new AutomatedExperiment({
-    actions: ArAvailableEndScreenExperimentDeclaration,
+    actions: ArAvailableButtonExperimentDeclaration,
     defaultActions: {
-        color: ArAvailableEndScreenExperimentDeclaration.color.BLACK,
-        skip: ArAvailableEndScreenExperimentDeclaration.skip.NO
+        color: ArAvailableButtonExperimentDeclaration.color.BLACK,
+        skip: ArAvailableButtonExperimentDeclaration.skip.NO
     },
     cacheDisabled: true
 });
