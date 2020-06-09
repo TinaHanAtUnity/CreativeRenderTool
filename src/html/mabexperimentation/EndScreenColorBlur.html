@@ -44,12 +44,12 @@
                 </div>
             </div>
             <div class="install-container">
-            <% if (data.ctaText && data.isEnglish) { %>
-            <span class="download-text"><%= data.ctaText %></span>
+            <% if (data.ctaAlternativeText && data.isEnglish) { %>
+            <span class="download-text"><%= data.ctaAlternativeText %></span>
             <% } else { %>
             <span class="download-text"><%= data.t("Install Now") %></span>
             <% } %>
-            <% if(data.ctaText !== "Download For Free") { %>
+            <% if(data.ctaAlternativeText !== "Download For Free") { %>
             <span class="free-text"><%= data.t("Free") %></span>
             <% } %>
             </div>

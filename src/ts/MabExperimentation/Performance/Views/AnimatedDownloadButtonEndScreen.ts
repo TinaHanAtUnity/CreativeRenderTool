@@ -48,7 +48,7 @@ export class AnimatedDownloadButtonEndScreen extends PerformanceEndScreen {
         this._templateData = {
             ...this._templateData,
             hasShadow: this._animation === ButtonExperimentDeclaration.animation.BOUNCING,
-            ctaText: this._ctaAlternativeText,
+            ctaAlternativeText: this._ctaAlternativeText,
             isEnglish: this._language.indexOf('en') !== -1
         };
     }

@@ -27,7 +27,7 @@ export class ColorBlurEndScreen extends PerformanceEndScreen {
         this._templateData = {
             ...this._templateData,
             simpleRating: simpleRating,
-            ctaText: this._ctaAlternativeText,
+            ctaAlternativeText: this._ctaAlternativeText,
             isEnglish: this._language.indexOf('en') !== -1
         };
         this._bindings.splice(0, 1, {
