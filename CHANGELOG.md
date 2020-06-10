@@ -1,5 +1,13 @@
-# Pending
+# Tue  9 Jun 2020 23:20:00 UTC
 
+* [AUI] Create Seperate File for Experiment EndScreen Tests [#15814](https://github.com/Applifier/unity-ads-webview/pull/15814)
+* [AUI] Rename AnimatedDownloadButtonEndScreen and its related files to ExperimentEndScreen [#15813](https://github.com/Applifier/unity-ads-webview/pull/15813)
+* [Load V5] Skip invalidation for no fill in RELOAD request [#15709](https://github.com/Applifier/unity-ads-webview/pull/15709)
+* Merge 3.4.6 to Master [#15784](https://github.com/Applifier/unity-ads-webview/pull/15784)
+
+# Mon Jun  8 19:57:01 UTC 2020
+
+* Add more game IDs to skip orientation check [#15812](https://github.com/Applifier/unity-ads-webview/pull/15812)
 * Fix iOS crash when orientation doees not match supported. [#15755](https://github.com/Applifier/unity-ads-webview/pull/15755)
 
 # Fri Jun  5 18:52:31 UTC 2020

@@ -2,7 +2,6 @@ import { Ads } from 'Ads/__mocks__/Ads';
 import { CacheBookkeepingManager } from 'Core/Managers/__mocks__/CacheBookkeepingManager';
 import { CacheManager } from 'Core/Managers/__mocks__/CacheManager';
 import { ConfigManager } from 'Core/Managers/__mocks__/ConfigManager';
-import { DeviceIdManager } from 'Core/Managers/__mocks__/DeviceIdManager';
 import { FocusManager } from 'Core/Managers/__mocks__/FocusManager';
 import { JaegerManager } from 'Core/Managers/__mocks__/JaegerManager';
 import { MetaDataManager } from 'Core/Managers/__mocks__/MetaDataManager';
@@ -77,7 +76,6 @@ export const Core = jest.fn(() => {
         RequestManager: new RequestManager(),
         CacheManager: new CacheManager(),
         JaegerManager: new JaegerManager(),
-        DeviceIdManager: new DeviceIdManager(),
         ClientInfo: new ClientInfo(),
         DeviceInfo: new DeviceInfo(),
         Config: new CoreConfiguration(),

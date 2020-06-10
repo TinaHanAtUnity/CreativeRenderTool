@@ -107,7 +107,6 @@ export interface IInfoJson {
     frameworkName?: string;
     frameworkVersion?: string;
     skippedAt?: number;
-    imei?: string;
     privacyType?: string;
     isLoadEnabled: boolean;
     legalFramework: string;

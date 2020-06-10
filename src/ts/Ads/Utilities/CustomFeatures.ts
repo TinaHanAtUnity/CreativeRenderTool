@@ -228,7 +228,9 @@ export class CustomFeatures {
     // can causes crashes for publishers: https://jira.unity3d.com/browse/ABT-1080
     public static allowSupportedOrientationCheck(gameId: string): boolean {
         const skipCheckGameIds = [
-            '1636888' // Blowfire
+            '3254219', // Blowfire
+            '3262346',
+            '1636888'
         ];
         // return true if not in list.
         return !this.existsInList(skipCheckGameIds, gameId);
