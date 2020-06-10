@@ -1,5 +1,6 @@
 # Pending
 
+* [Bug] Detect GooglePlay Store Existence with GAID [#15850](https://github.com/Applifier/unity-ads-webview/pull/15850)
 * [Chore] Force Browser tests to use Test Mode [#15851](https://github.com/Applifier/unity-ads-webview/pull/15851)
 
 # Tue  9 Jun 2020 23:20:00 UTC
