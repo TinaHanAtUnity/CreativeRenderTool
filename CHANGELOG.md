@@ -1,3 +1,7 @@
+# Pending
+
+* [Chore] Force Browser tests to use Test Mode [#15851](https://github.com/Applifier/unity-ads-webview/pull/15851)
+
 # Tue  9 Jun 2020 23:20:00 UTC
 
 * [AUI] Create Seperate File for Experiment EndScreen Tests [#15814](https://github.com/Applifier/unity-ads-webview/pull/15814)
