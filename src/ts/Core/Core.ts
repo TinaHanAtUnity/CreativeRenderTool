@@ -131,11 +131,9 @@ export class Core implements ICore {
             this.ClientInfo = new ClientInfo(data);
 
             if (!/^\d+$/.test(this.ClientInfo.getGameId())) {
-                const message = `Unity Ads SDK fail to initialize due to provided Game ID '${this.ClientInfo.getGameId()}' is invalid. Game ID may contain only digits (0-9).`;
-                this.Api.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.INVALID_ARGUMENT], message);
-                this.Api.Sdk.initError(message, InitErrorCode.InvalidArgument);
-                SDKMetrics.reportMetricEvent(InitializationFailureMetric.InitializeFailed);
-                return Promise.reject(message);
+                const error = new Error(`Unity Ads SDK fail to initialize due to provided Game ID '${this.ClientInfo.getGameId()}' is invalid. Game ID may contain only digits (0-9).`);
+                error.name = 'InvalidArgument';
+                return Promise.reject(error);
             }
 
             if (this.NativeBridge.getPlatform() === Platform.ANDROID) {
@@ -260,6 +258,11 @@ export class Core implements ICore {
             if (error instanceof Error && error.name === 'DisabledGame') {
                 errorMessage = error.message;
                 errorCode = InitErrorCode.GameIdDisabled;
+            }
+
+            if (error instanceof Error && error.name === 'InvalidArgument') {
+                errorMessage = error.message;
+                errorCode = InitErrorCode.InvalidArgument;
             }
 
             if (error instanceof ConfigError) {
