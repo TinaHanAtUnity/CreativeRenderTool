@@ -1,5 +1,9 @@
 # Pending
 
+* [Revert] Revert auction XHR experiment [#15846](https://github.com/Applifier/unity-ads-webview/pull/15846)
+* [Chore] Cleanup isAppInstalled API Call [#15849](https://github.com/Applifier/unity-ads-webview/pull/15849)
+* [Load V5] Add new Group 13 to load v5 experiment [#15845](https://github.com/Applifier/unity-ads-webview/pull/15845)
+* [Bug] Detect GooglePlay Store Existence with GAID [#15850](https://github.com/Applifier/unity-ads-webview/pull/15850)
 * [Chore] Force Browser tests to use Test Mode [#15851](https://github.com/Applifier/unity-ads-webview/pull/15851)
 
 # Tue  9 Jun 2020 23:20:00 UTC

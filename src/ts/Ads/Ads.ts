@@ -83,7 +83,7 @@ import { Analytics } from 'Analytics/Analytics';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { PrivacyParser } from 'Privacy/Parsers/PrivacyParser';
 import { Promises } from 'Core/Utilities/Promises';
-import { MediationCacheModeAllowedTest, AuctionXHR, LoadV5, LoadV5AdUnit, LoadV5NoInvalidation } from 'Core/Models/ABGroup';
+import { MediationCacheModeAllowedTest, LoadV5, LoadV5AdUnit, LoadV5NoInvalidation } from 'Core/Models/ABGroup';
 import { PerPlacementLoadManagerV4 } from 'Ads/Managers/PerPlacementLoadManagerV4';
 import { PrivacyMetrics } from 'Privacy/PrivacyMetrics';
 import { PrivacySDKUnit } from 'Ads/AdUnits/PrivacySDKUnit';
@@ -394,13 +394,7 @@ export class Ads implements IAds {
 
                     let experimentType = MediationExperimentType.None;
 
-                    if (this._core.NativeBridge.getPlatform() === Platform.ANDROID && AuctionXHR.isValid(this._core.Config.getAbGroup())) {
-                        if (XHRequest.isAvailable()) {
-                            experimentType = MediationExperimentType.AuctionXHR;
-                        } else {
-                            SDKMetrics.reportMetricEvent(MiscellaneousMetric.XHRNotAvailable);
-                        }
-                    } else if (this.isLoadV5Enabled() && this._webViewEnabledLoad) {
+                    if (this.isLoadV5Enabled() && this._webViewEnabledLoad) {
                         experimentType = MediationExperimentType.LoadV5;
                     } else if (!CustomFeatures.isExcludedGameFromCacheModeTest(this._core.ClientInfo.getGameId()) && MediationCacheModeAllowedTest.isValid(this._core.Config.getAbGroup())) {
                         this.Config.set('cacheMode', CacheMode.ALLOWED);
