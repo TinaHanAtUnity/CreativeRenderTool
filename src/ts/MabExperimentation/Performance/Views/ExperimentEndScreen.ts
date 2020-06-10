@@ -91,11 +91,6 @@ export class ExperimentEndScreen extends PerformanceEndScreen {
             return EndScreenExperiment.getDefaultActions();
         }
 
-        if (!EndScreenExperiment.isValid(actions)) {
-            SDKMetrics.reportMetricEvent(AUIMetric.InvalidEndscreenAnimation);
-            return EndScreenExperiment.getDefaultActions();
-        }
-
         return actions;
     }
 
