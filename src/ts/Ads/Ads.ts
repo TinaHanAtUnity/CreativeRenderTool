@@ -325,15 +325,10 @@ export class Ads implements IAds {
     private configureCampaignManager() {
         if (this._loadApiEnabled && this._webViewEnabledLoad) {
             if (this.isLoadV5Enabled()) {
-                const useAdUnits = this.useAdUnitSupport();
-                const adUnitGame = CustomFeatures.useAdUnitSupport(this._core.ClientInfo.getGameId());
-
                 let experiment = LoadV5ExperimentType.None;
 
                 if (LoadV5NoInvalidation.isValid(this._core.Config.getAbGroup())) {
                     experiment = LoadV5ExperimentType.NoInvalidation;
-                } else if (adUnitGame) {
-                    experiment = useAdUnits ? LoadV5ExperimentType.AdUnit : LoadV5ExperimentType.BaseAdUnit;
                 }
 
                 this.AdRequestManager = new AdRequestManager(this._core.NativeBridge.getPlatform(), this._core, this._core.Config, this.Config, this.AssetManager, this.SessionManager, this.AdMobSignalFactory, this._core.RequestManager, this._core.ClientInfo, this._core.DeviceInfo, this._core.MetaDataManager, this._core.CacheBookkeeping, this.ContentTypeHandlerManager, this.PrivacySDK, this.PrivacyManager, experiment);
@@ -357,8 +352,7 @@ export class Ads implements IAds {
             if (LoadV5NoInvalidation.isValid(this._core.Config.getAbGroup())) {
                 this.RefreshManager = new PerPlacementLoadManagerV5NoInvalidation(this.Api, this.Config, this._core.Config, this.AdRequestManager, this._core.ClientInfo, this._core.FocusManager, false);
             } else {
-                const useAdUnits = this.useAdUnitSupport();
-                this.RefreshManager = new PerPlacementLoadManagerV5(this.Api, this.Config, this._core.Config, this.AdRequestManager, this._core.ClientInfo, this._core.FocusManager, useAdUnits);
+                this.RefreshManager = new PerPlacementLoadManagerV5(this.Api, this.Config, this._core.Config, this.AdRequestManager, this._core.ClientInfo, this._core.FocusManager, false);
             }
             return;
         }
@@ -815,12 +809,5 @@ export class Ads implements IAds {
         const loadV5Game = CustomFeatures.isLoadV5Game(this._core.ClientInfo.getGameId());
 
         return (this._loadApiEnabled && loadV5Game) || this._forceLoadV5;
-    }
-
-    private useAdUnitSupport(): boolean {
-        const adUnitTest = LoadV5AdUnit.isValid(this._core.Config.getAbGroup());
-        const adUnitGame = CustomFeatures.useAdUnitSupport(this._core.ClientInfo.getGameId());
-
-        return (adUnitTest && adUnitGame);
     }
 }
