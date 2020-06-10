@@ -1,5 +1,6 @@
 # Pending
 
+* [Chore] Cleanup isAppInstalled API Call [#15849](https://github.com/Applifier/unity-ads-webview/pull/15849)
 * [Load V5] Add new Group 13 to load v5 experiment [#15845](https://github.com/Applifier/unity-ads-webview/pull/15845)
 * [Bug] Detect GooglePlay Store Existence with GAID [#15850](https://github.com/Applifier/unity-ads-webview/pull/15850)
 * [Chore] Force Browser tests to use Test Mode [#15851](https://github.com/Applifier/unity-ads-webview/pull/15851)
