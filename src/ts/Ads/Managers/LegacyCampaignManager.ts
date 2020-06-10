@@ -153,18 +153,7 @@ export class LegacyCampaignManager extends CampaignManager {
 
             measurement = createStopwatch();
             measurement.start();
-            if (this._mediationLoadTracking && this._mediationLoadTracking.getCurrentExperiment() === MediationExperimentType.AuctionXHR) {
-                return XHRequest.post(requestUrl, JSON.stringify(requestBody)).then((resp: string) => {
-                    return {
-                        url: requestUrl,
-                        response: resp,
-                        responseCode: 200,
-                        headers: []
-                    };
-                });
-            } else {
-                return CampaignManager.onlyRequest(this._request, requestUrl, requestBody);
-            }
+            return CampaignManager.onlyRequest(this._request, requestUrl, requestBody);
         }).catch((error: unknown) => {
             let reason: string = 'unknown';
             if (error instanceof RequestError) {
