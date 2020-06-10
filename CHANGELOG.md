@@ -1,5 +1,9 @@
 # Pending
 
+* [Chore] Force Browser tests to use Test Mode [#15851](https://github.com/Applifier/unity-ads-webview/pull/15851)
+
+# Tue  9 Jun 2020 23:20:00 UTC
+
 * [AUI] Create Seperate File for Experiment EndScreen Tests [#15814](https://github.com/Applifier/unity-ads-webview/pull/15814)
 * [AUI] Rename AnimatedDownloadButtonEndScreen and its related files to ExperimentEndScreen [#15813](https://github.com/Applifier/unity-ads-webview/pull/15813)
 * [Load V5] Skip invalidation for no fill in RELOAD request [#15709](https://github.com/Applifier/unity-ads-webview/pull/15709)
