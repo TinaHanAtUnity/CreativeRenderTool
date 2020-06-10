@@ -1,3 +1,8 @@
+# Pending
+
+* [VAST HTML Endcard] Reverse AB testing using group 17 and 11 [#15880](https://github.com/Applifier/unity-ads-webview/pull/15880)
+* [Bug]Add missing click report for admob [#15852](https://github.com/Applifier/unity-ads-webview/pull/15852)
+
 # Wed Jun 10 02:02:07 UTC 2020
 
 * [Revert] Revert auction XHR experiment [#15846](https://github.com/Applifier/unity-ads-webview/pull/15846)
