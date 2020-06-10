@@ -1,4 +1,4 @@
-# Pending
+# Wed Jun 10 23:55:46 UTC 2020
 
 * [VAST HTML Endcard] Reverse AB testing using group 17 and 11 [#15880](https://github.com/Applifier/unity-ads-webview/pull/15880)
 * [Bug]Add missing click report for admob [#15852](https://github.com/Applifier/unity-ads-webview/pull/15852)
