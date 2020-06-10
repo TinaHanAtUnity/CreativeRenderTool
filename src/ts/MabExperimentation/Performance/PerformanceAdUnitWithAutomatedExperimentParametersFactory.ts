@@ -4,9 +4,9 @@ import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
 import { IEndScreenParameters } from 'Ads/Views/EndScreen';
 import { ICore } from 'Core/ICore';
 import { ColorBlurEndScreen } from 'MabExperimentation/Performance/Views/ColorBlurEndScreen';
-import { AnimatedDownloadButtonEndScreen } from 'MabExperimentation/Performance/Views/AnimatedDownloadButtonEndScreen';
+import { ExperimentEndScreen } from 'MabExperimentation/Performance/Views/ExperimentEndScreen';
 import { AutomatedExperimentManager } from 'MabExperimentation/AutomatedExperimentManager';
-import { AutomatedExperimentsCategories, ButtonExperimentDeclaration } from 'MabExperimentation/Models/AutomatedExperimentsList';
+import { AutomatedExperimentsCategories, EndScreenExperimentDeclaration } from 'MabExperimentation/Models/AutomatedExperimentsList';
 import { PerformanceAdUnitParametersFactory } from 'Performance/AdUnits/PerformanceAdUnitParametersFactory';
 import { Campaign } from 'Ads/Models/Campaign';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
@@ -41,14 +41,14 @@ export class PerformanceAdUnitWithAutomatedExperimentParametersFactory extends P
 
         const endScreenCombination: IExperimentActionChoice | undefined = this._automatedExperimentManager.activateSelectedExperiment(baseParams.campaign, AutomatedExperimentsCategories.PERFORMANCE_ENDCARD);
 
-        let endScreen: AnimatedDownloadButtonEndScreen | ColorBlurEndScreen | ExternalEndScreen;
+        let endScreen: ExperimentEndScreen | ColorBlurEndScreen | ExternalEndScreen;
 
         if (this._campaign.getEndScreen()) {
             endScreen = new ExternalEndScreen(endScreenCombination, endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
-        } else if (endScreenCombination && endScreenCombination.scheme === ButtonExperimentDeclaration.scheme.COLORBLUR) {
+        } else if (endScreenCombination && endScreenCombination.scheme === EndScreenExperimentDeclaration.scheme.COLORBLUR) {
             endScreen = new ColorBlurEndScreen(endScreenCombination, endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
         } else {
-            endScreen = new AnimatedDownloadButtonEndScreen(
+            endScreen = new ExperimentEndScreen(
                 endScreenCombination,
                 endScreenParameters,
                 baseParams.campaign,

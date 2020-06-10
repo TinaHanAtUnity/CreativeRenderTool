@@ -6,7 +6,7 @@ export enum AutomatedExperimentsCategories {
     VIDEO_OVERLAY = 'webview-video-overlay'
 }
 
-export const ButtonExperimentDeclaration = {
+export const EndScreenExperimentDeclaration = {
     scheme: {
         DARK: 'dark',
         LIGHT: 'light',
@@ -39,13 +39,13 @@ export const ButtonExperimentDeclaration = {
     }
 };
 
-export const ButtonAnimationsExperiment = new AutomatedExperiment({
-    actions: ButtonExperimentDeclaration,
+export const EndScreenExperiment = new AutomatedExperiment({
+    actions: EndScreenExperimentDeclaration,
     defaultActions: {
-        scheme: ButtonExperimentDeclaration.scheme.LIGHT,
-        animation: ButtonExperimentDeclaration.animation.BOUNCING,
-        color: ButtonExperimentDeclaration.color.BLUE,
-        ctaText: ButtonExperimentDeclaration.ctaText.DOWNLOAD_FOR_FREE
+        scheme: EndScreenExperimentDeclaration.scheme.LIGHT,
+        animation: EndScreenExperimentDeclaration.animation.BOUNCING,
+        color: EndScreenExperimentDeclaration.color.BLUE,
+        ctaText: EndScreenExperimentDeclaration.ctaText.DOWNLOAD_FOR_FREE
     },
     cacheDisabled: true
 });

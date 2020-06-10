@@ -6,7 +6,7 @@ import { AUIMetric, SDKMetrics } from 'Ads/Utilities/SDKMetrics';
 import { ColorTheme } from 'Core/Utilities/ColorTheme';
 import { IColorTheme } from 'Performance/Utilities/Swatch';
 import { IExperimentActionChoice } from 'MabExperimentation/Models/AutomatedExperiment';
-import { ButtonAnimationsExperiment, ButtonExperimentDeclaration } from 'MabExperimentation/Models/AutomatedExperimentsList';
+import { EndScreenExperiment, EndScreenExperimentDeclaration } from 'MabExperimentation/Models/AutomatedExperimentsList';
 
 export class ColorBlurEndScreen extends PerformanceEndScreen {
     private _ctaAlternativeText: string;
@@ -39,12 +39,12 @@ export class ColorBlurEndScreen extends PerformanceEndScreen {
 
     private fixupExperimentChoices(actions: IExperimentActionChoice | undefined): IExperimentActionChoice {
         if (actions === undefined) {
-            return ButtonAnimationsExperiment.getDefaultActions();
+            return EndScreenExperiment.getDefaultActions();
         }
 
         if (actions.ctaText === undefined) {
             SDKMetrics.reportMetricEvent(AUIMetric.InvalidCtaText);
-            return ButtonAnimationsExperiment.getDefaultActions();
+            return EndScreenExperiment.getDefaultActions();
         }
 
         return actions;
@@ -61,7 +61,7 @@ export class ColorBlurEndScreen extends PerformanceEndScreen {
                 SDKMetrics.reportMetricEvent(error.tag);
             });
 
-        if (this._ctaAlternativeText === ButtonExperimentDeclaration.ctaText.DOWNLOAD_FOR_FREE) {
+        if (this._ctaAlternativeText === EndScreenExperimentDeclaration.ctaText.DOWNLOAD_FOR_FREE) {
             const installContainer: HTMLElement | null = this._container.querySelector('.install-container');
             if (installContainer) {
                 installContainer.classList.add('cta-alt-text');

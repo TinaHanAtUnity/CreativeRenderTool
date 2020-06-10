@@ -14,7 +14,7 @@ import { SDKMetrics } from 'Ads/Utilities/SDKMetrics';
 import { ColorBlurEndScreen } from 'MabExperimentation/Performance/Views/ColorBlurEndScreen';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { Localization } from 'Core/Utilities/Localization';
-import { ButtonExperimentDeclaration } from 'MabExperimentation/Models/AutomatedExperimentsList';
+import { EndScreenExperimentDeclaration } from 'MabExperimentation/Models/AutomatedExperimentsList';
 
 describe('ColorBlurEndScreenTest', () => {
     let platform: Platform;
@@ -186,7 +186,7 @@ describe('ColorBlurEndScreenTest', () => {
             assert.isNotNull(downloadElementText);
             assert.equal(downloadElementText, ctaText);
 
-            if (ctaText === ButtonExperimentDeclaration.ctaText.DOWNLOAD_FOR_FREE) {
+            if (ctaText === EndScreenExperimentDeclaration.ctaText.DOWNLOAD_FOR_FREE) {
                 const installBtnClasses = endScreen.container().querySelectorAll('.install-container')[0].className;
 
                 assert.include(installBtnClasses, 'cta-alt-text');
@@ -194,11 +194,11 @@ describe('ColorBlurEndScreenTest', () => {
         };
 
         it(`should render Install Now`, () => {
-            validateCtaText(createColorBlurEndScreen(ButtonExperimentDeclaration.ctaText.INSTALL_NOW, 'en'), ButtonExperimentDeclaration.ctaText.INSTALL_NOW);
+            validateCtaText(createColorBlurEndScreen(EndScreenExperimentDeclaration.ctaText.INSTALL_NOW, 'en'), EndScreenExperimentDeclaration.ctaText.INSTALL_NOW);
         });
 
         it(`should render Download For Free`, () => {
-            validateCtaText(createColorBlurEndScreen(ButtonExperimentDeclaration.ctaText.DOWNLOAD_FOR_FREE, 'en'), ButtonExperimentDeclaration.ctaText.DOWNLOAD_FOR_FREE);
+            validateCtaText(createColorBlurEndScreen(EndScreenExperimentDeclaration.ctaText.DOWNLOAD_FOR_FREE, 'en'), EndScreenExperimentDeclaration.ctaText.DOWNLOAD_FOR_FREE);
         });
     });
 });
