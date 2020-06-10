@@ -38,8 +38,35 @@ export class ExperimentEndScreen extends PerformanceEndScreen {
             default:
         }
 
-        if (combination.ctaText) {
-            this._ctaAlternativeText = combination.ctaText;
+        switch (combination.cta_text) {
+            case EndScreenExperimentDeclaration.cta_text.DOWNLOAD:
+                this._ctaAlternativeText = 'Download';
+                break;
+            case EndScreenExperimentDeclaration.cta_text.DOWNLOAD_FOR_FREE:
+                this._ctaAlternativeText = 'Download For Free';
+                break;
+            case EndScreenExperimentDeclaration.cta_text.DOWNLOAD_NOW:
+                this._ctaAlternativeText = 'Download Now!';
+                break;
+            case EndScreenExperimentDeclaration.cta_text.DOWNLOAD_NOW_FIRE:
+                this._ctaAlternativeText = '🔥 Download Now 🔥';
+                break;
+            case EndScreenExperimentDeclaration.cta_text.GET:
+                this._ctaAlternativeText = 'Get';
+                break;
+            case EndScreenExperimentDeclaration.cta_text.GET_STARTED:
+                this._ctaAlternativeText = 'Get Started!';
+                break;
+            case EndScreenExperimentDeclaration.cta_text.INSTALL_NOW:
+                this._ctaAlternativeText = 'Install Now';
+                break;
+            case EndScreenExperimentDeclaration.cta_text.LETS_TRY_IT:
+                this._ctaAlternativeText = `Let's try it!`;
+                break;
+            case EndScreenExperimentDeclaration.cta_text.OK:
+                this._ctaAlternativeText = 'OK!';
+                break;
+            default:
         }
 
         // combination.animation will be defined at this point

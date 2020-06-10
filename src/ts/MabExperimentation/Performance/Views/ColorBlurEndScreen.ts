@@ -10,6 +10,7 @@ import { EndScreenExperiment, EndScreenExperimentDeclaration } from 'MabExperime
 
 export class ColorBlurEndScreen extends PerformanceEndScreen {
     private _ctaAlternativeText: string;
+    private _formattedCtaAlternativeText: string;
     private _language: string;
 
     constructor(combination: IExperimentActionChoice | undefined, parameters: IEndScreenParameters, campaign: PerformanceCampaign, country?: string) {
@@ -19,15 +20,24 @@ export class ColorBlurEndScreen extends PerformanceEndScreen {
 
         combination = this.fixupExperimentChoices(combination);
 
-        if (combination.ctaText) {
-            this._ctaAlternativeText = combination.ctaText;
+        switch (combination.cta_text) {
+            case EndScreenExperimentDeclaration.cta_text.DOWNLOAD_FOR_FREE:
+                this._formattedCtaAlternativeText = 'Download For Free';
+                break;
+            case EndScreenExperimentDeclaration.cta_text.INSTALL_NOW:
+                this._formattedCtaAlternativeText = 'Install Now';
+                break;
+            default:
         }
+
+        // combination.cta_text will be defined at this point
+        this._ctaAlternativeText = combination.cta_text!;
 
         this._language = parameters.language;
         this._templateData = {
             ...this._templateData,
             simpleRating: simpleRating,
-            ctaAlternativeText: this._ctaAlternativeText,
+            ctaAlternativeText: this._formattedCtaAlternativeText,
             isEnglish: this._language.indexOf('en') !== -1
         };
         this._bindings.splice(0, 1, {
@@ -42,7 +52,7 @@ export class ColorBlurEndScreen extends PerformanceEndScreen {
             return EndScreenExperiment.getDefaultActions();
         }
 
-        if (actions.ctaText === undefined) {
+        if (actions.cta_text === undefined) {
             SDKMetrics.reportMetricEvent(AUIMetric.InvalidCtaText);
             return EndScreenExperiment.getDefaultActions();
         }
@@ -61,7 +71,7 @@ export class ColorBlurEndScreen extends PerformanceEndScreen {
                 SDKMetrics.reportMetricEvent(error.tag);
             });
 
-        if (this._ctaAlternativeText === EndScreenExperimentDeclaration.ctaText.DOWNLOAD_FOR_FREE) {
+        if (this._ctaAlternativeText === EndScreenExperimentDeclaration.cta_text.DOWNLOAD_FOR_FREE) {
             const installContainer: HTMLElement | null = this._container.querySelector('.install-container');
             if (installContainer) {
                 installContainer.classList.add('cta-alt-text');

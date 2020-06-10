@@ -26,16 +26,16 @@ export const EndScreenExperimentDeclaration = {
         RED: 'c31e25',
         UNDEFINED: undefined
     },
-    ctaText: {
-        DOWNLOAD: 'Download',
-        DOWNLOAD_FOR_FREE: 'Download For Free',
-        DOWNLOAD_NOW: 'Download Now!',
-        DOWNLOAD_NOW_FIRE: '🔥 Download Now 🔥',
-        GET: 'Get',
-        GET_STARTED: 'Get Started!',
-        INSTALL_NOW: 'Install Now',
-        LETS_TRY_IT: `Let's try it!`,
-        OK: 'OK!'
+    cta_text: {
+        DOWNLOAD: 'download',
+        DOWNLOAD_FOR_FREE: 'download_for_free',
+        DOWNLOAD_NOW: 'download_now',
+        DOWNLOAD_NOW_FIRE: 'download_now_fire',
+        GET: 'get',
+        GET_STARTED: 'get_started',
+        INSTALL_NOW: 'install_now',
+        LETS_TRY_IT: 'lets_try_it',
+        OK: 'ok'
     }
 };
 
@@ -45,7 +45,7 @@ export const EndScreenExperiment = new AutomatedExperiment({
         scheme: EndScreenExperimentDeclaration.scheme.LIGHT,
         animation: EndScreenExperimentDeclaration.animation.BOUNCING,
         color: EndScreenExperimentDeclaration.color.BLUE,
-        ctaText: EndScreenExperimentDeclaration.ctaText.DOWNLOAD_FOR_FREE
+        cta_text: EndScreenExperimentDeclaration.cta_text.DOWNLOAD_FOR_FREE
     },
     cacheDisabled: true
 });
