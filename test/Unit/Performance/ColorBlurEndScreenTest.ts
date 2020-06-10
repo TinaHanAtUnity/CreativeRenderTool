@@ -71,7 +71,7 @@ describe('ColorBlurEndScreenTest', () => {
         };
 
         const experimentDescription = {
-            ctaText
+            cta_text: ctaText
         };
 
         return new ColorBlurEndScreen(experimentDescription, params, campaign);
@@ -186,7 +186,7 @@ describe('ColorBlurEndScreenTest', () => {
             assert.isNotNull(downloadElementText);
             assert.equal(downloadElementText, ctaText);
 
-            if (ctaText === EndScreenExperimentDeclaration.ctaText.DOWNLOAD_FOR_FREE) {
+            if (ctaText === EndScreenExperimentDeclaration.cta_text.DOWNLOAD_FOR_FREE) {
                 const installBtnClasses = endScreen.container().querySelectorAll('.install-container')[0].className;
 
                 assert.include(installBtnClasses, 'cta-alt-text');
@@ -194,11 +194,11 @@ describe('ColorBlurEndScreenTest', () => {
         };
 
         it(`should render Install Now`, () => {
-            validateCtaText(createColorBlurEndScreen(EndScreenExperimentDeclaration.ctaText.INSTALL_NOW, 'en'), EndScreenExperimentDeclaration.ctaText.INSTALL_NOW);
+            validateCtaText(createColorBlurEndScreen(EndScreenExperimentDeclaration.cta_text.INSTALL_NOW, 'en'), 'Install Now');
         });
 
         it(`should render Download For Free`, () => {
-            validateCtaText(createColorBlurEndScreen(EndScreenExperimentDeclaration.ctaText.DOWNLOAD_FOR_FREE, 'en'), EndScreenExperimentDeclaration.ctaText.DOWNLOAD_FOR_FREE);
+            validateCtaText(createColorBlurEndScreen(EndScreenExperimentDeclaration.cta_text.DOWNLOAD_FOR_FREE, 'en'), 'Download For Free');
         });
     });
 });
