@@ -9,7 +9,7 @@ import { IExperimentActionChoice } from 'MabExperimentation/Models/AutomatedExpe
 import { EndScreenExperiment, EndScreenExperimentDeclaration } from 'MabExperimentation/Models/AutomatedExperimentsList';
 
 export class ColorBlurEndScreen extends PerformanceEndScreen {
-    private _ctaAlternativeText: string;
+    private _ctaText: string;
     private _formattedCtaAlternativeText: string;
     private _language: string;
 
@@ -31,7 +31,7 @@ export class ColorBlurEndScreen extends PerformanceEndScreen {
         }
 
         // combination.cta_text will be defined at this point
-        this._ctaAlternativeText = combination.cta_text!;
+        this._ctaText = combination.cta_text!;
 
         this._language = parameters.language;
         this._templateData = {
@@ -71,7 +71,7 @@ export class ColorBlurEndScreen extends PerformanceEndScreen {
                 SDKMetrics.reportMetricEvent(error.tag);
             });
 
-        if (this._ctaAlternativeText === EndScreenExperimentDeclaration.cta_text.DOWNLOAD_FOR_FREE) {
+        if (this._ctaText === EndScreenExperimentDeclaration.cta_text.DOWNLOAD_FOR_FREE) {
             const installContainer: HTMLElement | null = this._container.querySelector('.install-container');
             if (installContainer) {
                 installContainer.classList.add('cta-alt-text');

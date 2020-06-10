@@ -15,7 +15,7 @@ export class ExperimentEndScreen extends PerformanceEndScreen {
     private _downloadButtonColor: string;
     private _darkMode: boolean;
     private _tintColor: boolean;
-    private _ctaAlternativeText: string;
+    private _formattedCtaAlternativeText: string;
     private _language: string;
 
     constructor(combination: IExperimentActionChoice | undefined, parameters: IEndScreenParameters, campaign: PerformanceCampaign, country?: string) {
@@ -40,31 +40,31 @@ export class ExperimentEndScreen extends PerformanceEndScreen {
 
         switch (combination.cta_text) {
             case EndScreenExperimentDeclaration.cta_text.DOWNLOAD:
-                this._ctaAlternativeText = 'Download';
+                this._formattedCtaAlternativeText = 'Download';
                 break;
             case EndScreenExperimentDeclaration.cta_text.DOWNLOAD_FOR_FREE:
-                this._ctaAlternativeText = 'Download For Free';
+                this._formattedCtaAlternativeText = 'Download For Free';
                 break;
             case EndScreenExperimentDeclaration.cta_text.DOWNLOAD_NOW:
-                this._ctaAlternativeText = 'Download Now!';
+                this._formattedCtaAlternativeText = 'Download Now!';
                 break;
             case EndScreenExperimentDeclaration.cta_text.DOWNLOAD_NOW_FIRE:
-                this._ctaAlternativeText = '🔥 Download Now 🔥';
+                this._formattedCtaAlternativeText = '🔥 Download Now 🔥';
                 break;
             case EndScreenExperimentDeclaration.cta_text.GET:
-                this._ctaAlternativeText = 'Get';
+                this._formattedCtaAlternativeText = 'Get';
                 break;
             case EndScreenExperimentDeclaration.cta_text.GET_STARTED:
-                this._ctaAlternativeText = 'Get Started!';
+                this._formattedCtaAlternativeText = 'Get Started!';
                 break;
             case EndScreenExperimentDeclaration.cta_text.INSTALL_NOW:
-                this._ctaAlternativeText = 'Install Now';
+                this._formattedCtaAlternativeText = 'Install Now';
                 break;
             case EndScreenExperimentDeclaration.cta_text.LETS_TRY_IT:
-                this._ctaAlternativeText = `Let's try it!`;
+                this._formattedCtaAlternativeText = `Let's try it!`;
                 break;
             case EndScreenExperimentDeclaration.cta_text.OK:
-                this._ctaAlternativeText = 'OK!';
+                this._formattedCtaAlternativeText = 'OK!';
                 break;
             default:
         }
@@ -75,7 +75,7 @@ export class ExperimentEndScreen extends PerformanceEndScreen {
         this._templateData = {
             ...this._templateData,
             hasShadow: this._animation === EndScreenExperimentDeclaration.animation.BOUNCING,
-            ctaAlternativeText: this._ctaAlternativeText,
+            ctaAlternativeText: this._formattedCtaAlternativeText,
             isEnglish: this._language.indexOf('en') !== -1
         };
     }
