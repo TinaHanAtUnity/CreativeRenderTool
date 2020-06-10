@@ -41,12 +41,6 @@ export interface IAndroidDeviceInfo extends IDeviceInfo {
 }
 
 export class AndroidDeviceInfo extends DeviceInfo<IAndroidDeviceInfo> {
-
-    public static GooglePlayPackageName = 'com.android.vending';
-    public static XiaomiPackageName = 'com.xiaomi.gamecenter';
-    public static GoogleMapsPackageName = 'com.google.android.gms.maps';
-    public static TelephonyPackageName = 'com.android.telephony';
-
     constructor(core: ICoreApi) {
         super('AndroidDeviceInfo', {
             ... DeviceInfo.Schema,
