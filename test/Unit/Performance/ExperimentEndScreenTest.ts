@@ -81,7 +81,7 @@ describe('ExperimentEndScreenTest', () => {
             }
         };
 
-        validateTranslation(createExperimentEndScreen('fi', EndScreenExperimentDeclaration.scheme.LIGHT, EndScreenExperimentDeclaration.color.RED, EndScreenExperimentDeclaration.cta_text.DOWNLOAD_NOW_FIRE));
+        validateTranslation(createExperimentEndScreen('fi', EndScreenExperimentDeclaration.scheme.LIGHT, EndScreenExperimentDeclaration.color.RED, EndScreenExperimentDeclaration.cta_text.DOWNLOAD_FOR_FREE));
     });
 
     it('should render correct experiment attributes', () => {
