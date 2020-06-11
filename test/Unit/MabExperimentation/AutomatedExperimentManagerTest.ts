@@ -86,6 +86,7 @@ describe('AutomatedExperimentManagerTests', () => {
     const defaultContextualFeatures: { [key: string]: ContextualFeature } = {
         bundle_id: 'com.unity3d.ads.example',
         game_id: '12345',
+        gamer_token: 'abcdef',
         coppa_compliant: false,
         limit_ad_tracking: true,
         gdpr_enabled: false,
