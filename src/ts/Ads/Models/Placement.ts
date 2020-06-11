@@ -30,6 +30,7 @@ export interface IRawPlacement {
     auctionType?: string;
     banner?: { refreshRate?: number };
     adUnitId?: string;
+    groupId?: string;
 }
 
 export interface IPlacement {
@@ -60,6 +61,7 @@ export interface IPlacement {
     auctionType: PlacementAuctionType;
     bannerRefreshRate: number | undefined;
     adUnitId: string | undefined;
+    groupId: string | undefined;
 
     invalidationPending: boolean;
 }
@@ -89,6 +91,7 @@ export class Placement extends Model<IPlacement> {
             auctionType: ['string'],
             bannerRefreshRate: ['number', 'undefined'],
             adUnitId: ['string', 'undefined'],
+            groupId: ['string', 'undefined'],
             invalidationPending: ['boolean']
         });
 
@@ -125,6 +128,7 @@ export class Placement extends Model<IPlacement> {
         }
 
         this.set('adUnitId', data.adUnitId);
+        this.set('groupId', data.groupId);
         this.set('invalidationPending', false);
     }
 
@@ -254,6 +258,17 @@ export class Placement extends Model<IPlacement> {
 
     public hasAdUnitId(): boolean {
         if (this.getAdUnitId()) {
+            return true;
+        }
+        return false;
+    }
+
+    public getGroupId(): string | undefined {
+        return this.get('groupId');
+    }
+
+    public hasGroupId(): boolean {
+        if (this.getGroupId()) {
             return true;
         }
         return false;
