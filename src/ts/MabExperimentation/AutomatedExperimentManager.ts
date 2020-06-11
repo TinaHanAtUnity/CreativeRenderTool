@@ -227,6 +227,7 @@ export class AutomatedExperimentManager {
             //GAMES, CAMPAIGN, THE AD
             { l: 'bundleId', c: 'bundle_id' },
             { l: 'gameId', c: 'game_id' },
+            { l: 'gamerToken', c: 'gamer_token' },
 
             //PRIVACY & OPT-OUTS
             { l: 'coppaCompliant', c: 'coppa_compliant' },
