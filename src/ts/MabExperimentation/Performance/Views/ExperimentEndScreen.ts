@@ -26,7 +26,6 @@ export class ExperimentEndScreen extends PerformanceEndScreen {
                 this._downloadButtonColor = Color.hexToCssRgba(combination.color);
                 break;
             case EndScreenExperimentDeclaration.scheme.DARK:
-                // This is "pastel blue", to be cohesive with dark mode
                 this._downloadButtonColor = Color.hexToCssRgba(combination.color);
                 this._darkMode = true;
                 break;
