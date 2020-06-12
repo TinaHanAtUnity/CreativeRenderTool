@@ -82,7 +82,8 @@ export enum MiscellaneousMetric {
     XHRNotAvailable = 'xhr_not_available',
     AuctionRequestFailed = 'auction_request_failed',
     AuctionRequestOk = 'auction_request_ok',
-    AuctionRequestCreated = 'auction_request_created'
+    AuctionRequestCreated = 'auction_request_created',
+    GAIDInvestigation = 'gaid_investigation'
 }
 
 export enum LoadMetric {
