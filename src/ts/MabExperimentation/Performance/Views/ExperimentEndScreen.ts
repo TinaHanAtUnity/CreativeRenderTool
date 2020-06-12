@@ -127,7 +127,8 @@ export class ExperimentEndScreen extends PerformanceEndScreen {
     }
 
     private applyColorTheme(baseColorTheme: IColorTheme, secondaryColorTheme: IColorTheme): void {
-        if (!baseColorTheme.light || !baseColorTheme.medium || !baseColorTheme.dark || !secondaryColorTheme.light || !secondaryColorTheme.medium || !secondaryColorTheme.dark) {
+        if (!baseColorTheme.light || !baseColorTheme.medium || !baseColorTheme.dark ||
+            !secondaryColorTheme.light || !secondaryColorTheme.medium || !secondaryColorTheme.dark) {
             SDKMetrics.reportMetricEvent(AUIMetric.InvalidEndscreenColorTintTheme);
             return;
         }
@@ -179,7 +180,7 @@ export class ExperimentEndScreen extends PerformanceEndScreen {
     }
 
     private handleResize() {
-        const element = <HTMLElement>document.getElementById('end-screen');
+        const element = <HTMLElement> document.getElementById('end-screen');
         if (element == null) {
             return;
         }
