@@ -52,7 +52,7 @@ export class ColorBlurEndScreen extends PerformanceEndScreen {
             return EndScreenExperiment.getDefaultActions();
         }
 
-        // the color blur scheme always needs a defined cta
+        // the color blur scheme always needs a defined CTA text
         if (actions.cta_text === undefined) {
             SDKMetrics.reportMetricEvent(AUIMetric.InvalidCtaText);
             return EndScreenExperiment.getDefaultActions();
