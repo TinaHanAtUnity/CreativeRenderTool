@@ -287,6 +287,8 @@ export class Placement extends Model<IPlacement> {
             'disableVideoControlsFade': this.disableVideoControlsFade(),
             'useCloseIconInsteadOfSkipIcon': this.useCloseIconInsteadOfSkipIcon(),
             'adTypes': this.getAdTypes(),
+            'adUnitId': this.getAdUnitId(),
+            'groupId': this.getGroupId(),
             'state': PlacementState[this.getState()].toLowerCase()
         };
     }
