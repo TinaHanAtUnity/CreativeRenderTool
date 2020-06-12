@@ -35,7 +35,8 @@ export const EndScreenExperimentDeclaration = {
         GET_STARTED: 'get_started',
         INSTALL_NOW: 'install_now',
         LETS_TRY_IT: 'lets_try_it',
-        OK: 'ok'
+        OK: 'ok',
+        UNDEFINED: undefined
     }
 };
 
