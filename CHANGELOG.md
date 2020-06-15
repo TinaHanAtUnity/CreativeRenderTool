@@ -1,7 +1,12 @@
-# Pending
+# Thu Jun 11 17:43:16 UTC 2020
+
+* [Load V5] Reverse ab test [#15884](https://github.com/Applifier/unity-ads-webview/pull/15884)
+
+# Wed Jun 10 23:55:46 UTC 2020
 
 * [VAST HTML Endcard] Reverse AB testing using group 17 and 11 [#15880](https://github.com/Applifier/unity-ads-webview/pull/15880)
 * [Bug]Add missing click report for admob [#15852](https://github.com/Applifier/unity-ads-webview/pull/15852)
+* [Revert] Remove load baseline metric [#15847](https://github.com/Applifier/unity-ads-webview/pull/15847)
 
 # Wed Jun 10 02:02:07 UTC 2020
 
