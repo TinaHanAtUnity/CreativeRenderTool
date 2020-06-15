@@ -30,7 +30,7 @@ export class ColorBlurEndScreen extends PerformanceEndScreen {
             default:
         }
 
-        // combination.cta_text will be defined at this point
+        // combination.cta_text will be defined at this point, due to a check in `this.fixupExperimentChoices`
         this._ctaText = combination.cta_text!;
 
         this._language = parameters.language;
