@@ -1,5 +1,6 @@
 # Pending
 
+* [Ad Unit] Conclude experiment [#15882](https://github.com/Applifier/unity-ads-webview/pull/15882)
 * [GAID] Investigate GAID versus GooglePlay Existence [#15948](https://github.com/Applifier/unity-ads-webview/pull/15948)
 
 # Thu Jun 11 17:43:16 UTC 2020
