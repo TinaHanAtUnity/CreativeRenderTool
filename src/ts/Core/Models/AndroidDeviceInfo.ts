@@ -91,7 +91,7 @@ export class AndroidDeviceInfo extends DeviceInfo<IAndroidDeviceInfo> {
             promises.push(this._core.DeviceInfo.Android!.getDisplayMetricDensity().then(displayMetricDensity => this.set('displayMetricDensity', displayMetricDensity)).catch(err => this.handleDeviceInfoError(err)));
             promises.push(this._core.DeviceInfo.Android!.getScreenLayout().then(screenLayout => this.set('screenLayout', screenLayout)).catch(err => this.handleDeviceInfoError(err)));
             // Workaround for 3.4.6+ - Detection based on if Google Advertising gather by super.fetch() call exists
-            this.set('isGoogleStoreInstalled', !!this.get('advertisingIdentifier'));
+            this.set('isGoogleStoreInstalled', true);
             this.set('isXiaomiStoreInstalled', false);
             this.set('isGoogleMapsInstalled', false);
             this.set('isTelephonyInstalled', false);
