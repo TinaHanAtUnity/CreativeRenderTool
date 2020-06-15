@@ -117,7 +117,7 @@ describe('ExperimentEndScreenTest', () => {
 
         Object.values(EndScreenExperimentDeclaration.color).forEach((c: string | undefined) => {
             if (c === undefined) {
-                validateExperimentAttributes(createExperimentEndScreen('fi', EndScreenExperimentDeclaration.scheme.LIGHT, c), EndScreenExperimentDeclaration.color.BLUE);
+                validateExperimentAttributes(createExperimentEndScreen('fi', EndScreenExperimentDeclaration.scheme.LIGHT, c), EndScreenExperimentDeclaration.color.GREEN);
             } else {
                 validateExperimentAttributes(createExperimentEndScreen('fi', EndScreenExperimentDeclaration.scheme.LIGHT, c), c);
             }

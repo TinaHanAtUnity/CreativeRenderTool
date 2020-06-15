@@ -33,7 +33,7 @@ export const EndScreenExperiment = new AutomatedExperiment({
     defaultActions: {
         scheme: EndScreenExperimentDeclaration.scheme.LIGHT,
         animation: EndScreenExperimentDeclaration.animation.BOUNCING,
-        color: EndScreenExperimentDeclaration.color.BLUE
+        color: EndScreenExperimentDeclaration.color.GREEN
     },
     cacheDisabled: true
 });
