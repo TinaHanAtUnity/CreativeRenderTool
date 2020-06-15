@@ -161,7 +161,7 @@ export class ExperimentEndScreen extends PerformanceEndScreen {
     }
 
     private handleResize() {
-        const element = <HTMLElement>document.getElementById('end-screen');
+        const element = <HTMLElement> document.getElementById('end-screen');
         if (element == null) {
             return;
         }
