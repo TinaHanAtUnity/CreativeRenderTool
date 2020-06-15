@@ -2,6 +2,7 @@
 
 * [Ad Unit] Conclude experiment [#15882](https://github.com/Applifier/unity-ads-webview/pull/15882)
 * [GAID] Investigate GAID versus GooglePlay Existence [#15948](https://github.com/Applifier/unity-ads-webview/pull/15948)
+* Add support for external end screen for versions prior to 2.1.0 [#15844](https://github.com/Applifier/unity-ads-webview/pull/15844)
 
 # Thu Jun 11 17:43:16 UTC 2020
 
