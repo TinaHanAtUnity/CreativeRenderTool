@@ -57,7 +57,7 @@ export class ExperimentEndScreen extends PerformanceEndScreen {
         }
 
         if (actions.color) {
-            const colorKeyName = Object.keys(EndScreenExperimentDeclaration.color).find((colorKeyName) => EndScreenExperimentDeclaration.color[colorKeyName] === actions.color);
+            const colorKeyName = Object.keys(EndScreenExperimentDeclaration.color).find((key) => EndScreenExperimentDeclaration.color[key] === actions.color);
 
             // light scheme can only use light colors
             if (actions.scheme === EndScreenExperimentDeclaration.scheme.LIGHT && actions.color && colorKeyName && colorKeyName.startsWith('DARK')) {
