@@ -1,3 +1,7 @@
+# Pending
+
+* Add support for External EndScreen for versions prior to 2.1.0 [#15844](https://github.com/Applifier/unity-ads-webview/pull/15844)
+
 # Mon Jun 15 20:25:47 UTC 2020
 
 * [Bug] Set isGoogleStoreInstalled to true always on 3.4.6+ [#15944](https://github.com/Applifier/unity-ads-webview/pull/15944)
