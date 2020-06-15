@@ -1,3 +1,7 @@
+# Pending
+
+* [GAID] Investigate GAID versus GooglePlay Existence [#15948](https://github.com/Applifier/unity-ads-webview/pull/15948)
+
 # Thu Jun 11 17:43:16 UTC 2020
 
 * [Load V5] Reverse ab test [#15884](https://github.com/Applifier/unity-ads-webview/pull/15884)
