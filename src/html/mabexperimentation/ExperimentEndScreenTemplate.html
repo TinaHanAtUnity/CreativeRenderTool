@@ -47,20 +47,20 @@
           <% } %>
 
           <% if (!!data.ratingCount && data.ratingCount !== "0") { %>
-          <span class="game-rating-count">
-            (<span class="game-rating-count-number"><%= data.ratingCount %></span>)
-          </span>
+            <span class="game-rating-count">
+              (<span class="game-rating-count-number"><%= data.ratingCount %></span>)
+            </span>
           <% } %>
         </div>
         <div class="download-container">
           <% if (data.ctaAlternativeText && data.isEnglish) { %>
-          <span class="download-text"><%= data.ctaAlternativeText %></span>
+            <span class="download-text"><%= data.ctaAlternativeText %></span>
           <% } else { %>
-          <span class="download-text"><%= data.t("Download For Free") %></span>
+            <span class="download-text"><%= data.t("Download For Free") %></span>
           <% } %>
         </div>
         <% if (data.hasShadow) { %>
-        <div class="download-container-shadow"></div>
+          <div class="download-container-shadow"></div>
         <% } %>
         <div class="download-message-container">
           <span class="download-message-text"></span>
