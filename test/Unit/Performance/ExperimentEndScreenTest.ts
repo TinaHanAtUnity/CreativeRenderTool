@@ -41,6 +41,11 @@ describe('ExperimentEndScreenTest', () => {
 
     afterEach(() => {
         sandbox.restore();
+
+        const container = privacy.container();
+        if (container && container.parentElement) {
+            container.parentElement.removeChild(container);
+        }
     });
 
     const createExperimentEndScreen = (language: string, scheme: string | undefined, buttonColor: string | undefined): ExperimentEndScreen => {
@@ -116,9 +121,14 @@ describe('ExperimentEndScreenTest', () => {
         };
 
         Object.values(EndScreenExperimentDeclaration.color).forEach((c: string | undefined) => {
-            if (c) {
+            const colorKeyName = Object.keys(EndScreenExperimentDeclaration.color).find((colorKeyName) => EndScreenExperimentDeclaration.color[colorKeyName] === c);
+            if (c && colorKeyName && !colorKeyName.startsWith('DARK')) {
                 it(`renders ${c}`, () => {
                     validateExperimentAttributes(createExperimentEndScreen('fi', EndScreenExperimentDeclaration.scheme.LIGHT, c), c);
+                });
+            } else if (c && colorKeyName && colorKeyName.startsWith('DARK')) {
+                it(`renders ${c}`, () => {
+                    validateExperimentAttributes(createExperimentEndScreen('fi', EndScreenExperimentDeclaration.scheme.DARK, c), c);
                 });
             } else {
                 it(`When c is undefined, it defaults to ${EndScreenExperimentDeclaration.color.BLUE}`, () => {
@@ -126,6 +136,12 @@ describe('ExperimentEndScreenTest', () => {
                 });
             }
         });
+
+        // Object.keys(EndScreenExperimentDeclaration.color).forEach((color: string | undefined) => {
+        //     if (color && color.startsWith('DARK')) {
+        //         console.log(color);
+        //     }
+        // });
 
         //Dark mode should ignore the color of the button, and set it to '#2ba3ff'
         // validateExperimentAttributes(createExperimentEndScreen('fi', EndScreenExperimentDeclaration.scheme.DARK, EndScreenExperimentDeclaration.color.RED), '2ba3ff');

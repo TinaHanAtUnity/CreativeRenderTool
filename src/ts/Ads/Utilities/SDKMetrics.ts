@@ -149,7 +149,8 @@ export enum AUIMetric {
     UnknownExperimentName = 'unknown_experiment_name',
     InvalidVideoOverlayMode = 'invalid_video_overlay_mode',
     UnknownCategoryProvided = 'unknown_automated_experiment_category_provided',
-    InvalidImageAssets = 'invalid_image_assets'
+    InvalidImageAssets = 'invalid_image_assets',
+    InvalidSchemeAndColorCoordination = 'invalid_scheme_and_color_coordination'
 }
 
 export enum ExternalEndScreenMetric {

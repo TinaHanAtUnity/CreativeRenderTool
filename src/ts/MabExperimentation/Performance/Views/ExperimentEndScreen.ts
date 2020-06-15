@@ -48,9 +48,23 @@ export class ExperimentEndScreen extends PerformanceEndScreen {
             return EndScreenExperiment.getDefaultActions();
         }
 
-        // light scheme must include a color
-        if (actions.scheme === EndScreenExperimentDeclaration.scheme.LIGHT && actions.color === undefined) {
+        // both light and dark scheme must include a color
+        if (actions.color === undefined) {
             SDKMetrics.reportMetricEvent(AUIMetric.InvalidEndscreenAnimation);
+            return EndScreenExperiment.getDefaultActions();
+        }
+
+        const colorKeyName = Object.keys(EndScreenExperimentDeclaration.color).find((colorKeyName => EndScreenExperimentDeclaration.color[colorKeyName] === actions.color));
+
+        // light scheme can only use light colors
+        if (actions.scheme === EndScreenExperimentDeclaration.scheme.LIGHT && actions.color && colorKeyName && colorKeyName.startsWith('DARK')) {
+            SDKMetrics.reportMetricEvent(AUIMetric.InvalidSchemeAndColorCoordination)
+            return EndScreenExperiment.getDefaultActions();
+        }
+
+        // dark scheme can only use dark colors
+        if (actions.scheme === EndScreenExperimentDeclaration.scheme.DARK && actions.color && colorKeyName && !colorKeyName.startsWith('DARK')) {
+            SDKMetrics.reportMetricEvent(AUIMetric.InvalidSchemeAndColorCoordination)
             return EndScreenExperiment.getDefaultActions();
         }
 
