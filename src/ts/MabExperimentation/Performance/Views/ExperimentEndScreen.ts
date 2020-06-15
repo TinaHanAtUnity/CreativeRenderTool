@@ -23,10 +23,18 @@ export class ExperimentEndScreen extends PerformanceEndScreen {
 
         switch (combination.scheme) {
             case EndScreenExperimentDeclaration.scheme.LIGHT:
-                this._downloadButtonColor = Color.hexToCssRgba(combination.color);
+                if (combination.color) {
+                    this._downloadButtonColor = Color.hexToCssRgba(combination.color);
+                } else {
+                    this._downloadButtonColor = Color.hexToCssRgba(EndScreenExperimentDeclaration.color.BLUE);
+                }
                 break;
             case EndScreenExperimentDeclaration.scheme.DARK:
-                this._downloadButtonColor = Color.hexToCssRgba(combination.color);
+                if (combination.color) {
+                    this._downloadButtonColor = Color.hexToCssRgba(combination.color);
+                } else {
+                    this._downloadButtonColor = Color.hexToCssRgba(EndScreenExperimentDeclaration.color.DARK_BLUE);
+                }
                 this._darkMode = true;
                 break;
             case EndScreenExperimentDeclaration.scheme.COLORMATCHING:
@@ -48,24 +56,20 @@ export class ExperimentEndScreen extends PerformanceEndScreen {
             return EndScreenExperiment.getDefaultActions();
         }
 
-        // both light and dark scheme must include a color
-        if (actions.color === undefined) {
-            SDKMetrics.reportMetricEvent(AUIMetric.InvalidEndscreenAnimation);
-            return EndScreenExperiment.getDefaultActions();
-        }
+        if (actions.color) {
+            const colorKeyName = Object.keys(EndScreenExperimentDeclaration.color).find((colorKeyName) => EndScreenExperimentDeclaration.color[colorKeyName] === actions.color);
 
-        const colorKeyName = Object.keys(EndScreenExperimentDeclaration.color).find((colorKeyName => EndScreenExperimentDeclaration.color[colorKeyName] === actions.color));
+            // light scheme can only use light colors
+            if (actions.scheme === EndScreenExperimentDeclaration.scheme.LIGHT && actions.color && colorKeyName && colorKeyName.startsWith('DARK')) {
+                SDKMetrics.reportMetricEvent(AUIMetric.InvalidSchemeAndColorCoordination);
+                return EndScreenExperiment.getDefaultActions();
+            }
 
-        // light scheme can only use light colors
-        if (actions.scheme === EndScreenExperimentDeclaration.scheme.LIGHT && actions.color && colorKeyName && colorKeyName.startsWith('DARK')) {
-            SDKMetrics.reportMetricEvent(AUIMetric.InvalidSchemeAndColorCoordination)
-            return EndScreenExperiment.getDefaultActions();
-        }
-
-        // dark scheme can only use dark colors
-        if (actions.scheme === EndScreenExperimentDeclaration.scheme.DARK && actions.color && colorKeyName && !colorKeyName.startsWith('DARK')) {
-            SDKMetrics.reportMetricEvent(AUIMetric.InvalidSchemeAndColorCoordination)
-            return EndScreenExperiment.getDefaultActions();
+            // dark scheme can only use dark colors
+            if (actions.scheme === EndScreenExperimentDeclaration.scheme.DARK && actions.color && colorKeyName && !colorKeyName.startsWith('DARK')) {
+                SDKMetrics.reportMetricEvent(AUIMetric.InvalidSchemeAndColorCoordination);
+                return EndScreenExperiment.getDefaultActions();
+            }
         }
 
         if (!EndScreenExperiment.isValid(actions)) {
@@ -157,7 +161,7 @@ export class ExperimentEndScreen extends PerformanceEndScreen {
     }
 
     private handleResize() {
-        const element = <HTMLElement> document.getElementById('end-screen');
+        const element = <HTMLElement>document.getElementById('end-screen');
         if (element == null) {
             return;
         }

@@ -131,19 +131,14 @@ describe('ExperimentEndScreenTest', () => {
                     validateExperimentAttributes(createExperimentEndScreen('fi', EndScreenExperimentDeclaration.scheme.DARK, c), c);
                 });
             } else {
-                it(`When c is undefined, it defaults to ${EndScreenExperimentDeclaration.color.BLUE}`, () => {
+                it(`When c is undefined and the scheme is light, it defaults to ${EndScreenExperimentDeclaration.color.BLUE}`, () => {
                     validateExperimentAttributes(createExperimentEndScreen('fi', EndScreenExperimentDeclaration.scheme.LIGHT, c), EndScreenExperimentDeclaration.color.BLUE);
+                });
+
+                it(`When c is undefined and the scheme is dark, it defaults to ${EndScreenExperimentDeclaration.color.DARK_BLUE}`, () => {
+                    validateExperimentAttributes(createExperimentEndScreen('fi', EndScreenExperimentDeclaration.scheme.DARK, c), EndScreenExperimentDeclaration.color.DARK_BLUE);
                 });
             }
         });
-
-        // Object.keys(EndScreenExperimentDeclaration.color).forEach((color: string | undefined) => {
-        //     if (color && color.startsWith('DARK')) {
-        //         console.log(color);
-        //     }
-        // });
-
-        //Dark mode should ignore the color of the button, and set it to '#2ba3ff'
-        // validateExperimentAttributes(createExperimentEndScreen('fi', EndScreenExperimentDeclaration.scheme.DARK, EndScreenExperimentDeclaration.color.RED), '2ba3ff');
     });
 });
