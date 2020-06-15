@@ -28,6 +28,8 @@ export class ColorBlurEndScreen extends PerformanceEndScreen {
                 this._formattedCtaAlternativeText = 'Install Now';
                 break;
             default:
+                SDKMetrics.reportMetricEvent(AUIMetric.InvalidCtaText);
+                this._formattedCtaAlternativeText = 'Download For Free';
         }
 
         // combination.cta_text will be defined at this point, due to a check in `this.fixupExperimentChoices`

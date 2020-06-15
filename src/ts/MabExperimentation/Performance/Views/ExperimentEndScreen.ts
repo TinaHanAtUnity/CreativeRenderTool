@@ -67,6 +67,8 @@ export class ExperimentEndScreen extends PerformanceEndScreen {
                 this._formattedCtaAlternativeText = 'OK!';
                 break;
             default:
+                SDKMetrics.reportMetricEvent(AUIMetric.InvalidCtaText);
+                this._formattedCtaAlternativeText = 'Download For Free';
         }
 
         // combination.animation will be defined at this point
