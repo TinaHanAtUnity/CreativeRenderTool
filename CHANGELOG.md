@@ -1,4 +1,4 @@
-# Pending
+# Mon Jun 15 20:25:47 UTC 2020
 
 * [Bug] Set isGoogleStoreInstalled to true always on 3.4.6+ [#15944](https://github.com/Applifier/unity-ads-webview/pull/15944)
 * [Ad Unit] Conclude experiment [#15882](https://github.com/Applifier/unity-ads-webview/pull/15882)
