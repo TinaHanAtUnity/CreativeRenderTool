@@ -121,7 +121,7 @@ describe('ExperimentEndScreenTest', () => {
         };
 
         Object.values(EndScreenExperimentDeclaration.color).forEach((c: string | undefined) => {
-            const colorKeyName = Object.keys(EndScreenExperimentDeclaration.color).find((colorKeyName) => EndScreenExperimentDeclaration.color[colorKeyName] === c);
+            const colorKeyName = Object.keys(EndScreenExperimentDeclaration.color).find((key) => EndScreenExperimentDeclaration.color[key] === c);
             if (c && colorKeyName && !colorKeyName.startsWith('DARK')) {
                 it(`renders ${c}`, () => {
                     validateExperimentAttributes(createExperimentEndScreen('fi', EndScreenExperimentDeclaration.scheme.LIGHT, c), c);
