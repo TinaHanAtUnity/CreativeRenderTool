@@ -69,7 +69,8 @@ export enum LoadV5ExperimentType {
     None = 'none',
     AdUnit = 'adunit',
     BaseAdUnit = 'base_adunit',
-    NoInvalidation = 'no_invalidation'
+    NoInvalidation = 'no_invalidation',
+    GroupId = 'groupId'
 }
 
 export class AdRequestManager extends CampaignManager {
