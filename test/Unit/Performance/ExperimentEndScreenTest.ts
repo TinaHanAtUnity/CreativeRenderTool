@@ -206,12 +206,7 @@ describe('ExperimentEndScreenTest', () => {
         describe('For other languages', () => {
             it('should ignore the cta provided, default to Download For Free and localize it', () => {
                 validateCtaText(
-                    createExperimentEndScreen(
-                        'fi',
-                        EndScreenExperimentDeclaration.scheme.LIGHT,
-                        EndScreenExperimentDeclaration.color.BLUE,
-                        EndScreenExperimentDeclaration.cta_text.DOWNLOAD_NOW_FIRE
-                    ),
+                    createExperimentEndScreen('fi', EndScreenExperimentDeclaration.scheme.LIGHT, EndScreenExperimentDeclaration.color.BLUE, EndScreenExperimentDeclaration.cta_text.DOWNLOAD_NOW_FIRE),
                     'Lataa ilmaiseksi'
                 );
             });
