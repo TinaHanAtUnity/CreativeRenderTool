@@ -122,7 +122,7 @@ describe('ExperimentEndScreenTest', () => {
             if (c === undefined) {
                 validateExperimentAttributes(
                     createExperimentEndScreen('fi', EndScreenExperimentDeclaration.scheme.LIGHT, c, EndScreenExperimentDeclaration.cta_text.DOWNLOAD_NOW_FIRE),
-                    EndScreenExperimentDeclaration.color.BLUE
+                    EndScreenExperimentDeclaration.color.GREEN
                 );
             } else {
                 validateExperimentAttributes(createExperimentEndScreen('fi', EndScreenExperimentDeclaration.scheme.LIGHT, c, EndScreenExperimentDeclaration.cta_text.DOWNLOAD_NOW_FIRE), c);

@@ -45,7 +45,7 @@ export const EndScreenExperiment = new AutomatedExperiment({
     defaultActions: {
         scheme: EndScreenExperimentDeclaration.scheme.LIGHT,
         animation: EndScreenExperimentDeclaration.animation.BOUNCING,
-        color: EndScreenExperimentDeclaration.color.BLUE,
+        color: EndScreenExperimentDeclaration.color.GREEN,
         cta_text: EndScreenExperimentDeclaration.cta_text.DOWNLOAD_FOR_FREE
     },
     cacheDisabled: true
