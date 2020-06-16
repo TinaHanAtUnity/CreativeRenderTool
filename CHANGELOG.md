@@ -1,3 +1,19 @@
+# Tue 16 Jun 2020 15:41:08 UTC
+
+* [AUI] Update ExperimentEndScreen default actions to use global best combination [#16007](https://github.com/Applifier/unity-ads-webview/pull/16007)
+* [AUI] Add ctaAlternativeText to Endcard Experiments [#15748](https://github.com/Applifier/unity-ads-webview/pull/15748)
+* Add support for External EndScreen for versions prior to 2.1.0 [#15844](https://github.com/Applifier/unity-ads-webview/pull/15844)
+
+# Mon Jun 15 20:25:47 UTC 2020
+
+* [Bug] Set isGoogleStoreInstalled to true always on 3.4.6+ [#15944](https://github.com/Applifier/unity-ads-webview/pull/15944)
+* [Ad Unit] Conclude experiment [#15882](https://github.com/Applifier/unity-ads-webview/pull/15882)
+* [GAID] Investigate GAID versus GooglePlay Existence [#15948](https://github.com/Applifier/unity-ads-webview/pull/15948)
+
+# Thu Jun 11 17:43:16 UTC 2020
+
+* [Load V5] Reverse ab test [#15884](https://github.com/Applifier/unity-ads-webview/pull/15884)
+
 # Wed Jun 10 23:55:46 UTC 2020
 
 * [VAST HTML Endcard] Reverse AB testing using group 17 and 11 [#15880](https://github.com/Applifier/unity-ads-webview/pull/15880)
