@@ -1,5 +1,6 @@
 # Pending
 
+* [AUI] Update ExperimentEndScreen default actions to use global best combination [#16007](https://github.com/Applifier/unity-ads-webview/pull/16007)
 * [AUI] Add ctaAlternativeText to Endcard Experiments [#15748](https://github.com/Applifier/unity-ads-webview/pull/15748)
 * Add support for External EndScreen for versions prior to 2.1.0 [#15844](https://github.com/Applifier/unity-ads-webview/pull/15844)
 
