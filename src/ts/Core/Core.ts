@@ -258,7 +258,7 @@ export class Core implements ICore {
             });
         }).catch((error: { message: string; name: unknown }) => {
             if (error instanceof ConfigError) {
-                error =  new InitializationError('Unity Ads SDK fail to initialize due to configuration error', InitErrorCode.ConfigurationError);
+                error = new InitializationError('Unity Ads SDK fail to initialize due to configuration error', InitErrorCode.ConfigurationError);
             }
             this.handleInitializationError(error);
         });
