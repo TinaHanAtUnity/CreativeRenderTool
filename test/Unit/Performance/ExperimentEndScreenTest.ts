@@ -102,7 +102,7 @@ describe('ExperimentEndScreenTest', () => {
         );
     });
 
-    describe('should render correct experiment attributes', () => {
+    describe('CTA color variants', () => {
         // RGBToHex transforms a string in the "rgb(1, 12, 123)" format to the "#010C7B"
         function RGBToHex(rgb: string): string {
             const sep = rgb.indexOf(',') > -1 ? ',' : ' ';
