@@ -279,7 +279,7 @@ export class Core implements ICore {
         this.Api.Sdk.initError(message, errorCode);
         this.Api.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.INITIALIZE_FAILED], message);
         this.Api.Sdk.logError(`Initialization error: ${message}`);
-        SDKMetrics.reportMetricEventWithTags(InitializationFailureMetric.InitializeFailed, {'rsn': errorCode.toString()});
+        SDKMetrics.reportMetricEventWithTags(InitializationFailureMetric.InitializeFailed, { 'rsn': errorCode.toString() });
     }
 
     private setupTestEnvironment(): Promise<void> {
