@@ -23,22 +23,41 @@ export class ExperimentEndScreen extends PerformanceEndScreen {
 
         combination = this.fixupExperimentChoices(combination);
 
-        switch (combination.scheme) {
-            case EndScreenExperimentDeclaration.scheme.LIGHT:
-                this._downloadButtonColor = Color.hexToCssRgba(combination.color);
-                break;
-            case EndScreenExperimentDeclaration.scheme.DARK:
-                // This is "pastel blue", to be cohesive with dark mode
-                this._downloadButtonColor = Color.hexToCssRgba('#2ba3ff');
-                this._darkMode = true;
-                break;
-            case EndScreenExperimentDeclaration.scheme.COLORMATCHING:
-                this._tintColor = true;
-                break;
-            default:
-        }
+        this.fixupScheme(combination);
+        this.fixupCtaText(combination.cta_text);
 
-        switch (combination.cta_text) {
+        // combination.animation will be defined at this point
+        this._animation = combination.animation!;
+        this._language = parameters.language;
+        this._templateData = {
+            ...this._templateData,
+            hasShadow: this._animation === EndScreenExperimentDeclaration.animation.BOUNCING,
+            ctaAlternativeText: this._formattedCtaAlternativeText,
+            isEnglish: this._language.indexOf('en') !== -1
+        };
+    }
+
+    private fixupScheme(actions: IExperimentActionChoice | undefined) {
+        if (actions) {
+            switch (actions.scheme) {
+                case EndScreenExperimentDeclaration.scheme.LIGHT:
+                    this._downloadButtonColor = Color.hexToCssRgba(actions.color);
+                    break;
+                case EndScreenExperimentDeclaration.scheme.DARK:
+                    // This is "pastel blue", to be cohesive with dark mode
+                    this._downloadButtonColor = Color.hexToCssRgba('#2ba3ff');
+                    this._darkMode = true;
+                    break;
+                case EndScreenExperimentDeclaration.scheme.COLORMATCHING:
+                    this._tintColor = true;
+                    break;
+                default:
+            }
+        }
+    }
+
+    private fixupCtaText(ctaText: string | undefined) {
+        switch (ctaText) {
             case EndScreenExperimentDeclaration.cta_text.DOWNLOAD:
                 this._formattedCtaAlternativeText = 'Download';
                 break;
@@ -70,16 +89,6 @@ export class ExperimentEndScreen extends PerformanceEndScreen {
                 SDKMetrics.reportMetricEvent(AUIMetric.InvalidCtaText);
                 this._formattedCtaAlternativeText = 'Download For Free';
         }
-
-        // combination.animation will be defined at this point
-        this._animation = combination.animation!;
-        this._language = parameters.language;
-        this._templateData = {
-            ...this._templateData,
-            hasShadow: this._animation === EndScreenExperimentDeclaration.animation.BOUNCING,
-            ctaAlternativeText: this._formattedCtaAlternativeText,
-            isEnglish: this._language.indexOf('en') !== -1
-        };
     }
 
     private fixupExperimentChoices(actions: IExperimentActionChoice | undefined): IExperimentActionChoice {
