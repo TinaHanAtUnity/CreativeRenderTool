@@ -1,4 +1,4 @@
-import { ColorUtils } from 'Core/Utilities/ColorUtils';
+import { ColorUtils } from 'MabExperimentation/Utilities/ColorUtils.ts';
 
 describe('ColorUtils', () => {
     // the colors are assigned to a variable here for clarity,
