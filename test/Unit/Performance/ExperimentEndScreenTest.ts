@@ -33,7 +33,7 @@ describe('ExperimentEndScreenTest', () => {
         nativeBridge = TestFixtures.getNativeBridge(platform, backend);
         core = TestFixtures.getCoreApi(nativeBridge);
         Localization.setLanguageMap('fi.*', 'endscreen', {
-            'Download For Free': 'Lataa ilmaiseksi'
+            'Download For Free': 'Lataa ilmaiseksi',
         });
         configuration = TestFixtures.getCoreConfiguration();
         sandbox.stub(SDKMetrics, 'reportMetricEvent').returns(Promise.resolve());
@@ -49,12 +49,7 @@ describe('ExperimentEndScreenTest', () => {
         }
     });
 
-    const createExperimentEndScreen = (
-        language: string,
-        scheme: string | undefined,
-        buttonColor: string | undefined,
-        ctaText: string | undefined
-    ): ExperimentEndScreen => {
+    const createExperimentEndScreen = (language: string, scheme: string | undefined, buttonColor: string | undefined, ctaText: string | undefined): ExperimentEndScreen => {
         const privacyManager = sinon.createStubInstance(UserPrivacyManager);
         const campaign = TestFixtures.getCampaign();
         privacy = new Privacy(platform, campaign, privacyManager, false, false, 'en');
@@ -67,14 +62,14 @@ describe('ExperimentEndScreenTest', () => {
             abGroup: configuration.getAbGroup(),
             privacy,
             showGDPRBanner: false,
-            campaignId: campaign.getId()
+            campaignId: campaign.getId(),
         };
         // Non-default experiment description
         const experimentDescription = {
             scheme: scheme,
             color: buttonColor,
             animation: EndScreenExperimentDeclaration.animation.BOUNCING,
-            cta_text: ctaText
+            cta_text: ctaText,
         };
         return new ExperimentEndScreen(experimentDescription, params, campaign);
     };
@@ -93,12 +88,7 @@ describe('ExperimentEndScreenTest', () => {
         };
 
         validateTranslation(
-            createExperimentEndScreen(
-                'fi',
-                EndScreenExperimentDeclaration.scheme.LIGHT,
-                EndScreenExperimentDeclaration.color.RED,
-                EndScreenExperimentDeclaration.cta_text.DOWNLOAD_FOR_FREE
-            )
+            createExperimentEndScreen('fi', EndScreenExperimentDeclaration.scheme.LIGHT, EndScreenExperimentDeclaration.color.RED, EndScreenExperimentDeclaration.cta_text.DOWNLOAD_FOR_FREE)
         );
     });
 
@@ -137,49 +127,23 @@ describe('ExperimentEndScreenTest', () => {
         Object.values(EndScreenExperimentDeclaration.color).forEach((c: string | undefined) => {
             if (c && !ColorUtils.isDarkSchemeColor(c)) {
                 it(`renders ${c}`, () => {
-                    validateExperimentAttributes(
-                        createExperimentEndScreen(
-                            'fi',
-                            EndScreenExperimentDeclaration.scheme.LIGHT,
-                            c,
-                            EndScreenExperimentDeclaration.cta_text.DOWNLOAD_NOW_FIRE
-                        ),
-                        c
-                    );
+                    validateExperimentAttributes(createExperimentEndScreen('fi', EndScreenExperimentDeclaration.scheme.LIGHT, c, EndScreenExperimentDeclaration.cta_text.DOWNLOAD_NOW_FIRE), c);
                 });
             } else if (c && ColorUtils.isDarkSchemeColor(c)) {
                 it(`renders ${c}`, () => {
-                    validateExperimentAttributes(
-                        createExperimentEndScreen(
-                            'fi',
-                            EndScreenExperimentDeclaration.scheme.DARK,
-                            c,
-                            EndScreenExperimentDeclaration.cta_text.DOWNLOAD_NOW_FIRE
-                        ),
-                        c
-                    );
+                    validateExperimentAttributes(createExperimentEndScreen('fi', EndScreenExperimentDeclaration.scheme.DARK, c, EndScreenExperimentDeclaration.cta_text.DOWNLOAD_NOW_FIRE), c);
                 });
             } else {
                 it(`When c is undefined and the scheme is light, it defaults to ${EndScreenExperimentDeclaration.color.BLUE}`, () => {
                     validateExperimentAttributes(
-                        createExperimentEndScreen(
-                            'fi',
-                            EndScreenExperimentDeclaration.scheme.LIGHT,
-                            c,
-                            EndScreenExperimentDeclaration.cta_text.DOWNLOAD_NOW_FIRE
-                        ),
+                        createExperimentEndScreen('fi', EndScreenExperimentDeclaration.scheme.LIGHT, c, EndScreenExperimentDeclaration.cta_text.DOWNLOAD_NOW_FIRE),
                         EndScreenExperimentDeclaration.color.BLUE
                     );
                 });
 
                 it(`When c is undefined and the scheme is dark, it defaults to ${EndScreenExperimentDeclaration.color.DARK_BLUE}`, () => {
                     validateExperimentAttributes(
-                        createExperimentEndScreen(
-                            'fi',
-                            EndScreenExperimentDeclaration.scheme.DARK,
-                            c,
-                            EndScreenExperimentDeclaration.cta_text.DOWNLOAD_NOW_FIRE
-                        ),
+                        createExperimentEndScreen('fi', EndScreenExperimentDeclaration.scheme.DARK, c, EndScreenExperimentDeclaration.cta_text.DOWNLOAD_NOW_FIRE),
                         EndScreenExperimentDeclaration.color.DARK_BLUE
                     );
                 });
@@ -230,10 +194,7 @@ describe('ExperimentEndScreenTest', () => {
                 Object.values(EndScreenExperimentDeclaration.cta_text).forEach((cta: string | undefined) => {
                     if (cta) {
                         it(`should render ${cta} `, () => {
-                            validateCtaText(
-                                createExperimentEndScreen('en', EndScreenExperimentDeclaration.scheme.LIGHT, EndScreenExperimentDeclaration.color.BLUE, cta),
-                                formatCtaText(cta)
-                            );
+                            validateCtaText(createExperimentEndScreen('en', EndScreenExperimentDeclaration.scheme.LIGHT, EndScreenExperimentDeclaration.color.BLUE, cta), formatCtaText(cta));
                         });
                     } else {
                         it('should default to Download For Free when cta is undefined', () => {
