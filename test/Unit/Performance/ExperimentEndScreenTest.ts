@@ -33,7 +33,7 @@ describe('ExperimentEndScreenTest', () => {
         nativeBridge = TestFixtures.getNativeBridge(platform, backend);
         core = TestFixtures.getCoreApi(nativeBridge);
         Localization.setLanguageMap('fi.*', 'endscreen', {
-            'Download For Free': 'Lataa ilmaiseksi',
+            'Download For Free': 'Lataa ilmaiseksi'
         });
         configuration = TestFixtures.getCoreConfiguration();
         sandbox.stub(SDKMetrics, 'reportMetricEvent').returns(Promise.resolve());
@@ -42,11 +42,6 @@ describe('ExperimentEndScreenTest', () => {
 
     afterEach(() => {
         sandbox.restore();
-
-        const container = privacy.container();
-        if (container && container.parentElement) {
-            container.parentElement.removeChild(container);
-        }
     });
 
     const createExperimentEndScreen = (language: string, scheme: string | undefined, buttonColor: string | undefined, ctaText: string | undefined): ExperimentEndScreen => {
@@ -62,14 +57,14 @@ describe('ExperimentEndScreenTest', () => {
             abGroup: configuration.getAbGroup(),
             privacy,
             showGDPRBanner: false,
-            campaignId: campaign.getId(),
+            campaignId: campaign.getId()
         };
         // Non-default experiment description
         const experimentDescription = {
             scheme: scheme,
             color: buttonColor,
             animation: EndScreenExperimentDeclaration.animation.BOUNCING,
-            cta_text: ctaText,
+            cta_text: ctaText
         };
         return new ExperimentEndScreen(experimentDescription, params, campaign);
     };
