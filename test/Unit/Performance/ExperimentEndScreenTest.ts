@@ -144,6 +144,7 @@ describe('ExperimentEndScreenTest', () => {
                 });
             }
         });
+    });
 
         describe('CTA text variants', () => {
             const formatCtaText = (cta: string | undefined) => {
@@ -216,5 +217,4 @@ describe('ExperimentEndScreenTest', () => {
                 });
             });
         });
-    });
 });
