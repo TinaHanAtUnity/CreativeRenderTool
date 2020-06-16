@@ -43,7 +43,7 @@ describe('ExperimentEndScreenTest', () => {
         sandbox.restore();
     });
 
-    const createExperimentEndScreen = (language: string, scheme: string | undefined, buttonColor: string | undefined): ExperimentEndScreen => {
+    const createExperimentEndScreen = (language: string, scheme: string | undefined, buttonColor: string | undefined, ctaText: string | undefined): ExperimentEndScreen => {
         const privacyManager = sinon.createStubInstance(UserPrivacyManager);
         const campaign = TestFixtures.getCampaign();
         privacy = new Privacy(platform, campaign, privacyManager, false, false, 'en');
@@ -62,7 +62,8 @@ describe('ExperimentEndScreenTest', () => {
         const experimentDescription = {
             scheme: scheme,
             color: buttonColor,
-            animation: EndScreenExperimentDeclaration.animation.BOUNCING
+            animation: EndScreenExperimentDeclaration.animation.BOUNCING,
+            cta_text: ctaText
         };
         return new ExperimentEndScreen(experimentDescription, params, campaign);
     };
@@ -80,7 +81,9 @@ describe('ExperimentEndScreenTest', () => {
             }
         };
 
-        validateTranslation(createExperimentEndScreen('fi', EndScreenExperimentDeclaration.scheme.LIGHT, EndScreenExperimentDeclaration.color.RED));
+        validateTranslation(
+            createExperimentEndScreen('fi', EndScreenExperimentDeclaration.scheme.LIGHT, EndScreenExperimentDeclaration.color.RED, EndScreenExperimentDeclaration.cta_text.DOWNLOAD_FOR_FREE)
+        );
     });
 
     it('should render correct experiment attributes', () => {
@@ -117,13 +120,86 @@ describe('ExperimentEndScreenTest', () => {
 
         Object.values(EndScreenExperimentDeclaration.color).forEach((c: string | undefined) => {
             if (c === undefined) {
-                validateExperimentAttributes(createExperimentEndScreen('fi', EndScreenExperimentDeclaration.scheme.LIGHT, c), EndScreenExperimentDeclaration.color.GREEN);
+                validateExperimentAttributes(
+                    createExperimentEndScreen('fi', EndScreenExperimentDeclaration.scheme.LIGHT, c, EndScreenExperimentDeclaration.cta_text.DOWNLOAD_NOW_FIRE),
+                    EndScreenExperimentDeclaration.color.GREEN
+                );
             } else {
-                validateExperimentAttributes(createExperimentEndScreen('fi', EndScreenExperimentDeclaration.scheme.LIGHT, c), c);
+                validateExperimentAttributes(createExperimentEndScreen('fi', EndScreenExperimentDeclaration.scheme.LIGHT, c, EndScreenExperimentDeclaration.cta_text.DOWNLOAD_NOW_FIRE), c);
             }
         });
 
         //Dark mode should ignore the color of the button, and set it to '#2ba3ff'
-        validateExperimentAttributes(createExperimentEndScreen('fi', EndScreenExperimentDeclaration.scheme.DARK, EndScreenExperimentDeclaration.color.RED), '2ba3ff');
+        validateExperimentAttributes(
+            createExperimentEndScreen('fi', EndScreenExperimentDeclaration.scheme.DARK, EndScreenExperimentDeclaration.color.RED, EndScreenExperimentDeclaration.cta_text.DOWNLOAD_NOW_FIRE),
+            '2ba3ff'
+        );
+    });
+
+    describe('CTA text variants', () => {
+        const formatCtaText = (cta: string | undefined) => {
+            switch (cta) {
+                case EndScreenExperimentDeclaration.cta_text.DOWNLOAD:
+                    return 'Download';
+                case EndScreenExperimentDeclaration.cta_text.DOWNLOAD_FOR_FREE:
+                    return 'Download For Free';
+                case EndScreenExperimentDeclaration.cta_text.DOWNLOAD_NOW:
+                    return 'Download Now!';
+                case EndScreenExperimentDeclaration.cta_text.DOWNLOAD_NOW_FIRE:
+                    return '🔥 Download Now 🔥';
+                case EndScreenExperimentDeclaration.cta_text.GET:
+                    return 'Get';
+                case EndScreenExperimentDeclaration.cta_text.GET_STARTED:
+                    return 'Get Started!';
+                case EndScreenExperimentDeclaration.cta_text.INSTALL_NOW:
+                    return 'Install Now';
+                case EndScreenExperimentDeclaration.cta_text.LETS_TRY_IT:
+                    return `Let's try it!`;
+                case EndScreenExperimentDeclaration.cta_text.OK:
+                    return 'OK!';
+                default:
+            }
+        };
+
+        const validateCtaText = (endScreen: ExperimentEndScreen, ctaText: string | undefined) => {
+            endScreen.render();
+
+            const downloadElement = <HTMLElement>endScreen.container().querySelectorAll('.download-text')[0];
+            const downloadElementText = downloadElement.innerHTML;
+
+            assert.isNotNull(downloadElementText);
+            assert.equal(downloadElementText, ctaText);
+
+            const container = privacy.container();
+            if (container && container.parentElement) {
+                container.parentElement.removeChild(container);
+            }
+        };
+
+        describe('For English language', () => {
+            Object.values(EndScreenExperimentDeclaration.cta_text).forEach((cta: string | undefined) => {
+                if (cta) {
+                    it(`should render ${cta} `, () => {
+                        validateCtaText(createExperimentEndScreen('en', EndScreenExperimentDeclaration.scheme.LIGHT, EndScreenExperimentDeclaration.color.BLUE, cta), formatCtaText(cta));
+                    });
+                } else {
+                    it('should default to Download For Free when cta is undefined', () => {
+                        validateCtaText(
+                            createExperimentEndScreen('en', EndScreenExperimentDeclaration.scheme.LIGHT, EndScreenExperimentDeclaration.color.BLUE, cta),
+                            formatCtaText(EndScreenExperimentDeclaration.cta_text.DOWNLOAD_FOR_FREE)
+                        );
+                    });
+                }
+            });
+        });
+
+        describe('For other languages', () => {
+            it('should ignore the cta provided, default to Download For Free and localize it', () => {
+                validateCtaText(
+                    createExperimentEndScreen('fi', EndScreenExperimentDeclaration.scheme.LIGHT, EndScreenExperimentDeclaration.color.BLUE, EndScreenExperimentDeclaration.cta_text.DOWNLOAD_NOW_FIRE),
+                    'Lataa ilmaiseksi'
+                );
+            });
+        });
     });
 });
