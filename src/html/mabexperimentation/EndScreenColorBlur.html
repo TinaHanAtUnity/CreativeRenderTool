@@ -36,16 +36,22 @@
                         <% } %>
 
                         <% if (data.ratingCount && data.ratingCount !== "0") { %>
-                        <span class="game-rating-count">
-                            (<span class="game-rating-count-number"><%= data.ratingCount %></span>)
-                        </span>
+                            <span class="game-rating-count">
+                                (<span class="game-rating-count-number"><%= data.ratingCount %></span>)
+                            </span>
                         <% } %>
                     </div>
                 </div>
             </div>
             <div class="install-container">
+            <% if (data.ctaAlternativeText && data.isEnglish) { %>
+                <span class="download-text"><%= data.ctaAlternativeText %></span>
+            <% } else { %>
                 <span class="download-text"><%= data.t("Install Now") %></span>
+            <% } %>
+            <% if(data.ctaAlternativeText !== "Download For Free") { %>
                 <span class="free-text"><%= data.t("Free") %></span>
+            <% } %>
             </div>
             <div class="unityads-logo"></div>
         </div>

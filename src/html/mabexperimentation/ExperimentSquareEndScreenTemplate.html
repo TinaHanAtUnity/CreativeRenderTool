@@ -50,8 +50,12 @@
                     <% } %>
                 </div>
                 <div class="download-container">
-                    <span class="download-text"><%= data.t("Download For Free") %></span>
-                </div>
+                    <% if (data.ctaAlternativeText && data.isEnglish) { %>
+                        <span class="download-text"><%= data.ctaAlternativeText %></span>
+                    <% } else { %>
+                        <span class="download-text"><%= data.t("Download For Free") %></span>
+                    <% } %>
+                  </div>
                 <% if (data.hasShadow) { %>
                     <div class="download-container-shadow"></div>
                 <% } %>

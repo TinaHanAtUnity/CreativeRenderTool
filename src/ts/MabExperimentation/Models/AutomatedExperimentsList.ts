@@ -7,25 +7,37 @@ export enum AutomatedExperimentsCategories {
 }
 
 export const EndScreenExperimentDeclaration = {
-  scheme: {
-      DARK: 'dark',
-      LIGHT: 'light',
-      COLORMATCHING: 'color_matching',
-      COLORBLUR: 'color_blur'
-  },
-  animation: {
-      STATIC: 'static',
-      HEARTBEATING: 'heartbeating',
-      BOUNCING: 'bouncing',
-      SHINING: 'shining'
-  },
-  color: {
-      BLUE: '167dfb',
-      GREEN: '33cc00',
-      PINK: 'cc0099',
-      RED: 'c31e25',
-      UNDEFINED: undefined
-  }
+    scheme: {
+        DARK: 'dark',
+        LIGHT: 'light',
+        COLORMATCHING: 'color_matching',
+        COLORBLUR: 'color_blur'
+    },
+    animation: {
+        STATIC: 'static',
+        HEARTBEATING: 'heartbeating',
+        BOUNCING: 'bouncing',
+        SHINING: 'shining'
+    },
+    color: {
+        BLUE: '167dfb',
+        GREEN: '33cc00',
+        PINK: 'cc0099',
+        RED: 'c31e25',
+        UNDEFINED: undefined
+    },
+    cta_text: {
+        DOWNLOAD: 'download',
+        DOWNLOAD_FOR_FREE: 'download_for_free',
+        DOWNLOAD_NOW: 'download_now',
+        DOWNLOAD_NOW_FIRE: 'download_now_fire',
+        GET: 'get',
+        GET_STARTED: 'get_started',
+        INSTALL_NOW: 'install_now',
+        LETS_TRY_IT: 'lets_try_it',
+        OK: 'ok',
+        UNDEFINED: undefined
+    }
 };
 
 export const EndScreenExperiment = new AutomatedExperiment({
@@ -33,7 +45,8 @@ export const EndScreenExperiment = new AutomatedExperiment({
     defaultActions: {
         scheme: EndScreenExperimentDeclaration.scheme.LIGHT,
         animation: EndScreenExperimentDeclaration.animation.BOUNCING,
-        color: EndScreenExperimentDeclaration.color.BLUE
+        color: EndScreenExperimentDeclaration.color.BLUE,
+        cta_text: EndScreenExperimentDeclaration.cta_text.DOWNLOAD_FOR_FREE
     },
     cacheDisabled: true
 });
