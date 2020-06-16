@@ -9,6 +9,7 @@ import { AUIMetric, SDKMetrics } from 'Ads/Utilities/SDKMetrics';
 import { Color } from 'Core/Utilities/Color';
 import { IColorTheme } from 'Performance/Utilities/Swatch';
 import { ColorTheme } from 'Core/Utilities/ColorTheme';
+import { ColorUtils } from 'Core/Utilities/ColorUtils';
 
 export class ExperimentEndScreen extends PerformanceEndScreen {
     private _animation: string;
@@ -59,13 +60,13 @@ export class ExperimentEndScreen extends PerformanceEndScreen {
         if (actions.color) {
 
             // light scheme can only use light colors
-            if (actions.scheme === EndScreenExperimentDeclaration.scheme.LIGHT && !this.isDarkColor(actions.color)) {
+            if (actions.scheme === EndScreenExperimentDeclaration.scheme.LIGHT && ColorUtils.isDarkSchemeColor(actions.color)) {
                 SDKMetrics.reportMetricEvent(AUIMetric.InvalidSchemeAndColorCoordination);
                 return EndScreenExperiment.getDefaultActions();
             }
 
             // dark scheme can only use dark colors
-            if (actions.scheme === EndScreenExperimentDeclaration.scheme.DARK && this.isDarkColor(actions.color)) {
+            if (actions.scheme === EndScreenExperimentDeclaration.scheme.DARK && !ColorUtils.isDarkSchemeColor(actions.color)) {
                 SDKMetrics.reportMetricEvent(AUIMetric.InvalidSchemeAndColorCoordination);
                 return EndScreenExperiment.getDefaultActions();
             }
@@ -77,17 +78,6 @@ export class ExperimentEndScreen extends PerformanceEndScreen {
         }
 
         return actions;
-    }
-
-    // public so it can be accessible in the tests
-    public isDarkColor(color: string | undefined): boolean {
-        const colorKeyName = Object.keys(EndScreenExperimentDeclaration.color).find((key) => EndScreenExperimentDeclaration.color[key] === color);
-
-        if (colorKeyName && colorKeyName.startsWith('DARK')) {
-            return true;
-        } else {
-            return false;
-        }
     }
 
     public render(): void {

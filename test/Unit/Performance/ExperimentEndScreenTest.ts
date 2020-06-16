@@ -15,6 +15,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { ExperimentEndScreen } from 'MabExperimentation/Performance/Views/ExperimentEndScreen';
 import { EndScreenExperimentDeclaration } from 'MabExperimentation/Models/AutomatedExperimentsList';
 import { SDKMetrics } from 'Ads/Utilities/SDKMetrics';
+import { ColorUtils } from 'Core/Utilities/ColorUtils';
 
 describe('ExperimentEndScreenTest', () => {
     let platform: Platform;
@@ -121,12 +122,12 @@ describe('ExperimentEndScreenTest', () => {
         };
 
         Object.values(EndScreenExperimentDeclaration.color).forEach((c: string | undefined) => {
-            const colorKeyName = Object.keys(EndScreenExperimentDeclaration.color).find((key) => EndScreenExperimentDeclaration.color[key] === c);
-            if (c && colorKeyName && !colorKeyName.startsWith('DARK')) {
+
+            if (c && !ColorUtils.isDarkSchemeColor(c)) {
                 it(`renders ${c}`, () => {
                     validateExperimentAttributes(createExperimentEndScreen('fi', EndScreenExperimentDeclaration.scheme.LIGHT, c), c);
                 });
-            } else if (c && colorKeyName && colorKeyName.startsWith('DARK')) {
+            } else if (c && ColorUtils.isDarkSchemeColor(c)) {
                 it(`renders ${c}`, () => {
                     validateExperimentAttributes(createExperimentEndScreen('fi', EndScreenExperimentDeclaration.scheme.DARK, c), c);
                 });
