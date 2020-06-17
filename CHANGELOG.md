@@ -1,5 +1,6 @@
 # Pending
 
+* [Placement Grouping]Update files to use groupId [#16016](https://github.com/Applifier/unity-ads-webview/pull/16016)
 * [Placement Grouping]Add groupId and helper functions in Placement [#15942](https://github.com/Applifier/unity-ads-webview/pull/15942)
 
 # Tue 16 Jun 2020 15:41:08 UTC
