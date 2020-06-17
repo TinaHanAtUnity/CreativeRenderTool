@@ -70,7 +70,7 @@ export enum LoadV5ExperimentType {
     AdUnit = 'adunit',
     BaseAdUnit = 'base_adunit',
     NoInvalidation = 'no_invalidation',
-    GroupId = 'groupId'
+    GroupId = 'grouping'
 }
 
 export class AdRequestManager extends CampaignManager {
