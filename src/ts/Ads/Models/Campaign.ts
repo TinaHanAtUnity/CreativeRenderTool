@@ -52,8 +52,16 @@ export abstract class Campaign<T extends ICampaign = ICampaign> extends Model<T>
         isLoadEnabled: ['boolean']
     };
 
+    private _uniqueId: string;
+
     constructor(name: string, schema: ISchema<T>, data: T) {
         super(name, schema, data);
+
+        if (data.session) {
+            this._uniqueId = `${data.session.getId()}-${data.mediaId}`;
+        } else {
+            this._uniqueId = data.mediaId;
+        }
     }
 
     public getId(): string {
@@ -127,6 +135,10 @@ export abstract class Campaign<T extends ICampaign = ICampaign> extends Model<T>
             return urls[event] || [];
         }
         return [];
+    }
+
+    public getUniqueId(): string {
+        return this._uniqueId;
     }
 
     public getDTO(): { [key: string]: unknown } {
