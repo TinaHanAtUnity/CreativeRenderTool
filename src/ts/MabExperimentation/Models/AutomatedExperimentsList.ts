@@ -34,10 +34,10 @@ export const EndScreenExperimentDeclaration: IExperimentDeclaration = {
         DARK_CYAN: '009a9b',
         DARK_GREEN: '009a00',
         DARK_LIME: '659b00',
-        DARK_NAVY: '003366',
+        DARK_NAVY: '003365',
         DARK_ORANGE: 'c66a00',
         DARK_PINK: '96006b',
-        DARK_PURPLE: '6600cc',
+        DARK_PURPLE: '6600cb',
         DARK_RED: '8b0000',
         DARK_YELLOW: 'c89b00',
         UNDEFINED: undefined
