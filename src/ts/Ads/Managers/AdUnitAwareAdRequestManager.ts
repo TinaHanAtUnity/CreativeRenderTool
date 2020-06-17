@@ -13,7 +13,7 @@ export class AdUnitAwareAdRequestManager extends CampaignManager {
         super();
 
         this._adRequestManager = adRequestManager;
-        this._adRequestManager.onAdditionalPlacementsReady.subscribe((adUnitId, additionalPlacements) => this.onAdditionalPlacementsReady(adUnitId, additionalPlacements));
+        this._adRequestManager.onAdditionalPlacementsReady.subscribe((groupId, additionalPlacements) => this.onAdditionalPlacementsReady(groupId, additionalPlacements));
     }
 
     public request(nofillRetry?: boolean | undefined): Promise<void | INativeResponse> {
@@ -21,33 +21,33 @@ export class AdUnitAwareAdRequestManager extends CampaignManager {
     }
 
     public loadCampaign(placement: Placement): Promise<ILoadedCampaign | undefined> {
-        if (!placement.hasAdUnitId()) {
+        if (!placement.hasGroupId()) {
              return this._adRequestManager.loadCampaign(placement);
         }
 
-        const adUnitId = placement.getAdUnitId();
-        if (adUnitId === undefined) {
+        const groupId = placement.getGroupId();
+        if (groupId === undefined) {
              return this._adRequestManager.loadCampaign(placement);
         }
 
-        if (!(adUnitId in this._adUnitPlacements)) {
+        if (!(groupId in this._adUnitPlacements)) {
              return this._adRequestManager.loadCampaignWithAdditionalPlacement(placement);
         }
 
-        const additionalPlacements = this._adUnitPlacements[adUnitId];
+        const additionalPlacements = this._adUnitPlacements[groupId];
         if (!(placement.getId() in additionalPlacements)) {
              return this._adRequestManager.loadCampaignWithAdditionalPlacement(placement);
         }
 
-        this._adRequestManager.reportMetricEvent(LoadV5.LoadRequestStarted, { 'src': 'adunit' });
-        this._adRequestManager.reportMetricEvent(LoadV5.LoadRequestParsingResponse, { 'src': 'adunit' });
+        this._adRequestManager.reportMetricEvent(LoadV5.LoadRequestStarted, { 'src': 'groupId' });
+        this._adRequestManager.reportMetricEvent(LoadV5.LoadRequestParsingResponse, { 'src': 'groupId' });
 
         const notCachedLoadedCampaign = additionalPlacements[placement.getId()];
         if (notCachedLoadedCampaign === undefined) {
             return Promise.resolve(undefined);
         }
 
-        this._adRequestManager.reportMetricEvent(LoadV5.LoadRequestFill, { 'src': 'adunit' });
+        this._adRequestManager.reportMetricEvent(LoadV5.LoadRequestFill, { 'src': 'groupId' });
 
         return this._adRequestManager.cacheCampaign(notCachedLoadedCampaign);
     }
@@ -56,11 +56,11 @@ export class AdUnitAwareAdRequestManager extends CampaignManager {
         this._adUnitPlacements = {};
     }
 
-    private onAdditionalPlacementsReady(adUnitId: string | undefined, additionalPlacements: IPlacementIdMap<INotCachedLoadedCampaign | undefined>): void {
-        if (adUnitId === undefined) {
+    private onAdditionalPlacementsReady(groupId: string | undefined, additionalPlacements: IPlacementIdMap<INotCachedLoadedCampaign | undefined>): void {
+        if (groupId === undefined) {
             return;
         }
 
-        this._adUnitPlacements[adUnitId] = additionalPlacements;
+        this._adUnitPlacements[groupId] = additionalPlacements;
     }
 }

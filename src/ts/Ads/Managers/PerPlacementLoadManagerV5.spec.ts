@@ -7,7 +7,7 @@ import { FocusManagerMock, FocusManager } from 'Core/Managers/__mocks__/FocusMan
 import { ClientInfoMock, ClientInfo } from 'Core/Models/__mocks__/ClientInfo';
 import { AdRequestManagerMock, AdRequestManager } from 'Ads/Managers/__mocks__/AdRequestManager';
 import { Ads } from 'Ads/__mocks__/Ads';
-import { Placement, PlacementMock, withAdUnit } from 'Ads/Models/__mocks__/Placement';
+import { Placement, PlacementMock, withGroupId } from 'Ads/Models/__mocks__/Placement';
 import { PlacementState } from 'Ads/Models/Placement';
 import { Campaign, CampaignMock } from 'Ads/Models/__mocks__/Campaign';
 import { AbstractAdUnitMock, AbstractAdUnit } from 'Ads/AdUnits/__mocks__/AbstractAdUnit';
@@ -549,9 +549,9 @@ import { ProgrammaticMraidParser } from 'MRAID/Parsers/ProgrammaticMraidParser';
                     campaign = Campaign();
 
                     placements = {
-                        'video_1': withAdUnit(Placement('video_1', PlacementState.NOT_AVAILABLE, campaign), 'ad_unit'),
-                        'video_2': withAdUnit(Placement('video_2', PlacementState.NOT_AVAILABLE, campaign), 'ad_unit'),
-                        'video_3': withAdUnit(Placement('video_3', PlacementState.NOT_AVAILABLE, campaign), 'ad_unit')
+                        'video_1': withGroupId(Placement('video_1', PlacementState.NOT_AVAILABLE, campaign), 'group_id'),
+                        'video_2': withGroupId(Placement('video_2', PlacementState.NOT_AVAILABLE, campaign), 'group_id'),
+                        'video_3': withGroupId(Placement('video_3', PlacementState.NOT_AVAILABLE, campaign), 'group_id')
                     };
 
                     adsConfiguration.getPlacementIds.mockReturnValue(['video_1', 'video_2', 'video_3', 'video_4', 'video_5', 'video_6']);
@@ -569,7 +569,7 @@ import { ProgrammaticMraidParser } from 'MRAID/Parsers/ProgrammaticMraidParser';
 
                     (<ObservableMock>adsApi.LoadApi.onLoad).subscribe.mock.calls[0][0]({ 'video_1': 1 });
 
-                    (<ObservableMock>adRequestManager.onAdditionalPlacementsReady).subscribe.mock.calls[0][0]('ad_unit', {
+                    (<ObservableMock>adRequestManager.onAdditionalPlacementsReady).subscribe.mock.calls[0][0]('group_id', {
                         'video_2': {
                         campaign: campaign,
                         trackingUrl: {}
@@ -622,9 +622,9 @@ import { ProgrammaticMraidParser } from 'MRAID/Parsers/ProgrammaticMraidParser';
                     campaign2 = Campaign();
 
                     placements = {
-                        'video_1': withAdUnit(Placement('video_1', PlacementState.NOT_AVAILABLE), 'ad_unit'),
-                        'video_2': withAdUnit(Placement('video_2', PlacementState.NOT_AVAILABLE), 'ad_unit'),
-                        'video_3': withAdUnit(Placement('video_3', PlacementState.NOT_AVAILABLE), 'ad_unit')
+                        'video_1': withGroupId(Placement('video_1', PlacementState.NOT_AVAILABLE), 'group_id'),
+                        'video_2': withGroupId(Placement('video_2', PlacementState.NOT_AVAILABLE), 'group_id'),
+                        'video_3': withGroupId(Placement('video_3', PlacementState.NOT_AVAILABLE), 'group_id')
                     };
 
                     adsConfiguration.getPlacementIds.mockReturnValue(['video_1', 'video_2', 'video_3']);
@@ -642,7 +642,7 @@ import { ProgrammaticMraidParser } from 'MRAID/Parsers/ProgrammaticMraidParser';
 
                     (<ObservableMock>adsApi.LoadApi.onLoad).subscribe.mock.calls[0][0]({ 'video_1': 1 });
 
-                    (<ObservableMock>adRequestManager.onAdditionalPlacementsReady).subscribe.mock.calls[0][0]('ad_unit', {
+                    (<ObservableMock>adRequestManager.onAdditionalPlacementsReady).subscribe.mock.calls[0][0]('group_id', {
                         'video_2': {
                             campaign: campaign1,
                             trackingUrl: {}
