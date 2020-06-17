@@ -1,4 +1,4 @@
-import { AutomatedExperiment, IExperimentActionChoice } from 'MabExperimentation/Models/AutomatedExperiment';
+import { AutomatedExperiment, IExperimentDeclaration } from 'MabExperimentation/Models/AutomatedExperiment';
 
 export enum AutomatedExperimentsCategories {
     PERFORMANCE_ENDCARD = 'webview-perf-ad-endcard',
@@ -6,7 +6,7 @@ export enum AutomatedExperimentsCategories {
     VIDEO_OVERLAY = 'webview-video-overlay'
 }
 
-export const EndScreenExperimentDeclaration = {
+export const EndScreenExperimentDeclaration: IExperimentDeclaration = {
     scheme: {
         DARK: 'dark',
         LIGHT: 'light',
@@ -21,9 +21,25 @@ export const EndScreenExperimentDeclaration = {
     },
     color: {
         BLUE: '167dfb',
+        CYAN: '00cccc',
         GREEN: '33cc00',
+        LIME: '99cc00',
+        NAVY: '003366',
+        ORANGE: 'ff9900',
         PINK: 'cc0099',
+        PURPLE: '6600cc',
         RED: 'c31e25',
+        YELLOW: 'ffcc33',
+        DARK_BLUE: '0052c7',
+        DARK_CYAN: '009a9b',
+        DARK_GREEN: '009a00',
+        DARK_NAVY: '003365',
+        DARK_LIME: '659b00',
+        DARK_ORANGE: 'c66a00',
+        DARK_PINK: '96006b',
+        DARK_PURPLE: '6600cb',
+        DARK_RED: '8b0000',
+        DARK_YELLOW: 'c89b00',
         UNDEFINED: undefined
     },
     cta_text: {
