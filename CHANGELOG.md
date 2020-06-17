@@ -1,5 +1,6 @@
 # Pending
 
+* [AUI] Create color utils in preparation of new color experiments [#16012](https://github.com/Applifier/unity-ads-webview/pull/16012)
 * [AUI] Refactor ExperimentEndScreen constructor to make it less bloated [#16010](https://github.com/Applifier/unity-ads-webview/pull/16010)
 * [Fix] Fix language mapping for Finnish in test files [#16014](https://github.com/Applifier/unity-ads-webview/pull/16014)
 * [Placement Grouping]Update files to use groupId [#16016](https://github.com/Applifier/unity-ads-webview/pull/16016)
