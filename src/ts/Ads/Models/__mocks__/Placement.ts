@@ -21,6 +21,8 @@ export type PlacementMock = Base & {
     setInvalidationPending: Mock;
     hasAdUnitId: Mock<boolean>;
     getAdUnitId: Mock<string | undefined>;
+    hasGroupId: Mock<boolean>;
+    getGroupId: Mock<string | undefined>;
 };
 
 export const Placement = jest.fn((id: string = 'video', state: PlacementState = PlacementState.READY, campaign: Campaign | undefined = undefined) => {
@@ -48,7 +50,9 @@ export const Placement = jest.fn((id: string = 'video', state: PlacementState = 
         setInvalidationPending: jest.fn().mockImplementation((x) => classState.invalidationPending = x),
         isInvalidationPending: jest.fn().mockImplementation((x) => classState.invalidationPending),
         hasAdUnitId: jest.fn().mockReturnValue(false),
-        getAdUnitId: jest.fn().mockReturnValue(undefined)
+        getAdUnitId: jest.fn().mockReturnValue(undefined),
+        hasGroupId: jest.fn().mockReturnValue(false),
+        getGroupId: jest.fn().mockReturnValue(undefined)
     };
 });
 
@@ -57,5 +61,13 @@ export const withAdUnit = jest.fn((placement: PlacementMock, adUnit: string | un
         ...placement,
         hasAdUnitId: jest.fn().mockReturnValue(adUnit !== undefined),
         getAdUnitId: jest.fn().mockReturnValue(adUnit)
+    };
+});
+
+export const withGroupId = jest.fn((placement: PlacementMock, groupId: string | undefined) => {
+    return <PlacementMock>{
+        ...placement,
+        hasGroupId: jest.fn().mockReturnValue(groupId !== undefined),
+        getGroupId: jest.fn().mockReturnValue(groupId)
     };
 });

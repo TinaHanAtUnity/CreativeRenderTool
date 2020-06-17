@@ -1,3 +1,10 @@
+# Pending
+
+* [AUI] Refactor ExperimentEndScreen constructor to make it less bloated [#16010](https://github.com/Applifier/unity-ads-webview/pull/16010)
+* [Fix] Fix language mapping for Finnish in test files [#16014](https://github.com/Applifier/unity-ads-webview/pull/16014)
+* [Placement Grouping]Update files to use groupId [#16016](https://github.com/Applifier/unity-ads-webview/pull/16016)
+* [Placement Grouping]Add groupId and helper functions in Placement [#15942](https://github.com/Applifier/unity-ads-webview/pull/15942)
+
 # Tue 16 Jun 2020 15:41:08 UTC
 
 * [AUI] Update ExperimentEndScreen default actions to use global best combination [#16007](https://github.com/Applifier/unity-ads-webview/pull/16007)

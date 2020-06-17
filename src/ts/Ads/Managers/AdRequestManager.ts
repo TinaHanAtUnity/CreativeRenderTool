@@ -372,8 +372,8 @@ export class AdRequestManager extends CampaignManager {
     public loadCampaignWithAdditionalPlacement(placement: Placement): Promise<ILoadedCampaign | undefined> {
         let additionalPlacements: string[] = [];
 
-        if (placement.hasAdUnitId()) {
-            additionalPlacements = this._adsConfig.getPlacementsForAdunit(placement.getAdUnitId()!)
+        if (placement.hasGroupId()) {
+            additionalPlacements = this._adsConfig.getPlacementsForGroupId(placement.getGroupId()!)
                 .filter(placementId => placementId !== placement.getId());
         }
 
@@ -456,7 +456,7 @@ export class AdRequestManager extends CampaignManager {
                 previousValue[currentValue] = loadedCampaigns[currentValue];
                 return previousValue;
             }, {});
-            this.onAdditionalPlacementsReady.trigger(placement.getAdUnitId(), additionalCampaigns);
+            this.onAdditionalPlacementsReady.trigger(placement.getGroupId(), additionalCampaigns);
 
             return loadedCampaigns[placement.getId()];
         }).then(

@@ -31,9 +31,6 @@ describe('ExperimentEndScreenTest', () => {
         backend = TestFixtures.getBackend(platform);
         nativeBridge = TestFixtures.getNativeBridge(platform, backend);
         core = TestFixtures.getCoreApi(nativeBridge);
-        Localization.setLanguageMap('fi.*', 'endscreen', {
-            'Download For Free': 'Lataa ilmaiseksi'
-        });
         configuration = TestFixtures.getCoreConfiguration();
         sandbox.stub(SDKMetrics, 'reportMetricEvent').returns(Promise.resolve());
         sandbox.stub(SDKMetrics, 'reportMetricEventWithTags').returns(Promise.resolve());
