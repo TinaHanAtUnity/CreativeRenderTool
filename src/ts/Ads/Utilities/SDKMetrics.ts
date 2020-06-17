@@ -151,7 +151,8 @@ export enum AUIMetric {
     InvalidVideoOverlayMode = 'invalid_video_overlay_mode',
     UnknownCategoryProvided = 'unknown_automated_experiment_category_provided',
     InvalidImageAssets = 'invalid_image_assets',
-    InvalidCtaText = 'invalid_cta_text'
+    InvalidCtaText = 'invalid_cta_text',
+    InvalidSchemeAndColorCoordination = 'invalid_scheme_and_color_coordination'
 }
 
 export enum ExternalEndScreenMetric {
