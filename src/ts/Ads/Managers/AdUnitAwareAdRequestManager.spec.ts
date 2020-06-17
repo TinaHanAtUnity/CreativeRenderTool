@@ -1,6 +1,6 @@
 import { AdRequestManager, AdRequestManagerMock } from 'Ads/Managers/__mocks__/AdRequestManager';
 import { ILoadedCampaign } from 'Ads/Managers/CampaignManager';
-import { Placement, PlacementMock, withAdUnit } from 'Ads/Models/__mocks__/Placement';
+import { Placement, PlacementMock, withGroupId } from 'Ads/Models/__mocks__/Placement';
 import { Campaign } from 'Ads/Models/__mocks__/Campaign';
 import { AdUnitAwareAdRequestManager } from 'Ads/Managers/AdUnitAwareAdRequestManager';
 import { INotCachedLoadedCampaign } from 'Ads/Managers/AdRequestManager';
@@ -63,7 +63,7 @@ describe(`AdUnitAwareAdRequestManager`, () => {
 
     describe('load campaign: with ad unit and additional placements not set', () => {
         beforeEach(async () => {
-            placement = withAdUnit(placement, 'test');
+            placement = withGroupId(placement, 'test');
             loadedCampaign = await adUnitAwareAdRequestManager.loadCampaign(placement);
         });
 
@@ -85,7 +85,7 @@ describe(`AdUnitAwareAdRequestManager`, () => {
         let notCachedCampaign: INotCachedLoadedCampaign;
 
         beforeEach(async () => {
-            placement = withAdUnit(placement, 'test');
+            placement = withGroupId(placement, 'test');
             notCachedCampaign = {
                 notCachedCampaign: Campaign('', 'cached'),
                 notCachedTrackingUrls: {}
@@ -120,7 +120,7 @@ describe(`AdUnitAwareAdRequestManager`, () => {
         let notCachedCampaign: INotCachedLoadedCampaign;
 
         beforeEach(async () => {
-            placement = withAdUnit(placement, 'test');
+            placement = withGroupId(placement, 'test');
             notCachedCampaign = {
                 notCachedCampaign: Campaign('', 'cached'),
                 notCachedTrackingUrls: {}
@@ -153,7 +153,7 @@ describe(`AdUnitAwareAdRequestManager`, () => {
 
     describe('load campaign: with ad unit and additional placements set with no fill', () => {
         beforeEach(async () => {
-            placement = withAdUnit(placement, 'test');
+            placement = withGroupId(placement, 'test');
 
             adRequestManager.onAdditionalPlacementsReady.subscribe.mock.calls[0][0]('test', {
                 video: undefined
@@ -179,7 +179,7 @@ describe(`AdUnitAwareAdRequestManager`, () => {
         let notCachedCampaign: INotCachedLoadedCampaign;
 
         beforeEach(async () => {
-            placement = withAdUnit(placement, 'test');
+            placement = withGroupId(placement, 'test');
             notCachedCampaign = {
                 notCachedCampaign: Campaign('', 'cached'),
                 notCachedTrackingUrls: {}

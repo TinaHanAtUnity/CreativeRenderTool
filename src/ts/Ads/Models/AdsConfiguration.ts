@@ -105,6 +105,15 @@ export class AdsConfiguration extends Model<IAdsConfiguration> {
                      .map((placement) => placement.getId());
     }
 
+    public getPlacementsForGroupId(groupId: string): string[] {
+        const placements = this.getPlacements();
+
+        return Object.keys(placements)
+                     .map((placementId) => placements[placementId])
+                     .filter(placement => placement.hasGroupId() && placement.getGroupId() === groupId)
+                     .map((placement) => placement.getId());
+    }
+
     public getHidePrivacy(): boolean | undefined {
         return this.get('hidePrivacy');
     }

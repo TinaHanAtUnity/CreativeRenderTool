@@ -9,7 +9,7 @@ import { AUIMetric, SDKMetrics } from 'Ads/Utilities/SDKMetrics';
 import { Color } from 'Core/Utilities/Color';
 import { IColorTheme } from 'Performance/Utilities/Swatch';
 import { ColorTheme } from 'Core/Utilities/ColorTheme';
-import { ColorUtils } from 'Core/Utilities/ColorUtils';
+import { ColorUtils } from 'MabExperimentation/Utilities/ColorUtils';
 
 export class ExperimentEndScreen extends PerformanceEndScreen {
     private _animation: string;
@@ -24,29 +24,48 @@ export class ExperimentEndScreen extends PerformanceEndScreen {
 
         combination = this.fixupExperimentChoices(combination);
 
-        switch (combination.scheme) {
-            case EndScreenExperimentDeclaration.scheme.LIGHT:
-                if (combination.color) {
-                    this._downloadButtonColor = Color.hexToCssRgba(combination.color);
-                } else {
-                    this._downloadButtonColor = Color.hexToCssRgba(EndScreenExperimentDeclaration.color.GREEN);
-                }
-                break;
-            case EndScreenExperimentDeclaration.scheme.DARK:
-                if (combination.color) {
-                    this._downloadButtonColor = Color.hexToCssRgba(combination.color);
-                } else {
-                    this._downloadButtonColor = Color.hexToCssRgba(EndScreenExperimentDeclaration.color.DARK_BLUE);
-                }
-                this._darkMode = true;
-                break;
-            case EndScreenExperimentDeclaration.scheme.COLORMATCHING:
-                this._tintColor = true;
-                break;
-            default:
-        }
+        this.fixupScheme(combination);
+        this.fixupCtaText(combination.cta_text);
 
-        switch (combination.cta_text) {
+        // combination.animation will be defined at this point
+        this._animation = combination.animation!;
+        this._language = parameters.language;
+        this._templateData = {
+            ...this._templateData,
+            hasShadow: this._animation === EndScreenExperimentDeclaration.animation.BOUNCING,
+            ctaAlternativeText: this._formattedCtaAlternativeText,
+            isEnglish: this._language.indexOf('en') !== -1
+        };
+    }
+
+    private fixupScheme(actions: IExperimentActionChoice | undefined) {
+        if (actions) {
+            switch (actions.scheme) {
+                case EndScreenExperimentDeclaration.scheme.LIGHT:
+                    if (actions.color) {
+                        this._downloadButtonColor = Color.hexToCssRgba(actions.color);
+                    } else {
+                        this._downloadButtonColor = Color.hexToCssRgba(EndScreenExperimentDeclaration.color.GREEN);
+                    }
+                    break;
+                case EndScreenExperimentDeclaration.scheme.DARK:
+                    if (actions.color) {
+                        this._downloadButtonColor = Color.hexToCssRgba(actions.color);
+                    } else {
+                        this._downloadButtonColor = Color.hexToCssRgba(EndScreenExperimentDeclaration.color.DARK_BLUE);
+                    }
+                    this._darkMode = true;
+                    break;
+                case EndScreenExperimentDeclaration.scheme.COLORMATCHING:
+                    this._tintColor = true;
+                    break;
+                default:
+            }
+        }
+    }
+
+    private fixupCtaText(ctaText: string | undefined) {
+        switch (ctaText) {
             case EndScreenExperimentDeclaration.cta_text.DOWNLOAD:
                 this._formattedCtaAlternativeText = 'Download';
                 break;
@@ -78,16 +97,6 @@ export class ExperimentEndScreen extends PerformanceEndScreen {
                 SDKMetrics.reportMetricEvent(AUIMetric.InvalidCtaText);
                 this._formattedCtaAlternativeText = 'Download For Free';
         }
-
-        // combination.animation will be defined at this point
-        this._animation = combination.animation!;
-        this._language = parameters.language;
-        this._templateData = {
-            ...this._templateData,
-            hasShadow: this._animation === EndScreenExperimentDeclaration.animation.BOUNCING,
-            ctaAlternativeText: this._formattedCtaAlternativeText,
-            isEnglish: this._language.indexOf('en') !== -1
-        };
     }
 
     private fixupExperimentChoices(actions: IExperimentActionChoice | undefined): IExperimentActionChoice {
