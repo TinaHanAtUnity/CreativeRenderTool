@@ -1,5 +1,6 @@
 # Pending
 
+* [AUI] Add more color variants for the CTA button on the EndScreen [#15947](https://github.com/Applifier/unity-ads-webview/pull/15947)
 * [AUI] Create color utils in preparation of new color experiments [#16012](https://github.com/Applifier/unity-ads-webview/pull/16012)
 * [AUI] Refactor ExperimentEndScreen constructor to make it less bloated [#16010](https://github.com/Applifier/unity-ads-webview/pull/16010)
 * [Fix] Fix language mapping for Finnish in test files [#16014](https://github.com/Applifier/unity-ads-webview/pull/16014)
