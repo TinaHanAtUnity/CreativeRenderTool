@@ -41,10 +41,10 @@ describe('ColorBlurEndScreenTest', () => {
         // language on devices, in browser, and while running local tests.
         // Github CI may need a 'make setup'.
         // Copied this behavior from 'EndScreenTest.ts:37
-        Localization.setLanguageMap('fi.*', 'endscreen', {
-            'Install Now': 'Asenna nyt',
-            'Free': 'Ilmainen'
-        });
+        // Localization.setLanguageMap('fi.*', 'endscreen', {
+        //     'Install Now': 'Asenna nyt',
+        //     'Free': 'Ilmainen'
+        // });
     });
 
     afterEach(() => {
