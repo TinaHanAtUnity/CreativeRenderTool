@@ -46,7 +46,7 @@ import { StorageBridge } from 'Core/Utilities/StorageBridge';
 import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
 import CreativeUrlConfiguration from 'json/CreativeUrlConfiguration.json';
 import { NativeErrorApi } from 'Core/Api/NativeErrorApi';
-import { SDKMetrics, InitializationMetric } from 'Ads/Utilities/SDKMetrics';
+import { SDKMetrics, InitializationMetric, MiscellaneousMetric } from 'Ads/Utilities/SDKMetrics';
 import { SdkDetectionInfo } from 'Core/Models/SdkDetectionInfo';
 import { ClassDetectionApi } from 'Core/Native/ClassDetection';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
@@ -167,6 +167,15 @@ export class Core implements ICore {
 
             return Promise.all([this.DeviceInfo.fetch(), this.SdkDetectionInfo.detectSdks(), this.UnityInfo.fetch(this.ClientInfo.getApplicationName()), this.setupTestEnvironment()]);
         }).then(() => {
+
+            // Temporary for GAID Investigation. Do not apply above 3.4.0
+            if (this.DeviceInfo instanceof AndroidDeviceInfo) {
+                SDKMetrics.reportMetricEventWithTags(MiscellaneousMetric.GAIDInvestigation, {
+                    'gaid': `${!!this.DeviceInfo.get('advertisingIdentifier')}`,
+                    'pkg': `${!!this.DeviceInfo.get('isGoogleStoreInstalled')}`
+                });
+            }
+
             measurements.stopAndSend(
                 InitializationMetric.WebviewInitializationPhases, {
                 'wel': 'undefined',

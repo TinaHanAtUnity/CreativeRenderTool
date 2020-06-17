@@ -15,6 +15,8 @@ export class ExperimentEndScreen extends PerformanceEndScreen {
     private _downloadButtonColor: string;
     private _darkMode: boolean;
     private _tintColor: boolean;
+    private _formattedCtaAlternativeText: string;
+    private _language: string;
 
     constructor(combination: IExperimentActionChoice | undefined, parameters: IEndScreenParameters, campaign: PerformanceCampaign, country?: string) {
         super(parameters, campaign, country);
@@ -36,11 +38,47 @@ export class ExperimentEndScreen extends PerformanceEndScreen {
             default:
         }
 
+        switch (combination.cta_text) {
+            case EndScreenExperimentDeclaration.cta_text.DOWNLOAD:
+                this._formattedCtaAlternativeText = 'Download';
+                break;
+            case EndScreenExperimentDeclaration.cta_text.DOWNLOAD_FOR_FREE:
+                this._formattedCtaAlternativeText = 'Download For Free';
+                break;
+            case EndScreenExperimentDeclaration.cta_text.DOWNLOAD_NOW:
+                this._formattedCtaAlternativeText = 'Download Now!';
+                break;
+            case EndScreenExperimentDeclaration.cta_text.DOWNLOAD_NOW_FIRE:
+                this._formattedCtaAlternativeText = '🔥 Download Now 🔥';
+                break;
+            case EndScreenExperimentDeclaration.cta_text.GET:
+                this._formattedCtaAlternativeText = 'Get';
+                break;
+            case EndScreenExperimentDeclaration.cta_text.GET_STARTED:
+                this._formattedCtaAlternativeText = 'Get Started!';
+                break;
+            case EndScreenExperimentDeclaration.cta_text.INSTALL_NOW:
+                this._formattedCtaAlternativeText = 'Install Now';
+                break;
+            case EndScreenExperimentDeclaration.cta_text.LETS_TRY_IT:
+                this._formattedCtaAlternativeText = `Let's try it!`;
+                break;
+            case EndScreenExperimentDeclaration.cta_text.OK:
+                this._formattedCtaAlternativeText = 'OK!';
+                break;
+            default:
+                SDKMetrics.reportMetricEvent(AUIMetric.InvalidCtaText);
+                this._formattedCtaAlternativeText = 'Download For Free';
+        }
+
         // combination.animation will be defined at this point
         this._animation = combination.animation!;
+        this._language = parameters.language;
         this._templateData = {
             ...this._templateData,
-            'hasShadow': this._animation === EndScreenExperimentDeclaration.animation.BOUNCING
+            hasShadow: this._animation === EndScreenExperimentDeclaration.animation.BOUNCING,
+            ctaAlternativeText: this._formattedCtaAlternativeText,
+            isEnglish: this._language.indexOf('en') !== -1
         };
     }
 

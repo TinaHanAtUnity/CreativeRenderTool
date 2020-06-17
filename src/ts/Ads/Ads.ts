@@ -83,7 +83,7 @@ import { Analytics } from 'Analytics/Analytics';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { PrivacyParser } from 'Privacy/Parsers/PrivacyParser';
 import { Promises } from 'Core/Utilities/Promises';
-import { MediationCacheModeAllowedTest, LoadV5, LoadV5AdUnit, LoadV5NoInvalidation, LoadV5GroupId } from 'Core/Models/ABGroup';
+import { MediationCacheModeAllowedTest, LoadV5, LoadV5NoInvalidation, LoadV5GroupId } from 'Core/Models/ABGroup';
 import { PerPlacementLoadManagerV4 } from 'Ads/Managers/PerPlacementLoadManagerV4';
 import { PrivacyMetrics } from 'Privacy/PrivacyMetrics';
 import { PrivacySDKUnit } from 'Ads/AdUnits/PrivacySDKUnit';
@@ -812,13 +812,6 @@ export class Ads implements IAds {
         const loadV5Game = CustomFeatures.isLoadV5Game(this._core.ClientInfo.getGameId());
 
         return (this._loadApiEnabled && loadV5Game) || this._forceLoadV5;
-    }
-
-    private useAdUnitSupport(): boolean {
-        const adUnitTest = LoadV5AdUnit.isValid(this._core.Config.getAbGroup());
-        const adUnitGame = CustomFeatures.useAdUnitSupport(this._core.ClientInfo.getGameId());
-
-        return (adUnitTest && adUnitGame);
     }
 
     private useGroupIdSupport(): boolean {

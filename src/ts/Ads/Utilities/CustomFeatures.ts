@@ -156,14 +156,6 @@ export class CustomFeatures {
         return this.existsInList(gameIds, gameId) || CustomFeatures.isZyngaDealGame(gameId);
     }
 
-    public static useAdUnitSupport(gameId: string): boolean {
-        const gameIds = [
-            '3578767', '3578766', '3486365', '3486364', '3211592', '3079031', '1566453', '1434564'
-        ];
-
-        return this.existsInList(gameIds, gameId);
-    }
-
     public static shouldDisableBannerRefresh(gameId: string): boolean {
         if (gameId === '2962474') {
             return true;

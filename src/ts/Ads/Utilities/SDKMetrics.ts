@@ -82,7 +82,8 @@ export enum MiscellaneousMetric {
     XHRNotAvailable = 'xhr_not_available',
     AuctionRequestFailed = 'auction_request_failed',
     AuctionRequestOk = 'auction_request_ok',
-    AuctionRequestCreated = 'auction_request_created'
+    AuctionRequestCreated = 'auction_request_created',
+    GAIDInvestigation = 'gaid_investigation'
 }
 
 export enum LoadMetric {
@@ -149,7 +150,8 @@ export enum AUIMetric {
     UnknownExperimentName = 'unknown_experiment_name',
     InvalidVideoOverlayMode = 'invalid_video_overlay_mode',
     UnknownCategoryProvided = 'unknown_automated_experiment_category_provided',
-    InvalidImageAssets = 'invalid_image_assets'
+    InvalidImageAssets = 'invalid_image_assets',
+    InvalidCtaText = 'invalid_cta_text'
 }
 
 export enum ExternalEndScreenMetric {

@@ -14,6 +14,7 @@ import { SDKMetrics } from 'Ads/Utilities/SDKMetrics';
 import { ColorBlurEndScreen } from 'MabExperimentation/Performance/Views/ColorBlurEndScreen';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { Localization } from 'Core/Utilities/Localization';
+import { EndScreenExperimentDeclaration } from 'MabExperimentation/Models/AutomatedExperimentsList';
 
 describe('ColorBlurEndScreenTest', () => {
     let platform: Platform;
@@ -42,7 +43,7 @@ describe('ColorBlurEndScreenTest', () => {
         // Copied this behavior from 'EndScreenTest.ts:37
         Localization.setLanguageMap('fi.*', 'endscreen', {
             'Install Now': 'Asenna nyt',
-            Free: 'Ilmainen'
+            'Free': 'Ilmainen'
         });
     });
 
@@ -54,7 +55,7 @@ describe('ColorBlurEndScreenTest', () => {
         }
     });
 
-    const createColorBlurEndScreen = (language: string): ColorBlurEndScreen => {
+    const createColorBlurEndScreen = (ctaText: string | undefined, language: string): ColorBlurEndScreen => {
         const privacyManager = sinon.createStubInstance(UserPrivacyManager);
         privacy = new Privacy(platform, campaign, privacyManager, false, false, 'en');
         const params: IEndScreenParameters = {
@@ -69,7 +70,11 @@ describe('ColorBlurEndScreenTest', () => {
             campaignId: campaign.getId()
         };
 
-        return new ColorBlurEndScreen(params, campaign);
+        const experimentDescription = {
+            cta_text: ctaText
+        };
+
+        return new ColorBlurEndScreen(experimentDescription, params, campaign);
     };
 
     describe('Locales for Install Now and Free', () => {
@@ -91,55 +96,55 @@ describe('ColorBlurEndScreenTest', () => {
         };
 
         it('renders ko', () => {
-            validateTranslation(createColorBlurEndScreen('ko'), '다운로드', '무료');
+            validateTranslation(createColorBlurEndScreen('Install Now', 'ko'), '다운로드', '무료');
         });
         it('renders da_DK', () => {
-            validateTranslation(createColorBlurEndScreen('da_DK'), 'Installér nu', 'Gratis');
+            validateTranslation(createColorBlurEndScreen('Install Now', 'da_DK'), 'Installér nu', 'Gratis');
         });
         it('renders de', () => {
-            validateTranslation(createColorBlurEndScreen('de'), 'Installieren', 'Gratis');
+            validateTranslation(createColorBlurEndScreen('Install Now', 'de'), 'Installieren', 'Gratis');
         });
         it('renders es', () => {
-            validateTranslation(createColorBlurEndScreen('es'), 'Instalar Ahora', 'Gratis');
+            validateTranslation(createColorBlurEndScreen('Install Now', 'es'), 'Instalar Ahora', 'Gratis');
         });
         it('renders fi', () => {
-            validateTranslation(createColorBlurEndScreen('fi'), 'Asenna nyt', 'Ilmainen');
+            validateTranslation(createColorBlurEndScreen('Install Now', 'fi'), 'Asenna nyt', 'Ilmainen');
         });
         it('renders fr', () => {
-            validateTranslation(createColorBlurEndScreen('fr'), 'Installer maintenant', 'Gratuit');
+            validateTranslation(createColorBlurEndScreen('Install Now', 'fr'), 'Installer maintenant', 'Gratuit');
         });
         it('renders is', () => {
-            validateTranslation(createColorBlurEndScreen('is'), 'Setja upp', 'Frítt');
+            validateTranslation(createColorBlurEndScreen('Install Now', 'is'), 'Setja upp', 'Frítt');
         });
         it('renders it', () => {
-            validateTranslation(createColorBlurEndScreen('it'), 'Installa Ora', 'Gratis');
+            validateTranslation(createColorBlurEndScreen('Install Now', 'it'), 'Installa Ora', 'Gratis');
         });
         it('renders ja', () => {
-            validateTranslation(createColorBlurEndScreen('ja'), 'インストール', '無料');
+            validateTranslation(createColorBlurEndScreen('Install Now', 'ja'), 'インストール', '無料');
         });
         it('renders lt', () => {
-            validateTranslation(createColorBlurEndScreen('lt'), 'Atsisiųsti', 'Nemokamai');
+            validateTranslation(createColorBlurEndScreen('Install Now', 'lt'), 'Atsisiųsti', 'Nemokamai');
         });
         it('renders nb', () => {
-            validateTranslation(createColorBlurEndScreen('nb'), 'Installere nå', 'Gratis');
+            validateTranslation(createColorBlurEndScreen('Install Now', 'nb'), 'Installere nå', 'Gratis');
         });
         it('renders pt', () => {
-            validateTranslation(createColorBlurEndScreen('pt'), 'Instale Agora', 'Grátis');
+            validateTranslation(createColorBlurEndScreen('Install Now', 'pt'), 'Instale Agora', 'Grátis');
         });
         it('renders ro', () => {
-            validateTranslation(createColorBlurEndScreen('ro'), 'Descarcă', 'Gratis');
+            validateTranslation(createColorBlurEndScreen('Install Now', 'ro'), 'Descarcă', 'Gratis');
         });
         it('renders ru', () => {
-            validateTranslation(createColorBlurEndScreen('ru'), 'Установить', 'бесплатно');
+            validateTranslation(createColorBlurEndScreen('Install Now', 'ru'), 'Установить', 'бесплатно');
         });
         it('renders tr', () => {
-            validateTranslation(createColorBlurEndScreen('tr'), 'Şimdi Kur', 'ücretsiz');
+            validateTranslation(createColorBlurEndScreen('Install Now', 'tr'), 'Şimdi Kur', 'ücretsiz');
         });
         it('renders zh_Hans', () => {
-            validateTranslation(createColorBlurEndScreen('zh_Hans'), '立即下載', '免费');
+            validateTranslation(createColorBlurEndScreen('Install Now', 'zh_Hans'), '立即下載', '免费');
         });
         it('renders zh_Hant', () => {
-            validateTranslation(createColorBlurEndScreen('zh_Hant'), '立即下载', '免费');
+            validateTranslation(createColorBlurEndScreen('Install Now', 'zh_Hant'), '立即下载', '免费');
         });
     });
 
@@ -167,7 +172,33 @@ describe('ColorBlurEndScreenTest', () => {
         };
 
         it('should render with the same color for game info container background and install container text', () => {
-            validateColorTheme(createColorBlurEndScreen('en'));
+            validateColorTheme(createColorBlurEndScreen('Install Now', 'en'));
+        });
+    });
+
+    describe('Alternate CTA text', () => {
+        const validateCtaText = (endScreen: ColorBlurEndScreen, ctaText: string | undefined) => {
+            endScreen.render();
+
+            const downloadElement = <HTMLElement>endScreen.container().querySelectorAll('.download-text')[0];
+            const downloadElementText = downloadElement.innerHTML;
+
+            assert.isNotNull(downloadElementText);
+            assert.equal(downloadElementText, ctaText);
+
+            if (ctaText === EndScreenExperimentDeclaration.cta_text.DOWNLOAD_FOR_FREE) {
+                const installBtnClasses = endScreen.container().querySelectorAll('.install-container')[0].className;
+
+                assert.include(installBtnClasses, 'cta-alt-text');
+            }
+        };
+
+        it(`should render Install Now`, () => {
+            validateCtaText(createColorBlurEndScreen(EndScreenExperimentDeclaration.cta_text.INSTALL_NOW, 'en'), 'Install Now');
+        });
+
+        it(`should render Download For Free`, () => {
+            validateCtaText(createColorBlurEndScreen(EndScreenExperimentDeclaration.cta_text.DOWNLOAD_FOR_FREE, 'en'), 'Download For Free');
         });
     });
 });
