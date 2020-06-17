@@ -129,10 +129,10 @@ describe('ExperimentEndScreenTest', () => {
                     validateExperimentAttributes(createExperimentEndScreen('fi', EndScreenExperimentDeclaration.scheme.DARK, c, EndScreenExperimentDeclaration.cta_text.DOWNLOAD_NOW_FIRE), c);
                 });
             } else {
-                it(`When c is undefined and the scheme is light, it defaults to ${EndScreenExperimentDeclaration.color.BLUE}`, () => {
+                it(`When c is undefined and the scheme is light, it defaults to ${EndScreenExperimentDeclaration.color.GREEN}`, () => {
                     validateExperimentAttributes(
                         createExperimentEndScreen('fi', EndScreenExperimentDeclaration.scheme.LIGHT, c, EndScreenExperimentDeclaration.cta_text.DOWNLOAD_NOW_FIRE),
-                        EndScreenExperimentDeclaration.color.BLUE
+                        EndScreenExperimentDeclaration.color.GREEN
                     );
                 });
 

@@ -29,7 +29,7 @@ export class ExperimentEndScreen extends PerformanceEndScreen {
                 if (combination.color) {
                     this._downloadButtonColor = Color.hexToCssRgba(combination.color);
                 } else {
-                    this._downloadButtonColor = Color.hexToCssRgba(EndScreenExperimentDeclaration.color.BLUE);
+                    this._downloadButtonColor = Color.hexToCssRgba(EndScreenExperimentDeclaration.color.GREEN);
                 }
                 break;
             case EndScreenExperimentDeclaration.scheme.DARK:
