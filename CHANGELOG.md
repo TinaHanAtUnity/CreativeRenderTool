@@ -1,3 +1,6 @@
+# Pending
+* [Open Measurement] Add MOAT to om whitelist [#16074](https://github.com/Applifier/unity-ads-webview/pull/16074)
+
 # Thu Jun 18 20:59:41 UTC 2020
 
 * [Load V4] Remove load v4 and Zynga Deal [#16015](https://github.com/Applifier/unity-ads-webview/pull/16015)
