@@ -102,7 +102,7 @@ export class CustomFeatures {
     }
 
     public static gameSpawnsNewViewControllerOnFinish(gameId: string): boolean {
-        return this.existsInList(LionStudiosGamesJson, gameId);
+        return this.existsInList(LionStudiosGamesJson, gameId) || gameId === '1195277';
     }
 
     /**
