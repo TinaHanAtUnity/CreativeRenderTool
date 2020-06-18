@@ -30,7 +30,6 @@ describe('PerformanceCampaign', () => {
             assert.equal(campaign.getId(), campaignObject.id);
             assert.equal(campaign.getRating(), campaignObject.rating);
             assert.equal(campaign.getRatingCount(), campaignObject.ratingCount);
-            assert.equal(campaign.getUniqueId(), '12345-beefcace-abcdefg-deadbeef');
         });
     });
 });
@@ -62,7 +61,6 @@ describe('VastCampaign', () => {
             assert.equal(vast.getVideoUrl(), 'http://static.applifier.com/impact/videos/104090/e97394713b8efa50/1602-30s-v22r3-seven-knights-character-select/m31-1000.mp4', 'video url');
             assert.equal(vast.getDuration(), 30, 'duration');
             assert.deepEqual(vast.getErrorURLTemplates(), [], 'error urls');
-            assert.equal(campaign.getUniqueId(), '12345-beefcace-abcdefg-deadbeef');
         });
 
         it('should return cached video url when set', () => {

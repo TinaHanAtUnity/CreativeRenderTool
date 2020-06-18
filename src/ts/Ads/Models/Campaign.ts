@@ -4,6 +4,7 @@ import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { WebViewError } from 'Core/Errors/WebViewError';
 import { ISchema, Model } from 'Core/Models/Model';
 import { TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
+import { JaegerUtilities } from 'Core/Jaeger/JaegerUtilities';
 
 export interface ICampaignTrackingUrls {
     [key: string]: string[];
@@ -57,11 +58,7 @@ export abstract class Campaign<T extends ICampaign = ICampaign> extends Model<T>
     constructor(name: string, schema: ISchema<T>, data: T) {
         super(name, schema, data);
 
-        if (data.session) {
-            this._uniqueId = `${data.session.getId()}-${data.mediaId}`;
-        } else {
-            this._uniqueId = data.mediaId;
-        }
+        this._uniqueId = JaegerUtilities.uuidv4();
     }
 
     public getId(): string {
