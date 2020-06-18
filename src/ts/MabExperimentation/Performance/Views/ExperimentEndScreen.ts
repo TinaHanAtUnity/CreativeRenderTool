@@ -9,6 +9,7 @@ import { AUIMetric, SDKMetrics } from 'Ads/Utilities/SDKMetrics';
 import { Color } from 'Core/Utilities/Color';
 import { IColorTheme } from 'Performance/Utilities/Swatch';
 import { ColorTheme } from 'Core/Utilities/ColorTheme';
+import { ColorUtils } from 'MabExperimentation/Utilities/ColorUtils';
 
 export class ExperimentEndScreen extends PerformanceEndScreen {
     private _animation: string;
@@ -41,11 +42,18 @@ export class ExperimentEndScreen extends PerformanceEndScreen {
         if (actions) {
             switch (actions.scheme) {
                 case EndScreenExperimentDeclaration.scheme.LIGHT:
-                    this._downloadButtonColor = Color.hexToCssRgba(actions.color);
+                    if (actions.color) {
+                        this._downloadButtonColor = Color.hexToCssRgba(actions.color);
+                    } else {
+                        this._downloadButtonColor = Color.hexToCssRgba(EndScreenExperimentDeclaration.color.GREEN);
+                    }
                     break;
                 case EndScreenExperimentDeclaration.scheme.DARK:
-                    // This is "pastel blue", to be cohesive with dark mode
-                    this._downloadButtonColor = Color.hexToCssRgba('#2ba3ff');
+                    if (actions.color) {
+                        this._downloadButtonColor = Color.hexToCssRgba(actions.color);
+                    } else {
+                        this._downloadButtonColor = Color.hexToCssRgba(EndScreenExperimentDeclaration.color.DARK_BLUE);
+                    }
                     this._darkMode = true;
                     break;
                 case EndScreenExperimentDeclaration.scheme.COLORMATCHING:
@@ -96,10 +104,19 @@ export class ExperimentEndScreen extends PerformanceEndScreen {
             return EndScreenExperiment.getDefaultActions();
         }
 
-        // light scheme must include a color
-        if (actions.scheme === EndScreenExperimentDeclaration.scheme.LIGHT && actions.color === undefined) {
-            SDKMetrics.reportMetricEvent(AUIMetric.InvalidEndscreenAnimation);
-            return EndScreenExperiment.getDefaultActions();
+        if (actions.color) {
+
+            // light scheme can only use light colors
+            if (actions.scheme === EndScreenExperimentDeclaration.scheme.LIGHT && ColorUtils.isDarkSchemeColor(actions.color)) {
+                SDKMetrics.reportMetricEvent(AUIMetric.InvalidSchemeAndColorCoordination);
+                return EndScreenExperiment.getDefaultActions();
+            }
+
+            // dark scheme can only use dark colors
+            if (actions.scheme === EndScreenExperimentDeclaration.scheme.DARK && !ColorUtils.isDarkSchemeColor(actions.color)) {
+                SDKMetrics.reportMetricEvent(AUIMetric.InvalidSchemeAndColorCoordination);
+                return EndScreenExperiment.getDefaultActions();
+            }
         }
 
         if (!EndScreenExperiment.isValid(actions)) {

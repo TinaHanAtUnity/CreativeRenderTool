@@ -153,7 +153,8 @@ export class CustomFeatures {
             '1662635', '3320399'
         ];
 
-        return this.existsInList(gameIds, gameId) || CustomFeatures.isZyngaDealGame(gameId);
+        return this.existsInList(gameIds, gameId) || CustomFeatures.isZyngaDealGame(gameId)
+            || this.isMopubTestGameForLoad(gameId) || this.isFanateeExtermaxGameForLoad(gameId);
     }
 
     public static shouldDisableBannerRefresh(gameId: string): boolean {

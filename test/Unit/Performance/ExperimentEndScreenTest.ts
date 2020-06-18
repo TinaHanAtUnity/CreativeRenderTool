@@ -15,6 +15,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { ExperimentEndScreen } from 'MabExperimentation/Performance/Views/ExperimentEndScreen';
 import { EndScreenExperimentDeclaration } from 'MabExperimentation/Models/AutomatedExperimentsList';
 import { SDKMetrics } from 'Ads/Utilities/SDKMetrics';
+import { ColorUtils } from 'MabExperimentation/Utilities/ColorUtils';
 
 describe('ExperimentEndScreenTest', () => {
     let platform: Platform;
@@ -83,7 +84,7 @@ describe('ExperimentEndScreenTest', () => {
         );
     });
 
-    it('should render correct experiment attributes', () => {
+    describe('CTA color variants', () => {
         // RGBToHex transforms a string in the "rgb(1, 12, 123)" format to the "#010C7B"
         function RGBToHex(rgb: string): string {
             const sep = rgb.indexOf(',') > -1 ? ',' : ' ';
@@ -116,21 +117,30 @@ describe('ExperimentEndScreenTest', () => {
         };
 
         Object.values(EndScreenExperimentDeclaration.color).forEach((c: string | undefined) => {
-            if (c === undefined) {
-                validateExperimentAttributes(
-                    createExperimentEndScreen('fi', EndScreenExperimentDeclaration.scheme.LIGHT, c, EndScreenExperimentDeclaration.cta_text.DOWNLOAD_NOW_FIRE),
-                    EndScreenExperimentDeclaration.color.GREEN
-                );
+            if (c && !ColorUtils.isDarkSchemeColor(c)) {
+                it(`renders ${c}`, () => {
+                    validateExperimentAttributes(createExperimentEndScreen('fi', EndScreenExperimentDeclaration.scheme.LIGHT, c, EndScreenExperimentDeclaration.cta_text.DOWNLOAD_NOW_FIRE), c);
+                });
+            } else if (c && ColorUtils.isDarkSchemeColor(c)) {
+                it(`renders ${c}`, () => {
+                    validateExperimentAttributes(createExperimentEndScreen('fi', EndScreenExperimentDeclaration.scheme.DARK, c, EndScreenExperimentDeclaration.cta_text.DOWNLOAD_NOW_FIRE), c);
+                });
             } else {
-                validateExperimentAttributes(createExperimentEndScreen('fi', EndScreenExperimentDeclaration.scheme.LIGHT, c, EndScreenExperimentDeclaration.cta_text.DOWNLOAD_NOW_FIRE), c);
+                it(`When c is undefined and the scheme is light, it defaults to ${EndScreenExperimentDeclaration.color.GREEN}`, () => {
+                    validateExperimentAttributes(
+                        createExperimentEndScreen('fi', EndScreenExperimentDeclaration.scheme.LIGHT, c, EndScreenExperimentDeclaration.cta_text.DOWNLOAD_NOW_FIRE),
+                        EndScreenExperimentDeclaration.color.GREEN
+                    );
+                });
+
+                it(`When c is undefined and the scheme is dark, it defaults to ${EndScreenExperimentDeclaration.color.DARK_BLUE}`, () => {
+                    validateExperimentAttributes(
+                        createExperimentEndScreen('fi', EndScreenExperimentDeclaration.scheme.DARK, c, EndScreenExperimentDeclaration.cta_text.DOWNLOAD_NOW_FIRE),
+                        EndScreenExperimentDeclaration.color.DARK_BLUE
+                    );
+                });
             }
         });
-
-        //Dark mode should ignore the color of the button, and set it to '#2ba3ff'
-        validateExperimentAttributes(
-            createExperimentEndScreen('fi', EndScreenExperimentDeclaration.scheme.DARK, EndScreenExperimentDeclaration.color.RED, EndScreenExperimentDeclaration.cta_text.DOWNLOAD_NOW_FIRE),
-            '2ba3ff'
-        );
     });
 
     describe('CTA text variants', () => {

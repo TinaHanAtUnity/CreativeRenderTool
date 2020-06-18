@@ -1,5 +1,13 @@
 # Pending
 
+* [Load V1] Move game on original load to load v5 [#16045](https://github.com/Applifier/unity-ads-webview/pull/16045)
+* [Feature] Add unique id for each campaign [#16044](https://github.com/Applifier/unity-ads-webview/pull/16044)
+* [Placement Grouping]Add AB group test for placement grouping [#16013](https://github.com/Applifier/unity-ads-webview/pull/16013)
+
+# Wed 17 Jun 2020 23:18:30 UTC
+
+* [AUI] Add more color variants for the CTA button on the EndScreen [#15947](https://github.com/Applifier/unity-ads-webview/pull/15947)
+* [AUI] Create color utils in preparation of new color experiments [#16012](https://github.com/Applifier/unity-ads-webview/pull/16012)
 * [AUI] Refactor ExperimentEndScreen constructor to make it less bloated [#16010](https://github.com/Applifier/unity-ads-webview/pull/16010)
 * [Fix] Fix language mapping for Finnish in test files [#16014](https://github.com/Applifier/unity-ads-webview/pull/16014)
 * [Placement Grouping]Update files to use groupId [#16016](https://github.com/Applifier/unity-ads-webview/pull/16016)
