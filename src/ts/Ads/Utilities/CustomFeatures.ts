@@ -199,10 +199,15 @@ export class CustomFeatures {
         return vendorKey ? vendorKey.startsWith('doubleclickbygoogle.com') : false;
     }
 
+    private static isMoatVendor(vendorKey: string | undefined): boolean {
+        return vendorKey ? vendorKey.includes('z.moatads.com') : false;
+    }
+
     public static isWhitelistedOMVendor(omVendor: string | undefined) {
         return this.isIASVendor(omVendor) ||
                this.isDoubleClickGoogle(omVendor) ||
-               omVendor === 'doubleverify.com-omid';
+               omVendor === 'doubleverify.com-omid' ||
+               this.isMoatVendor(omVendor);
     }
 
     // Enables experimental PausableListenerApi, which allows pausing and resuming events.
