@@ -1,4 +1,4 @@
-# Pending
+# Thu Jun 18 23:23:28 UTC 2020
 
 * [Open Measurement] Add MOAT to om whitelist [#16074](https://github.com/Applifier/unity-ads-webview/pull/16074)
 * Add game ID to gameSpawnsNewViewControllerOnFinish whitelist [#16046](https://github.com/Applifier/unity-ads-webview/pull/16046)
