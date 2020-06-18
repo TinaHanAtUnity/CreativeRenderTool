@@ -5,7 +5,6 @@ import Game7GamesJson from 'json/custom_features/Game7Games.json';
 import LionStudiosGamesJson from 'json/custom_features/LionStudiosGames.json';
 import MobilityWareGamesJson from 'json/custom_features/MobilityWareGames.json';
 import CacheModeAllowedExperimentGames from 'json/custom_features/CacheModeAllowedExperimentGames.json';
-import GameSpawnsNewViewControllerOnFinishJson from 'json/custom_features/GameSpawnsNewViewControllerOnFinish.json';
 
 export class CustomFeatures {
 
@@ -103,7 +102,7 @@ export class CustomFeatures {
     }
 
     public static gameSpawnsNewViewControllerOnFinish(gameId: string): boolean {
-        return this.existsInList(LionStudiosGamesJson, gameId) || this.existsInList(GameSpawnsNewViewControllerOnFinishJson, gameId);
+        return this.existsInList(LionStudiosGamesJson, gameId) || gameId === '1195277';
     }
 
     /**
