@@ -791,12 +791,10 @@ export class Ads implements IAds {
         this._loadApiEnabled = this._core.ClientInfo.getUsePerPlacementLoad();
 
         const isZyngaDealGame = CustomFeatures.isZyngaDealGame(this._core.ClientInfo.getGameId());
-        const isMopubTestGame = CustomFeatures.isMopubTestGameForLoad(this._core.ClientInfo.getGameId());
         const isCheetahTestGame = CustomFeatures.isCheetahTestGameForLoad(this._core.ClientInfo.getGameId());
-        const isFanateeExtermaxGameForLoad = CustomFeatures.isFanateeExtermaxGameForLoad(this._core.ClientInfo.getGameId());
         const loadV5 = this.isLoadV5Enabled();
 
-        if (isZyngaDealGame || isMopubTestGame || isCheetahTestGame || isFanateeExtermaxGameForLoad || loadV5) {
+        if (isZyngaDealGame || isCheetahTestGame || loadV5) {
             this._webViewEnabledLoad = true;
         }
     }
