@@ -28,6 +28,12 @@ And check that it's correctly set with:
 
 `git config --get user.name`
 
+Also, be sure you have jq and hub installed, if not you could do:
+
+`brew install jq`
+
+`brew inistall hub`
+
 ### Staging
 
 ## Description
