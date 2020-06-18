@@ -1,3 +1,7 @@
+# Pending
+
+* [Placement Grouping]Add AB group test for placement grouping [#16013](https://github.com/Applifier/unity-ads-webview/pull/16013)
+
 # Wed 17 Jun 2020 23:18:30 UTC
 
 * [AUI] Add more color variants for the CTA button on the EndScreen [#15947](https://github.com/Applifier/unity-ads-webview/pull/15947)
