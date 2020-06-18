@@ -84,7 +84,6 @@ import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { PrivacyParser } from 'Privacy/Parsers/PrivacyParser';
 import { Promises } from 'Core/Utilities/Promises';
 import { MediationCacheModeAllowedTest, LoadV5, LoadV5NoInvalidation, LoadV5GroupId } from 'Core/Models/ABGroup';
-import { PerPlacementLoadManagerV4 } from 'Ads/Managers/PerPlacementLoadManagerV4';
 import { PrivacyMetrics } from 'Privacy/PrivacyMetrics';
 import { PrivacySDKUnit } from 'Ads/AdUnits/PrivacySDKUnit';
 import { PerPlacementLoadAdapter } from 'Ads/Managers/PerPlacementLoadAdapter';
@@ -363,13 +362,7 @@ export class Ads implements IAds {
         }
 
         if (this._loadApiEnabled && this._webViewEnabledLoad) {
-            const isZyngaDealGame = CustomFeatures.isZyngaDealGame(this._core.ClientInfo.getGameId());
-
-            if (isZyngaDealGame) {
-                this.RefreshManager = new PerPlacementLoadManagerV4(this.Api, this.Config, this._core.Config, this.CampaignManager, this._core.ClientInfo, this._core.FocusManager);
-            } else {
-                this.RefreshManager = new PerPlacementLoadManager(this.Api, this.Config, this._core.Config, this.CampaignManager, this._core.ClientInfo, this._core.FocusManager);
-            }
+            this.RefreshManager = new PerPlacementLoadManager(this.Api, this.Config, this._core.Config, this.CampaignManager, this._core.ClientInfo, this._core.FocusManager);
         } else if (this._loadApiEnabled) {
             this.RefreshManager = new PerPlacementLoadAdapter(this._core.NativeBridge.getPlatform(), this._core.Api, this._core.Config, this.Api, this._core.WakeUpManager, this.CampaignManager, this.Config, this._core.FocusManager, this.SessionManager, this._core.ClientInfo, this._core.RequestManager, this._core.CacheManager);
         } else {
@@ -790,11 +783,10 @@ export class Ads implements IAds {
     private setupLoadApiEnabled(): void {
         this._loadApiEnabled = this._core.ClientInfo.getUsePerPlacementLoad();
 
-        const isZyngaDealGame = CustomFeatures.isZyngaDealGame(this._core.ClientInfo.getGameId());
         const isCheetahTestGame = CustomFeatures.isCheetahTestGameForLoad(this._core.ClientInfo.getGameId());
         const loadV5 = this.isLoadV5Enabled();
 
-        if (isZyngaDealGame || isCheetahTestGame || loadV5) {
+        if (isCheetahTestGame || loadV5) {
             this._webViewEnabledLoad = true;
         }
     }
