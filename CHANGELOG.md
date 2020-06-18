@@ -1,4 +1,4 @@
-# Pending
+# Thu Jun 18 20:59:41 UTC 2020
 
 * [Load V4] Remove load v4 and Zynga Deal [#16015](https://github.com/Applifier/unity-ads-webview/pull/16015)
 * [Load V1] Move game on original load to load v5 [#16045](https://github.com/Applifier/unity-ads-webview/pull/16045)
