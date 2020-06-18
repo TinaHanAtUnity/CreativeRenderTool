@@ -1,5 +1,6 @@
 # Pending
 
+* [Feature] Add unique id for each campaign [#16044](https://github.com/Applifier/unity-ads-webview/pull/16044)
 * [Placement Grouping]Add AB group test for placement grouping [#16013](https://github.com/Applifier/unity-ads-webview/pull/16013)
 
 # Wed 17 Jun 2020 23:18:30 UTC
