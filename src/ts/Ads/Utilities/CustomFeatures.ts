@@ -114,12 +114,12 @@ export class CustomFeatures {
         return this.existsInList(wordsWithFriends, gameId) || this.existsInList(zyngaSolitaire, gameId);
     }
 
-    public static isMopubTestGameForLoad(gameId: string): boolean {
-        if (gameId === '1926039' || gameId === '1732577' || gameId === '3206806' || gameId === '2788221') {
-            return true;
-        } else {
-            return false;
-        }
+    public static isExternalMopubTestGameForLoad(gameId: string): boolean {
+        return gameId === '2788221';
+    }
+
+    public static isPSPTestAppGame(gameId: string): boolean {
+        return gameId === '1926039' || gameId === '1732577' || gameId === '3206806';
     }
 
     public static isCheetahTestGameForLoad(gameId: string): boolean {
@@ -154,7 +154,7 @@ export class CustomFeatures {
         ];
 
         return this.existsInList(gameIds, gameId) || CustomFeatures.isZyngaDealGame(gameId)
-            || this.isMopubTestGameForLoad(gameId) || this.isFanateeExtermaxGameForLoad(gameId);
+            || this.isExternalMopubTestGameForLoad(gameId) || this.isFanateeExtermaxGameForLoad(gameId);
     }
 
     public static shouldDisableBannerRefresh(gameId: string): boolean {
