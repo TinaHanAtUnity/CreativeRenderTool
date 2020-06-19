@@ -1,4 +1,4 @@
-# Pending
+# Fri Jun 19 01:16:51 UTC 2020
 
 * Remove PSP Test App IDs from Load V5 Whitelist [#16102](https://github.com/Applifier/unity-ads-webview/pull/16102)
 
