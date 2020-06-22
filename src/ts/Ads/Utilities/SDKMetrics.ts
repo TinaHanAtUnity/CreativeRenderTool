@@ -208,7 +208,8 @@ export enum LoadV5 {
     RefreshManagerCampaignExpired = 'v5_refresh_manager_campaign_expired',
     RefreshManagerCampaignFailedToInvalidate = 'v5_refresh_manager_campaign_failed_to_be_invalidate',
     Show = 'v5_show',
-    PlacementInvalidationPending = 'placement_invalidation_pending'
+    PlacementInvalidationPending = 'placement_invalidation_pending',
+    RefreshManagerForcedToInvalidate = 'v5_refresh_manager_forced_to_invalidate'
 }
 
 export enum AuctionV6 {

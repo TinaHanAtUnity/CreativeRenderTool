@@ -19,6 +19,7 @@ export class PerPlacementLoadManagerV5 extends PerPlacementLoadManager {
 
     private _shouldRefresh: boolean = true;
     private _useGroupIds: boolean;
+    private _lastShownCampaignId: string | undefined;
 
     constructor(ads: IAdsApi, adsConfig: AdsConfiguration, coreConfig: CoreConfiguration, adRequestManager: AdRequestManager, clientInfo: ClientInfo, focusManager: FocusManager, useGroupIds: boolean) {
         super(ads, adsConfig, coreConfig, useGroupIds ? new AdUnitAwareAdRequestManager(adRequestManager) : adRequestManager, clientInfo, focusManager);
@@ -32,6 +33,11 @@ export class PerPlacementLoadManagerV5 extends PerPlacementLoadManager {
 
     public setCurrentAdUnit(adUnit: AbstractAdUnit, placement: Placement): void {
         this._shouldRefresh = true;
+
+        const campaign = placement.getCurrentCampaign();
+        if (campaign) {
+            this._lastShownCampaignId = campaign.getUniqueId();
+        }
 
         Observables.once(adUnit.onStartProcessed, () => {
             // Aids in supplying comet a suitable amount of time to process start event
@@ -172,6 +178,11 @@ export class PerPlacementLoadManagerV5 extends PerPlacementLoadManager {
                             break;
                         default:
                             shouldInvalidate = false;
+                    }
+
+                    if (!shouldInvalidate && this._lastShownCampaignId && campaign.getUniqueId() === this._lastShownCampaignId) {
+                        this._adRequestManager.reportMetricEvent(LoadV5.RefreshManagerForcedToInvalidate);
+                        shouldInvalidate = true;
                     }
                 }
             }
