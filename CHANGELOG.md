@@ -1,4 +1,4 @@
-# Pending
+# Mon Jun 22 20:17:29 UTC 2020
 
 * [Load V5] Force to invalidation for previously shown campaign [#16130](https://github.com/Applifier/unity-ads-webview/pull/16130)
 
