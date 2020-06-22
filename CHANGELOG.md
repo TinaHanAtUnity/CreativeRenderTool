@@ -1,3 +1,7 @@
+# Mon Jun 22 20:17:29 UTC 2020
+
+* [Load V5] Force to invalidation for previously shown campaign [#16130](https://github.com/Applifier/unity-ads-webview/pull/16130)
+
 # Fri Jun 19 01:16:51 UTC 2020
 
 * Remove PSP Test App IDs from Load V5 Whitelist [#16102](https://github.com/Applifier/unity-ads-webview/pull/16102)
