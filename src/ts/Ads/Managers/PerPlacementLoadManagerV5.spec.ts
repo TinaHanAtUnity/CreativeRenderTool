@@ -692,13 +692,11 @@ import { ProgrammaticMraidParser } from 'MRAID/Parsers/ProgrammaticMraidParser';
                 });
 
                 it('should reset campaign', () => {
-                    expect(placement.setCurrentCampaign).toBeCalledTimes(1);
-                    expect(placement.setCurrentCampaign).toBeCalledWith(undefined);
+                    expect(placement.setCurrentCampaign).toBeCalledTimes(0);
                 });
 
                 it('should reset tracking urls', () => {
-                    expect(placement.setCurrentTrackingUrls).toBeCalledTimes(1);
-                    expect(placement.setCurrentTrackingUrls).toBeCalledWith(undefined);
+                    expect(placement.setCurrentTrackingUrls).toBeCalledTimes(0);
                 });
 
                 it('should reset invalidation pending', () => {
