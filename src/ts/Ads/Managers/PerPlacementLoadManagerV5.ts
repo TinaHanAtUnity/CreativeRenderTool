@@ -18,13 +18,11 @@ export class PerPlacementLoadManagerV5 extends PerPlacementLoadManager {
     protected _adRequestManager: AdRequestManager;
 
     private _shouldRefresh: boolean = true;
-    private _useGroupIds: boolean;
 
     constructor(ads: IAdsApi, adsConfig: AdsConfiguration, coreConfig: CoreConfiguration, adRequestManager: AdRequestManager, clientInfo: ClientInfo, focusManager: FocusManager, useGroupIds: boolean) {
         super(ads, adsConfig, coreConfig, useGroupIds ? new AdUnitAwareAdRequestManager(adRequestManager) : adRequestManager, clientInfo, focusManager);
 
         this._adRequestManager = adRequestManager;
-        this._useGroupIds = useGroupIds;
 
         this._adRequestManager.onCampaign.subscribe((placementId, campaign, trackingUrls) => this.onCampaign(placementId, campaign, trackingUrls));
         this._adRequestManager.onNoFill.subscribe((placementId) => this.onNoFill(placementId));
@@ -159,22 +157,21 @@ export class PerPlacementLoadManagerV5 extends PerPlacementLoadManager {
             placement.setInvalidationPending(false);
 
             let shouldInvalidate = true;
-            if (!this._useGroupIds) {
-                // Invalidate only Direct Demand campaigns, we would like to show old programmatic campaign.
-                const campaign = placement.getCurrentCampaign();
-                if (campaign) {
-                    const contentType = campaign.getContentType();
-                    switch (contentType) {
-                        case PerformanceAdUnitFactory.ContentType:
-                        case PerformanceAdUnitFactory.ContentTypeMRAID:
-                        case PerformanceAdUnitFactory.ContentTypeVideo:
-                            shouldInvalidate = true;
-                            break;
-                        default:
-                            shouldInvalidate = false;
-                    }
+            // Invalidate only Direct Demand campaigns, we would like to show old programmatic campaign.
+            const campaign = placement.getCurrentCampaign();
+            if (campaign) {
+                const contentType = campaign.getContentType();
+                switch (contentType) {
+                    case PerformanceAdUnitFactory.ContentType:
+                    case PerformanceAdUnitFactory.ContentTypeMRAID:
+                    case PerformanceAdUnitFactory.ContentTypeVideo:
+                        shouldInvalidate = true;
+                        break;
+                    default:
+                        shouldInvalidate = false;
                 }
             }
+
             if (shouldInvalidate) {
                 this._adRequestManager.reportMetricEvent(LoadV5.RefreshManagerCampaignFailedToInvalidate);
                 placement.setCurrentCampaign(undefined);
