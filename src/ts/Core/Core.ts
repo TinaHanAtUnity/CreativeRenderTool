@@ -12,7 +12,7 @@ import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { ResolveManager } from 'Core/Managers/ResolveManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
-import { toAbGroup, FilteredABTest } from 'Core/Models/ABGroup';
+import { toAbGroup, FilteredABTest, GooglePlayDetectionTest } from 'Core/Models/ABGroup';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
@@ -230,6 +230,11 @@ export class Core implements ICore {
             return Promise.all([<Promise<[unknown, CoreConfiguration]>>configPromise, cachePromise]);
         }).then(([[configJson, coreConfig]]) => {
             this.Config = coreConfig;
+
+            if (this.DeviceInfo instanceof AndroidDeviceInfo && GooglePlayDetectionTest.isValid(this.Config.getAbGroup())) {
+                this.DeviceInfo.set('isGoogleStoreInstalled', true);
+            }
+
             SDKMetrics.setMetricInstance(createMetricInstance(this.NativeBridge.getPlatform(), this.RequestManager, this.ClientInfo, this.DeviceInfo, this.Config.getCountry()));
 
             // tslint:disable-next-line:no-any
