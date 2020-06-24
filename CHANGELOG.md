@@ -1,5 +1,6 @@
 # Pending
 
+* [Load V5] Allow invalidation for grouping experiment [#16131](https://github.com/Applifier/unity-ads-webview/pull/16131)
 * Add gameid to skipCheckGameIds in custom features [#16159](https://github.com/Applifier/unity-ads-webview/pull/16159)
 
 # Mon Jun 22 20:17:29 UTC 2020
