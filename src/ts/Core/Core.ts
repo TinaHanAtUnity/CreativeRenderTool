@@ -2,6 +2,7 @@ import { Ads } from 'Ads/Ads';
 import { Platform } from 'Core/Constants/Platform';
 import { UnityAdsError } from 'Core/Constants/UnityAdsError';
 import { ConfigError } from 'Core/Errors/ConfigError';
+import { InitializationError } from 'Core/Errors/InitializationError';
 import { ICore, ICoreApi } from 'Core/ICore';
 import { CacheBookkeepingManager } from 'Core/Managers/CacheBookkeepingManager';
 import { CacheManager } from 'Core/Managers/CacheManager';
@@ -54,15 +55,6 @@ import { NoGzipCacheManager } from 'Core/Managers/NoGzipCacheManager';
 import { createMetricInstance } from 'Ads/Networking/MetricInstance';
 import { createStopwatch } from 'Core/Utilities/Stopwatch';
 import { IsMadeWithUnity } from 'Ads/Utilities/IsMadeWithUnity';
-
-class InitializationError extends Error {
-    public readonly tag: InitErrorCode;
-
-    constructor(message: string, tag: InitErrorCode) {
-        super(message);
-        this.tag = tag;
-    }
-}
 
 export class Core implements ICore {
 
