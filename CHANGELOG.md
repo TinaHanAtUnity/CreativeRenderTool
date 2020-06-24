@@ -1,4 +1,4 @@
-# Pending
+# Wed Jun 24 19:17:28 UTC 2020
 
 * Add Android GooglePlay Detection Test on Group 8 [#16160](https://github.com/Applifier/unity-ads-webview/pull/16160)
 * [Load V5] Allow invalidation for grouping experiment [#16131](https://github.com/Applifier/unity-ads-webview/pull/16131)
