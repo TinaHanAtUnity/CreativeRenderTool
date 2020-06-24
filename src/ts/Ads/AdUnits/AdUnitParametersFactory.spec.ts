@@ -19,7 +19,6 @@ import { VastAdVerification, VastAdVerificationMock } from 'VAST/Models/__mocks_
 import { VastVerificationResource } from 'VAST/Models/VastVerificationResource';
 import { VastHTMLEndScreen } from 'VAST/Views/VastHTMLEndScreen';
 import { VastStaticEndScreen } from 'VAST/Views/VastStaticEndScreen';
-import { HtmlEndcardTest } from 'Core/Models/ABGroup';
 
 jest.mock('VAST/Views/VastHTMLEndScreen');
 jest.mock('VAST/Views/VastStaticEndScreen');
@@ -85,9 +84,7 @@ describe('AdUnitParametersFactoryTest', () => {
         describe('when creating parameters', () => {
             describe('when creating endscreen parameters', () => {
                 beforeEach(() => {
-                    const isValid = jest.spyOn(HtmlEndcardTest, 'isValid');
                     vast.getAdVerifications.mockReturnValue([]);
-                    isValid.mockReturnValue(true);
                 });
                 [
                     { hasStaticEndscreen: true, hasHtmlEndscreen: true, expectedType: VastHTMLEndScreen, description: 'when static and html endscreen both exist', expectedResult: 'vast endscreen should be html endscreen' },
