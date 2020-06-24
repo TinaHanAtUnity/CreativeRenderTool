@@ -1,5 +1,6 @@
 # Pending
 
+* Add Android GooglePlay Detection Test on Group 8 [#16160](https://github.com/Applifier/unity-ads-webview/pull/16160)
 * [Load V5] Allow invalidation for grouping experiment [#16131](https://github.com/Applifier/unity-ads-webview/pull/16131)
 * Add gameid to skipCheckGameIds in custom features [#16159](https://github.com/Applifier/unity-ads-webview/pull/16159)
 
