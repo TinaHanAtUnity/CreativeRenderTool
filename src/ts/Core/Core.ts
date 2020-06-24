@@ -257,9 +257,6 @@ export class Core implements ICore {
                 IsMadeWithUnity.sendIsMadeWithUnity(this.Api.Storage, this.SdkDetectionInfo);
             });
         }).catch((error: { message: string; name: unknown }) => {
-            if (error instanceof ConfigError) {
-                error = new InitializationError('Unity Ads SDK fail to initialize due to configuration error', InitErrorCode.ConfigurationError);
-            }
             this.handleInitializationError(error);
         });
     }
@@ -271,6 +268,9 @@ export class Core implements ICore {
         if (err instanceof InitializationError) {
             message = err.message;
             errorCode = err.tag;
+        } else if (err instanceof ConfigError) {
+            message = 'Unity Ads SDK fail to initialize due to configuration error';
+            errorCode = InitErrorCode.ConfigurationError;
         } else {
             message = 'Unity Ads SDK fail to initialize due to internal error';
             errorCode = InitErrorCode.Unknown;
