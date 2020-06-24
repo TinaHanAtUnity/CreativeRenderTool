@@ -228,7 +228,8 @@ export class CustomFeatures {
         const skipCheckGameIds = [
             '3254219', // Blowfire
             '3262346',
-            '1636888'
+            '1636888',
+            '3268075'
         ];
         // return true if not in list.
         return !this.existsInList(skipCheckGameIds, gameId);
