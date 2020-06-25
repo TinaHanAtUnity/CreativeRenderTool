@@ -154,7 +154,8 @@ export class CustomFeatures {
         ];
 
         return this.existsInList(gameIds, gameId) || CustomFeatures.isZyngaDealGame(gameId)
-            || this.isExternalMopubTestGameForLoad(gameId) || this.isFanateeExtermaxGameForLoad(gameId);
+            || this.isExternalMopubTestGameForLoad(gameId) || this.isFanateeExtermaxGameForLoad(gameId)
+            || this.isCheetahTestGameForLoad(gameId);
     }
 
     public static shouldDisableBannerRefresh(gameId: string): boolean {

@@ -783,11 +783,10 @@ export class Ads implements IAds {
     private setupLoadApiEnabled(): void {
         this._loadApiEnabled = this._core.ClientInfo.getUsePerPlacementLoad();
 
-        const isCheetahTestGame = CustomFeatures.isCheetahTestGameForLoad(this._core.ClientInfo.getGameId());
         const loadV5 = this.isLoadV5Enabled();
         const isPSPTestApp = CustomFeatures.isPSPTestAppGame(this._core.ClientInfo.getGameId());
 
-        if (loadV5 || isCheetahTestGame || isPSPTestApp) {
+        if (loadV5 || isPSPTestApp) {
             this._webViewEnabledLoad = true;
         }
     }
