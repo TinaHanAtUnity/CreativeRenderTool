@@ -85,7 +85,6 @@ export const LoadV5 = new ReverseABTest(14, 15, 18, 19);
 export const LoadV5GroupId = new ABTest(6, 10);
 
 // Disabled AB Tests
-export const HtmlEndcardTest = new DisabledABTest();
 export const OpenMeasurementTest = new DisabledABTest();
 export const IframeEndcardTest = new DisabledABTest();
 export const ConsentUXTest = new DisabledABTest();
