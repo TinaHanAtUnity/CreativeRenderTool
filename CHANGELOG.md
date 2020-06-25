@@ -1,3 +1,7 @@
+# Pending
+
+* [VAST HTML endcard] Remove reverse AB test and open 100% traffic for HTML endcard feature [#16188](https://github.com/Applifier/unity-ads-webview/pull/16188)
+
 # Wed Jun 24 19:17:28 UTC 2020
 
 * Add Android GooglePlay Detection Test on Group 8 [#16160](https://github.com/Applifier/unity-ads-webview/pull/16160)
