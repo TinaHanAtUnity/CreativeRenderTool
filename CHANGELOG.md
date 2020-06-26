@@ -1,4 +1,4 @@
-# Pending
+# Fri Jun 26 22:17:18 UTC 2020
 
 * [China Auction] Add Latency Instrumentation [#16191](https://github.com/Applifier/unity-ads-webview/pull/16191)
 * [Load V5] Use smaller timeout and remove retry delay [#16221](https://github.com/Applifier/unity-ads-webview/pull/16221)
