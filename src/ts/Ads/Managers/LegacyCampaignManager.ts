@@ -148,10 +148,9 @@ export class LegacyCampaignManager extends CampaignManager {
         }).then(([requestUrl, requestBody]) => {
             this._core.Sdk.logInfo('Requesting ad plan from ' + requestUrl);
 
-            if (this._coreConfig.getCountry().toLowerCase() === 'cn') {
+            if (this._coreConfig.getCountry() === 'CN') {
                 SDKMetrics.reportMetricEventWithTags(ChinaAucionEndpoint.AuctionRequest, {
-                    'uce': `${this._useChinaAuctionEndpoint}`,
-                    'load': 'false'
+                    'uce': `${this._useChinaAuctionEndpoint}`
                 });
                 chinaMeasurement = createStopwatch();
                 chinaMeasurement.start();
@@ -189,10 +188,9 @@ export class LegacyCampaignManager extends CampaignManager {
                 'stg': 'auction_response'
             });
 
-            if (this._coreConfig.getCountry().toLowerCase() === 'cn') {
+            if (this._coreConfig.getCountry() === 'CN') {
                 chinaMeasurement.stopAndSend(ChinaAucionEndpoint.AuctionResponse, {
-                    'uce': `${this._useChinaAuctionEndpoint}`,
-                    'load': 'false'
+                    'uce': `${this._useChinaAuctionEndpoint}`
                 });
             }
 
@@ -243,7 +241,6 @@ export class LegacyCampaignManager extends CampaignManager {
     }
 
     public loadCampaign(placement: Placement): Promise<ILoadedCampaign | undefined> {
-        let chinaMeasurement: IStopwatch;
         SDKMetrics.reportMetricEventWithTags(MiscellaneousMetric.AuctionRequestCreated, {
             'wel': 'true',
             'iar': `${GameSessionCounters.getCurrentCounters().adRequests === 1}`
@@ -283,15 +280,6 @@ export class LegacyCampaignManager extends CampaignManager {
             const body = JSON.stringify(requestBody);
             SDKMetrics.reportMetricEvent(LoadMetric.LoadEnabledAuctionRequest);
 
-            if (this._coreConfig.getCountry().toLowerCase() === 'cn') {
-                SDKMetrics.reportMetricEventWithTags(ChinaAucionEndpoint.AuctionRequest, {
-                    'uce': `${this._useChinaAuctionEndpoint}`,
-                    'load': 'true'
-                });
-                chinaMeasurement = createStopwatch();
-                chinaMeasurement.start();
-            }
-
             return Promise.resolve().then(() => {
                 return this._request.post(requestUrl, body, [], {
                     retries: 0,
@@ -328,12 +316,6 @@ export class LegacyCampaignManager extends CampaignManager {
                     this._mediationLoadTracking.reportAuctionRequest(this.getTime() - requestStartTime, true);
                 }
 
-                if (this._coreConfig.getCountry().toLowerCase() === 'cn') {
-                    chinaMeasurement.stopAndSend(ChinaAucionEndpoint.AuctionResponse, {
-                        'uce': `${this._useChinaAuctionEndpoint}`,
-                        'load': 'true'
-                    });
-                }
                 return this.parseLoadedCampaign(response, placement, countersForOperativeEvents, this._deviceFreeSpace, requestPrivacy, legacyRequestPrivacy);
             }).then((loadedCampaign) => {
                 if (loadedCampaign) {
