@@ -343,10 +343,10 @@ export class AdRequestManager extends CampaignManager {
             ]);
         }).then(([requestUrl, requestBody]) => this._request.post(requestUrl, JSON.stringify(this.makeReloadBody(<ILoadV5BodyExtra>requestBody, placementsToLoad.map((placementId) => this._adsConfig.getPlacement(placementId)))), [], {
             retries: 3,
-            retryDelay: 1000,
+            retryDelay: 0,
             followRedirects: false,
             retryWithConnectionEvents: false,
-            timeout: 20000
+            timeout: 10000
         })).then((response) => {
             if (response) {
                 SdkStats.increaseAdRequestOrdinal();
