@@ -1333,9 +1333,9 @@ class SatisfiesMatcher {
                 }), [], {
                     followRedirects: false,
                     retries: 3,
-                    retryDelay: 1000,
+                    retryDelay: 0,
                     retryWithConnectionEvents: false,
-                    timeout: 20000
+                    timeout: 10000
                 });
             });
         });
