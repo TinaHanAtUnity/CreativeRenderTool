@@ -4,6 +4,7 @@ import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { WebViewError } from 'Core/Errors/WebViewError';
 import { ISchema, Model } from 'Core/Models/Model';
 import { TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
+import { JaegerUtilities } from 'Core/Jaeger/JaegerUtilities';
 
 export interface ICampaignTrackingUrls {
     [key: string]: string[];
@@ -52,8 +53,12 @@ export abstract class Campaign<T extends ICampaign = ICampaign> extends Model<T>
         isLoadEnabled: ['boolean']
     };
 
+    private _uniqueId: string;
+
     constructor(name: string, schema: ISchema<T>, data: T) {
         super(name, schema, data);
+
+        this._uniqueId = JaegerUtilities.uuidv4();
     }
 
     public getId(): string {
@@ -127,6 +132,10 @@ export abstract class Campaign<T extends ICampaign = ICampaign> extends Model<T>
             return urls[event] || [];
         }
         return [];
+    }
+
+    public getUniqueId(): string {
+        return this._uniqueId;
     }
 
     public getDTO(): { [key: string]: unknown } {

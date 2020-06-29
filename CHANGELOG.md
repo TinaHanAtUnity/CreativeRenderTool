@@ -1,3 +1,80 @@
+# Pending
+
+* [Load V5] Invalidate only already shown programmatic campaign [#16190](https://github.com/Applifier/unity-ads-webview/pull/16190)
+* [Load V5] Change Request Timeouts from 10 to 5 seconds [#16224](https://github.com/Applifier/unity-ads-webview/pull/16224)
+
+# Fri Jun 26 22:17:18 UTC 2020
+
+* [China Auction] Add Latency Instrumentation [#16191](https://github.com/Applifier/unity-ads-webview/pull/16191)
+* [Load V5] Use smaller timeout and remove retry delay [#16221](https://github.com/Applifier/unity-ads-webview/pull/16221)
+* [Load V5] Move Cheetah games to Load V5 [#16192](https://github.com/Applifier/unity-ads-webview/pull/16192)
+* [VAST HTML endcard] Remove reverse AB test and open 100% traffic for HTML endcard feature [#16188](https://github.com/Applifier/unity-ads-webview/pull/16188)
+
+# Wed Jun 24 19:17:28 UTC 2020
+
+* Add Android GooglePlay Detection Test on Group 8 [#16160](https://github.com/Applifier/unity-ads-webview/pull/16160)
+* [Load V5] Allow invalidation for grouping experiment [#16131](https://github.com/Applifier/unity-ads-webview/pull/16131)
+* Add gameid to skipCheckGameIds in custom features [#16159](https://github.com/Applifier/unity-ads-webview/pull/16159)
+
+# Mon Jun 22 20:17:29 UTC 2020
+
+* [Load V5] Force to invalidation for previously shown campaign [#16130](https://github.com/Applifier/unity-ads-webview/pull/16130)
+
+# Fri Jun 19 01:16:51 UTC 2020
+
+* Remove PSP Test App IDs from Load V5 Whitelist [#16102](https://github.com/Applifier/unity-ads-webview/pull/16102)
+
+# Thu Jun 18 23:23:28 UTC 2020
+
+* [Open Measurement] Add MOAT to om whitelist [#16074](https://github.com/Applifier/unity-ads-webview/pull/16074)
+* Add game ID to gameSpawnsNewViewControllerOnFinish whitelist [#16046](https://github.com/Applifier/unity-ads-webview/pull/16046)
+
+# Thu Jun 18 20:59:41 UTC 2020
+
+* [Load V4] Remove load v4 and Zynga Deal [#16015](https://github.com/Applifier/unity-ads-webview/pull/16015)
+* [Load V1] Move game on original load to load v5 [#16045](https://github.com/Applifier/unity-ads-webview/pull/16045)
+* [Feature] Add unique id for each campaign [#16044](https://github.com/Applifier/unity-ads-webview/pull/16044)
+* [Placement Grouping]Add AB group test for placement grouping [#16013](https://github.com/Applifier/unity-ads-webview/pull/16013)
+
+# Wed 17 Jun 2020 23:18:30 UTC
+
+* [AUI] Add more color variants for the CTA button on the EndScreen [#15947](https://github.com/Applifier/unity-ads-webview/pull/15947)
+* [AUI] Create color utils in preparation of new color experiments [#16012](https://github.com/Applifier/unity-ads-webview/pull/16012)
+* [AUI] Refactor ExperimentEndScreen constructor to make it less bloated [#16010](https://github.com/Applifier/unity-ads-webview/pull/16010)
+* [Fix] Fix language mapping for Finnish in test files [#16014](https://github.com/Applifier/unity-ads-webview/pull/16014)
+* [Placement Grouping]Update files to use groupId [#16016](https://github.com/Applifier/unity-ads-webview/pull/16016)
+* [Placement Grouping]Add groupId and helper functions in Placement [#15942](https://github.com/Applifier/unity-ads-webview/pull/15942)
+
+# Tue 16 Jun 2020 15:41:08 UTC
+
+* [AUI] Update ExperimentEndScreen default actions to use global best combination [#16007](https://github.com/Applifier/unity-ads-webview/pull/16007)
+* [AUI] Add ctaAlternativeText to Endcard Experiments [#15748](https://github.com/Applifier/unity-ads-webview/pull/15748)
+* Add support for External EndScreen for versions prior to 2.1.0 [#15844](https://github.com/Applifier/unity-ads-webview/pull/15844)
+
+# Mon Jun 15 20:25:47 UTC 2020
+
+* [Bug] Set isGoogleStoreInstalled to true always on 3.4.6+ [#15944](https://github.com/Applifier/unity-ads-webview/pull/15944)
+* [Ad Unit] Conclude experiment [#15882](https://github.com/Applifier/unity-ads-webview/pull/15882)
+* [GAID] Investigate GAID versus GooglePlay Existence [#15948](https://github.com/Applifier/unity-ads-webview/pull/15948)
+
+# Thu Jun 11 17:43:16 UTC 2020
+
+* [Load V5] Reverse ab test [#15884](https://github.com/Applifier/unity-ads-webview/pull/15884)
+
+# Wed Jun 10 23:55:46 UTC 2020
+
+* [VAST HTML Endcard] Reverse AB testing using group 17 and 11 [#15880](https://github.com/Applifier/unity-ads-webview/pull/15880)
+* [Bug]Add missing click report for admob [#15852](https://github.com/Applifier/unity-ads-webview/pull/15852)
+* [Revert] Remove load baseline metric [#15847](https://github.com/Applifier/unity-ads-webview/pull/15847)
+
+# Wed Jun 10 02:02:07 UTC 2020
+
+* [Revert] Revert auction XHR experiment [#15846](https://github.com/Applifier/unity-ads-webview/pull/15846)
+* [Chore] Cleanup isAppInstalled API Call [#15849](https://github.com/Applifier/unity-ads-webview/pull/15849)
+* [Load V5] Add new Group 13 to load v5 experiment [#15845](https://github.com/Applifier/unity-ads-webview/pull/15845)
+* [Bug] Detect GooglePlay Store Existence with GAID [#15850](https://github.com/Applifier/unity-ads-webview/pull/15850)
+* [Chore] Force Browser tests to use Test Mode [#15851](https://github.com/Applifier/unity-ads-webview/pull/15851)
+
 # Tue  9 Jun 2020 23:20:00 UTC
 
 * [AUI] Create Seperate File for Experiment EndScreen Tests [#15814](https://github.com/Applifier/unity-ads-webview/pull/15814)

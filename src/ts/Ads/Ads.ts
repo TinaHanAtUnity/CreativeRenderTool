@@ -83,8 +83,7 @@ import { Analytics } from 'Analytics/Analytics';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { PrivacyParser } from 'Privacy/Parsers/PrivacyParser';
 import { Promises } from 'Core/Utilities/Promises';
-import { MediationCacheModeAllowedTest, AuctionXHR, LoadV5, BaseLineLoadV5, LoadV5AdUnit, LoadV5NoInvalidation } from 'Core/Models/ABGroup';
-import { PerPlacementLoadManagerV4 } from 'Ads/Managers/PerPlacementLoadManagerV4';
+import { MediationCacheModeAllowedTest, LoadV5, LoadV5NoInvalidation, LoadV5GroupId } from 'Core/Models/ABGroup';
 import { PrivacyMetrics } from 'Privacy/PrivacyMetrics';
 import { PrivacySDKUnit } from 'Ads/AdUnits/PrivacySDKUnit';
 import { PerPlacementLoadAdapter } from 'Ads/Managers/PerPlacementLoadAdapter';
@@ -325,15 +324,14 @@ export class Ads implements IAds {
     private configureCampaignManager() {
         if (this._loadApiEnabled && this._webViewEnabledLoad) {
             if (this.isLoadV5Enabled()) {
-                const useAdUnits = this.useAdUnitSupport();
-                const adUnitGame = CustomFeatures.useAdUnitSupport(this._core.ClientInfo.getGameId());
+                const useGroupIds = this.useGroupIdSupport();
 
                 let experiment = LoadV5ExperimentType.None;
 
                 if (LoadV5NoInvalidation.isValid(this._core.Config.getAbGroup())) {
                     experiment = LoadV5ExperimentType.NoInvalidation;
-                } else if (adUnitGame) {
-                    experiment = useAdUnits ? LoadV5ExperimentType.AdUnit : LoadV5ExperimentType.BaseAdUnit;
+                } else if (useGroupIds) {
+                    experiment = LoadV5ExperimentType.GroupId;
                 }
 
                 this.AdRequestManager = new AdRequestManager(this._core.NativeBridge.getPlatform(), this._core, this._core.Config, this.Config, this.AssetManager, this.SessionManager, this.AdMobSignalFactory, this._core.RequestManager, this._core.ClientInfo, this._core.DeviceInfo, this._core.MetaDataManager, this._core.CacheBookkeeping, this.ContentTypeHandlerManager, this.PrivacySDK, this.PrivacyManager, experiment);
@@ -357,20 +355,14 @@ export class Ads implements IAds {
             if (LoadV5NoInvalidation.isValid(this._core.Config.getAbGroup())) {
                 this.RefreshManager = new PerPlacementLoadManagerV5NoInvalidation(this.Api, this.Config, this._core.Config, this.AdRequestManager, this._core.ClientInfo, this._core.FocusManager, false);
             } else {
-                const useAdUnits = this.useAdUnitSupport();
-                this.RefreshManager = new PerPlacementLoadManagerV5(this.Api, this.Config, this._core.Config, this.AdRequestManager, this._core.ClientInfo, this._core.FocusManager, useAdUnits);
+                const useGroupIds = this.useGroupIdSupport();
+                this.RefreshManager = new PerPlacementLoadManagerV5(this.Api, this.Config, this._core.Config, this.AdRequestManager, this._core.ClientInfo, this._core.FocusManager, useGroupIds);
             }
             return;
         }
 
         if (this._loadApiEnabled && this._webViewEnabledLoad) {
-            const isZyngaDealGame = CustomFeatures.isZyngaDealGame(this._core.ClientInfo.getGameId());
-
-            if (isZyngaDealGame) {
-                this.RefreshManager = new PerPlacementLoadManagerV4(this.Api, this.Config, this._core.Config, this.CampaignManager, this._core.ClientInfo, this._core.FocusManager);
-            } else {
-                this.RefreshManager = new PerPlacementLoadManager(this.Api, this.Config, this._core.Config, this.CampaignManager, this._core.ClientInfo, this._core.FocusManager);
-            }
+            this.RefreshManager = new PerPlacementLoadManager(this.Api, this.Config, this._core.Config, this.CampaignManager, this._core.ClientInfo, this._core.FocusManager);
         } else if (this._loadApiEnabled) {
             this.RefreshManager = new PerPlacementLoadAdapter(this._core.NativeBridge.getPlatform(), this._core.Api, this._core.Config, this.Api, this._core.WakeUpManager, this.CampaignManager, this.Config, this._core.FocusManager, this.SessionManager, this._core.ClientInfo, this._core.RequestManager, this._core.CacheManager);
         } else {
@@ -394,13 +386,7 @@ export class Ads implements IAds {
 
                     let experimentType = MediationExperimentType.None;
 
-                    if (this._core.NativeBridge.getPlatform() === Platform.ANDROID && AuctionXHR.isValid(this._core.Config.getAbGroup())) {
-                        if (XHRequest.isAvailable()) {
-                            experimentType = MediationExperimentType.AuctionXHR;
-                        } else {
-                            SDKMetrics.reportMetricEvent(MiscellaneousMetric.XHRNotAvailable);
-                        }
-                    } else if (this.isLoadV5Enabled() && this._webViewEnabledLoad) {
+                    if (this.isLoadV5Enabled() && this._webViewEnabledLoad) {
                         experimentType = MediationExperimentType.LoadV5;
                     } else if (!CustomFeatures.isExcludedGameFromCacheModeTest(this._core.ClientInfo.getGameId()) && MediationCacheModeAllowedTest.isValid(this._core.Config.getAbGroup())) {
                         this.Config.set('cacheMode', CacheMode.ALLOWED);
@@ -631,8 +617,6 @@ export class Ads implements IAds {
                 // AdRequestManager is valid only if Load V5 is enabled
                 if (this.AdRequestManager) {
                     this.AdRequestManager.reportMetricEvent(LoadV5Metrics.Show);
-                } else if (this._loadApiEnabled && BaseLineLoadV5.isValid(this._core.Config.getAbGroup()) && CustomFeatures.isLoadV5Game(this._core.ClientInfo.getGameId())) {
-                    SDKMetrics.reportMetricEvent(LoadV5Metrics.Show);
                 }
 
                 if (this.MediationLoadTrackingManager) {
@@ -799,13 +783,10 @@ export class Ads implements IAds {
     private setupLoadApiEnabled(): void {
         this._loadApiEnabled = this._core.ClientInfo.getUsePerPlacementLoad();
 
-        const isZyngaDealGame = CustomFeatures.isZyngaDealGame(this._core.ClientInfo.getGameId());
-        const isMopubTestGame = CustomFeatures.isMopubTestGameForLoad(this._core.ClientInfo.getGameId());
-        const isCheetahTestGame = CustomFeatures.isCheetahTestGameForLoad(this._core.ClientInfo.getGameId());
-        const isFanateeExtermaxGameForLoad = CustomFeatures.isFanateeExtermaxGameForLoad(this._core.ClientInfo.getGameId());
         const loadV5 = this.isLoadV5Enabled();
+        const isPSPTestApp = CustomFeatures.isPSPTestAppGame(this._core.ClientInfo.getGameId());
 
-        if (isZyngaDealGame || isMopubTestGame || isCheetahTestGame || isFanateeExtermaxGameForLoad || loadV5) {
+        if (loadV5 || isPSPTestApp) {
             this._webViewEnabledLoad = true;
         }
     }
@@ -823,10 +804,7 @@ export class Ads implements IAds {
         return (this._loadApiEnabled && loadV5Game) || this._forceLoadV5;
     }
 
-    private useAdUnitSupport(): boolean {
-        const adUnitTest = LoadV5AdUnit.isValid(this._core.Config.getAbGroup());
-        const adUnitGame = CustomFeatures.useAdUnitSupport(this._core.ClientInfo.getGameId());
-
-        return (adUnitTest && adUnitGame);
+    private useGroupIdSupport(): boolean {
+        return LoadV5GroupId.isValid(this._core.Config.getAbGroup());
     }
 }

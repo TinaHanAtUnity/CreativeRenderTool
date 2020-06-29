@@ -113,6 +113,7 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     }
 
     public sendClickEvent() {
+        this._ads.Listener.sendClickEvent(this._placement.getId());
         this.sendTrackingEvent(TrackingEvent.CLICK);
         this._operativeEventManager.sendClick(this.getOperativeEventParams());
 

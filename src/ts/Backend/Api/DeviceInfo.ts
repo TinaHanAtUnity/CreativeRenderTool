@@ -1,5 +1,4 @@
 import { BackendApi } from 'Backend/BackendApi';
-import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 
 export class DeviceInfo extends BackendApi {
 
@@ -369,10 +368,6 @@ export class DeviceInfo extends BackendApi {
 
     public isSimulator() {
         return this._simulator;
-    }
-
-    public isAppInstalled(packageName: string) {
-        return packageName === AndroidDeviceInfo.GooglePlayPackageName;
     }
 
     public getStatusBarHeight() {
