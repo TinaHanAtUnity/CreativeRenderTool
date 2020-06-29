@@ -1,3 +1,7 @@
+# Pending
+
+* [Load V5] Change Request Timeouts from 10 to 5 seconds [#16224](https://github.com/Applifier/unity-ads-webview/pull/16224)
+
 # Fri Jun 26 22:17:18 UTC 2020
 
 * [China Auction] Add Latency Instrumentation [#16191](https://github.com/Applifier/unity-ads-webview/pull/16191)
