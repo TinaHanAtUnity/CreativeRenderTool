@@ -1,8 +1,7 @@
 import { NativeApi, ApiPackage } from 'Core/Native/Bridge/NativeApi';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { EventCategory } from 'Core/Constants/EventCategory';
-import { Observable, Observable1 } from 'Core/Utilities/Observable';
-import { constructor } from 'chai';
+import { Observable1 } from 'Core/Utilities/Observable';
 
 export enum TrackingAuthorizationStatus {
     NotDetermined,
