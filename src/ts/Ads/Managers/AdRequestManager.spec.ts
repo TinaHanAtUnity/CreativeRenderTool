@@ -141,7 +141,7 @@ class SatisfiesMatcher {
                     retries: 1,
                     retryDelay: 0,
                     retryWithConnectionEvents: false,
-                    timeout: 10000
+                    timeout: 5000
                 });
             });
 
@@ -415,7 +415,7 @@ class SatisfiesMatcher {
                     retries: 0,
                     retryDelay: 0,
                     retryWithConnectionEvents: false,
-                    timeout: 10000
+                    timeout: 5000
                 });
                 expect(request.post).toHaveBeenNthCalledWith(3, expect.anything(), new SatisfiesMatcher({
                     preload: false,
@@ -440,7 +440,7 @@ class SatisfiesMatcher {
                     retries: 0,
                     retryDelay: 0,
                     retryWithConnectionEvents: false,
-                    timeout: 10000
+                    timeout: 5000
                 });
             });
         });
@@ -550,7 +550,7 @@ class SatisfiesMatcher {
                     retries: 0,
                     retryDelay: 0,
                     retryWithConnectionEvents: false,
-                    timeout: 10000
+                    timeout: 5000
                 });
             });
 
@@ -714,7 +714,7 @@ class SatisfiesMatcher {
                     retries: 0,
                     retryDelay: 0,
                     retryWithConnectionEvents: false,
-                    timeout: 10000
+                    timeout: 5000
                 });
             });
         });
@@ -810,7 +810,7 @@ class SatisfiesMatcher {
                     retries: 0,
                     retryDelay: 0,
                     retryWithConnectionEvents: false,
-                    timeout: 10000
+                    timeout: 5000
                 });
             });
         });
@@ -1335,7 +1335,7 @@ class SatisfiesMatcher {
                     retries: 3,
                     retryDelay: 0,
                     retryWithConnectionEvents: false,
-                    timeout: 10000
+                    timeout: 5000
                 });
             });
         });
@@ -1456,7 +1456,7 @@ class SatisfiesMatcher {
                     retries: 0,
                     retryDelay: 0,
                     retryWithConnectionEvents: false,
-                    timeout: 10000
+                    timeout: 5000
                 });
             });
 
