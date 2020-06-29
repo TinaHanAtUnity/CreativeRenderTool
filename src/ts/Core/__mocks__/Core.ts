@@ -20,6 +20,7 @@ import { IosPreferencesApi } from 'Core/Native/iOS/__mocks__/IosPreferencesApi';
 import { MainBundleApi } from 'Core/Native/iOS/__mocks__/MainBundleApi';
 import { NotificationApi } from 'Core/Native/iOS/__mocks__/NotificationApi';
 import { UrlSchemeApi } from 'Core/Native/iOS/__mocks__/UrlSchemeApi';
+import { TrackingManagerApi } from 'Core/Native/iOS/__mocks__/TrackingManagerApi';
 import { CacheApi } from 'Core/Native/__mocks__/CacheApi';
 import { ClassDetectionApi } from 'Core/Native/__mocks__/ClassDetectionApi';
 import { ConnectivityApi } from 'Core/Native/__mocks__/ConnectivityApi';
@@ -36,6 +37,7 @@ import { NativeErrorApi } from 'Core/__mocks__/NativeErrorApi';
 import { SdkDetectionInfo } from 'Core/Models/__mocks__/SdkDetectionInfo';
 
 import { ICore } from 'Core/ICore';
+import { TrackingManagerApi } from 'Core/Native/iOS/TrackingManager';
 
 export const Core = jest.fn(() => {
     return <ICore>{
@@ -62,7 +64,8 @@ export const Core = jest.fn(() => {
                 MainBundle: new MainBundleApi(),
                 Notification: new NotificationApi(),
                 Preferences: new IosPreferencesApi(),
-                UrlScheme: new UrlSchemeApi()
+                UrlScheme: new UrlSchemeApi(),
+                TrackingManager: new TrackingManagerApi()
             }
         },
         NativeBridge: new NativeBridge(),
