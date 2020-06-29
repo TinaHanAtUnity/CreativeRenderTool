@@ -66,6 +66,7 @@ export class AutomatedExperimentManager {
 
     private _abGroup: number;
     private _gameSessionID: number;
+    private _gamerToken: string;
     private _experimentFilters: AutomatedExperimentFilter[];
     private _campaign: OptimizedCampaign;
     private _staticFeaturesPromise: Promise<{ [key: string]: ContextualFeature }>;
@@ -92,6 +93,7 @@ export class AutomatedExperimentManager {
         this._nativeBridge = core.NativeBridge;
         this._abGroup = core.Config.getAbGroup();
         this._gameSessionID = core.Ads.SessionManager.getGameSessionId();
+        this._gamerToken = core.Config.getToken();
         this._campaignSource = campaignSource;
         this._onCampaignListener = (placementID: string, campaign: Campaign, trackingURL: ICampaignTrackingUrls | undefined) => this.onNewCampaign(campaign);
         this._campaignSource.subscribe(this._onCampaignListener);
@@ -227,7 +229,6 @@ export class AutomatedExperimentManager {
             //GAMES, CAMPAIGN, THE AD
             { l: 'bundleId', c: 'bundle_id' },
             { l: 'gameId', c: 'game_id' },
-            { l: 'gamerToken', c: 'gamer_token' },
 
             //PRIVACY & OPT-OUTS
             { l: 'coppaCompliant', c: 'coppa_compliant' },
@@ -431,7 +432,8 @@ export class AutomatedExperimentManager {
             user_info: {
                 ab_group: this._abGroup,
                 game_session_id: this._gameSessionID,
-                auction_id: campaign.getSession().getId()
+                auction_id: campaign.getSession().getId(),
+                gamer_token: this._gamerToken
             },
             categories: categories,
             contextual_features: contextualFeatures
