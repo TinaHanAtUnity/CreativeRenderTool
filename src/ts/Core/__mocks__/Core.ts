@@ -37,7 +37,6 @@ import { NativeErrorApi } from 'Core/__mocks__/NativeErrorApi';
 import { SdkDetectionInfo } from 'Core/Models/__mocks__/SdkDetectionInfo';
 
 import { ICore } from 'Core/ICore';
-import { TrackingManagerApi } from 'Core/Native/iOS/TrackingManager';
 
 export const Core = jest.fn(() => {
     return <ICore>{
