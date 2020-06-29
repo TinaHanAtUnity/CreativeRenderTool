@@ -186,7 +186,7 @@ export class AdRequestManager extends CampaignManager {
             retryDelay: 0,
             followRedirects: false,
             retryWithConnectionEvents: false,
-            timeout: 10000
+            timeout: 5000
         })).then((response) => {
             if (response) {
                 SdkStats.increaseAdRequestOrdinal();
@@ -276,7 +276,7 @@ export class AdRequestManager extends CampaignManager {
             retryDelay: 0,
             followRedirects: false,
             retryWithConnectionEvents: false,
-            timeout: 10000
+            timeout: 5000
         })).then((response) => {
             // if load request has been canceled by reload request, we start it again or we use result from reload request
             if (this._ongoingLoadRequests[placementId] === undefined) {
@@ -346,7 +346,7 @@ export class AdRequestManager extends CampaignManager {
             retryDelay: 0,
             followRedirects: false,
             retryWithConnectionEvents: false,
-            timeout: 10000
+            timeout: 5000
         })).then((response) => {
             if (response) {
                 SdkStats.increaseAdRequestOrdinal();
