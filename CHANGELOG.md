@@ -1,4 +1,4 @@
-# Pending
+# Mon Jun 29 23:26:34 UTC 2020
 
 * [Load V5] Invalidate only already shown programmatic campaign [#16190](https://github.com/Applifier/unity-ads-webview/pull/16190)
 * [Load V5] Change Request Timeouts from 10 to 5 seconds [#16224](https://github.com/Applifier/unity-ads-webview/pull/16224)
