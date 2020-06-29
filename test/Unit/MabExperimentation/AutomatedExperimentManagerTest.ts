@@ -317,7 +317,7 @@ describe('AutomatedExperimentManagerTests', () => {
 
             const rewardPostUrl = AutomatedExperimentManager.BaseUrl + AutomatedExperimentManager.RewardEndPoint;
             const rewardRequestBodyText = JSON.stringify({
-                user_info: { ab_group: 99, auction_id: '12345', gamer_token: 'abcdef' },
+                user_info: { ab_group: 99, auction_id: '12345', gamer_token: 'abcd.1234.5678' },
                 reward: rewarded,
                 experiments:
                 [
@@ -476,7 +476,7 @@ describe('AutomatedExperimentManagerTests', () => {
 
             const rewardPostUrl = AutomatedExperimentManager.BaseUrl + AutomatedExperimentManager.RewardEndPoint;
             const rewardRequestBodyText = JSON.stringify({
-                user_info: { ab_group: 99, auction_id: '12345', gamer_token: 'abcdef' },
+                user_info: { ab_group: 99, auction_id: '12345', gamer_token: 'abcd.1234.5678' },
                 reward: firstReward,
                 experiments:
                 [

@@ -194,7 +194,8 @@ export class AutomatedExperimentManager {
             user_info: {
                 ab_group: this._abGroup,
                 auction_id: campaign.getSession().getId(),
-                game_session_id: this._gameSessionID
+                game_session_id: this._gameSessionID,
+                gamer_token: this._gamerToken
             },
             reward: categorizedExp.Outcome,
             experiments: experiments
