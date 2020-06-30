@@ -138,7 +138,7 @@ class SatisfiesMatcher {
                     preloadData: {}
                 }), [], {
                     followRedirects: false,
-                    retries: 1,
+                    retries: 3,
                     retryDelay: 0,
                     retryWithConnectionEvents: false,
                     timeout: 5000
@@ -412,7 +412,7 @@ class SatisfiesMatcher {
                     }
                 }), [], {
                     followRedirects: false,
-                    retries: 0,
+                    retries: 3,
                     retryDelay: 0,
                     retryWithConnectionEvents: false,
                     timeout: 5000
@@ -437,7 +437,7 @@ class SatisfiesMatcher {
                     }
                 }), [], {
                     followRedirects: false,
-                    retries: 0,
+                    retries: 3,
                     retryDelay: 0,
                     retryWithConnectionEvents: false,
                     timeout: 5000
@@ -547,7 +547,7 @@ class SatisfiesMatcher {
                     }
                 }), [], {
                     followRedirects: false,
-                    retries: 0,
+                    retries: 3,
                     retryDelay: 0,
                     retryWithConnectionEvents: false,
                     timeout: 5000
@@ -711,7 +711,7 @@ class SatisfiesMatcher {
                     }
                 }), [], {
                     followRedirects: false,
-                    retries: 0,
+                    retries: 3,
                     retryDelay: 0,
                     retryWithConnectionEvents: false,
                     timeout: 5000
@@ -807,7 +807,7 @@ class SatisfiesMatcher {
                     }
                 }), [], {
                     followRedirects: false,
-                    retries: 0,
+                    retries: 3,
                     retryDelay: 0,
                     retryWithConnectionEvents: false,
                     timeout: 5000
@@ -1453,7 +1453,7 @@ class SatisfiesMatcher {
                     }
                 }), [], {
                     followRedirects: false,
-                    retries: 0,
+                    retries: 3,
                     retryDelay: 0,
                     retryWithConnectionEvents: false,
                     timeout: 5000
