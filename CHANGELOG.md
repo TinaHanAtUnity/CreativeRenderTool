@@ -1,4 +1,4 @@
-# Pending
+# Tue Jun 30 19:46:23 UTC 2020
 
 * [AUI] Add gamer token to collected data [#15913](https://github.com/Applifier/unity-ads-webview/pull/15913)
 
