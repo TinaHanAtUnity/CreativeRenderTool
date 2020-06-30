@@ -63,11 +63,11 @@ export class VastHTMLEndScreen extends VastEndScreen implements IPrivacyHandlerV
         this._controlBarHeight = 100;
     }
 
-    public show(): void {
+    public show(): Promise<void> {
         if (this._htmlContentTemplateData) {
             super.show();
-            this.setUpWebPlayers().then(() => {
-                this._webPlayerContainer.setData(this._htmlContentTemplate.render(this._htmlContentTemplateData), 'text/html', 'UTF-8')
+            return this.setUpWebPlayers().then(() => {
+                return this._webPlayerContainer.setData(this._htmlContentTemplate.render(this._htmlContentTemplateData), 'text/html', 'UTF-8')
                     .then(() => {
                         SDKMetrics.reportMetricEvent(VastMetric.VastHTMLEndcardShown);
                     }).catch(() => {
@@ -77,10 +77,12 @@ export class VastHTMLEndScreen extends VastEndScreen implements IPrivacyHandlerV
             }).catch(() => {
                 this.onCloseEvent(new Event('click'));
                 SDKMetrics.reportMetricEvent(VastMetric.VastHTMLEndcardShownFailed);
+                return Promise.reject();
             });
         } else {
             this.onCloseEvent(new Event('click'));
             SDKMetrics.reportMetricEvent(VastMetric.VastHTMLEndcardShownFailed);
+            return Promise.reject();
         }
     }
 
@@ -115,22 +117,20 @@ export class VastHTMLEndScreen extends VastEndScreen implements IPrivacyHandlerV
                 this.shouldOverrideUrlLoading(url, method);
             });
         }
-        return this._adUnitContainer.reconfigure(ViewConfiguration.WEB_PLAYER)
-            .then(() => {
-                this._adUnitContainer.reorient(false, this._adUnitContainer.getLockedOrientation());
-            })
-            .then(() => {
-                this.setWebPlayerSettings().then(() => {
-                    const promises = [
-                        this._deviceInfo.getScreenWidth(),
-                        this._deviceInfo.getScreenHeight()
-                    ];
-                    Promise.all(promises).then(([screenWidth, screenHeight]) => {
-                        this._screenHeight = screenHeight;
-                        this._screenWidth = screenWidth;
-                        this._adUnitContainer.setViewFrame('webplayer', 0, 0, screenWidth, screenHeight).then(() => {
-                            this._adUnitContainer.setViewFrame('webview', 0, 0, screenWidth, this._controlBarHeight).then(() => {
-                                return this.setWebplayerEventSettings();
+        return this._adUnitContainer.reconfigure(ViewConfiguration.WEB_PLAYER).then(() => {
+                this._adUnitContainer.reorient(false, this._adUnitContainer.getLockedOrientation()).then(() => {
+                    this.setWebPlayerSettings().then(() => {
+                        const promises = [
+                            this._deviceInfo.getScreenWidth(),
+                            this._deviceInfo.getScreenHeight()
+                        ];
+                        Promise.all(promises).then(([screenWidth, screenHeight]) => {
+                            this._screenHeight = screenHeight;
+                            this._screenWidth = screenWidth;
+                            this._adUnitContainer.setViewFrame('webplayer', 0, 0, screenWidth, screenHeight).then(() => {
+                                this._adUnitContainer.setViewFrame('webview', 0, 0, screenWidth, this._controlBarHeight).then(() => {
+                                    return this.setWebplayerEventSettings();
+                                });
                             });
                         });
                     });

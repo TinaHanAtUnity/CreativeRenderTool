@@ -52,6 +52,11 @@ export class VastStaticEndScreen extends VastEndScreen implements IPrivacyHandle
         }
     }
 
+    public show(): Promise<void> {
+        super.show();
+        return Promise.resolve();
+    }
+
     public remove(): void {
         super.remove();
         if (this._privacy) {
