@@ -1,3 +1,7 @@
+# Pending
+
+* [AUI] Add gamer token to collected data [#15913](https://github.com/Applifier/unity-ads-webview/pull/15913)
+
 # Mon Jun 29 23:26:34 UTC 2020
 
 * [Load V5] Invalidate only already shown programmatic campaign [#16190](https://github.com/Applifier/unity-ads-webview/pull/16190)
