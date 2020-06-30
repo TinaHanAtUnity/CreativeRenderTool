@@ -1,5 +1,6 @@
 # Pending
 
+* [Load V5] Update Preload and Load Retries to 3 [#16255](https://github.com/Applifier/unity-ads-webview/pull/16255)
 * Increase proxied auction traffic from China to 25% [#16222](https://github.com/Applifier/unity-ads-webview/pull/16222)
 
 # Tue Jun 30 19:46:23 UTC 2020
