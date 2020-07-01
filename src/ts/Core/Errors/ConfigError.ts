@@ -4,6 +4,6 @@ import { InitErrorCode } from 'Core/Native/Sdk';
 export class ConfigError extends InitializationError {
 
     constructor(error: Error) {
-        super(error.message, InitErrorCode.ConfigurationError);
+        super({errorCode: InitErrorCode.ConfigurationError, rsn: 'Unity Ads SDK fail to initialize due to configuration error'}, error.message);
     }
 }
