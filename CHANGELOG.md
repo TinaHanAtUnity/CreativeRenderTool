@@ -1,3 +1,7 @@
+# Pending
+
+* [Initialization Callback]Improve initError code and error message [#15752](https://github.com/Applifier/unity-ads-webview/pull/15752)
+
 # Tue Jun 30 23:38:28 UTC 2020
 
 * [Load V5] Update Preload and Load Retries to 3 [#16255](https://github.com/Applifier/unity-ads-webview/pull/16255)
