@@ -132,7 +132,7 @@ export class Core implements ICore {
             this.ClientInfo = new ClientInfo(data);
 
             if (!/^\d+$/.test(this.ClientInfo.getGameId())) {
-                return Promise.reject(new InitializationError({ errorCode: InitErrorCode.InvalidArgument, rsn: `Unity Ads SDK fail to initialize due to provided Game ID '${this.ClientInfo.getGameId() }' is invalid. Game ID may contain only digits (0-9).`}, undefined));
+                return Promise.reject(new InitializationError({ errorCode: InitErrorCode.InvalidArgument, rsn: `Unity Ads SDK fail to initialize due to provided Game ID '${this.ClientInfo.getGameId() }' is invalid. Game ID may contain only digits (0-9).` }, undefined));
             }
 
             if (this.NativeBridge.getPlatform() === Platform.ANDROID) {
