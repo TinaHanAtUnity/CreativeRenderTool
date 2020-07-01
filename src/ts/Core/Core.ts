@@ -258,8 +258,11 @@ export class Core implements ICore {
         let errorCode: InitErrorCode = InitErrorCode.Unknown;
 
         if (err instanceof InitializationError) {
-            message = err.message;
             errorCode = err.tag;
+            message = err.message;
+            if (err.tag === InitErrorCode.ConfigurationError) {
+                message = 'Unity Ads SDK fail to initialize due to configuration error';
+            }
         }
 
         this.Api.Sdk.initError(message, errorCode);

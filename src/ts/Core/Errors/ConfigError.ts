@@ -3,7 +3,7 @@ import { InitErrorCode } from 'Core/Native/Sdk';
 
 export class ConfigError extends InitializationError {
 
-    constructor(error: InitializationError) {
+    constructor(error: Error) {
         super(error.message, InitErrorCode.ConfigurationError);
     }
 }
