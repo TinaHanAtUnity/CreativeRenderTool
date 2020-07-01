@@ -1,8 +1,9 @@
-import { WebViewError } from 'Core/Errors/WebViewError';
+import { InitializationError } from 'Core/Errors/InitializationError';
+import { InitErrorCode } from 'Core/Native/Sdk';
 
-export class ConfigError extends WebViewError {
+export class ConfigError extends InitializationError {
 
-    constructor(error: Error) {
-        super(error.message, error.name);
+    constructor(error: InitializationError) {
+        super(error.message, InitErrorCode.ConfigurationError);
     }
 }
