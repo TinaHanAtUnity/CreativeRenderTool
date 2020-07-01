@@ -12,10 +12,12 @@ export enum TrackingAuthorizationStatus {
 
 export class TrackingManagerApi extends NativeApi {
 
-    public readonly onTrackingAuthorizationStatus = new Observable1<TrackingAuthorizationStatus>();
+    public readonly onTrackingAuthorizationStatus: Observable1<TrackingAuthorizationStatus>;
 
     constructor(nativeBridge: NativeBridge) {
         super(nativeBridge, 'TrackingManager', ApiPackage.CORE, EventCategory.TRACKING_MANAGER);
+
+        this.onTrackingAuthorizationStatus = new Observable1<TrackingAuthorizationStatus>();
     }
 
     public available(): Promise<boolean> {
