@@ -14,6 +14,10 @@ we currently need to use for some native releases.
 
 All API methods are referred with class.method notation, e.g. VideoPlayer.play
 
+## 3.5.0
+
+* iOS 14.0 ATTrackingManager methods.
+
 ## 3.4.0
 
 * Added ClassDetection API
