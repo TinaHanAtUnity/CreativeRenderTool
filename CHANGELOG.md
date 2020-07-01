@@ -1,3 +1,21 @@
+# Pending
+
+* [Initialization Callback]Improve initError code and error message [#15752](https://github.com/Applifier/unity-ads-webview/pull/15752)
+
+# Tue Jun 30 23:38:28 UTC 2020
+
+* [Load V5] Update Preload and Load Retries to 3 [#16255](https://github.com/Applifier/unity-ads-webview/pull/16255)
+* Increase proxied auction traffic from China to 25% [#16222](https://github.com/Applifier/unity-ads-webview/pull/16222)
+
+# Tue Jun 30 19:46:23 UTC 2020
+
+* [AUI] Add gamer token to collected data [#15913](https://github.com/Applifier/unity-ads-webview/pull/15913)
+
+# Mon Jun 29 23:26:34 UTC 2020
+
+* [Load V5] Invalidate only already shown programmatic campaign [#16190](https://github.com/Applifier/unity-ads-webview/pull/16190)
+* [Load V5] Change Request Timeouts from 10 to 5 seconds [#16224](https://github.com/Applifier/unity-ads-webview/pull/16224)
+
 # Fri Jun 26 22:17:18 UTC 2020
 
 * [China Auction] Add Latency Instrumentation [#16191](https://github.com/Applifier/unity-ads-webview/pull/16191)

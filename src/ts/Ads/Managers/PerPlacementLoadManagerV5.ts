@@ -18,7 +18,7 @@ export class PerPlacementLoadManagerV5 extends PerPlacementLoadManager {
     protected _adRequestManager: AdRequestManager;
 
     private _shouldRefresh: boolean = true;
-    private _lastShownCampaignId: string | undefined;
+    protected _lastShownCampaignId: string | undefined;
 
     constructor(ads: IAdsApi, adsConfig: AdsConfiguration, coreConfig: CoreConfiguration, adRequestManager: AdRequestManager, clientInfo: ClientInfo, focusManager: FocusManager, useGroupIds: boolean) {
         super(ads, adsConfig, coreConfig, useGroupIds ? new AdUnitAwareAdRequestManager(adRequestManager) : adRequestManager, clientInfo, focusManager);

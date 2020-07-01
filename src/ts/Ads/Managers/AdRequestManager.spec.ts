@@ -138,10 +138,10 @@ class SatisfiesMatcher {
                     preloadData: {}
                 }), [], {
                     followRedirects: false,
-                    retries: 1,
+                    retries: 3,
                     retryDelay: 0,
                     retryWithConnectionEvents: false,
-                    timeout: 10000
+                    timeout: 5000
                 });
             });
 
@@ -412,10 +412,10 @@ class SatisfiesMatcher {
                     }
                 }), [], {
                     followRedirects: false,
-                    retries: 0,
+                    retries: 3,
                     retryDelay: 0,
                     retryWithConnectionEvents: false,
-                    timeout: 10000
+                    timeout: 5000
                 });
                 expect(request.post).toHaveBeenNthCalledWith(3, expect.anything(), new SatisfiesMatcher({
                     preload: false,
@@ -437,10 +437,10 @@ class SatisfiesMatcher {
                     }
                 }), [], {
                     followRedirects: false,
-                    retries: 0,
+                    retries: 3,
                     retryDelay: 0,
                     retryWithConnectionEvents: false,
-                    timeout: 10000
+                    timeout: 5000
                 });
             });
         });
@@ -547,10 +547,10 @@ class SatisfiesMatcher {
                     }
                 }), [], {
                     followRedirects: false,
-                    retries: 0,
+                    retries: 3,
                     retryDelay: 0,
                     retryWithConnectionEvents: false,
-                    timeout: 10000
+                    timeout: 5000
                 });
             });
 
@@ -711,10 +711,10 @@ class SatisfiesMatcher {
                     }
                 }), [], {
                     followRedirects: false,
-                    retries: 0,
+                    retries: 3,
                     retryDelay: 0,
                     retryWithConnectionEvents: false,
-                    timeout: 10000
+                    timeout: 5000
                 });
             });
         });
@@ -807,10 +807,10 @@ class SatisfiesMatcher {
                     }
                 }), [], {
                     followRedirects: false,
-                    retries: 0,
+                    retries: 3,
                     retryDelay: 0,
                     retryWithConnectionEvents: false,
-                    timeout: 10000
+                    timeout: 5000
                 });
             });
         });
@@ -1335,7 +1335,7 @@ class SatisfiesMatcher {
                     retries: 3,
                     retryDelay: 0,
                     retryWithConnectionEvents: false,
-                    timeout: 10000
+                    timeout: 5000
                 });
             });
         });
@@ -1453,10 +1453,10 @@ class SatisfiesMatcher {
                     }
                 }), [], {
                     followRedirects: false,
-                    retries: 0,
+                    retries: 3,
                     retryDelay: 0,
                     retryWithConnectionEvents: false,
-                    timeout: 10000
+                    timeout: 5000
                 });
             });
 

@@ -182,11 +182,11 @@ export class AdRequestManager extends CampaignManager {
                 CampaignManager.createRequestBody(this._clientInfo, this._coreConfig, this._deviceInfo, this._userPrivacyManager, this._sessionManager, this._privacy, countersForOperativeEvents, fullyCachedCampaignIds, versionCode, this._adMobSignalFactory, freeSpace, this._metaDataManager, this._adsConfig, true, this.getPreviousPlacementId(), requestPrivacy, legacyRequestPrivacy, false, undefined, true)
             ]);
         }).then(([requestUrl, requestBody]) => this._request.post(requestUrl, JSON.stringify(this.makePreloadBody(<ILoadV5BodyExtra>requestBody)), [], {
-            retries: 1,
+            retries: 3,
             retryDelay: 0,
             followRedirects: false,
             retryWithConnectionEvents: false,
-            timeout: 10000
+            timeout: 5000
         })).then((response) => {
             if (response) {
                 SdkStats.increaseAdRequestOrdinal();
@@ -272,11 +272,11 @@ export class AdRequestManager extends CampaignManager {
                 CampaignManager.createRequestBody(this._clientInfo, this._coreConfig, this._deviceInfo, this._userPrivacyManager, this._sessionManager, this._privacy, undefined, fullyCachedCampaignIds, versionCode, this._adMobSignalFactory, freeSpace, this._metaDataManager, this._adsConfig, true, this.getPreviousPlacementId(), requestPrivacy, legacyRequestPrivacy, false, this._adsConfig.getPlacement(placementId), true)
             ]);
         }).then(([requestUrl, requestBody]) => this._request.post(requestUrl, JSON.stringify(this.makeLoadBody(<ILoadV5BodyExtra>requestBody, placementId, additionalPlacements)), [], {
-            retries: 0,
+            retries: 3,
             retryDelay: 0,
             followRedirects: false,
             retryWithConnectionEvents: false,
-            timeout: 10000
+            timeout: 5000
         })).then((response) => {
             // if load request has been canceled by reload request, we start it again or we use result from reload request
             if (this._ongoingLoadRequests[placementId] === undefined) {
@@ -346,7 +346,7 @@ export class AdRequestManager extends CampaignManager {
             retryDelay: 0,
             followRedirects: false,
             retryWithConnectionEvents: false,
-            timeout: 10000
+            timeout: 5000
         })).then((response) => {
             if (response) {
                 SdkStats.increaseAdRequestOrdinal();
