@@ -1,9 +1,8 @@
-import { InitializationError } from 'Core/Errors/InitializationError';
-import { InitErrorCode } from 'Core/Native/Sdk';
+import { WebViewError } from 'Core/Errors/WebViewError';
 
-export class ConfigError extends InitializationError {
+export class ConfigError extends WebViewError {
 
     constructor(error: Error) {
-        super({ errorCode: InitErrorCode.ConfigurationError, rsn: 'Unity Ads SDK fail to initialize due to configuration error' }, error.message);
+        super(error.message, error.name);
     }
 }

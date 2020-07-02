@@ -132,7 +132,7 @@ export class Core implements ICore {
             this.ClientInfo = new ClientInfo(data);
 
             if (!/^\d+$/.test(this.ClientInfo.getGameId())) {
-                return Promise.reject(new InitializationError({ errorCode: InitErrorCode.InvalidArgument, rsn: `Unity Ads SDK fail to initialize due to provided Game ID '${this.ClientInfo.getGameId() }' is invalid. Game ID may contain only digits (0-9).` }, undefined));
+                return Promise.reject(new InitializationError(`Unity Ads SDK fail to initialize due to provided Game ID '${this.ClientInfo.getGameId() }' is invalid. Game ID may contain only digits (0-9).`, InitErrorCode.InvalidArgument));
             }
 
             if (this.NativeBridge.getPlatform() === Platform.ANDROID) {
@@ -237,7 +237,7 @@ export class Core implements ICore {
             this.JaegerManager.setJaegerTracingEnabled(this.Config.isJaegerTracingEnabled());
 
             if (!this.Config.isEnabled()) {
-                throw new InitializationError({ errorCode: InitErrorCode.GameIdDisabled, rsn: 'Unity Ads SDK fail to initialize due to game with ID ' + this.ClientInfo.getGameId() + ' is not enabled' }, undefined);
+                throw new InitializationError('Unity Ads SDK fail to initialize due to game with ID ' + this.ClientInfo.getGameId() + ' is not enabled', InitErrorCode.GameIdDisabled);
             }
 
             return configJson;
@@ -258,8 +258,13 @@ export class Core implements ICore {
         let errorCode: InitErrorCode = InitErrorCode.Unknown;
 
         if (err instanceof InitializationError) {
-            errorCode = err.tag.errorCode;
-            message = err.tag.rsn;
+            errorCode = err.errorCode;
+            message = err.message;
+        }
+
+        if (err instanceof ConfigError) {
+            errorCode = InitErrorCode.ConfigurationError;
+            message = 'Unity Ads SDK fail to initialize due to configuration error';
         }
 
         this.Api.Sdk.initError(message, errorCode);

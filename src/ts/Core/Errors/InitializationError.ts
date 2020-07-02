@@ -1,16 +1,11 @@
 import { InitErrorCode } from 'Core/Native/Sdk';
 
-interface IInitializationErrorObject {
-    errorCode: InitErrorCode;
-    rsn: string;
-}
-
 export class InitializationError extends Error {
 
-    public readonly tag: IInitializationErrorObject;
+    public readonly errorCode: InitErrorCode;
 
-    constructor(tag: IInitializationErrorObject, message: string | undefined) {
+    constructor(message: string, errorCode: InitErrorCode) {
         super(message);
-        this.tag = tag;
+        this.errorCode = errorCode;
     }
 }
