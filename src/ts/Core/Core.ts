@@ -132,7 +132,7 @@ export class Core implements ICore {
             this.ClientInfo = new ClientInfo(data);
 
             if (!/^\d+$/.test(this.ClientInfo.getGameId())) {
-                return Promise.reject(new InitializationError(`Unity Ads SDK fail to initialize due to provided Game ID '${this.ClientInfo.getGameId() }' is invalid. Game ID may contain only digits (0-9).`, InitErrorCode.InvalidArgument));
+                return Promise.reject(new InitializationError(InitErrorCode.InvalidArgument, `Unity Ads SDK fail to initialize due to provided Game ID '${this.ClientInfo.getGameId() }' is invalid. Game ID may contain only digits (0-9).`));
             }
 
             if (this.NativeBridge.getPlatform() === Platform.ANDROID) {
@@ -237,7 +237,7 @@ export class Core implements ICore {
             this.JaegerManager.setJaegerTracingEnabled(this.Config.isJaegerTracingEnabled());
 
             if (!this.Config.isEnabled()) {
-                throw new InitializationError('Unity Ads SDK fail to initialize due to game with ID ' + this.ClientInfo.getGameId() + ' is not enabled', InitErrorCode.GameIdDisabled);
+                throw new InitializationError(InitErrorCode.GameIdDisabled, 'Unity Ads SDK fail to initialize due to game with ID ' + this.ClientInfo.getGameId() + ' is not enabled');
             }
 
             return configJson;
