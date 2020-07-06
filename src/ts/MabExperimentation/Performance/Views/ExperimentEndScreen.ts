@@ -11,6 +11,17 @@ import { IColorTheme } from 'Performance/Utilities/Swatch';
 import { ColorTheme } from 'Core/Utilities/ColorTheme';
 import { ColorUtils } from 'MabExperimentation/Utilities/ColorUtils';
 
+export interface IClickHeatMapEntry {
+    x: number;
+    y: number;
+    target: string;
+    normalizedX: number;
+    normalizedY: number;
+    orientation: string;
+    width: number;
+    height: number;
+}
+
 export class ExperimentEndScreen extends PerformanceEndScreen {
     private _animation: string;
     private _downloadButtonColor: string;
@@ -18,6 +29,7 @@ export class ExperimentEndScreen extends PerformanceEndScreen {
     private _tintColor: boolean;
     private _formattedCtaAlternativeText: string;
     private _language: string;
+    private _clickHeatMapData: IClickHeatMapEntry[];
 
     constructor(combination: IExperimentActionChoice | undefined, parameters: IEndScreenParameters, campaign: PerformanceCampaign, country?: string) {
         super(parameters, campaign, country);
@@ -26,6 +38,7 @@ export class ExperimentEndScreen extends PerformanceEndScreen {
 
         this.fixupScheme(combination);
         this.fixupCtaText(combination.cta_text);
+        this._clickHeatMapData = [];
 
         // combination.animation will be defined at this point
         this._animation = combination.animation!;
@@ -36,6 +49,11 @@ export class ExperimentEndScreen extends PerformanceEndScreen {
             ctaAlternativeText: this._formattedCtaAlternativeText,
             isEnglish: this._language.indexOf('en') !== -1
         };
+
+        this._bindings.push({
+            event: 'click',
+            listener: (event: Event) => this.onClickCollection(event)
+        });
     }
 
     private fixupScheme(actions: IExperimentActionChoice | undefined) {
@@ -218,5 +236,21 @@ export class ExperimentEndScreen extends PerformanceEndScreen {
         // for example).
         element.classList.remove('on-show');
         setTimeout(() => element.classList.add('on-show'), 0);
+    }
+
+    private onClickCollection(event: Event): void {
+        event.preventDefault();
+
+        this._clickHeatMapData.push({
+            x: (<MouseEvent>event).pageX,
+            y: (<MouseEvent>event).pageY,
+            target: (<HTMLElement>(<MouseEvent>event).target).className,
+            normalizedX: (<MouseEvent>event).pageX / window.innerWidth,
+            normalizedY: (<MouseEvent>event).pageY / window.innerHeight,
+            orientation: window.innerHeight > window.innerWidth ? 'portrait' : 'landscape',
+            width: window.innerWidth,
+            height: window.innerHeight
+        });
+        console.log(this._clickHeatMapData);
     }
 }
