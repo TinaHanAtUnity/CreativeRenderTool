@@ -412,3 +412,10 @@ else
 		-d "{\"state\":\"success\",\"target_url\":\"\",\"description\": \"Original: ${SIZE}, GZip: ${GZIPSIZE}\",\"context\": \"Size\"}" \
 		"https://api.github.com/repos/${TRAVIS_REPO_SLUG}/statuses/${TRAVIS_PULL_REQUEST_SHA}"
 endif
+
+# privacy SDK
+privacy-get-flows:
+	curl -o src/json/privacy/PrivacySDKFlow.json https://form-flows.privacy.unity3d.com/api/v1/nodes
+
+privacy-get-translations:
+	curl -o src/json/privacy/PrivacySDKLocale.json https://form-flows.privacy.unity3d.com/api/v1/translations

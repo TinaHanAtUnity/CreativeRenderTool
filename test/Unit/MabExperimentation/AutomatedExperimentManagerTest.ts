@@ -317,7 +317,7 @@ describe('AutomatedExperimentManagerTests', () => {
 
             const rewardPostUrl = AutomatedExperimentManager.BaseUrl + AutomatedExperimentManager.RewardEndPoint;
             const rewardRequestBodyText = JSON.stringify({
-                user_info: { ab_group: 99, auction_id: '12345' },
+                user_info: { ab_group: 99, auction_id: '12345', gamer_token: 'abcd.1234.5678' },
                 reward: rewarded,
                 experiments:
                 [
@@ -357,6 +357,7 @@ describe('AutomatedExperimentManagerTests', () => {
     it('AutomatedExperimentManager notified of performance campaigns', () => {
         sandbox.stub(SDKMetrics, 'reportMetricEventWithTags')
             .returns(true);
+        sinon.stub(SDKMetrics, 'reportTimingEventWithTags');
 
         RequestManager.setTestAuctionProtocol(AuctionProtocol.V4);
 
@@ -475,7 +476,7 @@ describe('AutomatedExperimentManagerTests', () => {
 
             const rewardPostUrl = AutomatedExperimentManager.BaseUrl + AutomatedExperimentManager.RewardEndPoint;
             const rewardRequestBodyText = JSON.stringify({
-                user_info: { ab_group: 99, auction_id: '12345' },
+                user_info: { ab_group: 99, auction_id: '12345', gamer_token: 'abcd.1234.5678' },
                 reward: firstReward,
                 experiments:
                 [

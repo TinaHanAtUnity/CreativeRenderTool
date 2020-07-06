@@ -7,7 +7,7 @@ import { FocusManagerMock, FocusManager } from 'Core/Managers/__mocks__/FocusMan
 import { ClientInfoMock, ClientInfo } from 'Core/Models/__mocks__/ClientInfo';
 import { AdRequestManagerMock, AdRequestManager } from 'Ads/Managers/__mocks__/AdRequestManager';
 import { Ads } from 'Ads/__mocks__/Ads';
-import { Placement, PlacementMock, withAdUnit } from 'Ads/Models/__mocks__/Placement';
+import { Placement, PlacementMock, withGroupId } from 'Ads/Models/__mocks__/Placement';
 import { PlacementState } from 'Ads/Models/Placement';
 import { Campaign, CampaignMock } from 'Ads/Models/__mocks__/Campaign';
 import { AbstractAdUnitMock, AbstractAdUnit } from 'Ads/AdUnits/__mocks__/AbstractAdUnit';
@@ -180,11 +180,11 @@ import { ProgrammaticMraidParser } from 'MRAID/Parsers/ProgrammaticMraidParser';
             });
 
             it('should set invalidation pending for placements', () => {
-                expect(placements['video_5'].setInvalidationPending).toBeCalledTimes(1);
-                expect(placements['video_5'].setInvalidationPending).toHaveBeenNthCalledWith(1, true);
+                expect(placements.video_5.setInvalidationPending).toBeCalledTimes(1);
+                expect(placements.video_5.setInvalidationPending).toHaveBeenNthCalledWith(1, true);
 
-                expect(placements['video_6'].setInvalidationPending).toBeCalledTimes(1);
-                expect(placements['video_6'].setInvalidationPending).toHaveBeenNthCalledWith(1, true);
+                expect(placements.video_6.setInvalidationPending).toBeCalledTimes(1);
+                expect(placements.video_6.setInvalidationPending).toHaveBeenNthCalledWith(1, true);
             });
         });
 
@@ -218,11 +218,11 @@ import { ProgrammaticMraidParser } from 'MRAID/Parsers/ProgrammaticMraidParser';
             });
 
             it('should set invalidation pending for placements', () => {
-                expect(placements['video_5'].setInvalidationPending).toBeCalledTimes(1);
-                expect(placements['video_5'].setInvalidationPending).toHaveBeenNthCalledWith(1, true);
+                expect(placements.video_5.setInvalidationPending).toBeCalledTimes(1);
+                expect(placements.video_5.setInvalidationPending).toHaveBeenNthCalledWith(1, true);
 
-                expect(placements['video_6'].setInvalidationPending).toBeCalledTimes(1);
-                expect(placements['video_6'].setInvalidationPending).toHaveBeenNthCalledWith(1, true);
+                expect(placements.video_6.setInvalidationPending).toBeCalledTimes(1);
+                expect(placements.video_6.setInvalidationPending).toHaveBeenNthCalledWith(1, true);
             });
         });
 
@@ -256,39 +256,76 @@ import { ProgrammaticMraidParser } from 'MRAID/Parsers/ProgrammaticMraidParser';
             });
 
             it('should set invalidation pending for placements', () => {
-                expect(placements['video_5'].setInvalidationPending).toBeCalledTimes(1);
-                expect(placements['video_5'].setInvalidationPending).toHaveBeenNthCalledWith(1, true);
+                expect(placements.video_5.setInvalidationPending).toBeCalledTimes(1);
+                expect(placements.video_5.setInvalidationPending).toHaveBeenNthCalledWith(1, true);
 
-                expect(placements['video_6'].setInvalidationPending).toBeCalledTimes(1);
-                expect(placements['video_6'].setInvalidationPending).toHaveBeenNthCalledWith(1, true);
+                expect(placements.video_6.setInvalidationPending).toBeCalledTimes(1);
+                expect(placements.video_6.setInvalidationPending).toHaveBeenNthCalledWith(1, true);
             });
         });
 
         describe('trigger on no fill programmatic', () => {
-            let placement: PlacementMock;
+            let placements: {[key: string]: PlacementMock};
 
             beforeEach(async () => {
-                placement = Placement();
+                placements = {
+                    'video': Placement('video', PlacementState.READY, Campaign(ProgrammaticMraidParser.ContentType, 'another')),
+                    'rewardedVideo': Placement('rewardedVideo', PlacementState.READY, Campaign(ProgrammaticMraidParser.ContentType, 'shown'))
+                };
 
-                placement.getCurrentCampaign.mockReturnValue(Campaign(ProgrammaticMraidParser.ContentType));
-                adsConfiguration.getPlacement.mockReturnValue(placement);
+                adsConfiguration.getPlacement.mockImplementation((x) => placements[x]);
 
                 await refreshManager.initialize();
+
+                refreshManager.setCurrentAdUnit(AbstractAdUnit(), placements.rewardedVideo);
 
                 adRequestManager.onNoFill.subscribe.mock.calls[0][0]('video');
             });
 
             it('should reset campaign', () => {
-                expect(placement.setCurrentCampaign).toBeCalledTimes(0);
+                expect(placements.video.setCurrentCampaign).toBeCalledTimes(0);
             });
 
             it('should reset tracking urls', () => {
-                expect(placement.setCurrentTrackingUrls).toBeCalledTimes(0);
+                expect(placements.video.setCurrentTrackingUrls).toBeCalledTimes(0);
             });
 
             it('should reset invalidation pending', () => {
-                expect(placement.setInvalidationPending).toBeCalledTimes(1);
-                expect(placement.setInvalidationPending).toHaveBeenNthCalledWith(1, false);
+                expect(placements.video.setInvalidationPending).toBeCalledTimes(1);
+                expect(placements.video.setInvalidationPending).toHaveBeenNthCalledWith(1, false);
+            });
+        });
+
+        describe(`trigger on no fill programmatic for same campaign`, () => {
+            let placements: { [key: string]: PlacementMock };
+
+            beforeEach(async () => {
+                const campaign = Campaign(ProgrammaticMraidParser.ContentType, 'shown');
+                placements = {
+                    'video': Placement('video', PlacementState.READY, campaign),
+                    'rewardedVideo': Placement('rewardedVideo', PlacementState.READY, campaign)
+                };
+
+                adsConfiguration.getPlacement.mockImplementation((x) => placements[x]);
+
+                await refreshManager.initialize();
+
+                refreshManager.setCurrentAdUnit(AbstractAdUnit(), placements.rewardedVideo);
+
+                adRequestManager.onNoFill.subscribe.mock.calls[0][0]('video');
+            });
+
+            it('should reset campaign', () => {
+                expect(placements.video.setCurrentCampaign).toBeCalledTimes(1);
+            });
+
+            it('should reset tracking urls', () => {
+                expect(placements.video.setCurrentTrackingUrls).toBeCalledTimes(1);
+            });
+
+            it('should reset invalidation pending', () => {
+                expect(placements.video.setInvalidationPending).toBeCalledTimes(1);
+                expect(placements.video.setInvalidationPending).toHaveBeenNthCalledWith(1, false);
             });
         });
 
@@ -501,7 +538,7 @@ import { ProgrammaticMraidParser } from 'MRAID/Parsers/ProgrammaticMraidParser';
 
             it('should call loadCampaign', () => {
                 expect(adRequestManager.loadCampaign).toBeCalledTimes(1);
-                expect(adRequestManager.loadCampaign).toBeCalledWith(placements['video_2']);
+                expect(adRequestManager.loadCampaign).toBeCalledWith(placements.video_2);
             });
 
             it('should call requestReload', () => {
@@ -549,9 +586,9 @@ import { ProgrammaticMraidParser } from 'MRAID/Parsers/ProgrammaticMraidParser';
                     campaign = Campaign();
 
                     placements = {
-                        'video_1': withAdUnit(Placement('video_1', PlacementState.NOT_AVAILABLE, campaign), 'ad_unit'),
-                        'video_2': withAdUnit(Placement('video_2', PlacementState.NOT_AVAILABLE, campaign), 'ad_unit'),
-                        'video_3': withAdUnit(Placement('video_3', PlacementState.NOT_AVAILABLE, campaign), 'ad_unit')
+                        'video_1': withGroupId(Placement('video_1', PlacementState.NOT_AVAILABLE, campaign), 'group_id'),
+                        'video_2': withGroupId(Placement('video_2', PlacementState.NOT_AVAILABLE, campaign), 'group_id'),
+                        'video_3': withGroupId(Placement('video_3', PlacementState.NOT_AVAILABLE, campaign), 'group_id')
                     };
 
                     adsConfiguration.getPlacementIds.mockReturnValue(['video_1', 'video_2', 'video_3', 'video_4', 'video_5', 'video_6']);
@@ -569,7 +606,7 @@ import { ProgrammaticMraidParser } from 'MRAID/Parsers/ProgrammaticMraidParser';
 
                     (<ObservableMock>adsApi.LoadApi.onLoad).subscribe.mock.calls[0][0]({ 'video_1': 1 });
 
-                    (<ObservableMock>adRequestManager.onAdditionalPlacementsReady).subscribe.mock.calls[0][0]('ad_unit', {
+                    (<ObservableMock>adRequestManager.onAdditionalPlacementsReady).subscribe.mock.calls[0][0]('group_id', {
                         'video_2': {
                         campaign: campaign,
                         trackingUrl: {}
@@ -622,9 +659,9 @@ import { ProgrammaticMraidParser } from 'MRAID/Parsers/ProgrammaticMraidParser';
                     campaign2 = Campaign();
 
                     placements = {
-                        'video_1': withAdUnit(Placement('video_1', PlacementState.NOT_AVAILABLE), 'ad_unit'),
-                        'video_2': withAdUnit(Placement('video_2', PlacementState.NOT_AVAILABLE), 'ad_unit'),
-                        'video_3': withAdUnit(Placement('video_3', PlacementState.NOT_AVAILABLE), 'ad_unit')
+                        'video_1': withGroupId(Placement('video_1', PlacementState.NOT_AVAILABLE), 'group_id'),
+                        'video_2': withGroupId(Placement('video_2', PlacementState.NOT_AVAILABLE), 'group_id'),
+                        'video_3': withGroupId(Placement('video_3', PlacementState.NOT_AVAILABLE), 'group_id')
                     };
 
                     adsConfiguration.getPlacementIds.mockReturnValue(['video_1', 'video_2', 'video_3']);
@@ -642,7 +679,7 @@ import { ProgrammaticMraidParser } from 'MRAID/Parsers/ProgrammaticMraidParser';
 
                     (<ObservableMock>adsApi.LoadApi.onLoad).subscribe.mock.calls[0][0]({ 'video_1': 1 });
 
-                    (<ObservableMock>adRequestManager.onAdditionalPlacementsReady).subscribe.mock.calls[0][0]('ad_unit', {
+                    (<ObservableMock>adRequestManager.onAdditionalPlacementsReady).subscribe.mock.calls[0][0]('group_id', {
                         'video_2': {
                             campaign: campaign1,
                             trackingUrl: {}
@@ -674,6 +711,34 @@ import { ProgrammaticMraidParser } from 'MRAID/Parsers/ProgrammaticMraidParser';
 
                 it('should have correct campaign in placement video_2', () => {
                     expect(placements.video_2.setCurrentCampaign).toBeCalledWith(campaign2);
+                });
+            });
+
+            describe('invalidate programmatic campaigns', () => {
+                let placement: PlacementMock;
+
+                beforeEach(async () => {
+                    placement = Placement();
+
+                    placement.getCurrentCampaign.mockReturnValue(Campaign(ProgrammaticMraidParser.ContentType));
+                    adsConfiguration.getPlacement.mockReturnValue(placement);
+
+                    await refreshManager.initialize();
+
+                    adRequestManager.onNoFill.subscribe.mock.calls[0][0]('video');
+                });
+
+                it('should reset campaign', () => {
+                    expect(placement.setCurrentCampaign).toBeCalledTimes(0);
+                });
+
+                it('should reset tracking urls', () => {
+                    expect(placement.setCurrentTrackingUrls).toBeCalledTimes(0);
+                });
+
+                it('should reset invalidation pending', () => {
+                    expect(placement.setInvalidationPending).toBeCalledTimes(1);
+                    expect(placement.setInvalidationPending).toHaveBeenNthCalledWith(1, false);
                 });
             });
         });

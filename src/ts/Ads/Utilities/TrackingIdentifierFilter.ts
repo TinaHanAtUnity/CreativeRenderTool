@@ -6,7 +6,6 @@ export interface ITrackingIdentifier {
     advertisingTrackingId?: string | null;
     limitAdTracking?: boolean;
     androidId?: string;
-    imei?: string;
 }
 
 export class TrackingIdentifierFilter {
@@ -21,12 +20,6 @@ export class TrackingIdentifierFilter {
             trackingIdentifiers = {
                 androidId: deviceInfo.getAndroidId()
             };
-            if (deviceInfo.getDeviceId1()) {
-                trackingIdentifiers = {
-                    ...trackingIdentifiers,
-                    imei: deviceInfo.getDeviceId1()
-                };
-            }
         }
         return trackingIdentifiers;
     }

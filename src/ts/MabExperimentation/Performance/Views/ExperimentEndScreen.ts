@@ -1,63 +1,127 @@
 import { IEndScreenParameters } from 'Ads/Views/EndScreen';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { PerformanceEndScreen, SQUARE_END_SCREEN } from 'Performance/Views/PerformanceEndScreen';
-import EndScreenAnimatedDownloadButton from 'html/mabexperimentation/EndScreenAnimatedDownloadButton.html';
-import SquareEndScreenAnimatedDownloadButtonTemplate from 'html/mabexperimentation/SquareEndScreenAnimatedDownloadButton.html';
+import ExperimentEndScreenTemplate from 'html/mabexperimentation/ExperimentEndScreenTemplate.html';
+import ExperimentSquareEndScreenTemplate from 'html/mabexperimentation/ExperimentSquareEndScreenTemplate.html';
 import { IExperimentActionChoice } from 'MabExperimentation/Models/AutomatedExperiment';
-import { ButtonExperimentDeclaration, ButtonAnimationsExperiment } from 'MabExperimentation/Models/AutomatedExperimentsList';
+import { EndScreenExperimentDeclaration, EndScreenExperiment } from 'MabExperimentation/Models/AutomatedExperimentsList';
 import { AUIMetric, SDKMetrics } from 'Ads/Utilities/SDKMetrics';
 import { Color } from 'Core/Utilities/Color';
-import { ImageAnalysis } from 'Performance/Utilities/ImageAnalysis';
 import { IColorTheme } from 'Performance/Utilities/Swatch';
+import { ColorTheme } from 'Core/Utilities/ColorTheme';
+import { ColorUtils } from 'MabExperimentation/Utilities/ColorUtils';
 
-export class AnimatedDownloadButtonEndScreen extends PerformanceEndScreen {
+export class ExperimentEndScreen extends PerformanceEndScreen {
     private _animation: string;
     private _downloadButtonColor: string;
     private _darkMode: boolean;
     private _tintColor: boolean;
+    private _formattedCtaAlternativeText: string;
+    private _language: string;
 
     constructor(combination: IExperimentActionChoice | undefined, parameters: IEndScreenParameters, campaign: PerformanceCampaign, country?: string) {
         super(parameters, campaign, country);
 
         combination = this.fixupExperimentChoices(combination);
 
-        switch (combination.scheme) {
-            case ButtonExperimentDeclaration.scheme.LIGHT:
-                this._downloadButtonColor = Color.hexToCssRgba(combination.color);
-                break;
-            case ButtonExperimentDeclaration.scheme.DARK:
-                // This is "pastel blue", to be cohesive with dark mode
-                this._downloadButtonColor = Color.hexToCssRgba('#2ba3ff');
-                this._darkMode = true;
-                break;
-            case ButtonExperimentDeclaration.scheme.COLORMATCHING:
-                this._tintColor = true;
-                break;
-            default:
-        }
+        this.fixupScheme(combination);
+        this.fixupCtaText(combination.cta_text);
 
         // combination.animation will be defined at this point
         this._animation = combination.animation!;
+        this._language = parameters.language;
         this._templateData = {
             ...this._templateData,
-            'hasShadow': this._animation === ButtonExperimentDeclaration.animation.BOUNCING
+            hasShadow: this._animation === EndScreenExperimentDeclaration.animation.BOUNCING,
+            ctaAlternativeText: this._formattedCtaAlternativeText,
+            isEnglish: this._language.indexOf('en') !== -1
         };
+    }
+
+    private fixupScheme(actions: IExperimentActionChoice | undefined) {
+        if (actions) {
+            switch (actions.scheme) {
+                case EndScreenExperimentDeclaration.scheme.LIGHT:
+                    if (actions.color) {
+                        this._downloadButtonColor = Color.hexToCssRgba(actions.color);
+                    } else {
+                        this._downloadButtonColor = Color.hexToCssRgba(EndScreenExperimentDeclaration.color.GREEN);
+                    }
+                    break;
+                case EndScreenExperimentDeclaration.scheme.DARK:
+                    if (actions.color) {
+                        this._downloadButtonColor = Color.hexToCssRgba(actions.color);
+                    } else {
+                        this._downloadButtonColor = Color.hexToCssRgba(EndScreenExperimentDeclaration.color.DARK_BLUE);
+                    }
+                    this._darkMode = true;
+                    break;
+                case EndScreenExperimentDeclaration.scheme.COLORMATCHING:
+                    this._tintColor = true;
+                    break;
+                default:
+            }
+        }
+    }
+
+    private fixupCtaText(ctaText: string | undefined) {
+        switch (ctaText) {
+            case EndScreenExperimentDeclaration.cta_text.DOWNLOAD:
+                this._formattedCtaAlternativeText = 'Download';
+                break;
+            case EndScreenExperimentDeclaration.cta_text.DOWNLOAD_FOR_FREE:
+                this._formattedCtaAlternativeText = 'Download For Free';
+                break;
+            case EndScreenExperimentDeclaration.cta_text.DOWNLOAD_NOW:
+                this._formattedCtaAlternativeText = 'Download Now!';
+                break;
+            case EndScreenExperimentDeclaration.cta_text.DOWNLOAD_NOW_FIRE:
+                this._formattedCtaAlternativeText = '🔥 Download Now 🔥';
+                break;
+            case EndScreenExperimentDeclaration.cta_text.GET:
+                this._formattedCtaAlternativeText = 'Get';
+                break;
+            case EndScreenExperimentDeclaration.cta_text.GET_STARTED:
+                this._formattedCtaAlternativeText = 'Get Started!';
+                break;
+            case EndScreenExperimentDeclaration.cta_text.INSTALL_NOW:
+                this._formattedCtaAlternativeText = 'Install Now';
+                break;
+            case EndScreenExperimentDeclaration.cta_text.LETS_TRY_IT:
+                this._formattedCtaAlternativeText = `Let's try it!`;
+                break;
+            case EndScreenExperimentDeclaration.cta_text.OK:
+                this._formattedCtaAlternativeText = 'OK!';
+                break;
+            default:
+                SDKMetrics.reportMetricEvent(AUIMetric.InvalidCtaText);
+                this._formattedCtaAlternativeText = 'Download For Free';
+        }
     }
 
     private fixupExperimentChoices(actions: IExperimentActionChoice | undefined): IExperimentActionChoice {
         if (actions === undefined) {
-            return ButtonAnimationsExperiment.getDefaultActions();
+            return EndScreenExperiment.getDefaultActions();
         }
 
-        // light scheme must include a color
-        if (actions.scheme === ButtonExperimentDeclaration.scheme.LIGHT && actions.color === undefined) {
-            SDKMetrics.reportMetricEvent(AUIMetric.InvalidEndscreenAnimation);
-            return ButtonAnimationsExperiment.getDefaultActions();
+        if (actions.color) {
+
+            // light scheme can only use light colors
+            if (actions.scheme === EndScreenExperimentDeclaration.scheme.LIGHT && ColorUtils.isDarkSchemeColor(actions.color)) {
+                SDKMetrics.reportMetricEvent(AUIMetric.InvalidSchemeAndColorCoordination);
+                return EndScreenExperiment.getDefaultActions();
+            }
+
+            // dark scheme can only use dark colors
+            if (actions.scheme === EndScreenExperimentDeclaration.scheme.DARK && !ColorUtils.isDarkSchemeColor(actions.color)) {
+                SDKMetrics.reportMetricEvent(AUIMetric.InvalidSchemeAndColorCoordination);
+                return EndScreenExperiment.getDefaultActions();
+            }
         }
 
-        if (!ButtonAnimationsExperiment.isValid(actions)) {
+        if (!EndScreenExperiment.isValid(actions)) {
             SDKMetrics.reportMetricEvent(AUIMetric.InvalidEndscreenAnimation);
-            return ButtonAnimationsExperiment.getDefaultActions();
+            return EndScreenExperiment.getDefaultActions();
         }
 
         return actions;
@@ -76,53 +140,18 @@ export class AnimatedDownloadButtonEndScreen extends PerformanceEndScreen {
             }
         }
         if (this._tintColor) {
-            this.renderColorTheme();
+            ColorTheme.calculateColorThemeForEndCard(this._campaign, this._core)
+                .then((theme) => {
+                    this.applyColorTheme(theme.base, theme.secondary);
+                })
+                .catch((error) => {
+                    SDKMetrics.reportMetricEvent(error.tag);
+                });
         }
     }
 
     private applyDarkMode() {
         document.body.classList.add('dark-mode');
-    }
-
-    private renderColorTheme() {
-        const portraitImage = this._campaign.getPortrait();
-        const landscapeImage = this._campaign.getLandscape();
-        const squareImage = this._campaign.getSquare();
-
-        const deviceInfo = this._core.DeviceInfo;
-        Promise.all([deviceInfo.getScreenWidth(), deviceInfo.getScreenHeight()])
-            .then(([screenWidth, screenHeight]) => {
-                const isLandscape = screenWidth > screenHeight;
-                let image;
-                if (squareImage) {
-                    image = squareImage;
-                } else if (isLandscape && portraitImage) {
-                    image = portraitImage; // when the device is in landscape mode, we are showing a portrait image
-                } else if (landscapeImage) {
-                    image = landscapeImage;
-                } else {
-                    image = portraitImage;
-                }
-
-                if (image) {
-                    ImageAnalysis.getImageSrc(this._core.Cache, image)
-                        .then(ImageAnalysis.analyseImage)
-                        .then(swatches => {
-                            if (!swatches || !swatches.length) {
-                                SDKMetrics.reportMetricEvent(AUIMetric.InvalidEndscreenColorTintSwitches);
-                                return;
-                            }
-
-                            const baseColorTheme = swatches[0].getColorTheme();
-                            const secondaryColorTheme = ((swatches.length > 1) ? swatches[1] : swatches[0]).getColorTheme();
-                            this.applyColorTheme(baseColorTheme, secondaryColorTheme);
-                        }).catch((msg: string) => {
-                        SDKMetrics.reportMetricEventWithTags(AUIMetric.EndscreenColorTintError, {
-                            'msg': msg
-                        });
-                    });
-                }
-            });
     }
 
     private applyColorTheme(baseColorTheme: IColorTheme, secondaryColorTheme: IColorTheme): void {
@@ -173,9 +202,9 @@ export class AnimatedDownloadButtonEndScreen extends PerformanceEndScreen {
 
     protected getTemplate() {
         if (this.getEndscreenAlt() === SQUARE_END_SCREEN) {
-            return SquareEndScreenAnimatedDownloadButtonTemplate;
+            return ExperimentSquareEndScreenTemplate;
         }
-        return EndScreenAnimatedDownloadButton;
+        return ExperimentEndScreenTemplate;
     }
 
     private handleResize() {

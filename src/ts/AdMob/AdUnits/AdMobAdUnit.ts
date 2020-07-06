@@ -113,6 +113,7 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     }
 
     public sendClickEvent() {
+        this._ads.Listener.sendClickEvent(this._placement.getId());
         this.sendTrackingEvent(TrackingEvent.CLICK);
         this._operativeEventManager.sendClick(this.getOperativeEventParams());
 
@@ -347,18 +348,9 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     private sendPTSStart() {
         // TODO: Add Tagging to remove the below logic
         SDKMetrics.reportMetricEvent(AdmobMetric.AdmobVideoStarted);
-        if (this.isDBMCreative() && this._isRewardedPlacement) {
-            SDKMetrics.reportMetricEvent(AdmobMetric.AdmobDBMRewardedStarted);
-        } else if (this.isDBMCreative() && !this._isRewardedPlacement) {
-            SDKMetrics.reportMetricEvent(AdmobMetric.AdmobDBMNonRewardedStarted);
-        }
 
         if (this._view.getOpenMeasurementController()) {
             SDKMetrics.reportMetricEvent(AdmobMetric.AdmobOMVideoStart);
         }
-    }
-
-    private isDBMCreative(): boolean {
-        return this._campaign.getCreativeId() !== undefined;
     }
 }

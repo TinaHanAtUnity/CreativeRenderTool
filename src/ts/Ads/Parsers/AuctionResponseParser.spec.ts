@@ -3,6 +3,7 @@ import { Placement, PlacementMock } from 'Ads/Models/__mocks__/Placement.ts';
 import { AuctionResponseParser, IParsedAuctionResponse } from 'Ads/Parsers/AuctionResponseParser';
 
 // TODO: Update once json importing is fixed for .spec.ts
+// eslint-disable-next-line
 const AuctionV6Response = require('json/AuctionV6Response.json');
 
 describe('AuctionResponseParser', () => {

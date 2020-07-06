@@ -90,8 +90,7 @@ document.addEventListener('DOMContentLoaded', () => {
             ['DeviceVolume', toInt],
             ['BatteryLevel', toInt],
             ['BatteryStatus', toInt],
-            ['RingerMode', toInt],
-            ['Imei', undefined]
+            ['RingerMode', toInt]
         ];
         fields.forEach(([field, parser]: [string, ((element: HTMLInputElement) => unknown) | undefined]) => {
             const element = <HTMLInputElement>window.parent.document.getElementById('android' + field);
@@ -277,9 +276,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // tslint:disable-next-line
         if ((<any>window).parent[JS_FUNC_NAME_GET_HEADLESS]()) {
+            testModeElement.checked = true;
             initialize();
         // tslint:disable-next-line
          } else if ((<any>window).parent[JS_FUNC_NAME_GET_HEADLESS_LOAD]()) {
+            testModeElement.checked = true;
             loadModeElement.checked = true;
             //Mopub whitelisted load API gameID
             gameIdElement.value = '2788221';
@@ -287,6 +288,7 @@ document.addEventListener('DOMContentLoaded', () => {
             UnityAds.load('rewardedVideo');
         // tslint:disable-next-line
         } else if ((<any>window).parent[JS_FUNC_NAME_GET_HEADLESS_LOAD_ADAPTER]()) {
+            testModeElement.checked = true;
             loadModeElement.checked = true;
             abGroupElement.value = '5'; // Temporary while under abtest
             initialize();

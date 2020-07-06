@@ -11,7 +11,6 @@ export enum ErrorMetric {
     CampaignExpired = 'campaign_expired',
     NoConnectionWhenNeeded = 'no_connection_when_needed',
     MissingTrackingUrlsOnShow = 'missing_tracking_urls_on_show',
-    PlacementInvalidationPending = 'placement_invalidation_pending',
     AttemptToStreamCampaignWithoutConnection = 'attempt_to_stream_campaign_without_connection'
 }
 
@@ -34,8 +33,6 @@ export enum AdmobMetric {
     AdmobRewardedVideoStart = 'admob_rewarded_video_start',
     AdmobUserWasRewarded = 'admob_user_was_rewarded',
     AdmobUserSkippedRewardedVideo = 'admob_user_skipped_rewarded_video',
-    AdmobDBMRewardedStarted = 'admob_dbm_rewarded_started',
-    AdmobDBMNonRewardedStarted = 'admob_dbm_nonrewarded_started',
     AdmobVideoCanPlay = 'admob_video_canplay',
     AdmobVideoStarted = 'admob_video_started',
     AdmobOMEnabled = 'admob_om_enabled',
@@ -44,9 +41,7 @@ export enum AdmobMetric {
     DoubleClickOMStarts = 'doubleclick_om_starts',
     DoubleClickOMImpressions = 'doubleclick_om_impressions',
     DoubleClickInstanceCreated = 'doubleclick_om_instance_created',
-    AdmobOMVideoStart = 'admob_om_video_start',
-    AdmobOMStartFirst = 'admob_om_start_first',
-    AdmobOMLoadedFirst = 'admob_om_load_first'
+    AdmobOMVideoStart = 'admob_om_video_start'
 }
 
 export enum BannerMetric {
@@ -87,7 +82,8 @@ export enum MiscellaneousMetric {
     XHRNotAvailable = 'xhr_not_available',
     AuctionRequestFailed = 'auction_request_failed',
     AuctionRequestOk = 'auction_request_ok',
-    AuctionRequestCreated = 'auction_request_created'
+    AuctionRequestCreated = 'auction_request_created',
+    GAIDInvestigation = 'gaid_investigation'
 }
 
 export enum LoadMetric {
@@ -152,13 +148,17 @@ export enum AUIMetric {
     OptimizationResponseIgnored = 'campaign_optimization_response_ignored',
     RequestingCampaignOptimization = 'requesting_campaign_optimization',
     UnknownExperimentName = 'unknown_experiment_name',
-    UnknownCategoryProvided = 'unknown_automated_experiment_category_provided'
+    UnknownCategoryProvided = 'unknown_automated_experiment_category_provided',
+    InvalidImageAssets = 'invalid_image_assets',
+    InvalidCtaText = 'invalid_cta_text',
+    InvalidSchemeAndColorCoordination = 'invalid_scheme_and_color_coordination'
 }
 
 export enum ExternalEndScreenMetric {
     IframeTimeout = 'external_end_screen_iframe_timeout',
     GameIconImageMissing = 'external_end_screen_game_icon_missing',
-    ImageMissing = 'external_end_screen_image_missing'
+    ImageMissing = 'external_end_screen_image_missing',
+    UnableToGetDataUrl = 'external_end_screen_image_unable_to_get_data_url'
 }
 
 export enum GeneralTimingMetric {
@@ -166,7 +166,8 @@ export enum GeneralTimingMetric {
     AuctionHealthGood = 'auction_health_good',
     AuctionHealthBad = 'auction_health_bad',
     AuctionHealthGoodXHR = 'auction_health_good_xhr',
-    AuctionHealthBadXHR = 'auction_health_bad_xhr'
+    AuctionHealthBadXHR = 'auction_health_bad_xhr',
+    CacheSpeed = 'cache_speed'
 }
 
 export enum MediationMetric {
@@ -198,13 +199,16 @@ export enum LoadV5 {
     LoadRequestFailed = 'v5_load_request_failed',
     LoadRequestWasCanceled = 'v5_load_request_was_canceled',
     LoadRequestFill = 'v5_load_request_fill',
+    LoadRequestParseCampaignFailed = 'v5_load_request_parse_campaign_failed',
     ReloadRequestFailed = 'v5_reload_request_failed',
     ReloadRequestParsingResponse = 'v5_reload_request_parsing_response',
     ReloadRequestStarted = 'v5_reload_request_started',
     ReloadRequestParseCampaignFailed = 'v5_reload_request_parse_campaign_failed',
     RefreshManagerCampaignExpired = 'v5_refresh_manager_campaign_expired',
     RefreshManagerCampaignFailedToInvalidate = 'v5_refresh_manager_campaign_failed_to_be_invalidate',
-    Show = 'v5_show'
+    Show = 'v5_show',
+    PlacementInvalidationPending = 'placement_invalidation_pending',
+    RefreshManagerForcedToInvalidate = 'v5_refresh_manager_forced_to_invalidate'
 }
 
 export enum AuctionV6 {
@@ -220,9 +224,13 @@ export enum ChinaAucionEndpoint {
     AuctionResponse = 'china_user_auction_response'
 }
 
-export type TimingEvent = InitializationMetric | MediationMetric | GeneralTimingMetric;
+export enum InitializationFailureMetric {
+    InitializeFailed = 'webview_fail_to_initialize'
+}
 
-export type PTSEvent = VideoMetric | TimingEvent | AuctionV6 | AdmobMetric | BannerMetric | CachingMetric | ChinaMetric | VastMetric | MraidMetric | MiscellaneousMetric | LoadMetric | ErrorMetric | OMMetric | AUIMetric | LoadV5 | ChinaAucionEndpoint | ExternalEndScreenMetric;
+export type TimingEvent = InitializationMetric | MediationMetric | GeneralTimingMetric | ChinaAucionEndpoint;
+
+export type PTSEvent = VideoMetric | TimingEvent | AuctionV6 | AdmobMetric | BannerMetric | CachingMetric | ChinaMetric | VastMetric | MraidMetric | MiscellaneousMetric | LoadMetric | ErrorMetric | OMMetric | AUIMetric | LoadV5 | ChinaAucionEndpoint | ExternalEndScreenMetric | InitializationFailureMetric;
 
 export class SDKMetrics {
 

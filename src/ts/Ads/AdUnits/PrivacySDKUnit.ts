@@ -18,7 +18,12 @@ import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { IPrivacySDKViewParameters, PrivacySDKView } from 'Ads/Views/Privacy/PrivacySDKView';
 import { PrivacyConfig } from 'Privacy/PrivacyConfig';
-import { IPrivacyCompletedParams, IPrivacyFetchUrlParams, IUserPrivacySettings } from 'Privacy/IPrivacySettings';
+import {
+    IPrivacyCompletedParams,
+    IPrivacyFetchUrlParams,
+    IPrivacyReadyCallbackParams,
+    IUserPrivacySettings
+} from 'Privacy/IPrivacySettings';
 import { PrivacyTestEnvironment } from 'Privacy/PrivacyTestEnvironment';
 
 export interface IPrivacyUnitParameters {
@@ -109,6 +114,8 @@ export class PrivacySDKUnit implements IAdUnit, IPrivacySDKViewHandler {
         if (this._showing) {
             this._showing = false;
             this._adUnitContainer.removeEventHandler(this);
+            this._unityPrivacyView.hide();
+
             if (this._unityPrivacyView.container().parentElement) {
                 document.body.removeChild(this._unityPrivacyView.container());
                 delete this._unityPrivacyView;
@@ -233,11 +240,17 @@ export class PrivacySDKUnit implements IAdUnit, IPrivacySDKViewHandler {
     }
 
     public onPrivacyReady(): void {
-        this._unityPrivacyView.readyCallback(this._privacyConfig.getFlow(), {
-            env: this._privacyConfig.getEnv(),
-            user: this._privacyConfig.getUserSettings()
-        });
+        const params: IPrivacyReadyCallbackParams = {
+            startNode: this._privacyConfig.getStartNode(),
+            nodes: this._privacyConfig.getFlow(),
+            locale: this._privacyConfig.getLocale(),
+            state: {
+                env: this._privacyConfig.getEnv(),
+                user: this._privacyConfig.getUserSettings()
+            }
+        };
 
+        this._unityPrivacyView.readyCallback(params);
         this._core.Sdk.logDebug('PRIVACY: Privacy ready');
     }
 

@@ -19,6 +19,10 @@ describe('omid3p', () => {
             expect(window.omid3p.isSupported()).toEqual(true);
         });
 
+        it('customNative should be true', () => {
+            expect(window.omid3p.customNative).toEqual(true);
+        });
+
         it('adding an event listener should pass adjusted event string', () => {
             window.omid3p.addEventListener('impression', () => jest.fn());
             expect(window.postMessage).toBeCalled();

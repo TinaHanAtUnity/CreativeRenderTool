@@ -85,11 +85,11 @@ import { VastCampaign } from 'VAST/Models/VastCampaign';
                 const vastProperties: IVastProperties = {
                     skippable: false,
                     skipOffset: 10,
-                    isAutoplay: true, // Always autoplay for video
+                    autoplay: true, // Always autoplay for video
                     position: VideoPosition.STANDALONE // Always standalone video
                 };
                 omManager.loaded(vastProperties);
-                sinon.assert.calledWith(<sinon.SinonStub>openMeasurement.triggerVideoEvent, 'omidLoaded', { vastProperties });
+                sinon.assert.calledWith(<sinon.SinonStub>openMeasurement.triggerVideoEvent, 'omidLoaded', vastProperties);
                 sinon.assert.calledTwice(<sinon.SinonStub>openMeasurement.triggerVideoEvent);
             });
 

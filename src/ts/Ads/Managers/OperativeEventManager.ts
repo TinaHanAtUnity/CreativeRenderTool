@@ -46,6 +46,7 @@ export interface IOperativeEventManagerParams<T extends Campaign> {
     playerMetadataServerId: string | undefined;
     privacySDK: PrivacySDK;
     userPrivacyManager: UserPrivacyManager;
+    loadV5Support?: boolean | undefined;
 }
 
 export interface IOperativeEventParams {
@@ -106,11 +107,11 @@ export interface IInfoJson {
     frameworkName?: string;
     frameworkVersion?: string;
     skippedAt?: number;
-    imei?: string;
     privacyType?: string;
     isLoadEnabled: boolean;
     legalFramework: string;
     agreedOverAgeLimit: AgeGateChoice;
+    loadV5Support?: boolean;
 }
 
 export class OperativeEventManager {
@@ -152,6 +153,7 @@ export class OperativeEventManager {
     private _playerMetadataServerId: string | undefined;
     private _privacySDK: PrivacySDK;
     private _userPrivacyManager: UserPrivacyManager;
+    private _loadV5Support: boolean;
 
     constructor(params: IOperativeEventManagerParams<Campaign>) {
         this._storageBridge = params.storageBridge;
@@ -169,6 +171,7 @@ export class OperativeEventManager {
         this._playerMetadataServerId = params.playerMetadataServerId;
         this._privacySDK = params.privacySDK;
         this._userPrivacyManager = params.userPrivacyManager;
+        this._loadV5Support = params.loadV5Support || false;
     }
 
     public sendStart(params: IOperativeEventParams): Promise<void> {
@@ -428,7 +431,8 @@ export class OperativeEventManager {
                 'deviceFreeSpace': session.getDeviceFreeSpace(),
                 'isLoadEnabled': this._campaign.isLoadEnabled(),
                 'legalFramework': this._privacySDK.getLegalFramework(),
-                'agreedOverAgeLimit': this._userPrivacyManager.getAgeGateChoice()
+                'agreedOverAgeLimit': this._userPrivacyManager.getAgeGateChoice(),
+                'loadV5Support': this._loadV5Support
             };
 
             if (this._platform === Platform.ANDROID && this._deviceInfo instanceof AndroidDeviceInfo) {

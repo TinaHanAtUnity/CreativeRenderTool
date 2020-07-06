@@ -16,7 +16,6 @@ import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 import { CreativeBlocking, BlockingReason } from 'Core/Utilities/CreativeBlocking';
-import { createMeasurementsInstance } from 'Core/Utilities/TimeMeasurements';
 import { GameSessionCounters } from 'Ads/Utilities/GameSessionCounters';
 
 enum CacheType {

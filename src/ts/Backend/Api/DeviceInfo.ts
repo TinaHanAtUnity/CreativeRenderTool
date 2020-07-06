@@ -1,5 +1,4 @@
 import { BackendApi } from 'Backend/BackendApi';
-import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 
 export class DeviceInfo extends BackendApi {
 
@@ -49,10 +48,6 @@ export class DeviceInfo extends BackendApi {
 
     public setDeviceId(value: string) {
         this._deviceId = value;
-    }
-
-    public setImei(value: string) {
-        this._imei = value;
     }
 
     public setApiLevel(value: number) {
@@ -267,10 +262,6 @@ export class DeviceInfo extends BackendApi {
         return this._androidId;
     }
 
-    public getDeviceId() {
-        return this._deviceId;
-    }
-
     public getApiLevel() {
         return this._apiLevel;
     }
@@ -377,10 +368,6 @@ export class DeviceInfo extends BackendApi {
 
     public isSimulator() {
         return this._simulator;
-    }
-
-    public isAppInstalled(packageName: string) {
-        return packageName === AndroidDeviceInfo.GooglePlayPackageName;
     }
 
     public getStatusBarHeight() {
@@ -527,7 +514,6 @@ export class DeviceInfo extends BackendApi {
     private _statusBarHidden: boolean = true;
     private _adbEnabled = false;
     private _deviceId: string;
-    private _imei: string;
     private _isMadeWithUnity: false;
 
     private getGuid() {

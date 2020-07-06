@@ -1184,8 +1184,6 @@ export class TestFixtures {
     public static getFakeNativeAndroidDeviceInfo(): any {
         return {
             getAndroidId: sinon.stub().returns(Promise.resolve('17')),
-            getDeviceId: sinon.stub().returns(Promise.resolve('17')),
-            getDeviceIdWithSlot: sinon.stub().returns(Promise.resolve('17')),
             getApiLevel: sinon.stub().returns(Promise.resolve(16)),
             getManufacturer: sinon.stub().returns(Promise.resolve('N')),
             getDisplayMetricDensity: sinon.stub().returns(Promise.resolve(1)),
@@ -1195,7 +1193,6 @@ export class TestFixtures {
             getRingerMode: sinon.stub().returns(Promise.resolve(RingerMode.RINGER_MODE_NORMAL)),
             getDeviceVolume: sinon.stub().returns(Promise.resolve(0.5)),
             getFreeSpace: sinon.stub().returns(Promise.resolve(16)),
-            isAppInstalled: sinon.stub().returns(Promise.resolve(true)),
             getDeviceMaxVolume: sinon.stub().returns(Promise.resolve(1)),
             getApkDigest: sinon.stub().returns(Promise.resolve('apkDigest')),
             getCertificateFingerprint: sinon.stub().returns(Promise.resolve('certificateFingerPrint')),

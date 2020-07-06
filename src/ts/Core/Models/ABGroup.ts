@@ -78,12 +78,11 @@ export const FakeReverseABTest = new ReverseABTest(16, 17);
 // Active AB Tests
 export const MediationCacheModeAllowedTest = new ReverseABTest(5);
 export const MabDisabledABTest = new ZyngaFilteredABTest(7);
+export const GooglePlayDetectionTest = new ABTest(8);
 export const PrivacySDKTest = new ABTest(16);
-export const HtmlEndcardTest = new ABTest(17);
-export const AuctionXHR = new DisabledABTest();
-export const LoadV5AdUnit = new ABTest(14);
-export const LoadV5 = new ABTest(14, 15, 18, 19);
-export const BaseLineLoadV5 = new ABTest(14, 15, 18, 19);
+export const LoadV5NoInvalidation = new ABTest(13);
+export const LoadV5 = new ReverseABTest(14, 15, 18, 19);
+export const LoadV5GroupId = new ABTest(6, 10);
 
 // Disabled AB Tests
 export const OpenMeasurementTest = new DisabledABTest();

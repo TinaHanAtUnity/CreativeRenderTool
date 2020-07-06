@@ -4,6 +4,7 @@ interface IWebViewBridge {
 }
 
 interface IMessageHandler {
+    // eslint-disable-next-line
     postMessage: (message: unknown) => void;
 }
 
@@ -16,9 +17,8 @@ interface IWebKit {
     messageHandlers: IMessageHandlers;
 }
 
-// tslint:disable:interface-name
+// eslint-disable-next-line
 interface Window {
     webviewbridge: IWebViewBridge;
     webkit: IWebKit;
 }
-// tslint:enable:interface-name

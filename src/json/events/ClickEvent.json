@@ -248,12 +248,6 @@
       "body": true
     },
     {
-      "parameter": "imei",
-      "required": "no",
-      "queryString": false,
-      "body": true
-    },
-    {
       "parameter": "privacy",
       "required": "yes",
       "queryString": false,
@@ -285,6 +279,12 @@
     },
     {
       "parameter": "privacyType",
+      "required": "no",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "loadV5Support",
       "required": "no",
       "queryString": false,
       "body": true

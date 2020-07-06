@@ -17,26 +17,26 @@ import { PrivacySDKMock, PrivacySDK } from 'Privacy/__mocks__/PrivacySDK';
 import { UserPrivacyManagerMock, UserPrivacyManager } from 'Ads/Managers/__mocks__/UserPrivacyManager';
 import { GameSessionCounters } from 'Ads/Utilities/GameSessionCounters';
 import { ILoadedCampaign } from 'Ads/Managers/CampaignManager';
-import { Placement, PlacementMock, withAdUnit } from 'Ads/Models/__mocks__/Placement';
+import { Placement, PlacementMock, withGroupId } from 'Ads/Models/__mocks__/Placement';
 import { CometCampaignParser } from 'Performance/Parsers/CometCampaignParser';
 import { INativeResponse } from 'Core/Managers/RequestManager';
 import { Campaign, ICampaignTrackingUrls } from 'Ads/Models/Campaign';
 import { SDKMetrics, LoadV5 } from 'Ads/Utilities/SDKMetrics';
 import { IPlacementIdMap } from 'Ads/Managers/PlacementManager';
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+// eslint-disable-next-line
 const LoadV5PreloadResponse = require('json/LoadV5PreloadResponse.json');
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+// eslint-disable-next-line
 const LoadV5PreloadResponse_NoFill = require('json/LoadV5PreloadResponse_NoFill.json');
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+// eslint-disable-next-line
 const LoadV5LoadResponse = require('json/LoadV5LoadResponse.json');
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+// eslint-disable-next-line
 const LoadV5LoadResponse_2 = require('json/LoadV5LoadResponse_2.json');
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+// eslint-disable-next-line
 const LoadV5LoadResponseWithAdditionalPlacements = require('json/LoadV5LoadResponseWithAdditionalPlacements.json');
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+// eslint-disable-next-line
 const LoadV5LoadResponse_NoFill = require('json/LoadV5LoadResponse_NoFill.json');
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+// eslint-disable-next-line
 const LoadV5ReloadResponse = require('json/LoadV5ReloadResponse.json');
 
 class SatisfiesMatcher {
@@ -118,6 +118,7 @@ class SatisfiesMatcher {
             it('should have correct request', () => {
                 expect(request.post).toHaveBeenCalledTimes(1);
                 expect(request.post).toHaveBeenLastCalledWith(expect.anything(), new SatisfiesMatcher({
+                    loadV5Support: true,
                     isLoadEnabled: true,
                     preload: true,
                     load: false,
@@ -137,10 +138,10 @@ class SatisfiesMatcher {
                     preloadData: {}
                 }), [], {
                     followRedirects: false,
-                    retries: 0,
+                    retries: 3,
                     retryDelay: 0,
                     retryWithConnectionEvents: false,
-                    timeout: 20000
+                    timeout: 5000
                 });
             });
 
@@ -287,41 +288,41 @@ class SatisfiesMatcher {
             it('should have correct tracking url in loadedCampaign1', () => {
                 expect(loadedCampaign1!.trackingUrls).toEqual({
                     click: [
-                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=click&test=0&5be40c5f602f4510ec583881'
+                        'https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=click&test=0&5be40c5f602f4510ec583881'
                     ],
                     complete: [
-                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=complete&test=0&5be40c5f602f4510ec583881'
+                        'https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=complete&test=0&5be40c5f602f4510ec583881'
                     ],
                     error: [
-                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=error&test=0&5be40c5f602f4510ec583881'
+                        'https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=error&test=0&5be40c5f602f4510ec583881'
                     ],
                     firstQuartile: [
-                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=firstQuartile&test=0&5be40c5f602f4510ec583881'
+                        'https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=firstQuartile&test=0&5be40c5f602f4510ec583881'
                     ],
                     loaded: [
-                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=loaded&test=0&5be40c5f602f4510ec583881'
+                        'https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=loaded&test=0&5be40c5f602f4510ec583881'
                     ],
                     midpoint: [
-                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=midpoint&test=0&5be40c5f602f4510ec583881'
+                        'https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=midpoint&test=0&5be40c5f602f4510ec583881'
                     ],
                     show: [
-                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=skip&test=0&5be40c5f602f4510ec583881'
+                        'https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=skip&test=0&5be40c5f602f4510ec583881'
                     ],
                     skip: [
-                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=skip&test=0&5be40c5f602f4510ec583881'
+                        'https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=skip&test=0&5be40c5f602f4510ec583881'
                     ],
                     stalled: [
-                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=stalled&test=0&5be40c5f602f4510ec583881'
+                        'https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=stalled&test=0&5be40c5f602f4510ec583881'
                     ],
                     start: [
-                        'https://tracking.prd.mz.internal.unity3d.com/impression/%ZONE%?data=randomData&test=0&5be40c5f602f4510ec583881',
-                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=start&test=0&5be40c5f602f4510ec583881'
+                        'https://tracking.stg.mz.internal.unity3d.com/impression/%ZONE%?data=randomData&test=0&5be40c5f602f4510ec583881',
+                        'https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=start&test=0&5be40c5f602f4510ec583881'
                     ],
                     thirdQuartile: [
-                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=thirdQuartile&test=0&5be40c5f602f4510ec583881'
+                        'https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=thirdQuartile&test=0&5be40c5f602f4510ec583881'
                     ],
                     videoEndCardClick: [
-                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=videoEndCardClick&test=0&5be40c5f602f4510ec583881'
+                        'https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=videoEndCardClick&test=0&5be40c5f602f4510ec583881'
                     ]
                 });
             });
@@ -333,41 +334,41 @@ class SatisfiesMatcher {
             it('should have correct tracking url in loadedCampaign2', () => {
                 expect(loadedCampaign2!.trackingUrls).toEqual({
                     click: [
-                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=click&test=0&load_v5_2_rewardedVideo'
+                        'https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=click&test=0&load_v5_2_rewardedVideo'
                     ],
                     complete: [
-                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=complete&test=0&load_v5_2_rewardedVideo'
+                        'https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=complete&test=0&load_v5_2_rewardedVideo'
                     ],
                     error: [
-                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=error&test=0&load_v5_2_rewardedVideo'
+                        'https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=error&test=0&load_v5_2_rewardedVideo'
                     ],
                     firstQuartile: [
-                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=firstQuartile&test=0&load_v5_2_rewardedVideo'
+                        'https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=firstQuartile&test=0&load_v5_2_rewardedVideo'
                     ],
                     loaded: [
-                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=loaded&test=0&load_v5_2_rewardedVideo'
+                        'https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=loaded&test=0&load_v5_2_rewardedVideo'
                     ],
                     midpoint: [
-                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=midpoint&test=0&load_v5_2_rewardedVideo'
+                        'https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=midpoint&test=0&load_v5_2_rewardedVideo'
                     ],
                     show: [
-                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=skip&test=0&load_v5_2_rewardedVideo'
+                        'https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=skip&test=0&load_v5_2_rewardedVideo'
                     ],
                     skip: [
-                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=skip&test=0&load_v5_2_rewardedVideo'
+                        'https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=skip&test=0&load_v5_2_rewardedVideo'
                     ],
                     stalled: [
-                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=stalled&test=0&load_v5_2_rewardedVideo'
+                        'https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=stalled&test=0&load_v5_2_rewardedVideo'
                     ],
                     start: [
-                        'https://tracking.prd.mz.internal.unity3d.com/impression/%ZONE%?data=randomData&test=0&load_v5_2_rewardedVideo',
-                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=start&test=0&load_v5_2_rewardedVideo'
+                        'https://tracking.stg.mz.internal.unity3d.com/impression/%ZONE%?data=randomData&test=0&load_v5_2_rewardedVideo',
+                        'https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=start&test=0&load_v5_2_rewardedVideo'
                     ],
                     thirdQuartile: [
-                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=thirdQuartile&test=0&load_v5_2_rewardedVideo'
+                        'https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=thirdQuartile&test=0&load_v5_2_rewardedVideo'
                     ],
                     videoEndCardClick: [
-                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=videoEndCardClick&test=0&load_v5_2_rewardedVideo'
+                        'https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=videoEndCardClick&test=0&load_v5_2_rewardedVideo'
                     ]
                 });
             });
@@ -390,6 +391,7 @@ class SatisfiesMatcher {
             it('should make request with correct body', () => {
                 expect(request.post).toHaveBeenCalledTimes(3);
                 expect(request.post).toHaveBeenNthCalledWith(2, expect.anything(), new SatisfiesMatcher({
+                    loadV5Support: true,
                     isLoadEnabled: true,
                     preload: false,
                     load: true,
@@ -410,10 +412,10 @@ class SatisfiesMatcher {
                     }
                 }), [], {
                     followRedirects: false,
-                    retries: 0,
+                    retries: 3,
                     retryDelay: 0,
                     retryWithConnectionEvents: false,
-                    timeout: 10000
+                    timeout: 5000
                 });
                 expect(request.post).toHaveBeenNthCalledWith(3, expect.anything(), new SatisfiesMatcher({
                     preload: false,
@@ -435,10 +437,10 @@ class SatisfiesMatcher {
                     }
                 }), [], {
                     followRedirects: false,
-                    retries: 0,
+                    retries: 3,
                     retryDelay: 0,
                     retryWithConnectionEvents: false,
-                    timeout: 10000
+                    timeout: 5000
                 });
             });
         });
@@ -461,14 +463,14 @@ class SatisfiesMatcher {
                 });
 
                 const placements: { [key: string]: PlacementMock } = {
-                    'video': withAdUnit(Placement('video'), 'test_ad_unit'),
-                    'rewardedVideo': withAdUnit(Placement('rewardedVideo'), 'test_ad_unit'),
-                    'video2': withAdUnit(Placement('video2'), 'test_ad_unit'),
-                    'video3': withAdUnit(Placement('video3'), 'test_ad_unit')
+                    'video': withGroupId(Placement('video'), 'test_group_id'),
+                    'rewardedVideo': withGroupId(Placement('rewardedVideo'), 'test_group_id'),
+                    'video2': withGroupId(Placement('video2'), 'test_group_id'),
+                    'video3': withGroupId(Placement('video3'), 'test_group_id')
                 };
 
                 adsConfig.getPlacement.mockImplementation((x) => placements[x]);
-                adsConfig.getPlacementsForAdunit.mockReturnValueOnce([placements.video.getId(), placements.rewardedVideo.getId(), placements.video2.getId(), placements.video3.getId()]);
+                adsConfig.getPlacementsForGroupId.mockReturnValueOnce([placements.video.getId(), placements.rewardedVideo.getId(), placements.video2.getId(), placements.video3.getId()]);
 
                 contentTypeHandlerManager.getParser.mockReturnValue(new CometCampaignParser(core));
 
@@ -479,8 +481,8 @@ class SatisfiesMatcher {
                 loadedCampaign = await adRequestManager.loadCampaignWithAdditionalPlacement(placements.video);
             });
 
-            it('should getPlacementsForAdunit be called with correct ad unit id', () => {
-                expect(adsConfig.getPlacementsForAdunit).toBeCalledWith('test_ad_unit');
+            it('should getPlacementsForGroupId be called with correct ad unit id', () => {
+                expect(adsConfig.getPlacementsForGroupId).toBeCalledWith('test_group_id');
             });
 
             it('should send fill metric', () => {
@@ -514,6 +516,7 @@ class SatisfiesMatcher {
             it('should make request with correct body', () => {
                 expect(request.post).toHaveBeenCalledTimes(2);
                 expect(request.post).toHaveBeenNthCalledWith(2, expect.anything(), new SatisfiesMatcher({
+                    loadV5Support: true,
                     isLoadEnabled: true,
                     preload: false,
                     load: true,
@@ -544,10 +547,10 @@ class SatisfiesMatcher {
                     }
                 }), [], {
                     followRedirects: false,
-                    retries: 0,
+                    retries: 3,
                     retryDelay: 0,
                     retryWithConnectionEvents: false,
-                    timeout: 10000
+                    timeout: 5000
                 });
             });
 
@@ -563,9 +566,9 @@ class SatisfiesMatcher {
             });
 
             it('should return correct ad unit id in onAdditionalPlacementsReady', () => {
-                const adUnitId: string = <string>onAdditionalPlacementsReady.mock.calls[0][0];
+                const groupId: string = <string>onAdditionalPlacementsReady.mock.calls[0][0];
 
-                expect(adUnitId).toEqual('test_ad_unit');
+                expect(groupId).toEqual('test_group_id');
             });
 
             it('should get correct campaign for rewardedVideo', () => {
@@ -595,13 +598,22 @@ class SatisfiesMatcher {
                 expect(campaign).toBeUndefined();
             });
 
-            it('should have not the same campaigns in video2 and rewardedVideo', () => {
+            it('should have the same campaigns in video2 and rewardedVideo', () => {
                 const additionalCampaigns: IPlacementIdMap<INotCachedLoadedCampaign | undefined> = <IPlacementIdMap<INotCachedLoadedCampaign | undefined>>onAdditionalPlacementsReady.mock.calls[0][1];
 
                 const campaign1: Campaign = additionalCampaigns.rewardedVideo!.notCachedCampaign;
                 const campaign2: Campaign = additionalCampaigns.video2!.notCachedCampaign;
 
-                expect(campaign1).not.toBe(campaign2);
+                expect(campaign1).toBe(campaign2);
+            });
+
+            it('should have different tracking urls', () => {
+                const additionalCampaigns: IPlacementIdMap<INotCachedLoadedCampaign | undefined> = <IPlacementIdMap<INotCachedLoadedCampaign | undefined>>onAdditionalPlacementsReady.mock.calls[0][1];
+
+                const trackingUrls1: ICampaignTrackingUrls = additionalCampaigns.rewardedVideo!.notCachedTrackingUrls;
+                const trackingUrls2: ICampaignTrackingUrls = additionalCampaigns.video2!.notCachedTrackingUrls;
+
+                expect(trackingUrls1).not.toEqual(trackingUrls2);
             });
 
             it('should cache only 1 campaigns', () => {
@@ -679,6 +691,7 @@ class SatisfiesMatcher {
             it('should make request with correct body', () => {
                 expect(request.post).toHaveBeenCalledTimes(2);
                 expect(request.post).toHaveBeenNthCalledWith(2, expect.anything(), new SatisfiesMatcher({
+                    loadV5Support: true,
                     isLoadEnabled: true,
                     preload: false,
                     load: true,
@@ -698,10 +711,10 @@ class SatisfiesMatcher {
                     }
                 }), [], {
                     followRedirects: false,
-                    retries: 0,
+                    retries: 3,
                     retryDelay: 0,
                     retryWithConnectionEvents: false,
-                    timeout: 10000
+                    timeout: 5000
                 });
             });
         });
@@ -774,6 +787,7 @@ class SatisfiesMatcher {
             it('should make request with correct body', () => {
                 expect(request.post).toHaveBeenCalledTimes(2);
                 expect(request.post).toHaveBeenNthCalledWith(2, expect.anything(), new SatisfiesMatcher({
+                    loadV5Support: true,
                     isLoadEnabled: true,
                     preload: false,
                     load: true,
@@ -793,10 +807,10 @@ class SatisfiesMatcher {
                     }
                 }), [], {
                     followRedirects: false,
-                    retries: 0,
+                    retries: 3,
                     retryDelay: 0,
                     retryWithConnectionEvents: false,
-                    timeout: 10000
+                    timeout: 5000
                 });
             });
         });
@@ -1245,41 +1259,41 @@ class SatisfiesMatcher {
 
                 expect(trackingUrls).toEqual({
                     click: [
-                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=click&test=0&reload_v5_rewardedVideo'
+                        'https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=click&test=0&reload_v5_rewardedVideo'
                     ],
                     complete: [
-                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=complete&test=0&reload_v5_rewardedVideo'
+                        'https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=complete&test=0&reload_v5_rewardedVideo'
                     ],
                     error: [
-                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=error&test=0&reload_v5_rewardedVideo'
+                        'https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=error&test=0&reload_v5_rewardedVideo'
                     ],
                     firstQuartile: [
-                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=firstQuartile&test=0&reload_v5_rewardedVideo'
+                        'https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=firstQuartile&test=0&reload_v5_rewardedVideo'
                     ],
                     loaded: [
-                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=loaded&test=0&reload_v5_rewardedVideo'
+                        'https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=loaded&test=0&reload_v5_rewardedVideo'
                     ],
                     midpoint: [
-                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=midpoint&test=0&reload_v5_rewardedVideo'
+                        'https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=midpoint&test=0&reload_v5_rewardedVideo'
                     ],
                     show: [
-                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=skip&test=0&reload_v5_rewardedVideo'
+                        'https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=skip&test=0&reload_v5_rewardedVideo'
                     ],
                     skip: [
-                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=skip&test=0&reload_v5_rewardedVideo'
+                        'https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=skip&test=0&reload_v5_rewardedVideo'
                     ],
                     stalled: [
-                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=stalled&test=0&reload_v5_rewardedVideo'
+                        'https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=stalled&test=0&reload_v5_rewardedVideo'
                     ],
                     start: [
-                        'https://tracking.prd.mz.internal.unity3d.com/impression/%ZONE%?data=randomData&test=0&reload_v5_rewardedVideo',
-                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=start&test=0&reload_v5_rewardedVideo'
+                        'https://tracking.stg.mz.internal.unity3d.com/impression/%ZONE%?data=randomData&test=0&reload_v5_rewardedVideo',
+                        'https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=start&test=0&reload_v5_rewardedVideo'
                     ],
                     thirdQuartile: [
-                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=thirdQuartile&test=0&reload_v5_rewardedVideo'
+                        'https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=thirdQuartile&test=0&reload_v5_rewardedVideo'
                     ],
                     videoEndCardClick: [
-                        'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=videoEndCardClick&test=0&reload_v5_rewardedVideo'
+                        'https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=videoEndCardClick&test=0&reload_v5_rewardedVideo'
                     ]
                 });
             });
@@ -1292,6 +1306,7 @@ class SatisfiesMatcher {
 
             it('should make request with correct body', () => {
                 expect(request.post).toHaveBeenNthCalledWith(4, expect.anything(), new SatisfiesMatcher({
+                    loadV5Support: true,
                     isLoadEnabled: true,
                     preload: true,
                     load: true,
@@ -1318,9 +1333,9 @@ class SatisfiesMatcher {
                 }), [], {
                     followRedirects: false,
                     retries: 3,
-                    retryDelay: 1000,
+                    retryDelay: 0,
                     retryWithConnectionEvents: false,
-                    timeout: 20000
+                    timeout: 5000
                 });
             });
         });
@@ -1438,10 +1453,10 @@ class SatisfiesMatcher {
                     }
                 }), [], {
                     followRedirects: false,
-                    retries: 0,
+                    retries: 3,
                     retryDelay: 0,
                     retryWithConnectionEvents: false,
-                    timeout: 10000
+                    timeout: 5000
                 });
             });
 

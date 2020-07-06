@@ -5,12 +5,21 @@ export class PrivacyConfig {
     private _userSettings: IUserPrivacySettings;
     private _flow: { [key: string]: unknown };
     private _html: string;
+    private _startNode: string;
+    private _locale: { [key: string]: unknown };
 
-    constructor(flow: { [key: string]: unknown }, userSettings: IUserPrivacySettings, env: { [key: string]: unknown }, privacyHtml: string) {
+    constructor(env: { [key: string]: unknown },
+                userSettings: IUserPrivacySettings,
+                startNode: string,
+                privacyHtml: string,
+                flow: { [key: string]: unknown },
+                locale: { [key: string]: unknown }) {
         this._env = env;
-        this._flow = flow;
         this._userSettings = userSettings;
+        this._startNode = startNode;
         this._html = privacyHtml;
+        this._flow = flow;
+        this._locale = locale;
     }
 
     public getEnv(): { [key: string]: unknown } {
@@ -27,5 +36,13 @@ export class PrivacyConfig {
 
     public getHtml(): string {
         return this._html;
+    }
+
+    public getStartNode(): string {
+        return this._startNode;
+    }
+
+    public getLocale(): { [key: string]: unknown } {
+        return this._locale;
     }
 }

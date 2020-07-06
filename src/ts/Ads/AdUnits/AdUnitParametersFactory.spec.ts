@@ -19,7 +19,6 @@ import { VastAdVerification, VastAdVerificationMock } from 'VAST/Models/__mocks_
 import { VastVerificationResource } from 'VAST/Models/VastVerificationResource';
 import { VastHTMLEndScreen } from 'VAST/Views/VastHTMLEndScreen';
 import { VastStaticEndScreen } from 'VAST/Views/VastStaticEndScreen';
-import { HtmlEndcardTest } from 'Core/Models/ABGroup';
 
 jest.mock('VAST/Views/VastHTMLEndScreen');
 jest.mock('VAST/Views/VastStaticEndScreen');
@@ -52,7 +51,7 @@ describe('AdUnitParametersFactoryTest', () => {
 
         describe('when getBaseParameters', () => {
             it('it should set third party event macros on creation', () => {
-                adUnitParametersFactory.create(campaign, placement, Orientation.NONE, '123', 'option');
+                adUnitParametersFactory.create(campaign, placement, Orientation.NONE, '123', 'option', false);
 
                 expect(thirdPartyEventManagerFactory.create).toHaveBeenCalledWith({
                     [ThirdPartyEventMacro.ZONE]: 'video',
@@ -85,9 +84,7 @@ describe('AdUnitParametersFactoryTest', () => {
         describe('when creating parameters', () => {
             describe('when creating endscreen parameters', () => {
                 beforeEach(() => {
-                    const isValid = jest.spyOn(HtmlEndcardTest, 'isValid');
                     vast.getAdVerifications.mockReturnValue([]);
-                    isValid.mockReturnValue(true);
                 });
                 [
                     { hasStaticEndscreen: true, hasHtmlEndscreen: true, expectedType: VastHTMLEndScreen, description: 'when static and html endscreen both exist', expectedResult: 'vast endscreen should be html endscreen' },
@@ -99,7 +96,7 @@ describe('AdUnitParametersFactoryTest', () => {
                         beforeEach(() => {
                             campaign.hasStaticEndscreen.mockReturnValue(hasStaticEndscreen);
                             campaign.hasHtmlEndscreen.mockReturnValue(hasHtmlEndscreen);
-                            parameters = adUnitParametersFactory.create(campaign, placement, Orientation.NONE, '123', 'option');
+                            parameters = adUnitParametersFactory.create(campaign, placement, Orientation.NONE, '123', 'option', false);
                         });
                         it(expectedResult, () => {
                             expect(parameters.endScreen).toBeInstanceOf(expectedType);
@@ -110,7 +107,7 @@ describe('AdUnitParametersFactoryTest', () => {
 
             it('it should not set om tracking if an adverification does not exist in the adVerifications array', () => {
                 vast.getAdVerifications.mockReturnValue([]);
-                adUnitParametersFactory.create(campaign, placement, Orientation.NONE, '123', 'option');
+                adUnitParametersFactory.create(campaign, placement, Orientation.NONE, '123', 'option', false);
                 expect(campaign.setOmEnabled).toHaveBeenCalledTimes(0);
                 expect(campaign.setOMVendors).toHaveBeenCalledTimes(0);
             });
@@ -122,7 +119,7 @@ describe('AdUnitParametersFactoryTest', () => {
                 const verificationResource = new VastVerificationResource('https://scootmcdoot.com', 'omid');
                 vastAdVerificton1.getVerficationResources.mockReturnValue([verificationResource]);
                 vast.getAdVerifications.mockReturnValue([vastAdVerificton1]);
-                adUnitParametersFactory.create(campaign, placement, Orientation.NONE, '123', 'option');
+                adUnitParametersFactory.create(campaign, placement, Orientation.NONE, '123', 'option', false);
                 expect(campaign.setOmEnabled).toHaveBeenCalled();
                 expect(campaign.setOMVendors).toHaveBeenCalled();
             });

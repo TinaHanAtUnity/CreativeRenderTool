@@ -12,7 +12,7 @@ import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { ResolveManager } from 'Core/Managers/ResolveManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
-import { toAbGroup, FilteredABTest } from 'Core/Models/ABGroup';
+import { toAbGroup, FilteredABTest, GooglePlayDetectionTest } from 'Core/Models/ABGroup';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
@@ -46,14 +46,13 @@ import { StorageBridge } from 'Core/Utilities/StorageBridge';
 import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
 import CreativeUrlConfiguration from 'json/CreativeUrlConfiguration.json';
 import { NativeErrorApi } from 'Core/Api/NativeErrorApi';
-import { DeviceIdManager } from 'Core/Managers/DeviceIdManager';
-import { SDKMetrics, InitializationMetric } from 'Ads/Utilities/SDKMetrics';
+import { SDKMetrics, InitializationMetric, MiscellaneousMetric, InitializationFailureMetric } from 'Ads/Utilities/SDKMetrics';
 import { SdkDetectionInfo } from 'Core/Models/SdkDetectionInfo';
 import { ClassDetectionApi } from 'Core/Native/ClassDetection';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { NoGzipCacheManager } from 'Core/Managers/NoGzipCacheManager';
 import { createMetricInstance } from 'Ads/Networking/MetricInstance';
-import { createMeasurementsInstance } from 'Core/Utilities/TimeMeasurements';
+import { createStopwatch } from 'Core/Utilities/Stopwatch';
 import { IsMadeWithUnity } from 'Ads/Utilities/IsMadeWithUnity';
 
 export class Core implements ICore {
@@ -73,7 +72,6 @@ export class Core implements ICore {
     public RequestManager: RequestManager;
     public CacheManager: CacheManager;
     public JaegerManager: JaegerManager;
-    public DeviceIdManager: DeviceIdManager;
     public ClientInfo: ClientInfo;
     public DeviceInfo: DeviceInfo;
     public SdkDetectionInfo: SdkDetectionInfo;
@@ -128,22 +126,19 @@ export class Core implements ICore {
         if (performance && performance.now) {
             loadTime = performance.now();
         }
-        let measurements = createMeasurementsInstance(InitializationMetric.WebviewInitializationPhases, {
-            'wel': 'undefined'
-        });
+        const measurements = createStopwatch();
         return this.Api.Sdk.loadComplete().then((data) => {
             this.ClientInfo = new ClientInfo(data);
 
             if (!/^\d+$/.test(this.ClientInfo.getGameId())) {
-                const message = `Provided Game ID '${this.ClientInfo.getGameId()}' is invalid. Game ID may contain only digits (0-9).`;
-                this.Api.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.INVALID_ARGUMENT], message);
-                return Promise.reject(message);
+                const error = new Error(`Unity Ads SDK fail to initialize due to provided Game ID '${this.ClientInfo.getGameId()}' is invalid. Game ID may contain only digits (0-9).`);
+                error.name = 'InvalidArgument';
+                return Promise.reject(error);
             }
 
             if (this.NativeBridge.getPlatform() === Platform.ANDROID) {
                 this.DeviceInfo = new AndroidDeviceInfo(this.Api);
                 this.RequestManager = new RequestManager(this.NativeBridge.getPlatform(), this.Api, this.WakeUpManager, <AndroidDeviceInfo> this.DeviceInfo);
-                this.DeviceIdManager = new DeviceIdManager(this.Api, <AndroidDeviceInfo> this.DeviceInfo);
             } else if (this.NativeBridge.getPlatform() === Platform.IOS) {
                 this.DeviceInfo = new IosDeviceInfo(this.Api);
                 this.RequestManager = new RequestManager(this.NativeBridge.getPlatform(), this.Api, this.WakeUpManager);
@@ -167,13 +162,25 @@ export class Core implements ICore {
 
             this.Api.Request.setConcurrentRequestCount(8);
 
-            measurements = createMeasurementsInstance(InitializationMetric.WebviewInitializationPhases, {
-                'wel': 'undefined'
-            });
+            measurements.reset();
+            measurements.start();
 
             return Promise.all([this.DeviceInfo.fetch(), this.SdkDetectionInfo.detectSdks(), this.UnityInfo.fetch(this.ClientInfo.getApplicationName()), this.setupTestEnvironment()]);
         }).then(() => {
-            measurements.measure('device_info_collection');
+
+            // Temporary for GAID Investigation. Do not apply above 3.4.0
+            if (this.DeviceInfo instanceof AndroidDeviceInfo) {
+                SDKMetrics.reportMetricEventWithTags(MiscellaneousMetric.GAIDInvestigation, {
+                    'gaid': `${!!this.DeviceInfo.get('advertisingIdentifier')}`,
+                    'pkg': `${!!this.DeviceInfo.get('isGoogleStoreInstalled')}`
+                });
+            }
+
+            measurements.stopAndSend(
+                InitializationMetric.WebviewInitializationPhases, {
+                'wel': 'undefined',
+                'stg': 'device_info_collection'
+            });
             HttpKafka.setDeviceInfo(this.DeviceInfo);
             this.WakeUpManager.setListenConnectivity(true);
             this.Api.Sdk.logInfo('mediation detection is:' + this.SdkDetectionInfo.getSdkDetectionJSON());
@@ -187,9 +194,9 @@ export class Core implements ICore {
 
             this.ConfigManager = new ConfigManager(this.NativeBridge.getPlatform(), this.Api, this.MetaDataManager, this.ClientInfo, this.DeviceInfo, this.UnityInfo, this.RequestManager);
 
-            measurements = createMeasurementsInstance(InitializationMetric.WebviewInitializationPhases, {
-                'wel': 'undefined'
-            });
+            measurements.reset();
+            measurements.start();
+
             let configPromise: Promise<unknown>;
             if (TestEnvironment.get('creativeUrl')) {
                 configPromise = Promise.resolve(CreativeUrlConfiguration);
@@ -198,7 +205,11 @@ export class Core implements ICore {
             }
 
             configPromise = configPromise.then((configJson: unknown): [unknown, CoreConfiguration] => {
-                measurements.measure('config_request_received');
+                measurements.stopAndSend(
+                    InitializationMetric.WebviewInitializationPhases, {
+                    'wel': 'undefined',
+                    'stg': 'config_request_received'
+                });
                 const coreConfig = CoreConfigurationParser.parse(<IRawCoreConfiguration>configJson);
                 this.Api.Sdk.logInfo('Received configuration for token ' + coreConfig.getToken() + ' (A/B group ' + JSON.stringify(coreConfig.getAbGroup()) + ')');
                 if (this.NativeBridge.getPlatform() === Platform.IOS && this.DeviceInfo.getLimitAdTracking()) {
@@ -219,6 +230,11 @@ export class Core implements ICore {
             return Promise.all([<Promise<[unknown, CoreConfiguration]>>configPromise, cachePromise]);
         }).then(([[configJson, coreConfig]]) => {
             this.Config = coreConfig;
+
+            if (this.DeviceInfo instanceof AndroidDeviceInfo && GooglePlayDetectionTest.isValid(this.Config.getAbGroup())) {
+                this.DeviceInfo.set('isGoogleStoreInstalled', true);
+            }
+
             SDKMetrics.setMetricInstance(createMetricInstance(this.NativeBridge.getPlatform(), this.RequestManager, this.ClientInfo, this.DeviceInfo, this.Config.getCountry()));
 
             // tslint:disable-next-line:no-any
@@ -236,7 +252,7 @@ export class Core implements ICore {
             this.JaegerManager.setJaegerTracingEnabled(this.Config.isJaegerTracingEnabled());
 
             if (!this.Config.isEnabled()) {
-                const error = new Error('Game with ID ' + this.ClientInfo.getGameId() + ' is not enabled');
+                const error = new Error('Unity Ads SDK fail to initialize due to game with ID ' + this.ClientInfo.getGameId() + ' is not enabled');
                 error.name = 'DisabledGame';
                 throw error;
             }
@@ -250,17 +266,28 @@ export class Core implements ICore {
                 IsMadeWithUnity.sendIsMadeWithUnity(this.Api.Storage, this.SdkDetectionInfo);
             });
         }).catch((error: { message: string; name: unknown }) => {
-            if (error instanceof ConfigError) {
-                // tslint:disable-next-line
-                error = { 'message': error.message, 'name': error.name };
-                this.Api.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.INITIALIZE_FAILED], error.message);
-            } else if (error instanceof Error && error.name === 'DisabledGame') {
-                return;
+            let errorMessage = 'Unity Ads SDK fail to initialize due to internal error';
+            let errorCode: InitErrorCode = InitErrorCode.Unknown;
+
+            if (error instanceof Error && error.name === 'DisabledGame') {
+                errorMessage = error.message;
+                errorCode = InitErrorCode.GameIdDisabled;
             }
 
-            this.Api.Sdk.initError(error.message, InitErrorCode.Unknown);
+            if (error instanceof Error && error.name === 'InvalidArgument') {
+                errorMessage = error.message;
+                errorCode = InitErrorCode.InvalidArgument;
+            }
+
+            if (error instanceof ConfigError) {
+                errorMessage = 'Unity Ads SDK fail to initialize due to configuration error';
+                errorCode = InitErrorCode.ConfigurationError;
+            }
+
+            this.Api.Sdk.initError(errorMessage, errorCode);
+            this.Api.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.INITIALIZE_FAILED], errorMessage);
             this.Api.Sdk.logError(`Initialization error: ${error.message}`);
-            Diagnostics.trigger('initialization_error', error);
+            SDKMetrics.reportMetricEvent(InitializationFailureMetric.InitializeFailed);
         });
     }
 
