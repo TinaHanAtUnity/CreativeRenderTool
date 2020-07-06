@@ -71,6 +71,8 @@ export class AutomatedExperimentManager {
     private _campaign: OptimizedCampaign;
     private _staticFeaturesPromise: Promise<{ [key: string]: ContextualFeature }>;
     private _campaignSource: Observable3<string, Campaign, ICampaignTrackingUrls | undefined>;
+    private _experimentCallLatencyStart: number;
+    private _experimentCallLatencyEnd: number;
 
     public static setForcedARMRAID(value: boolean) {
         this._forcedARMRAID = value;
@@ -195,7 +197,8 @@ export class AutomatedExperimentManager {
                 ab_group: this._abGroup,
                 auction_id: campaign.getSession().getId(),
                 game_session_id: this._gameSessionID,
-                gamer_token: this._gamerToken
+                gamer_token: this._gamerToken,
+                experiment_call_latency: this._experimentCallLatencyEnd - this._experimentCallLatencyStart
             },
             reward: categorizedExp.Outcome,
             experiments: experiments
@@ -494,9 +497,13 @@ export class AutomatedExperimentManager {
             }).then((features) => {
                 const body = this.createRequestBody(campaign, categories, features);
                 const url = AutomatedExperimentManager.BaseUrl + AutomatedExperimentManager.CreateEndPoint;
+                this._experimentCallLatencyStart = Date.now();
 
                 return this._requestManager.post(url, body)
-                    .then((response) => this.parseExperimentsResponse(response))
+                    .then((response) => {
+                        this._experimentCallLatencyEnd = Date.now();
+                        return this.parseExperimentsResponse(response);
+                    })
                     .then((parsedResponse) => this.loadCampaignExperiments(campaign, parsedResponse))
                     .then(() => Promise.resolve())
                     .catch((err) => {
