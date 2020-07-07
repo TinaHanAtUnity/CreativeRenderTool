@@ -201,7 +201,7 @@ export class CustomFeatures {
     }
 
     private static isMoatVendor(vendorKey: string | undefined): boolean {
-        return vendorKey ? vendorKey.includes('z.moatads.com') : false;
+        return vendorKey ? vendorKey.includes('moat.com') : false;
     }
 
     public static isWhitelistedOMVendor(omVendor: string | undefined) {
