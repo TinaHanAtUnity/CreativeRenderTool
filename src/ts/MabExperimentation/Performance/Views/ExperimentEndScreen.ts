@@ -241,6 +241,9 @@ export class ExperimentEndScreen extends PerformanceEndScreen {
     private onClickCollection(event: Event): void {
         event.preventDefault();
 
+        if (this._clickHeatMapData.length >= 5) {
+            this._clickHeatMapData.shift();
+        }
         this._clickHeatMapData.push({
             x: (<MouseEvent>event).pageX,
             y: (<MouseEvent>event).pageY,
