@@ -2,6 +2,7 @@ import { Ads } from 'Ads/Ads';
 import { Platform } from 'Core/Constants/Platform';
 import { UnityAdsError } from 'Core/Constants/UnityAdsError';
 import { ConfigError } from 'Core/Errors/ConfigError';
+import { InitializationError } from 'Core/Errors/InitializationError';
 import { ICore, ICoreApi } from 'Core/ICore';
 import { CacheBookkeepingManager } from 'Core/Managers/CacheBookkeepingManager';
 import { CacheManager } from 'Core/Managers/CacheManager';
@@ -131,9 +132,7 @@ export class Core implements ICore {
             this.ClientInfo = new ClientInfo(data);
 
             if (!/^\d+$/.test(this.ClientInfo.getGameId())) {
-                const error = new Error(`Unity Ads SDK fail to initialize due to provided Game ID '${this.ClientInfo.getGameId()}' is invalid. Game ID may contain only digits (0-9).`);
-                error.name = 'InvalidArgument';
-                return Promise.reject(error);
+                return Promise.reject(new InitializationError(InitErrorCode.InvalidArgument, `Unity Ads SDK fail to initialize due to provided Game ID '${this.ClientInfo.getGameId() }' is invalid. Game ID may contain only digits (0-9).`));
             }
 
             if (this.NativeBridge.getPlatform() === Platform.ANDROID) {
@@ -252,9 +251,7 @@ export class Core implements ICore {
             this.JaegerManager.setJaegerTracingEnabled(this.Config.isJaegerTracingEnabled());
 
             if (!this.Config.isEnabled()) {
-                const error = new Error('Unity Ads SDK fail to initialize due to game with ID ' + this.ClientInfo.getGameId() + ' is not enabled');
-                error.name = 'DisabledGame';
-                throw error;
+                throw new InitializationError(InitErrorCode.GameIdDisabled, 'Unity Ads SDK fail to initialize due to game with ID ' + this.ClientInfo.getGameId() + ' is not enabled');
             }
 
             return configJson;
@@ -265,30 +262,29 @@ export class Core implements ICore {
                 SDKMetrics.sendBatchedEvents();
                 IsMadeWithUnity.sendIsMadeWithUnity(this.Api.Storage, this.SdkDetectionInfo);
             });
-        }).catch((error: { message: string; name: unknown }) => {
-            let errorMessage = 'Unity Ads SDK fail to initialize due to internal error';
-            let errorCode: InitErrorCode = InitErrorCode.Unknown;
-
-            if (error instanceof Error && error.name === 'DisabledGame') {
-                errorMessage = error.message;
-                errorCode = InitErrorCode.GameIdDisabled;
-            }
-
-            if (error instanceof Error && error.name === 'InvalidArgument') {
-                errorMessage = error.message;
-                errorCode = InitErrorCode.InvalidArgument;
-            }
-
-            if (error instanceof ConfigError) {
-                errorMessage = 'Unity Ads SDK fail to initialize due to configuration error';
-                errorCode = InitErrorCode.ConfigurationError;
-            }
-
-            this.Api.Sdk.initError(errorMessage, errorCode);
-            this.Api.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.INITIALIZE_FAILED], errorMessage);
-            this.Api.Sdk.logError(`Initialization error: ${error.message}`);
-            SDKMetrics.reportMetricEvent(InitializationFailureMetric.InitializeFailed);
+        }).catch((error: unknown) => {
+            this.handleInitializationError(error);
         });
+    }
+
+    private handleInitializationError(err: unknown) {
+        let message: string = 'Unity Ads SDK fail to initialize due to internal error';
+        let errorCode: InitErrorCode = InitErrorCode.Unknown;
+
+        if (err instanceof InitializationError) {
+            errorCode = err.errorCode;
+            message = err.message;
+        }
+
+        if (err instanceof ConfigError) {
+            errorCode = InitErrorCode.ConfigurationError;
+            message = 'Unity Ads SDK fail to initialize due to configuration error';
+        }
+
+        this.Api.Sdk.initError(message, errorCode);
+        this.Api.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.INITIALIZE_FAILED], message);
+        this.Api.Sdk.logError(`Initialization error: ${message}`);
+        SDKMetrics.reportMetricEventWithTags(InitializationFailureMetric.InitializeFailed, { 'rsn': InitErrorCode[errorCode] });
     }
 
     private setupTestEnvironment(): Promise<void> {
