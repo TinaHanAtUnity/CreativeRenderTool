@@ -25,6 +25,7 @@ import { ARUtil } from 'AR/Utilities/ARUtil';
 import { IAutomatedExperimentResponse } from 'MabExperimentation/Models/AutomatedExperimentResponse';
 import { OptimizedCampaign } from 'MabExperimentation/Models/OptimizedCampaign';
 import { CategorizedExperimentStage, CategorizedExperiment } from 'MabExperimentation/Models/CategorizedExperiment';
+import { IClickHeatMapEntry } from 'MabExperimentation/Performance/Views/ExperimentEndScreen';
 
 export type ContextualFeature = string | number | boolean | null | undefined | BatteryStatus | RingerMode | Platform | string[] | { [key: string]: string } | { [key: string]: number } | number[] | string[];
 
@@ -34,13 +35,6 @@ export type ContextualFeature = string | number | boolean | null | undefined | B
 class AutomatedExperimentFilter {
     public Category: string;
     public CampaignType: string;
-}
-
-export interface IClickHeatMapEntry {
-    target: string;
-    normalizedX: number;
-    normalizedY: number;
-    isPortrait: boolean;
 }
 
 // How to usage, call in order:

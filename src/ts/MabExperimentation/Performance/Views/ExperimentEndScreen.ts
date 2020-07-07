@@ -12,6 +12,13 @@ import { ColorTheme } from 'Core/Utilities/ColorTheme';
 import { ColorUtils } from 'MabExperimentation/Utilities/ColorUtils';
 import { AutomatedExperimentManager } from 'MabExperimentation/AutomatedExperimentManager';
 
+export interface IClickHeatMapEntry {
+    target: string;
+    normalizedX: number;
+    normalizedY: number;
+    isPortrait: boolean;
+}
+
 export class ExperimentEndScreen extends PerformanceEndScreen {
     private _animation: string;
     private _downloadButtonColor: string;
@@ -20,6 +27,7 @@ export class ExperimentEndScreen extends PerformanceEndScreen {
     private _formattedCtaAlternativeText: string;
     private _language: string;
     private _automatedExperimentManager: AutomatedExperimentManager;
+    private _clickHeatMapData: IClickHeatMapEntry[] = [];
 
     constructor(combination: IExperimentActionChoice | undefined, parameters: IEndScreenParameters, campaign: PerformanceCampaign, automatedExperimentManager: AutomatedExperimentManager, country?: string) {
         super(parameters, campaign, country);
@@ -207,6 +215,18 @@ export class ExperimentEndScreen extends PerformanceEndScreen {
         }
     }
 
+    protected onDownloadEvent(event: Event): void {
+        this.onClickCollection(event);
+        this.sendHeatMapDataToAEM(this._clickHeatMapData);
+        super.onDownloadEvent(event);
+    }
+
+    protected onCloseEvent(event: Event): void {
+        this.onClickCollection(event);
+        this.sendHeatMapDataToAEM(this._clickHeatMapData);
+        super.onCloseEvent(event);
+    }
+
     protected getTemplate() {
         if (this.getEndscreenAlt() === SQUARE_END_SCREEN) {
             return ExperimentSquareEndScreenTemplate;
@@ -230,15 +250,19 @@ export class ExperimentEndScreen extends PerformanceEndScreen {
     private onClickCollection(event: Event): void {
         event.preventDefault();
 
-        if (this._automatedExperimentManager._clickHeatMapData.length >= 5) {
-            this._automatedExperimentManager._clickHeatMapData.shift();
+        if (this._clickHeatMapData.length >= 5) {
+            this._clickHeatMapData.shift();
         }
 
-        this._automatedExperimentManager._clickHeatMapData.push({
+        this._clickHeatMapData.push({
             target: (<HTMLElement>(<MouseEvent>event).target).className,
             normalizedX: (<MouseEvent>event).pageX / window.innerWidth,
             normalizedY: (<MouseEvent>event).pageY / window.innerHeight,
             isPortrait: window.innerHeight > window.innerWidth ? true : false
         });
+    }
+
+    private sendHeatMapDataToAEM(clickHeatMapData: IClickHeatMapEntry[]) {
+        this._automatedExperimentManager._clickHeatMapData = clickHeatMapData;
     }
 }
