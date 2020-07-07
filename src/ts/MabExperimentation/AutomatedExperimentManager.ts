@@ -497,11 +497,11 @@ export class AutomatedExperimentManager {
             }).then((features) => {
                 const body = this.createRequestBody(campaign, categories, features);
                 const url = AutomatedExperimentManager.BaseUrl + AutomatedExperimentManager.CreateEndPoint;
-                this._experimentCallLatencyStart = Date.now();
+                this._experimentCallLatencyStart = performance.now();
 
                 return this._requestManager.post(url, body)
                     .then((response) => {
-                        this._experimentCallLatencyEnd = Date.now();
+                        this._experimentCallLatencyEnd = performance.now();
                         return this.parseExperimentsResponse(response);
                     })
                     .then((parsedResponse) => this.loadCampaignExperiments(campaign, parsedResponse))
