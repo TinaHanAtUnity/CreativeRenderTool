@@ -52,6 +52,7 @@ export class PerformanceAdUnitWithAutomatedExperimentParametersFactory extends P
                 endScreenCombination,
                 endScreenParameters,
                 baseParams.campaign,
+                this._automatedExperimentManager,
                 baseParams.coreConfig.getCountry()
             );
         }

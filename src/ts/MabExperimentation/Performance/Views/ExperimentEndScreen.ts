@@ -10,13 +10,7 @@ import { Color } from 'Core/Utilities/Color';
 import { IColorTheme } from 'Performance/Utilities/Swatch';
 import { ColorTheme } from 'Core/Utilities/ColorTheme';
 import { ColorUtils } from 'MabExperimentation/Utilities/ColorUtils';
-
-export interface IClickHeatMapEntry {
-    target: string;
-    normalizedX: number;
-    normalizedY: number;
-    orientation: string;
-}
+import { AutomatedExperimentManager } from 'MabExperimentation/AutomatedExperimentManager';
 
 export class ExperimentEndScreen extends PerformanceEndScreen {
     private _animation: string;
@@ -25,16 +19,15 @@ export class ExperimentEndScreen extends PerformanceEndScreen {
     private _tintColor: boolean;
     private _formattedCtaAlternativeText: string;
     private _language: string;
-    private _clickHeatMapData: IClickHeatMapEntry[];
+    private _automatedExperimentManager: AutomatedExperimentManager;
 
-    constructor(combination: IExperimentActionChoice | undefined, parameters: IEndScreenParameters, campaign: PerformanceCampaign, country?: string) {
+    constructor(combination: IExperimentActionChoice | undefined, parameters: IEndScreenParameters, campaign: PerformanceCampaign, automatedExperimentManager: AutomatedExperimentManager, country?: string) {
         super(parameters, campaign, country);
-
         combination = this.fixupExperimentChoices(combination);
 
         this.fixupScheme(combination);
         this.fixupCtaText(combination.cta_text);
-        this._clickHeatMapData = [];
+        this._automatedExperimentManager = automatedExperimentManager;
 
         // combination.animation will be defined at this point
         this._animation = combination.animation!;
@@ -237,14 +230,15 @@ export class ExperimentEndScreen extends PerformanceEndScreen {
     private onClickCollection(event: Event): void {
         event.preventDefault();
 
-        if (this._clickHeatMapData.length >= 5) {
-            this._clickHeatMapData.shift();
+        if (this._automatedExperimentManager._clickHeatMapData.length >= 5) {
+            this._automatedExperimentManager._clickHeatMapData.shift();
         }
-        this._clickHeatMapData.push({
+
+        this._automatedExperimentManager._clickHeatMapData.push({
             target: (<HTMLElement>(<MouseEvent>event).target).className,
             normalizedX: (<MouseEvent>event).pageX / window.innerWidth,
             normalizedY: (<MouseEvent>event).pageY / window.innerHeight,
-            orientation: window.innerHeight > window.innerWidth ? 'portrait' : 'landscape',
+            isPortrait: window.innerHeight > window.innerWidth ? true : false
         });
     }
 }

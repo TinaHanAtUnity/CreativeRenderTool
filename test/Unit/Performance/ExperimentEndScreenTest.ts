@@ -16,6 +16,7 @@ import { ExperimentEndScreen } from 'MabExperimentation/Performance/Views/Experi
 import { EndScreenExperimentDeclaration } from 'MabExperimentation/Models/AutomatedExperimentsList';
 import { SDKMetrics } from 'Ads/Utilities/SDKMetrics';
 import { ColorUtils } from 'MabExperimentation/Utilities/ColorUtils';
+import { AutomatedExperimentManager } from 'MabExperimentation/AutomatedExperimentManager';
 
 describe('ExperimentEndScreenTest', () => {
     let platform: Platform;
@@ -63,7 +64,7 @@ describe('ExperimentEndScreenTest', () => {
             animation: EndScreenExperimentDeclaration.animation.BOUNCING,
             cta_text: ctaText
         };
-        return new ExperimentEndScreen(experimentDescription, params, campaign);
+        return new ExperimentEndScreen(experimentDescription, params, campaign, new AutomatedExperimentManager());
     };
 
     it('should render with translations', () => {

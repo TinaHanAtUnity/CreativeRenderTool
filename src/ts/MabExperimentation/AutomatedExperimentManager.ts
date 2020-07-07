@@ -36,6 +36,13 @@ class AutomatedExperimentFilter {
     public CampaignType: string;
 }
 
+export interface IClickHeatMapEntry {
+    target: string;
+    normalizedX: number;
+    normalizedY: number;
+    isPortrait: boolean;
+}
+
 // How to usage, call in order:
 //  1. initialize()                             // Done by Ads
 //  2. registerExperimentCategory()             // for each category of interest
@@ -71,6 +78,7 @@ export class AutomatedExperimentManager {
     private _campaign: OptimizedCampaign;
     private _staticFeaturesPromise: Promise<{ [key: string]: ContextualFeature }>;
     private _campaignSource: Observable3<string, Campaign, ICampaignTrackingUrls | undefined>;
+    public _clickHeatMapData: IClickHeatMapEntry[] = [];
 
     public static setForcedARMRAID(value: boolean) {
         this._forcedARMRAID = value;
@@ -198,7 +206,8 @@ export class AutomatedExperimentManager {
                 gamer_token: this._gamerToken
             },
             reward: categorizedExp.Outcome,
-            experiments: experiments
+            experiments: experiments,
+            heatmap_data: this._clickHeatMapData
         };
 
         const url = AutomatedExperimentManager.BaseUrl + AutomatedExperimentManager.RewardEndPoint;
