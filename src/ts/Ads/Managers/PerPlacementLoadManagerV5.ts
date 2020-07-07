@@ -18,13 +18,12 @@ export class PerPlacementLoadManagerV5 extends PerPlacementLoadManager {
     protected _adRequestManager: AdRequestManager;
 
     private _shouldRefresh: boolean = true;
-    private _useAdUnits: boolean;
+    protected _lastShownCampaignId: string | undefined;
 
-    constructor(ads: IAdsApi, adsConfig: AdsConfiguration, coreConfig: CoreConfiguration, adRequestManager: AdRequestManager, clientInfo: ClientInfo, focusManager: FocusManager, useAdUnits: boolean) {
-        super(ads, adsConfig, coreConfig, useAdUnits ? new AdUnitAwareAdRequestManager(adRequestManager) : adRequestManager, clientInfo, focusManager);
+    constructor(ads: IAdsApi, adsConfig: AdsConfiguration, coreConfig: CoreConfiguration, adRequestManager: AdRequestManager, clientInfo: ClientInfo, focusManager: FocusManager, useGroupIds: boolean) {
+        super(ads, adsConfig, coreConfig, useGroupIds ? new AdUnitAwareAdRequestManager(adRequestManager) : adRequestManager, clientInfo, focusManager);
 
         this._adRequestManager = adRequestManager;
-        this._useAdUnits = useAdUnits;
 
         this._adRequestManager.onCampaign.subscribe((placementId, campaign, trackingUrls) => this.onCampaign(placementId, campaign, trackingUrls));
         this._adRequestManager.onNoFill.subscribe((placementId) => this.onNoFill(placementId));
@@ -32,6 +31,11 @@ export class PerPlacementLoadManagerV5 extends PerPlacementLoadManager {
 
     public setCurrentAdUnit(adUnit: AbstractAdUnit, placement: Placement): void {
         this._shouldRefresh = true;
+
+        const campaign = placement.getCurrentCampaign();
+        if (campaign) {
+            this._lastShownCampaignId = campaign.getUniqueId();
+        }
 
         Observables.once(adUnit.onStartProcessed, () => {
             // Aids in supplying comet a suitable amount of time to process start event
@@ -159,22 +163,27 @@ export class PerPlacementLoadManagerV5 extends PerPlacementLoadManager {
             placement.setInvalidationPending(false);
 
             let shouldInvalidate = true;
-            if (!this._useAdUnits) {
+
                 // Invalidate only Direct Demand campaigns, we would like to show old programmatic campaign.
-                const campaign = placement.getCurrentCampaign();
-                if (campaign) {
-                    const contentType = campaign.getContentType();
-                    switch (contentType) {
-                        case PerformanceAdUnitFactory.ContentType:
-                        case PerformanceAdUnitFactory.ContentTypeMRAID:
-                        case PerformanceAdUnitFactory.ContentTypeVideo:
-                            shouldInvalidate = true;
-                            break;
-                        default:
-                            shouldInvalidate = false;
-                    }
+            const campaign = placement.getCurrentCampaign();
+            if (campaign) {
+                const contentType = campaign.getContentType();
+                switch (contentType) {
+                    case PerformanceAdUnitFactory.ContentType:
+                    case PerformanceAdUnitFactory.ContentTypeMRAID:
+                    case PerformanceAdUnitFactory.ContentTypeVideo:
+                        shouldInvalidate = true;
+                        break;
+                    default:
+                        shouldInvalidate = false;
+                }
+
+                if (!shouldInvalidate && this._lastShownCampaignId && campaign.getUniqueId() === this._lastShownCampaignId) {
+                    this._adRequestManager.reportMetricEvent(LoadV5.RefreshManagerForcedToInvalidate);
+                    shouldInvalidate = true;
                 }
             }
+
             if (shouldInvalidate) {
                 this._adRequestManager.reportMetricEvent(LoadV5.RefreshManagerCampaignFailedToInvalidate);
                 placement.setCurrentCampaign(undefined);

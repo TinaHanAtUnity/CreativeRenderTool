@@ -17,7 +17,7 @@ import { PrivacySDKMock, PrivacySDK } from 'Privacy/__mocks__/PrivacySDK';
 import { UserPrivacyManagerMock, UserPrivacyManager } from 'Ads/Managers/__mocks__/UserPrivacyManager';
 import { GameSessionCounters } from 'Ads/Utilities/GameSessionCounters';
 import { ILoadedCampaign } from 'Ads/Managers/CampaignManager';
-import { Placement, PlacementMock, withAdUnit } from 'Ads/Models/__mocks__/Placement';
+import { Placement, PlacementMock, withGroupId } from 'Ads/Models/__mocks__/Placement';
 import { CometCampaignParser } from 'Performance/Parsers/CometCampaignParser';
 import { INativeResponse } from 'Core/Managers/RequestManager';
 import { Campaign, ICampaignTrackingUrls } from 'Ads/Models/Campaign';
@@ -138,10 +138,10 @@ class SatisfiesMatcher {
                     preloadData: {}
                 }), [], {
                     followRedirects: false,
-                    retries: 1,
+                    retries: 3,
                     retryDelay: 0,
                     retryWithConnectionEvents: false,
-                    timeout: 10000
+                    timeout: 5000
                 });
             });
 
@@ -412,10 +412,10 @@ class SatisfiesMatcher {
                     }
                 }), [], {
                     followRedirects: false,
-                    retries: 0,
+                    retries: 3,
                     retryDelay: 0,
                     retryWithConnectionEvents: false,
-                    timeout: 10000
+                    timeout: 5000
                 });
                 expect(request.post).toHaveBeenNthCalledWith(3, expect.anything(), new SatisfiesMatcher({
                     preload: false,
@@ -437,10 +437,10 @@ class SatisfiesMatcher {
                     }
                 }), [], {
                     followRedirects: false,
-                    retries: 0,
+                    retries: 3,
                     retryDelay: 0,
                     retryWithConnectionEvents: false,
-                    timeout: 10000
+                    timeout: 5000
                 });
             });
         });
@@ -463,14 +463,14 @@ class SatisfiesMatcher {
                 });
 
                 const placements: { [key: string]: PlacementMock } = {
-                    'video': withAdUnit(Placement('video'), 'test_ad_unit'),
-                    'rewardedVideo': withAdUnit(Placement('rewardedVideo'), 'test_ad_unit'),
-                    'video2': withAdUnit(Placement('video2'), 'test_ad_unit'),
-                    'video3': withAdUnit(Placement('video3'), 'test_ad_unit')
+                    'video': withGroupId(Placement('video'), 'test_group_id'),
+                    'rewardedVideo': withGroupId(Placement('rewardedVideo'), 'test_group_id'),
+                    'video2': withGroupId(Placement('video2'), 'test_group_id'),
+                    'video3': withGroupId(Placement('video3'), 'test_group_id')
                 };
 
                 adsConfig.getPlacement.mockImplementation((x) => placements[x]);
-                adsConfig.getPlacementsForAdunit.mockReturnValueOnce([placements.video.getId(), placements.rewardedVideo.getId(), placements.video2.getId(), placements.video3.getId()]);
+                adsConfig.getPlacementsForGroupId.mockReturnValueOnce([placements.video.getId(), placements.rewardedVideo.getId(), placements.video2.getId(), placements.video3.getId()]);
 
                 contentTypeHandlerManager.getParser.mockReturnValue(new CometCampaignParser(core));
 
@@ -481,8 +481,8 @@ class SatisfiesMatcher {
                 loadedCampaign = await adRequestManager.loadCampaignWithAdditionalPlacement(placements.video);
             });
 
-            it('should getPlacementsForAdunit be called with correct ad unit id', () => {
-                expect(adsConfig.getPlacementsForAdunit).toBeCalledWith('test_ad_unit');
+            it('should getPlacementsForGroupId be called with correct ad unit id', () => {
+                expect(adsConfig.getPlacementsForGroupId).toBeCalledWith('test_group_id');
             });
 
             it('should send fill metric', () => {
@@ -547,10 +547,10 @@ class SatisfiesMatcher {
                     }
                 }), [], {
                     followRedirects: false,
-                    retries: 0,
+                    retries: 3,
                     retryDelay: 0,
                     retryWithConnectionEvents: false,
-                    timeout: 10000
+                    timeout: 5000
                 });
             });
 
@@ -566,9 +566,9 @@ class SatisfiesMatcher {
             });
 
             it('should return correct ad unit id in onAdditionalPlacementsReady', () => {
-                const adUnitId: string = <string>onAdditionalPlacementsReady.mock.calls[0][0];
+                const groupId: string = <string>onAdditionalPlacementsReady.mock.calls[0][0];
 
-                expect(adUnitId).toEqual('test_ad_unit');
+                expect(groupId).toEqual('test_group_id');
             });
 
             it('should get correct campaign for rewardedVideo', () => {
@@ -711,10 +711,10 @@ class SatisfiesMatcher {
                     }
                 }), [], {
                     followRedirects: false,
-                    retries: 0,
+                    retries: 3,
                     retryDelay: 0,
                     retryWithConnectionEvents: false,
-                    timeout: 10000
+                    timeout: 5000
                 });
             });
         });
@@ -807,10 +807,10 @@ class SatisfiesMatcher {
                     }
                 }), [], {
                     followRedirects: false,
-                    retries: 0,
+                    retries: 3,
                     retryDelay: 0,
                     retryWithConnectionEvents: false,
-                    timeout: 10000
+                    timeout: 5000
                 });
             });
         });
@@ -1333,9 +1333,9 @@ class SatisfiesMatcher {
                 }), [], {
                     followRedirects: false,
                     retries: 3,
-                    retryDelay: 1000,
+                    retryDelay: 0,
                     retryWithConnectionEvents: false,
-                    timeout: 20000
+                    timeout: 5000
                 });
             });
         });
@@ -1453,10 +1453,10 @@ class SatisfiesMatcher {
                     }
                 }), [], {
                     followRedirects: false,
-                    retries: 0,
+                    retries: 3,
                     retryDelay: 0,
                     retryWithConnectionEvents: false,
-                    timeout: 10000
+                    timeout: 5000
                 });
             });
 

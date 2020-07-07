@@ -98,13 +98,14 @@ export class LegacyCampaignManager extends CampaignManager {
         this._privacy = privacySDK;
         this._userPrivacyManager = userPrivacyManager;
         this._mediationLoadTracking = mediationLoadTracking;
-        this._useChinaAuctionEndpoint = (CustomFeatures.sampleAtGivenPercent(20) && coreConfig.getCountry() === 'CN');
+        this._useChinaAuctionEndpoint = (CustomFeatures.sampleAtGivenPercent(25) && coreConfig.getCountry() === 'CN');
         this._loadV5Support = loadV5Support;
     }
 
     public request(nofillRetry?: boolean): Promise<INativeResponse | void> {
         const requestStartTime = this.getTime();
         let measurement: IStopwatch;
+        let chinaMeasurement: IStopwatch;
         this._isLoadEnabled = false;
         // prevent having more then one ad request in flight
         if (this._requesting) {
@@ -147,24 +148,17 @@ export class LegacyCampaignManager extends CampaignManager {
         }).then(([requestUrl, requestBody]) => {
             this._core.Sdk.logInfo('Requesting ad plan from ' + requestUrl);
 
-            if (this._useChinaAuctionEndpoint) {
-                SDKMetrics.reportMetricEvent(ChinaAucionEndpoint.AuctionRequest);
+            if (this._coreConfig.getCountry() === 'CN') {
+                SDKMetrics.reportMetricEventWithTags(ChinaAucionEndpoint.AuctionRequest, {
+                    'uce': `${this._useChinaAuctionEndpoint}`
+                });
+                chinaMeasurement = createStopwatch();
+                chinaMeasurement.start();
             }
 
             measurement = createStopwatch();
             measurement.start();
-            if (this._mediationLoadTracking && this._mediationLoadTracking.getCurrentExperiment() === MediationExperimentType.AuctionXHR) {
-                return XHRequest.post(requestUrl, JSON.stringify(requestBody)).then((resp: string) => {
-                    return {
-                        url: requestUrl,
-                        response: resp,
-                        responseCode: 200,
-                        headers: []
-                    };
-                });
-            } else {
-                return CampaignManager.onlyRequest(this._request, requestUrl, requestBody);
-            }
+            return CampaignManager.onlyRequest(this._request, requestUrl, requestBody);
         }).catch((error: unknown) => {
             let reason: string = 'unknown';
             if (error instanceof RequestError) {
@@ -194,8 +188,10 @@ export class LegacyCampaignManager extends CampaignManager {
                 'stg': 'auction_response'
             });
 
-            if (this._useChinaAuctionEndpoint) {
-                SDKMetrics.reportMetricEvent(ChinaAucionEndpoint.AuctionResponse);
+            if (this._coreConfig.getCountry() === 'CN') {
+                chinaMeasurement.stopAndSend(ChinaAucionEndpoint.AuctionResponse, {
+                    'uce': `${this._useChinaAuctionEndpoint}`
+                });
             }
 
             const cachingTime = this.getTime();
@@ -284,10 +280,6 @@ export class LegacyCampaignManager extends CampaignManager {
             const body = JSON.stringify(requestBody);
             SDKMetrics.reportMetricEvent(LoadMetric.LoadEnabledAuctionRequest);
 
-            if (this._useChinaAuctionEndpoint) {
-                SDKMetrics.reportMetricEvent(ChinaAucionEndpoint.AuctionRequest);
-            }
-
             return Promise.resolve().then(() => {
                 return this._request.post(requestUrl, body, [], {
                     retries: 0,
@@ -324,9 +316,6 @@ export class LegacyCampaignManager extends CampaignManager {
                     this._mediationLoadTracking.reportAuctionRequest(this.getTime() - requestStartTime, true);
                 }
 
-                if (this._useChinaAuctionEndpoint) {
-                    SDKMetrics.reportMetricEvent(ChinaAucionEndpoint.AuctionResponse);
-                }
                 return this.parseLoadedCampaign(response, placement, countersForOperativeEvents, this._deviceFreeSpace, requestPrivacy, legacyRequestPrivacy);
             }).then((loadedCampaign) => {
                 if (loadedCampaign) {

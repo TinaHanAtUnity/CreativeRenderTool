@@ -82,7 +82,8 @@ export enum MiscellaneousMetric {
     XHRNotAvailable = 'xhr_not_available',
     AuctionRequestFailed = 'auction_request_failed',
     AuctionRequestOk = 'auction_request_ok',
-    AuctionRequestCreated = 'auction_request_created'
+    AuctionRequestCreated = 'auction_request_created',
+    GAIDInvestigation = 'gaid_investigation'
 }
 
 export enum LoadMetric {
@@ -149,7 +150,9 @@ export enum AUIMetric {
     UnknownExperimentName = 'unknown_experiment_name',
     InvalidVideoOverlayMode = 'invalid_video_overlay_mode',
     UnknownCategoryProvided = 'unknown_automated_experiment_category_provided',
-    InvalidImageAssets = 'invalid_image_assets'
+    InvalidImageAssets = 'invalid_image_assets',
+    InvalidCtaText = 'invalid_cta_text',
+    InvalidSchemeAndColorCoordination = 'invalid_scheme_and_color_coordination'
 }
 
 export enum ExternalEndScreenMetric {
@@ -205,7 +208,8 @@ export enum LoadV5 {
     RefreshManagerCampaignExpired = 'v5_refresh_manager_campaign_expired',
     RefreshManagerCampaignFailedToInvalidate = 'v5_refresh_manager_campaign_failed_to_be_invalidate',
     Show = 'v5_show',
-    PlacementInvalidationPending = 'placement_invalidation_pending'
+    PlacementInvalidationPending = 'placement_invalidation_pending',
+    RefreshManagerForcedToInvalidate = 'v5_refresh_manager_forced_to_invalidate'
 }
 
 export enum AuctionV6 {
@@ -225,7 +229,7 @@ export enum InitializationFailureMetric {
     InitializeFailed = 'webview_fail_to_initialize'
 }
 
-export type TimingEvent = InitializationMetric | MediationMetric | GeneralTimingMetric;
+export type TimingEvent = InitializationMetric | MediationMetric | GeneralTimingMetric | ChinaAucionEndpoint;
 
 export type PTSEvent = VideoMetric | TimingEvent | AuctionV6 | AdmobMetric | BannerMetric | CachingMetric | ChinaMetric | VastMetric | MraidMetric | MiscellaneousMetric | LoadMetric | ErrorMetric | OMMetric | AUIMetric | LoadV5 | ChinaAucionEndpoint | ExternalEndScreenMetric | InitializationFailureMetric;
 

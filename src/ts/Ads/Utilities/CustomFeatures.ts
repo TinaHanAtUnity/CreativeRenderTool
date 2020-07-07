@@ -102,7 +102,7 @@ export class CustomFeatures {
     }
 
     public static gameSpawnsNewViewControllerOnFinish(gameId: string): boolean {
-        return this.existsInList(LionStudiosGamesJson, gameId);
+        return this.existsInList(LionStudiosGamesJson, gameId) || gameId === '1195277';
     }
 
     /**
@@ -114,12 +114,12 @@ export class CustomFeatures {
         return this.existsInList(wordsWithFriends, gameId) || this.existsInList(zyngaSolitaire, gameId);
     }
 
-    public static isMopubTestGameForLoad(gameId: string): boolean {
-        if (gameId === '1926039' || gameId === '1732577' || gameId === '3206806' || gameId === '2788221') {
-            return true;
-        } else {
-            return false;
-        }
+    public static isExternalMopubTestGameForLoad(gameId: string): boolean {
+        return gameId === '2788221';
+    }
+
+    public static isPSPTestAppGame(gameId: string): boolean {
+        return gameId === '1926039' || gameId === '1732577' || gameId === '3206806';
     }
 
     public static isCheetahTestGameForLoad(gameId: string): boolean {
@@ -153,15 +153,9 @@ export class CustomFeatures {
             '1662635', '3320399'
         ];
 
-        return this.existsInList(gameIds, gameId) || CustomFeatures.isZyngaDealGame(gameId);
-    }
-
-    public static useAdUnitSupport(gameId: string): boolean {
-        const gameIds = [
-            '3578767', '3578766', '3486365', '3486364', '3211592', '3079031', '1566453', '1434564'
-        ];
-
-        return this.existsInList(gameIds, gameId);
+        return this.existsInList(gameIds, gameId) || CustomFeatures.isZyngaDealGame(gameId)
+            || this.isExternalMopubTestGameForLoad(gameId) || this.isFanateeExtermaxGameForLoad(gameId)
+            || this.isCheetahTestGameForLoad(gameId);
     }
 
     public static shouldDisableBannerRefresh(gameId: string): boolean {
@@ -206,10 +200,15 @@ export class CustomFeatures {
         return vendorKey ? vendorKey.startsWith('doubleclickbygoogle.com') : false;
     }
 
+    private static isMoatVendor(vendorKey: string | undefined): boolean {
+        return vendorKey ? vendorKey.includes('z.moatads.com') : false;
+    }
+
     public static isWhitelistedOMVendor(omVendor: string | undefined) {
         return this.isIASVendor(omVendor) ||
                this.isDoubleClickGoogle(omVendor) ||
-               omVendor === 'doubleverify.com-omid';
+               omVendor === 'doubleverify.com-omid' ||
+               this.isMoatVendor(omVendor);
     }
 
     // Enables experimental PausableListenerApi, which allows pausing and resuming events.
@@ -230,7 +229,8 @@ export class CustomFeatures {
         const skipCheckGameIds = [
             '3254219', // Blowfire
             '3262346',
-            '1636888'
+            '1636888',
+            '3268075'
         ];
         // return true if not in list.
         return !this.existsInList(skipCheckGameIds, gameId);

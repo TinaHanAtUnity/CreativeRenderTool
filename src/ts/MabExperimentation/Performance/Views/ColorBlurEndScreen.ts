@@ -5,21 +5,62 @@ import EndScreenColorBlur from 'html/mabexperimentation/EndScreenColorBlur.html'
 import { AUIMetric, SDKMetrics } from 'Ads/Utilities/SDKMetrics';
 import { ColorTheme } from 'Core/Utilities/ColorTheme';
 import { IColorTheme } from 'Performance/Utilities/Swatch';
+import { IExperimentActionChoice } from 'MabExperimentation/Models/AutomatedExperiment';
+import { EndScreenExperiment, EndScreenExperimentDeclaration } from 'MabExperimentation/Models/AutomatedExperimentsList';
 
 export class ColorBlurEndScreen extends PerformanceEndScreen {
-    constructor(parameters: IEndScreenParameters, campaign: PerformanceCampaign, country?: string) {
+    private _ctaText: string;
+    private _formattedCtaAlternativeText: string;
+    private _language: string;
+
+    constructor(combination: IExperimentActionChoice | undefined, parameters: IEndScreenParameters, campaign: PerformanceCampaign, country?: string) {
         super(parameters, campaign, country);
 
         const simpleRating = campaign.getRating().toFixed(1);
+
+        combination = this.fixupExperimentChoices(combination);
+
+        switch (combination.cta_text) {
+            case EndScreenExperimentDeclaration.cta_text.DOWNLOAD_FOR_FREE:
+                this._formattedCtaAlternativeText = 'Download For Free';
+                break;
+            case EndScreenExperimentDeclaration.cta_text.INSTALL_NOW:
+                this._formattedCtaAlternativeText = 'Install Now';
+                break;
+            default:
+                SDKMetrics.reportMetricEvent(AUIMetric.InvalidCtaText);
+                this._formattedCtaAlternativeText = 'Install Now';
+        }
+
+        // combination.cta_text will be defined at this point, due to a check in `this.fixupExperimentChoices`
+        this._ctaText = combination.cta_text!;
+
+        this._language = parameters.language;
         this._templateData = {
             ...this._templateData,
-            simpleRating: simpleRating
+            simpleRating: simpleRating,
+            ctaAlternativeText: this._formattedCtaAlternativeText,
+            isEnglish: this._language.indexOf('en') !== -1
         };
         this._bindings.splice(0, 1, {
             event: 'click',
             listener: (event: Event) => this.onDownloadEvent(event),
             selector: '.end-screen-image, .install-container, .game-info-container'
         });
+    }
+
+    private fixupExperimentChoices(actions: IExperimentActionChoice | undefined): IExperimentActionChoice {
+        if (actions === undefined) {
+            return EndScreenExperiment.getDefaultActions();
+        }
+
+        // the color blur scheme always needs a defined CTA text
+        if (actions.cta_text === undefined) {
+            SDKMetrics.reportMetricEvent(AUIMetric.InvalidCtaText);
+            return EndScreenExperiment.getDefaultActions();
+        }
+
+        return actions;
     }
 
     public render(): void {
@@ -32,6 +73,13 @@ export class ColorBlurEndScreen extends PerformanceEndScreen {
             .catch((error) => {
                 SDKMetrics.reportMetricEvent(error.tag);
             });
+
+        if (this._ctaText === EndScreenExperimentDeclaration.cta_text.DOWNLOAD_FOR_FREE) {
+            const installContainer: HTMLElement | null = this._container.querySelector('.install-container');
+            if (installContainer) {
+                installContainer.classList.add('cta-alt-text');
+            }
+        }
     }
 
     private applyColorTheme(baseColorTheme: IColorTheme): void {

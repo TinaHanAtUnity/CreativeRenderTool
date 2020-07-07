@@ -11,7 +11,6 @@ import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 import { IAds } from 'Ads/IAds';
 import { ICore } from 'Core/ICore';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
-import { HtmlEndcardTest } from 'Core/Models/ABGroup';
 
 export class VastAdUnitParametersFactory extends AbstractAdUnitParametersFactory<VastCampaign, IVastAdUnitParameters> {
     private readonly _webPlayerContainer: WebPlayerContainer;
@@ -36,7 +35,7 @@ export class VastAdUnitParametersFactory extends AbstractAdUnitParametersFactory
             overlay: overlay
         };
 
-        if (baseParams.campaign.hasHtmlEndscreen() && HtmlEndcardTest.isValid(baseParams.coreConfig.getAbGroup())) {
+        if (baseParams.campaign.hasHtmlEndscreen()) {
             vastAdUnitParameters.endScreen = new VastHTMLEndScreen(baseParams, this._webPlayerContainer);
         } else if (baseParams.campaign.hasStaticEndscreen()) {
             vastAdUnitParameters.endScreen = new VastStaticEndScreen(baseParams, attachTapForTencentVast ? true : undefined);

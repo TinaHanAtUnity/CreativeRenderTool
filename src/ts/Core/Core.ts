@@ -13,7 +13,7 @@ import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { ResolveManager } from 'Core/Managers/ResolveManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
-import { toAbGroup, FilteredABTest } from 'Core/Models/ABGroup';
+import { toAbGroup, FilteredABTest, GooglePlayDetectionTest } from 'Core/Models/ABGroup';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
@@ -47,7 +47,7 @@ import { StorageBridge } from 'Core/Utilities/StorageBridge';
 import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
 import CreativeUrlConfiguration from 'json/CreativeUrlConfiguration.json';
 import { NativeErrorApi } from 'Core/Api/NativeErrorApi';
-import { SDKMetrics, InitializationMetric, InitializationFailureMetric } from 'Ads/Utilities/SDKMetrics';
+import { SDKMetrics, InitializationMetric, MiscellaneousMetric, InitializationFailureMetric } from 'Ads/Utilities/SDKMetrics';
 import { SdkDetectionInfo } from 'Core/Models/SdkDetectionInfo';
 import { ClassDetectionApi } from 'Core/Native/ClassDetection';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
@@ -166,6 +166,15 @@ export class Core implements ICore {
 
             return Promise.all([this.DeviceInfo.fetch(), this.SdkDetectionInfo.detectSdks(), this.UnityInfo.fetch(this.ClientInfo.getApplicationName()), this.setupTestEnvironment()]);
         }).then(() => {
+
+            // Temporary for GAID Investigation. Do not apply above 3.4.0
+            if (this.DeviceInfo instanceof AndroidDeviceInfo) {
+                SDKMetrics.reportMetricEventWithTags(MiscellaneousMetric.GAIDInvestigation, {
+                    'gaid': `${!!this.DeviceInfo.get('advertisingIdentifier')}`,
+                    'pkg': `${!!this.DeviceInfo.get('isGoogleStoreInstalled')}`
+                });
+            }
+
             measurements.stopAndSend(
                 InitializationMetric.WebviewInitializationPhases, {
                 'wel': 'undefined',
@@ -220,6 +229,11 @@ export class Core implements ICore {
             return Promise.all([<Promise<[unknown, CoreConfiguration]>>configPromise, cachePromise]);
         }).then(([[configJson, coreConfig]]) => {
             this.Config = coreConfig;
+
+            if (this.DeviceInfo instanceof AndroidDeviceInfo && GooglePlayDetectionTest.isValid(this.Config.getAbGroup())) {
+                this.DeviceInfo.set('isGoogleStoreInstalled', true);
+            }
+
             SDKMetrics.setMetricInstance(createMetricInstance(this.NativeBridge.getPlatform(), this.RequestManager, this.ClientInfo, this.DeviceInfo, this.Config.getCountry()));
 
             // tslint:disable-next-line:no-any
