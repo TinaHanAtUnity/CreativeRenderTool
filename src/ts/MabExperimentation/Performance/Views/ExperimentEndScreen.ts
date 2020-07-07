@@ -12,14 +12,10 @@ import { ColorTheme } from 'Core/Utilities/ColorTheme';
 import { ColorUtils } from 'MabExperimentation/Utilities/ColorUtils';
 
 export interface IClickHeatMapEntry {
-    x: number;
-    y: number;
     target: string;
     normalizedX: number;
     normalizedY: number;
     orientation: string;
-    width: number;
-    height: number;
 }
 
 export class ExperimentEndScreen extends PerformanceEndScreen {
@@ -245,15 +241,10 @@ export class ExperimentEndScreen extends PerformanceEndScreen {
             this._clickHeatMapData.shift();
         }
         this._clickHeatMapData.push({
-            x: (<MouseEvent>event).pageX,
-            y: (<MouseEvent>event).pageY,
             target: (<HTMLElement>(<MouseEvent>event).target).className,
             normalizedX: (<MouseEvent>event).pageX / window.innerWidth,
             normalizedY: (<MouseEvent>event).pageY / window.innerHeight,
             orientation: window.innerHeight > window.innerWidth ? 'portrait' : 'landscape',
-            width: window.innerWidth,
-            height: window.innerHeight
         });
-        console.log(this._clickHeatMapData);
     }
 }
