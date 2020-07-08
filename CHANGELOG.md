@@ -1,4 +1,4 @@
-# Pending
+# Wed Jul  8 00:13:36 UTC 2020
 
 * [Initialization Callback]Introduce InitializationError and handleInitializationError function [#16312](https://github.com/Applifier/unity-ads-webview/pull/16312)
 * [Initialization Callback]Improve initError code and error message [#15752](https://github.com/Applifier/unity-ads-webview/pull/15752)
