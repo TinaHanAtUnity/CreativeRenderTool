@@ -256,7 +256,7 @@ export class ExperimentEndScreen extends PerformanceEndScreen {
         }
 
         this._clickHeatMapData.push({
-            is_portrait: window.innerHeight > window.innerWidth ? true : false,
+            is_portrait: window.innerHeight > window.innerWidth,
             normalized_x: (<MouseEvent>event).pageX / window.innerWidth,
             normalized_y: (<MouseEvent>event).pageY / window.innerHeight,
             target: (<HTMLElement>(<MouseEvent>event).target).className
