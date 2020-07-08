@@ -218,13 +218,13 @@ export class ExperimentEndScreen extends PerformanceEndScreen {
 
     protected onDownloadEvent(event: Event): void {
         this.onClickCollection(event);
-        this.sendHeatMapDataToAEM(this._clickHeatMapData);
+        this._automatedExperimentManager.setHeatMapData(this._clickHeatMapData);
         super.onDownloadEvent(event);
     }
 
     protected onCloseEvent(event: Event): void {
         this.onClickCollection(event);
-        this.sendHeatMapDataToAEM(this._clickHeatMapData);
+        this._automatedExperimentManager.setHeatMapData(this._clickHeatMapData);
         super.onCloseEvent(event);
     }
 
@@ -261,9 +261,5 @@ export class ExperimentEndScreen extends PerformanceEndScreen {
             normalized_y: (<MouseEvent>event).pageY / window.innerHeight,
             target: (<HTMLElement>(<MouseEvent>event).target).className
         });
-    }
-
-    private sendHeatMapDataToAEM(clickHeatMapData: IClickHeatMapEntry[]) {
-        this._automatedExperimentManager._clickHeatMapData = clickHeatMapData;
     }
 }

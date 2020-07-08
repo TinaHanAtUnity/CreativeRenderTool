@@ -72,7 +72,7 @@ export class AutomatedExperimentManager {
     private _campaign: OptimizedCampaign;
     private _staticFeaturesPromise: Promise<{ [key: string]: ContextualFeature }>;
     private _campaignSource: Observable3<string, Campaign, ICampaignTrackingUrls | undefined>;
-    public _clickHeatMapData: IClickHeatMapEntry[] = [];
+    private _clickHeatMapData: IClickHeatMapEntry[] = [];
 
     public static setForcedARMRAID(value: boolean) {
         this._forcedARMRAID = value;
@@ -548,5 +548,9 @@ export class AutomatedExperimentManager {
         }
 
         return true;
+    }
+
+    public setHeatMapData(clickHeatMapData: IClickHeatMapEntry[]) {
+        this._clickHeatMapData = clickHeatMapData;
     }
 }
