@@ -326,6 +326,15 @@ describe('AutomatedExperimentManagerTests', () => {
                         actions: FooExperimentDefaultActions,
                         metadata: 'booh'
                     }
+                ],
+                heatmap_data:
+                [
+                    {
+                        is_portrait: true,
+                        normalized_x: 0.6773333333333333,
+                        normalized_y: 0.8608374384236454,
+                        target: 'download-text'
+                    }
                 ]
             });
 
@@ -484,6 +493,15 @@ describe('AutomatedExperimentManagerTests', () => {
                         experiment: testCategory + '-' + experimentID,
                         actions: FooExperimentDefaultActions,
                         metadata: 'booh'
+                    }
+                ],
+                heatmap_data:
+                [
+                    {
+                        is_portrait: true,
+                        normalized_x: 0.6773333333333333,
+                        normalized_y: 0.8608374384236454,
+                        target: 'download-text'
                     }
                 ]
             });
