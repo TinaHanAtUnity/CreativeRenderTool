@@ -13,10 +13,10 @@ import { ColorUtils } from 'MabExperimentation/Utilities/ColorUtils';
 import { AutomatedExperimentManager } from 'MabExperimentation/AutomatedExperimentManager';
 
 export interface IClickHeatMapEntry {
-    target: string;
+    is_portrait: boolean;
     normalized_x: number;
     normalized_y: number;
-    is_portrait: boolean;
+    target: string;
 }
 
 export class ExperimentEndScreen extends PerformanceEndScreen {
@@ -28,6 +28,7 @@ export class ExperimentEndScreen extends PerformanceEndScreen {
     private _language: string;
     private _automatedExperimentManager: AutomatedExperimentManager;
     private _clickHeatMapData: IClickHeatMapEntry[] = [];
+    private _clickHeatMapDataLimit: number = 5;
 
     constructor(combination: IExperimentActionChoice | undefined, parameters: IEndScreenParameters, campaign: PerformanceCampaign, automatedExperimentManager: AutomatedExperimentManager, country?: string) {
         super(parameters, campaign, country);
@@ -250,15 +251,15 @@ export class ExperimentEndScreen extends PerformanceEndScreen {
     private onClickCollection(event: Event): void {
         event.preventDefault();
 
-        if (this._clickHeatMapData.length >= 5) {
+        if (this._clickHeatMapData.length >= this._clickHeatMapDataLimit) {
             this._clickHeatMapData.shift();
         }
 
         this._clickHeatMapData.push({
-            target: (<HTMLElement>(<MouseEvent>event).target).className,
+            is_portrait: window.innerHeight > window.innerWidth ? true : false,
             normalized_x: (<MouseEvent>event).pageX / window.innerWidth,
             normalized_y: (<MouseEvent>event).pageY / window.innerHeight,
-            is_portrait: window.innerHeight > window.innerWidth ? true : false
+            target: (<HTMLElement>(<MouseEvent>event).target).className
         });
     }
 
