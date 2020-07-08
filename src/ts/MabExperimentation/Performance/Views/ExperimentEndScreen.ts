@@ -14,9 +14,9 @@ import { AutomatedExperimentManager } from 'MabExperimentation/AutomatedExperime
 
 export interface IClickHeatMapEntry {
     target: string;
-    normalizedX: number;
-    normalizedY: number;
-    isPortrait: boolean;
+    normalized_x: number;
+    normalized_y: number;
+    is_portrait: boolean;
 }
 
 export class ExperimentEndScreen extends PerformanceEndScreen {
@@ -256,9 +256,9 @@ export class ExperimentEndScreen extends PerformanceEndScreen {
 
         this._clickHeatMapData.push({
             target: (<HTMLElement>(<MouseEvent>event).target).className,
-            normalizedX: (<MouseEvent>event).pageX / window.innerWidth,
-            normalizedY: (<MouseEvent>event).pageY / window.innerHeight,
-            isPortrait: window.innerHeight > window.innerWidth ? true : false
+            normalized_x: (<MouseEvent>event).pageX / window.innerWidth,
+            normalized_y: (<MouseEvent>event).pageY / window.innerHeight,
+            is_portrait: window.innerHeight > window.innerWidth ? true : false
         });
     }
 
