@@ -201,7 +201,7 @@ export class AutomatedExperimentManager {
             },
             reward: categorizedExp.Outcome,
             experiments: experiments,
-            heatmap_data: this._clickHeatMapData
+            click_coordinates: this._clickHeatMapData
         };
 
         const url = AutomatedExperimentManager.BaseUrl + AutomatedExperimentManager.RewardEndPoint;
