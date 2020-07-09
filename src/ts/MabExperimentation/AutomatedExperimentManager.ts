@@ -198,7 +198,7 @@ export class AutomatedExperimentManager {
                 auction_id: campaign.getSession().getId(),
                 game_session_id: this._gameSessionID,
                 gamer_token: this._gamerToken,
-                experiment_call_latency: this._experimentCallLatencyEnd - this._experimentCallLatencyStart
+                experiment_call_latency_milliseconds: this._experimentCallLatencyEnd - this._experimentCallLatencyStart
             },
             reward: categorizedExp.Outcome,
             experiments: experiments
