@@ -317,7 +317,7 @@ describe('AutomatedExperimentManagerTests', () => {
 
             const rewardPostUrl = AutomatedExperimentManager.BaseUrl + AutomatedExperimentManager.RewardEndPoint;
             const rewardRequestBodyText = JSON.stringify({
-                user_info: { ab_group: 99, auction_id: '12345', gamer_token: 'abcd.1234.5678', experiment_call_latency_ms: 121 },
+                user_info: { ab_group: 99, auction_id: '12345', gamer_token: 'abcd.1234.5678' },
                 reward: rewarded,
                 experiments:
                 [
@@ -326,7 +326,8 @@ describe('AutomatedExperimentManagerTests', () => {
                         actions: FooExperimentDefaultActions,
                         metadata: 'booh'
                     }
-                ]
+                ],
+                experiment_call_latency_ms: 121
             });
 
             const postStubReward = postStub.onSecondCall().resolves(<INativeResponse>{
@@ -476,7 +477,7 @@ describe('AutomatedExperimentManagerTests', () => {
 
             const rewardPostUrl = AutomatedExperimentManager.BaseUrl + AutomatedExperimentManager.RewardEndPoint;
             const rewardRequestBodyText = JSON.stringify({
-                user_info: { ab_group: 99, auction_id: '12345', gamer_token: 'abcd.1234.5678', experiment_call_latency_ms: 121 },
+                user_info: { ab_group: 99, auction_id: '12345', gamer_token: 'abcd.1234.5678' },
                 reward: firstReward,
                 experiments:
                 [
@@ -485,7 +486,8 @@ describe('AutomatedExperimentManagerTests', () => {
                         actions: FooExperimentDefaultActions,
                         metadata: 'booh'
                     }
-                ]
+                ],
+                experiment_call_latency_ms: 121
             });
 
             const postStubReward = postStub.onSecondCall().resolves(<INativeResponse>{
