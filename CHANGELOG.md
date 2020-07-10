@@ -1,4 +1,4 @@
-# Pending
+# Fri Jul 10 20:49:53 UTC 2020
 
 * [Open Measurement] Update MOAT vendor key in whitelist [#16317](https://github.com/Applifier/unity-ads-webview/pull/16317)
 
