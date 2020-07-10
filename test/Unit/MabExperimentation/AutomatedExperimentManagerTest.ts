@@ -327,7 +327,7 @@ describe('AutomatedExperimentManagerTests', () => {
                         metadata: 'booh'
                     }
                 ],
-                heatmap_data:
+                click_coordinates:
                 [
                     {
                         is_portrait: true,
@@ -495,7 +495,7 @@ describe('AutomatedExperimentManagerTests', () => {
                         metadata: 'booh'
                     }
                 ],
-                heatmap_data:
+                click_coordinates:
                 [
                     {
                         is_portrait: true,
