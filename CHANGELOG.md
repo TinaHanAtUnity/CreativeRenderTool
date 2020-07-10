@@ -1,3 +1,7 @@
+# Pending
+
+* [Open Measurement] Update MOAT vendor key in whitelist [#16317](https://github.com/Applifier/unity-ads-webview/pull/16317)
+
 # Wed Jul  8 00:13:36 UTC 2020
 
 * [Initialization Callback]Introduce InitializationError and handleInitializationError function [#16312](https://github.com/Applifier/unity-ads-webview/pull/16312)
