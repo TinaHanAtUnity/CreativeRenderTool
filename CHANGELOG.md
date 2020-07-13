@@ -1,4 +1,4 @@
-# Pending
+# Mon Jul 13 22:18:34 UTC 2020
 
 * [AUI] Improve test coverage by checking for errors [#15566](https://github.com/Applifier/unity-ads-webview/pull/15566)
 * [AUI] Revert "Swipe Up To Install" Feature [#15432](https://github.com/Applifier/unity-ads-webview/pull/15432)
