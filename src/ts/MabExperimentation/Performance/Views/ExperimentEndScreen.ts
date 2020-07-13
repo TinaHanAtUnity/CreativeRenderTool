@@ -28,7 +28,7 @@ export class ExperimentEndScreen extends PerformanceEndScreen {
     private _language: string;
     private _automatedExperimentManager: AutomatedExperimentManager;
     private _clickHeatMapData: IClickHeatMapEntry[] = [];
-    private _clickHeatMapDataLimit: number = 5;
+    private _clickHeatMapDataLimit: number = 10;
 
     constructor(combination: IExperimentActionChoice | undefined, parameters: IEndScreenParameters, campaign: PerformanceCampaign, automatedExperimentManager: AutomatedExperimentManager, country?: string) {
         super(parameters, campaign, country);
