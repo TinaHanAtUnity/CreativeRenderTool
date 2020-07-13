@@ -101,7 +101,6 @@ import { AdRequestManager, LoadV5ExperimentType } from 'Ads/Managers/AdRequestMa
 import { PerPlacementLoadManagerV5 } from 'Ads/Managers/PerPlacementLoadManagerV5';
 import { CometCampaignParser } from 'Performance/Parsers/CometCampaignParser';
 import { PerPlacementLoadManagerV5NoInvalidation } from 'Ads/Managers/PerPlacementLoadManagerV5NoInvalidation';
-import { LoadAndFillEventManager } from 'Core/Managers/LoadAndFillEventManager';
 import { LoadAndFillEventManager } from 'Ads/Managers/LoadAndFillEventManager';
 import { FrameworkMetaData } from 'Core/Models/MetaData/FrameworkMetaData';
 
