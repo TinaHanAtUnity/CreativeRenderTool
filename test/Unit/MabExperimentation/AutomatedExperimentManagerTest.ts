@@ -316,7 +316,7 @@ describe('AutomatedExperimentManagerTests', () => {
             });
 
             const rewardPostUrl = AutomatedExperimentManager.BaseUrl + AutomatedExperimentManager.RewardEndPoint;
-            const rewardRequestBodyText = JSON.stringify({
+            const rewardRequestBody = {
                 user_info: { ab_group: 99, auction_id: '12345', gamer_token: 'abcd.1234.5678' },
                 reward: rewarded,
                 experiments:
@@ -327,16 +327,8 @@ describe('AutomatedExperimentManagerTests', () => {
                         metadata: 'booh'
                     }
                 ],
-                click_coordinates:
-                [
-                    {
-                        is_portrait: true,
-                        normalized_x: 0.6773333333333333,
-                        normalized_y: 0.8608374384236454,
-                        target: 'download-text'
-                    }
-                ]
-            });
+                click_coordinates: []
+            };
 
             const postStubReward = postStub.onSecondCall().resolves(<INativeResponse>{
                 responseCode: 200,
@@ -358,7 +350,10 @@ describe('AutomatedExperimentManagerTests', () => {
                     return aem.endSelectedExperiment(campaign, testCategory);
                 }).then(() => {
                     assert(postStub.calledTwice);
-                    assert(postStubReward.calledWith(rewardPostUrl, rewardRequestBodyText));
+                    postStubReward.calledWithMatch(rewardPostUrl, (bodyText: string) => {
+                        const body = JSON.parse(bodyText);
+                        return sinon.assert.match(body, rewardRequestBody);
+                    });
                 });
         });
     });
@@ -484,7 +479,7 @@ describe('AutomatedExperimentManagerTests', () => {
             });
 
             const rewardPostUrl = AutomatedExperimentManager.BaseUrl + AutomatedExperimentManager.RewardEndPoint;
-            const rewardRequestBodyText = JSON.stringify({
+            const rewardRequestBody = {
                 user_info: { ab_group: 99, auction_id: '12345', gamer_token: 'abcd.1234.5678' },
                 reward: firstReward,
                 experiments:
@@ -495,16 +490,8 @@ describe('AutomatedExperimentManagerTests', () => {
                         metadata: 'booh'
                     }
                 ],
-                click_coordinates:
-                [
-                    {
-                        is_portrait: true,
-                        normalized_x: 0.6773333333333333,
-                        normalized_y: 0.8608374384236454,
-                        target: 'download-text'
-                    }
-                ]
-            });
+                click_coordinates: []
+            };
 
             const postStubReward = postStub.onSecondCall().resolves(<INativeResponse>{
                 responseCode: 200,
@@ -529,7 +516,10 @@ describe('AutomatedExperimentManagerTests', () => {
                     }
                 }).then(() => {
                     if (firstReward) {
-                        assert(postStubReward.calledWith(rewardPostUrl, rewardRequestBodyText));
+                        postStubReward.calledWithMatch(rewardPostUrl, (bodyText: string) => {
+                            const body = JSON.parse(bodyText);
+                            return sinon.assert.match(body, rewardRequestBody);
+                        });
                     }
                 }).then(() => {
                     if (secondReward) {
