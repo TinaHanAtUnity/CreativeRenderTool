@@ -1,5 +1,6 @@
 # Pending
 
+* Re-enable GDPR banner preview for test app [#16313](https://github.com/Applifier/unity-ads-webview/pull/16313)
 * Increase proxied auction traffic from China to 50% [#16345](https://github.com/Applifier/unity-ads-webview/pull/16345)
 
 # Fri Jul 10 20:49:53 UTC 2020
