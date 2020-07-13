@@ -150,7 +150,7 @@ export class CampaignAssetInfo {
                 image = portraitImage;
             }
             if (!image) {
-                throw new ColorThemeError('The images assets provided are invalid', AUIMetric.InvalidImageAssets);
+                throw new ColorThemeError('The image assets provided are invalid', AUIMetric.InvalidImageAssets);
             }
             return image;
         });
