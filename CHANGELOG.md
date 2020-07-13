@@ -1,3 +1,7 @@
+# Pending
+
+* Increase proxied auction traffic from China to 50% [#16345](https://github.com/Applifier/unity-ads-webview/pull/16345)
+
 # Fri Jul 10 20:49:53 UTC 2020
 
 * [Open Measurement] Update MOAT vendor key in whitelist [#16317](https://github.com/Applifier/unity-ads-webview/pull/16317)
