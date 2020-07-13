@@ -148,7 +148,6 @@ export enum AUIMetric {
     OptimizationResponseIgnored = 'campaign_optimization_response_ignored',
     RequestingCampaignOptimization = 'requesting_campaign_optimization',
     UnknownExperimentName = 'unknown_experiment_name',
-    InvalidVideoOverlayMode = 'invalid_video_overlay_mode',
     UnknownCategoryProvided = 'unknown_automated_experiment_category_provided',
     InvalidImageAssets = 'invalid_image_assets',
     InvalidCtaText = 'invalid_cta_text',
