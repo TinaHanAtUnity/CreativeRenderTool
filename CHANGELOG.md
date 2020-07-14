@@ -1,5 +1,6 @@
 # Pending
 
+* [AUI] Collect click data for heatmap purposes [#16316](https://github.com/Applifier/unity-ads-webview/pull/16316)
 * [AUI] Add Experiment Call Latency to Reward Payload [#16315](https://github.com/Applifier/unity-ads-webview/pull/16315)
 
 # Mon Jul 13 22:18:34 UTC 2020
