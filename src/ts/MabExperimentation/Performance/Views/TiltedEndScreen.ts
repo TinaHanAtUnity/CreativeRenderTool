@@ -1,6 +1,6 @@
 import { IEndScreenParameters } from 'Ads/Views/EndScreen';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
-import { PerformanceEndScreen, SQUARE_END_SCREEN } from 'Performance/Views/PerformanceEndScreen';
+import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
 import TiltedEndScreenTemplate from 'html/mabexperimentation/TiltedEndScreenTemplate.html';
 import { IExperimentActionChoice } from 'MabExperimentation/Models/AutomatedExperiment';
 import { EndScreenExperimentDeclaration, EndScreenExperiment } from 'MabExperimentation/Models/AutomatedExperimentsList';
@@ -37,6 +37,7 @@ export class TiltedEndScreen extends PerformanceEndScreen {
         country?: string
     ) {
         super(parameters, campaign, country);
+        console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>imhere');
         // combination = this.fixupExperimentChoices(combination);
 
         // this.fixupScheme(combination);
@@ -217,15 +218,15 @@ export class TiltedEndScreen extends PerformanceEndScreen {
     // }
 
     public show(): void {
+        document.body.classList.add('tilted-layout');
         super.show();
         window.addEventListener('resize', this.handleResize, false);
-        document.body.classList.add('tilted-layout');
     }
 
     public hide(): void {
+        document.body.classList.remove('tilted-layout');
         super.hide();
         window.removeEventListener('resize', this.handleResize);
-        document.body.classList.remove('tilted-layout');
     }
 
     // protected onDownloadEvent(event: Event): void {
