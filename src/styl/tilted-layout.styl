@@ -13,6 +13,23 @@ body.tilted-layout #end-screen {
     }
 
     .end-screen-info-background {
+      background: $tilted-black;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: unset;
+      align-content: unset;
+      justify-content: unset;
+
+      .end-screen-info {
+        padding: 0 2em;
+        .game-icon-rating-container {
+          .game-icon {
+            margin-top: -1em;
+            margin-bottom: 0;
+          }
+        }
       }
+    }
   }
 }

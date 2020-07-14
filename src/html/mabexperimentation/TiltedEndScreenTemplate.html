@@ -20,6 +20,7 @@
   </div>
 
   <div class="end-screen-info-background">
+    <div class="end-screen-info">
     <div class="game-icon-rating-container">
       <div class="game-icon"
           style="background-image: url('<%= data.gameIcon && data.gameIcon.replace("file://", "") %>')">
@@ -63,10 +64,12 @@
       </span>
     </div>
   </div>
-
-  <div class="download-container">
-    <span class="download-text"><%= data.t("Download For Free") %></span>
+    <div class="download-container">
+      <span class="download-text"><%= data.t("Download For Free") %></span>
+    </div>
   </div>
+
+
 
   <!-- <div class="bottom-container">
       <div class="privacy-button"><span class="icon-gdpr"></span></div>
