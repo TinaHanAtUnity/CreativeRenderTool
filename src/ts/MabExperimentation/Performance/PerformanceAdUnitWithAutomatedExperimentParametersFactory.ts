@@ -10,6 +10,7 @@ import { AutomatedExperimentsCategories, EndScreenExperimentDeclaration } from '
 import { PerformanceAdUnitParametersFactory } from 'Performance/AdUnits/PerformanceAdUnitParametersFactory';
 import { IExperimentActionChoice } from 'MabExperimentation/Models/AutomatedExperiment';
 import { ExternalEndScreen } from 'ExternalEndScreen/Views/ExternalEndScreen';
+import { TiltedEndScreen } from 'MabExperimentation/Performance/Views/TiltedEndScreen';
 
 export class PerformanceAdUnitWithAutomatedExperimentParametersFactory extends PerformanceAdUnitParametersFactory {
     private _automatedExperimentManager: AutomatedExperimentManager;
@@ -36,21 +37,13 @@ export class PerformanceAdUnitWithAutomatedExperimentParametersFactory extends P
 
         const endScreenCombination: IExperimentActionChoice | undefined = this._automatedExperimentManager.activateSelectedExperiment(baseParams.campaign, AutomatedExperimentsCategories.PERFORMANCE_ENDCARD);
 
-        let endScreen: ExperimentEndScreen | ColorBlurEndScreen | ExternalEndScreen;
-
-        if (this._campaign.getEndScreen()) {
-            endScreen = new ExternalEndScreen(endScreenCombination, endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
-        } else if (endScreenCombination && endScreenCombination.scheme === EndScreenExperimentDeclaration.scheme.COLORBLUR) {
-            endScreen = new ColorBlurEndScreen(endScreenCombination, endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
-        } else {
-            endScreen = new ExperimentEndScreen(
+        const endScreen = new TiltedEndScreen(
                 endScreenCombination,
                 endScreenParameters,
                 baseParams.campaign,
                 this._automatedExperimentManager,
                 baseParams.coreConfig.getCountry()
             );
-        }
 
         return {
             ...baseParams,
