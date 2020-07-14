@@ -327,6 +327,7 @@ describe('AutomatedExperimentManagerTests', () => {
                         metadata: 'booh'
                     }
                 ],
+                click_coordinates: [],
                 experiment_call_latency_ms: sinon.match.number
             };
 
@@ -490,6 +491,7 @@ describe('AutomatedExperimentManagerTests', () => {
                         metadata: 'booh'
                     }
                 ],
+                click_coordinates: [],
                 experiment_call_latency_ms: sinon.match.number
             };
 

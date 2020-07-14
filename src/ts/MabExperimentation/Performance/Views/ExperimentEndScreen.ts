@@ -10,6 +10,14 @@ import { Color } from 'Core/Utilities/Color';
 import { IColorTheme } from 'Performance/Utilities/Swatch';
 import { ColorTheme } from 'Core/Utilities/ColorTheme';
 import { ColorUtils } from 'MabExperimentation/Utilities/ColorUtils';
+import { AutomatedExperimentManager } from 'MabExperimentation/AutomatedExperimentManager';
+
+export interface IClickHeatMapEntry {
+    is_portrait: boolean;
+    normalized_x: number;
+    normalized_y: number;
+    target: string;
+}
 
 export class ExperimentEndScreen extends PerformanceEndScreen {
     private _animation: string;
@@ -18,14 +26,17 @@ export class ExperimentEndScreen extends PerformanceEndScreen {
     private _tintColor: boolean;
     private _formattedCtaAlternativeText: string;
     private _language: string;
+    private _automatedExperimentManager: AutomatedExperimentManager;
+    private _clickHeatMapData: IClickHeatMapEntry[] = [];
+    private _clickHeatMapDataLimit: number = 10;
 
-    constructor(combination: IExperimentActionChoice | undefined, parameters: IEndScreenParameters, campaign: PerformanceCampaign, country?: string) {
+    constructor(combination: IExperimentActionChoice | undefined, parameters: IEndScreenParameters, campaign: PerformanceCampaign, automatedExperimentManager: AutomatedExperimentManager, country?: string) {
         super(parameters, campaign, country);
-
         combination = this.fixupExperimentChoices(combination);
 
         this.fixupScheme(combination);
         this.fixupCtaText(combination.cta_text);
+        this._automatedExperimentManager = automatedExperimentManager;
 
         // combination.animation will be defined at this point
         this._animation = combination.animation!;
@@ -36,6 +47,11 @@ export class ExperimentEndScreen extends PerformanceEndScreen {
             ctaAlternativeText: this._formattedCtaAlternativeText,
             isEnglish: this._language.indexOf('en') !== -1
         };
+
+        this._bindings.push({
+            event: 'click',
+            listener: (event: Event) => this.onClickCollection(event)
+        });
     }
 
     private fixupScheme(actions: IExperimentActionChoice | undefined) {
@@ -200,6 +216,18 @@ export class ExperimentEndScreen extends PerformanceEndScreen {
         }
     }
 
+    protected onDownloadEvent(event: Event): void {
+        this.onClickCollection(event);
+        this._automatedExperimentManager.setHeatMapData(this._clickHeatMapData);
+        super.onDownloadEvent(event);
+    }
+
+    protected onCloseEvent(event: Event): void {
+        this.onClickCollection(event);
+        this._automatedExperimentManager.setHeatMapData(this._clickHeatMapData);
+        super.onCloseEvent(event);
+    }
+
     protected getTemplate() {
         if (this.getEndscreenAlt() === SQUARE_END_SCREEN) {
             return ExperimentSquareEndScreenTemplate;
@@ -218,5 +246,20 @@ export class ExperimentEndScreen extends PerformanceEndScreen {
         // for example).
         element.classList.remove('on-show');
         setTimeout(() => element.classList.add('on-show'), 0);
+    }
+
+    private onClickCollection(event: Event): void {
+        event.preventDefault();
+
+        if (this._clickHeatMapData.length >= this._clickHeatMapDataLimit) {
+            this._clickHeatMapData.shift();
+        }
+
+        this._clickHeatMapData.push({
+            is_portrait: window.innerHeight > window.innerWidth,
+            normalized_x: (<MouseEvent>event).pageX / window.innerWidth,
+            normalized_y: (<MouseEvent>event).pageY / window.innerHeight,
+            target: (<HTMLElement>(<MouseEvent>event).target).className
+        });
     }
 }

@@ -25,6 +25,7 @@ import { ARUtil } from 'AR/Utilities/ARUtil';
 import { IAutomatedExperimentResponse } from 'MabExperimentation/Models/AutomatedExperimentResponse';
 import { OptimizedCampaign } from 'MabExperimentation/Models/OptimizedCampaign';
 import { CategorizedExperimentStage, CategorizedExperiment } from 'MabExperimentation/Models/CategorizedExperiment';
+import { IClickHeatMapEntry } from 'MabExperimentation/Performance/Views/ExperimentEndScreen';
 
 export type ContextualFeature = string | number | boolean | null | undefined | BatteryStatus | RingerMode | Platform | string[] | { [key: string]: string } | { [key: string]: number } | number[] | string[];
 
@@ -71,6 +72,7 @@ export class AutomatedExperimentManager {
     private _campaign: OptimizedCampaign;
     private _staticFeaturesPromise: Promise<{ [key: string]: ContextualFeature }>;
     private _campaignSource: Observable3<string, Campaign, ICampaignTrackingUrls | undefined>;
+    private _clickHeatMapData: IClickHeatMapEntry[] = [];
     private _experimentCallLatencyStart: number;
     private _experimentCallLatencyEnd: number;
 
@@ -201,6 +203,7 @@ export class AutomatedExperimentManager {
             },
             reward: categorizedExp.Outcome,
             experiments: experiments,
+            click_coordinates: this._clickHeatMapData,
             experiment_call_latency_ms: this._experimentCallLatencyEnd - this._experimentCallLatencyStart
         };
 
@@ -552,5 +555,9 @@ export class AutomatedExperimentManager {
         }
 
         return true;
+    }
+
+    public setHeatMapData(clickHeatMapData: IClickHeatMapEntry[]) {
+        this._clickHeatMapData = clickHeatMapData;
     }
 }
