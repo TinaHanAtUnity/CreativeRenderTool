@@ -1,5 +1,21 @@
 # Pending
 
+* [AUI] Add Experiment Call Latency to Reward Payload [#16315](https://github.com/Applifier/unity-ads-webview/pull/16315)
+
+# Mon Jul 13 22:18:34 UTC 2020
+
+* [AUI] Improve test coverage by checking for errors [#15566](https://github.com/Applifier/unity-ads-webview/pull/15566)
+* [AUI] Revert "Swipe Up To Install" Feature [#15432](https://github.com/Applifier/unity-ads-webview/pull/15432)
+* Re-enable GDPR banner preview for test app [#16313](https://github.com/Applifier/unity-ads-webview/pull/16313)
+* Increase proxied auction traffic from China to 50% [#16345](https://github.com/Applifier/unity-ads-webview/pull/16345)
+
+# Fri Jul 10 20:49:53 UTC 2020
+
+* [Open Measurement] Update MOAT vendor key in whitelist [#16317](https://github.com/Applifier/unity-ads-webview/pull/16317)
+
+# Wed Jul  8 00:13:36 UTC 2020
+
+* [Initialization Callback]Introduce InitializationError and handleInitializationError function [#16312](https://github.com/Applifier/unity-ads-webview/pull/16312)
 * [Initialization Callback]Improve initError code and error message [#15752](https://github.com/Applifier/unity-ads-webview/pull/15752)
 
 # Tue Jun 30 23:38:28 UTC 2020

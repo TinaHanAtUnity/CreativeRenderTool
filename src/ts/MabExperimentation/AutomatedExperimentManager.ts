@@ -73,6 +73,8 @@ export class AutomatedExperimentManager {
     private _staticFeaturesPromise: Promise<{ [key: string]: ContextualFeature }>;
     private _campaignSource: Observable3<string, Campaign, ICampaignTrackingUrls | undefined>;
     private _clickHeatMapData: IClickHeatMapEntry[] = [];
+    private _experimentCallLatencyStart: number;
+    private _experimentCallLatencyEnd: number;
 
     public static setForcedARMRAID(value: boolean) {
         this._forcedARMRAID = value;
@@ -201,7 +203,8 @@ export class AutomatedExperimentManager {
             },
             reward: categorizedExp.Outcome,
             experiments: experiments,
-            click_coordinates: this._clickHeatMapData
+            click_coordinates: this._clickHeatMapData,
+            experiment_call_latency_ms: this._experimentCallLatencyEnd - this._experimentCallLatencyStart
         };
 
         const url = AutomatedExperimentManager.BaseUrl + AutomatedExperimentManager.RewardEndPoint;
@@ -497,9 +500,13 @@ export class AutomatedExperimentManager {
             }).then((features) => {
                 const body = this.createRequestBody(campaign, categories, features);
                 const url = AutomatedExperimentManager.BaseUrl + AutomatedExperimentManager.CreateEndPoint;
+                this._experimentCallLatencyStart = performance.now();
 
                 return this._requestManager.post(url, body)
-                    .then((response) => this.parseExperimentsResponse(response))
+                    .then((response) => {
+                        this._experimentCallLatencyEnd = performance.now();
+                        return this.parseExperimentsResponse(response);
+                    })
                     .then((parsedResponse) => this.loadCampaignExperiments(campaign, parsedResponse))
                     .then(() => Promise.resolve())
                     .catch((err) => {

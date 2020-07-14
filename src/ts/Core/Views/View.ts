@@ -4,7 +4,6 @@ import { Template } from 'Core/Utilities/Template';
 import { IViewBinding } from 'Core/Views/IViewBinding';
 import { HorizontalSwipe } from 'Core/Utilities/HorizontalSwipe';
 import { DownSwipe } from 'Core/Utilities/DownSwipe';
-import { UpSwipe } from 'Core/Utilities/UpSwipe';
 
 export type TemplateDataType = string | number | boolean | null | undefined | string[];
 
@@ -21,10 +20,6 @@ export abstract class View<T extends object> {
 
         if (binding.event === 'swipedown') {
             binding.swipe = new DownSwipe(element);
-        }
-
-        if (binding.event === 'swipeup') {
-            binding.swipe = new UpSwipe(element);
         }
 
         if (attachTap && binding.event === 'click') {

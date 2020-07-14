@@ -32,6 +32,7 @@ import { IStoreApi } from 'Store/IStore';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { OMID_P } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
 import { PrivacyTestEnvironment } from 'Privacy/PrivacyTestEnvironment';
+import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
 
 export interface IAbstractAdUnitParametersFactory<T1 extends Campaign, T2 extends IAdUnitParameters<T1>> {
     create(campaign: T1, placement: Placement, orientation: Orientation, playerMetadataServerId: string, options: unknown, loadV5Support: boolean): T2;
@@ -184,6 +185,12 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
     protected showGDPRBanner(parameters: IAdUnitParameters<Campaign>): boolean {
         if (PrivacyTestEnvironment.isSet('showGDPRBanner')) {
             return PrivacyTestEnvironment.get<boolean>('showGDPRBanner');
+        }
+
+        // Temporary measure to enable previewing GDPR banner in external test app.
+        // Should be removed once a better solution is in place.
+        if (TestEnvironment.get('forcedGDPRBanner') !== undefined) {
+            return TestEnvironment.get('forcedGDPRBanner');
         }
 
         if (parameters.coreConfig.isCoppaCompliant()) {

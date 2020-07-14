@@ -327,7 +327,8 @@ describe('AutomatedExperimentManagerTests', () => {
                         metadata: 'booh'
                     }
                 ],
-                click_coordinates: []
+                click_coordinates: [],
+                experiment_call_latency_ms: sinon.match.number
             };
 
             const postStubReward = postStub.onSecondCall().resolves(<INativeResponse>{
@@ -490,7 +491,8 @@ describe('AutomatedExperimentManagerTests', () => {
                         metadata: 'booh'
                     }
                 ],
-                click_coordinates: []
+                click_coordinates: [],
+                experiment_call_latency_ms: sinon.match.number
             };
 
             const postStubReward = postStub.onSecondCall().resolves(<INativeResponse>{
