@@ -27,7 +27,8 @@ export class TiltedEndScreen extends PerformanceEndScreen {
     private _language: string;
     private _automatedExperimentManager: AutomatedExperimentManager;
     // private _clickHeatMapData: IClickHeatMapEntry[] = [];
-    // private _clickHeatMapDataLimit: number = 10;
+    // private _clickHeatMapDataLimit: number = 10;\
+    private _simpleRating: string;
 
     constructor(
         combination: IExperimentActionChoice | undefined,
@@ -37,19 +38,21 @@ export class TiltedEndScreen extends PerformanceEndScreen {
         country?: string
     ) {
         super(parameters, campaign, country);
-        console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>imhere');
         // combination = this.fixupExperimentChoices(combination);
 
         // this.fixupScheme(combination);
         // this.fixupCtaText(combination.cta_text);
         this._automatedExperimentManager = automatedExperimentManager;
+        this._simpleRating = campaign.getRating().toFixed(1);
 
+        console.log(this._templateData);
         // combination.animation will be defined at this point
         // this._animation = combination.animation!;
         this._language = parameters.language;
         this._templateData = {
             ...this._templateData,
-            isEnglish: this._language.indexOf('en') !== -1
+            isEnglish: this._language.indexOf('en') !== -1,
+            simpleRating: this._simpleRating
         };
 
         // this._bindings.push({
