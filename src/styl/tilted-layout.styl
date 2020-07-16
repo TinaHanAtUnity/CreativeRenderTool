@@ -14,13 +14,13 @@ body.tilted-layout #end-screen {
 
     .game-creative-container {
       width: 100%;
-      height: 60%;
+      height: 65%; // make this 60% when on a regular phone, not stretched
 
       .game-creative-image {
         width: 100%;
 
         &.landscape {
-          transform: rotate(-15deg) scale(1.35);
+          transform: rotate(-15deg) scale(1.35) translate(-5px, 35px); // remove the translation when using the description of the game
         }
 
         &.square {
@@ -39,7 +39,8 @@ body.tilted-layout #end-screen {
       align-content: unset;
       justify-content: unset;
       z-index: 2;
-      height: 40%;
+      height: 35%; // make this 40% when on a regular phone, not stretched
+      transform: translateY(25px); // Note: This is only for iphone X, which is the test device for the concept
 
       &::before {
         position: absolute;
@@ -138,10 +139,9 @@ body.tilted-layout #end-screen {
       .download-cta-container {
         height: 100%;
         position: relative;
-        overflow: hidden;
 
         .download-cta-button {
-          transform: skewY(-15deg) translateY(40%);
+          transform: skewY(-15deg) translateY(50%);
           background: $tilted-layout-blue;
           text-transform: uppercase;
           font-family: 'AldotheApache';
@@ -149,7 +149,8 @@ body.tilted-layout #end-screen {
           position: absolute;
           bottom: 0;
           right: 0;
-          height: 100%;
+          height: 9em;
+          animation: cta-button-bounce 1s ease-in-out 0s infinite;
 
           .download-cta-text {
             font-size: 1.5em;
@@ -161,5 +162,15 @@ body.tilted-layout #end-screen {
         }
       }
     }
+  }
+}
+
+@keyframes cta-button-bounce {
+  0%, 100% {
+    transform: skewY(-15deg) translateY(50%);
+  }
+
+  10% {
+    transform: skewY(-15deg) translateY(47%);
   }
 }
