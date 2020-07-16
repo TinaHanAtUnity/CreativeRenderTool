@@ -21,7 +21,6 @@ import { Store } from 'Store/__mocks__/Store';
 import { Core } from 'Core/__mocks__/Core';
 import { VastHTMLEndScreen } from 'VAST/Views/VastHTMLEndScreen';
 import { InterstitialWebPlayerContainer } from 'Ads/Utilities/__mocks__/InterstitialWebPlayerContainer';
-import anything = jasmine.anything;
 
 jest.mock('html/VastEndcardHTMLContent.html', () => {
     return {
@@ -86,7 +85,7 @@ jest.mock('html/VastHTMLEndScreen.html', () => {
                 expect(adUnitContainer.reconfigure).toHaveBeenCalled();
             });
             it('when showing html endcard, the screen orientation should be locked', () => {
-                expect(adUnitContainer.reorient).toHaveBeenCalledWith(false, anything());
+                expect(adUnitContainer.reorient).toHaveBeenCalledWith(false, jasmine.anything());
             });
             it('webplayer should set settings before show endcard', () => {
                 expect(webPlayer.setSettings).toHaveBeenCalled();
