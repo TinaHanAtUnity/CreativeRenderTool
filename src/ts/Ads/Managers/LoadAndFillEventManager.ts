@@ -10,7 +10,7 @@ import { ClientInfo } from 'Core/Models/ClientInfo';
 import { Platform } from 'Core/Constants/Platform';
 import { FrameworkMetaData } from 'Core/Models/MetaData/FrameworkMetaData';
 
-enum LoadAndFillEvenеMacro {
+enum LoadAndFillEventMacro {
     ZONE = '%ZONE%',
     SDK_VERSION = '%SDK_VERSION%',
     EVENT_TYPE = '%EVENT_TYPE%',
@@ -41,14 +41,14 @@ export class LoadAndFillEventManager extends ThirdPartyEventManager {
 
     constructor(core: ICoreApi, request: RequestManager, platform: Platform, clientInfo: ClientInfo, coreConfig: CoreConfiguration, storageBridge: StorageBridge, privacy: PrivacySDK, adsConfig: AdsConfiguration, framework: FrameworkMetaData | undefined) {
         super(core, request, {
-            [LoadAndFillEvenеMacro.TOKEN]: coreConfig.getToken(),
-            [LoadAndFillEvenеMacro.GAME_ID]: clientInfo.getGameId(),
-            [LoadAndFillEvenеMacro.COPPA]: coreConfig.isCoppaCompliant() ? 'true' : 'false',
-            [LoadAndFillEvenеMacro.FRAMEWORK_NAME]: (framework && framework.getName()) ? framework.getName()! : '',
-            [LoadAndFillEvenеMacro.FRAMEWORK_VERSION]: (framework && framework.getVersion()) ? framework.getVersion()! : '',
-            [LoadAndFillEvenеMacro.PLATFORM]: Platform[platform],
-            [LoadAndFillEvenеMacro.SDK_VERSION]: clientInfo.getSdkVersionName(),
-            [LoadAndFillEvenеMacro.AB_GROUP]: coreConfig.getAbGroup().toString()
+            [LoadAndFillEventMacro.TOKEN]: coreConfig.getToken(),
+            [LoadAndFillEventMacro.GAME_ID]: clientInfo.getGameId(),
+            [LoadAndFillEventMacro.COPPA]: coreConfig.isCoppaCompliant() ? 'true' : 'false',
+            [LoadAndFillEventMacro.FRAMEWORK_NAME]: (framework && framework.getName()) ? framework.getName()! : '',
+            [LoadAndFillEventMacro.FRAMEWORK_VERSION]: (framework && framework.getVersion()) ? framework.getVersion()! : '',
+            [LoadAndFillEventMacro.PLATFORM]: Platform[platform],
+            [LoadAndFillEventMacro.SDK_VERSION]: clientInfo.getSdkVersionName(),
+            [LoadAndFillEventMacro.AB_GROUP]: coreConfig.getAbGroup().toString()
         }, storageBridge);
 
         this._platform = platform;
@@ -61,11 +61,11 @@ export class LoadAndFillEventManager extends ThirdPartyEventManager {
         const adUnitId = placement ? placement.getAdUnitId() : undefined;
 
         return this.sendWithGet(LoadAndFillEventManager.LoadEventName, '', this._url, useWebViewUserAgentForTracking, headers, {
-            [LoadAndFillEvenеMacro.ZONE]: placementId,
-            [LoadAndFillEvenеMacro.EVENT_TYPE]: LoadAndFillEventManager.LoadEventName,
-            [LoadAndFillEvenеMacro.AD_UNIT_ID]: adUnitId ? adUnitId : '',
-            [LoadAndFillEvenеMacro.OPTOUT_ENABLED]: this._privacy.isOptOutEnabled() ? 'true' : 'false',
-            [LoadAndFillEvenеMacro.CAMPAIGN_ID]: this._platform === Platform.ANDROID ? LoadAndFillEventManager.AndroidCampaignId : LoadAndFillEventManager.IOSCampaignId
+            [LoadAndFillEventMacro.ZONE]: placementId,
+            [LoadAndFillEventMacro.EVENT_TYPE]: LoadAndFillEventManager.LoadEventName,
+            [LoadAndFillEventMacro.AD_UNIT_ID]: adUnitId ? adUnitId : '',
+            [LoadAndFillEventMacro.OPTOUT_ENABLED]: this._privacy.isOptOutEnabled() ? 'true' : 'false',
+            [LoadAndFillEventMacro.CAMPAIGN_ID]: this._platform === Platform.ANDROID ? LoadAndFillEventManager.AndroidCampaignId : LoadAndFillEventManager.IOSCampaignId
         });
     }
 
@@ -74,11 +74,11 @@ export class LoadAndFillEventManager extends ThirdPartyEventManager {
         const adUnitId = placement ? placement.getAdUnitId() : undefined;
 
         return this.sendWithGet(LoadAndFillEventManager.FillEventName, '', this._url, useWebViewUserAgentForTracking, headers, {
-            [LoadAndFillEvenеMacro.ZONE]: placementId,
-            [LoadAndFillEvenеMacro.EVENT_TYPE]: LoadAndFillEventManager.FillEventName,
-            [LoadAndFillEvenеMacro.AD_UNIT_ID]: adUnitId ? adUnitId : '',
-            [LoadAndFillEvenеMacro.CAMPAIGN_ID]: campaign.getId(),
-            [LoadAndFillEvenеMacro.OPTOUT_ENABLED]: this._privacy.isOptOutEnabled() ? 'true' : 'false'
+            [LoadAndFillEventMacro.ZONE]: placementId,
+            [LoadAndFillEventMacro.EVENT_TYPE]: LoadAndFillEventManager.FillEventName,
+            [LoadAndFillEventMacro.AD_UNIT_ID]: adUnitId ? adUnitId : '',
+            [LoadAndFillEventMacro.CAMPAIGN_ID]: campaign.getId(),
+            [LoadAndFillEventMacro.OPTOUT_ENABLED]: this._privacy.isOptOutEnabled() ? 'true' : 'false'
         });
     }
 }
