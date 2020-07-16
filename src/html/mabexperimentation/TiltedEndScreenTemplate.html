@@ -6,7 +6,11 @@
     <!-- <div class="game-background game-background-portrait"
       style="background-image: url('<%= data.endScreenLandscape && data.endScreenLandscape.replace("file://", "") %>')">
     </div> -->
-    <img class="game-creative-image" src="<%= data.endScreenLandscape && data.endScreenLandscape.replace("file://", "") %>" />
+    <% if(!!data.endScreenLandscape) { %>
+      <img class="game-creative-image landscape" src="<%= data.endScreenLandscape && data.endScreenLandscape.replace("file://", "") %>" />
+    <% } else if(!!data.endScreenSquare ) { %>
+      <img class="game-creative-image square" src="<%= data.endScreenSquare && data.endScreenSquare.replace("file://", "") %>" />
+    <% } %>
   </div>
 
    <!-- <div class="gdpr-pop-up">
@@ -59,7 +63,7 @@
           <%= data.gameName %>
         </span>
         <span class="game-description">
-
+          This is a description of the game Dancing Road: Color Ball Run! As you can see, I could not retrive the game description just yet, which explains why you're reading this right now.
         </span>
       </div>
     </div>

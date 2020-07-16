@@ -17,13 +17,19 @@ body.tilted-layout #end-screen {
       height: 60%;
 
       .game-creative-image {
-        transform: rotate(-15deg) scale(1.35);
         width: 100%;
+
+        &.landscape {
+          transform: rotate(-15deg) scale(1.35);
+        }
+
+        &.square {
+          transform: rotate(-15deg) scale(1.35) translateX(-15px);
+        }
       }
     }
 
     .end-screen-info-background {
-      text-transform: uppercase;
       background: $tilted-layout-black;
       color: $tilted-layout-white;
       position: relative;
@@ -48,30 +54,22 @@ body.tilted-layout #end-screen {
         z-index: -1;
       }
 
-      // &::after {
-      // position: absolute;
-      // display: block;
-      // background: inherit;
-      // left: 0;
-      // right: 0;
-      // bottom: 0;
-      // content: '';
-      // height: 100px;
-      // transform: skewY(-15deg) translateY(50px);
-      // z-index: -1;
-      // }
       .end-screen-info {
-        transform: rotate(-15deg);
-        padding: 0 2em;
+        display: flex;
+        flex-direction: column;
+        transform: rotate(-15deg) translateY(-40%);
+        padding-left: 2em;
+        height: 50%;
 
         .game-icon-rating-container {
           display: flex;
-          transform: translateY(-50%);
+          align-items: flex-end;
+          margin-bottom: 0.25em;
 
           .game-rating-stars-top, .game-rating-stars-bottom {
             .icon-star {
-              line-height: 1em;
               vertical-align: baseline;
+              margin-left: -0.15em;
 
               &::before {
                 content: '\2605';
@@ -81,7 +79,7 @@ body.tilted-layout #end-screen {
 
           .game-icon {
             margin-bottom: 0;
-            transform: translateY(-25%);
+            box-shadow: 0px 0px 15px 2px $tilted-layout-black;
           }
 
           .game-rating-container {
@@ -90,8 +88,7 @@ body.tilted-layout #end-screen {
             padding: 0.5em;
 
             .game-rating-stars-container {
-              display: flex;
-              align-items: center;
+              line-height: 0;
             }
 
             .game-rating {
@@ -101,10 +98,16 @@ body.tilted-layout #end-screen {
               line-height: 0.6em;
             }
 
+            .game-rating-count {
+              vertical-align: middle;
+            }
+
             .game-rating-number {
               display: flex;
               font-family: 'AldotheApache';
-              line-height: 0.8em;
+              line-height: 0.8;
+              font-size: 1.2em;
+              align-items: baseline;
 
               .game-rating-scale {
                 font-size: 0.45em;
@@ -114,8 +117,20 @@ body.tilted-layout #end-screen {
         }
 
         .game-details-container {
+          display: flex;
+          flex-direction: column;
+          transform: translateX(-1.5em);
+
           .game-name {
             font-family: 'AldotheApache';
+            text-transform: uppercase;
+            font-size: 1.75em;
+            line-height: 1em;
+          }
+
+          .game-description {
+            font-size: 0.5em;
+            line-height: 1.5em;
           }
         }
       }
@@ -128,6 +143,7 @@ body.tilted-layout #end-screen {
         .download-cta-button {
           transform: skewY(-15deg) translateY(40%);
           background: $tilted-layout-blue;
+          text-transform: uppercase;
           font-family: 'AldotheApache';
           width: 100%;
           position: absolute;
