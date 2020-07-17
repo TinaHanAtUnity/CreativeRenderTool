@@ -471,7 +471,7 @@ export class DeviceInfo extends BackendApi {
     }
 
     public getLocaleList() {
-        return 'en';
+        return ['en', 'fi'];
     }
 
     public getAdNetworkIdsPlist() {

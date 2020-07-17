@@ -79,8 +79,8 @@ export class IosDeviceInfoApi extends NativeApi {
         return this._nativeBridge.invoke<IosUiTheme>(this._fullApiClassName, 'getCurrentUITheme');
     }
 
-    public getLocaleList(): Promise<string> {
-        return this._nativeBridge.invoke<string>(this._fullApiClassName, 'getLocaleList');
+    public getLocaleList(): Promise<string[]> {
+        return this._nativeBridge.invoke<string[]>(this._fullApiClassName, 'getLocaleList');
     }
 
     public getAdNetworkIdsPlist(): Promise<string[]> {

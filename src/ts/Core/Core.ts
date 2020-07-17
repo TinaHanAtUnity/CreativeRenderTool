@@ -172,7 +172,7 @@ export class Core implements ICore {
                 ]).then(([deviceName, vendorIdentifer, localeList, currentTheme, adNetworks, systemBootTime]) => {
                     this.Api.Sdk.logInfo(`[Test] Device name: ${deviceName}`);
                     this.Api.Sdk.logInfo(`[Test] Vendor identifier: ${vendorIdentifer}`);
-                    this.Api.Sdk.logInfo(`[Test] Locale list: ${localeList}`);
+                    this.Api.Sdk.logInfo(`[Test] Locale list: ${localeList.join(', ')}`);
                     this.Api.Sdk.logInfo(`[Test] Current theme: ${currentTheme}`);
                     this.Api.Sdk.logInfo(`[Test] Ad Networks: ${adNetworks}`);
                     this.Api.Sdk.logInfo(`[Test] System boot time: ${systemBootTime}`);
