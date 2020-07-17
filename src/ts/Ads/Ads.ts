@@ -103,6 +103,7 @@ import { CometCampaignParser } from 'Performance/Parsers/CometCampaignParser';
 import { PerPlacementLoadManagerV5NoInvalidation } from 'Ads/Managers/PerPlacementLoadManagerV5NoInvalidation';
 import { LoadAndFillEventManager } from 'Ads/Managers/LoadAndFillEventManager';
 import { FrameworkMetaData } from 'Core/Models/MetaData/FrameworkMetaData';
+import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 
 export class Ads implements IAds {
 
@@ -803,6 +804,11 @@ export class Ads implements IAds {
 
     private setupLoadApiEnabled(): void {
         this._loadApiEnabled = this._core.ClientInfo.getUsePerPlacementLoad();
+
+        HttpKafka.sendEvent('ads.events.loadApiEnabled.v1.json', KafkaCommonObjectType.ANONYMOUS, {
+            'v': 1,
+            loadApiEnabled: this._loadApiEnabled
+        });
 
         const loadV5 = this.isLoadV5Enabled();
         const isPSPTestApp = CustomFeatures.isPSPTestAppGame(this._core.ClientInfo.getGameId());
