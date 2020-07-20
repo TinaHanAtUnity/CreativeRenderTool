@@ -170,8 +170,8 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
                 if (this._platform === Platform.ANDROID) {
                     this._arAndroidEnumsReceivedObserver = this._ar.AR.Android.onAndroidEnumsReceived.subscribe((enums) => this.handleAREvent('androidenumsreceived', JSON.stringify(enums)));
                 }
-            }).catch((err) => {
-                this._core.Sdk.logError('failed to create mraid: ' + err);
+            }).catch((err: Error) => {
+                this._core.Sdk.logError('failed to create mraid: ' + err.message);
 
                 SessionDiagnostics.trigger('create_mraid_error', {
                     message: err.message
