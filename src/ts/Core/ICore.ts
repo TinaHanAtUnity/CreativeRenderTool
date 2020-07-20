@@ -36,6 +36,7 @@ import { StorageBridge } from 'Core/Utilities/StorageBridge';
 import { NativeErrorApi } from 'Core/Api/NativeErrorApi';
 import { ClassDetectionApi } from 'Core/Native/ClassDetection';
 import { SdkDetectionInfo } from 'Core/Models/SdkDetectionInfo';
+import { TrackingManagerApi } from 'Core/Native/iOS/TrackingManager';
 
 export interface ICoreApi extends IModuleApi {
     Cache: CacheApi;
@@ -57,6 +58,7 @@ export interface ICoreApi extends IModuleApi {
         Preferences: AndroidPreferencesApi;
     };
     iOS?: {
+        TrackingManager: TrackingManagerApi;
         MainBundle: MainBundleApi;
         Notification: NotificationApi;
         Preferences: IosPreferencesApi;
