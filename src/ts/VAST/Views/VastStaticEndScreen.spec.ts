@@ -20,7 +20,6 @@ import { AbstractPrivacy } from 'Ads/Views/__mocks__/AbstractPrivacy';
 import { PrivacySDK } from 'Privacy/__mocks__/PrivacySDK';
 import { Store } from 'Store/__mocks__/Store';
 import { Core } from 'Core/__mocks__/Core';
-import anything = jasmine.anything;
 
 jest.mock('html/VastStaticEndScreen.html', () => {
     return {
@@ -72,7 +71,7 @@ jest.mock('html/VastStaticEndScreen.html', () => {
                 expect(adUnitContainer.reconfigure).toHaveBeenCalledWith(ViewConfiguration.ENDSCREEN);
             });
             it('the screen orientation should be locked', () => {
-                expect(adUnitContainer.reorient).toHaveBeenCalledWith(false, anything());
+                expect(adUnitContainer.reorient).toHaveBeenCalledWith(false, expect.anything());
             });
         });
 
