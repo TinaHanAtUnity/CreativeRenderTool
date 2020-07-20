@@ -1,4 +1,4 @@
-# Pending
+# Mon Jul 20 21:41:48 UTC 2020
 
 * Increase proxied auction traffic from China to 75% [#16437](https://github.com/Applifier/unity-ads-webview/pull/16437)
 
