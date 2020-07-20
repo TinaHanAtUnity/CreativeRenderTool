@@ -18,7 +18,7 @@ import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { Observable3 } from 'Core/Utilities/Observable';
 import { SDKMetrics, AUIMetric } from 'Ads/Utilities/SDKMetrics';
-import { MabDisabledABTest } from 'Core/Models/ABGroup';
+import { MabReverseABTest } from 'Core/Models/ABGroup';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { ARUtil } from 'AR/Utilities/ARUtil';
@@ -81,7 +81,7 @@ export class AutomatedExperimentManager {
     }
 
     public static isAutomationAvailable(adsConfig: AdsConfiguration, config: CoreConfiguration) {
-        return !MabDisabledABTest.isValid(config.getAbGroup()) || adsConfig.getHasArPlacement();
+        return MabReverseABTest.isValid(config.getAbGroup()) || adsConfig.getHasArPlacement();
     }
 
     constructor() {
