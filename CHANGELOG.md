@@ -1,5 +1,6 @@
 # Pending
 
+* [AUI] Make MAB reverse AB test explicit [#16436](https://github.com/Applifier/unity-ads-webview/pull/16436)
 * [VAST Endcard PR1] Refactor show method to be async and add more unit tests [#16252](https://github.com/Applifier/unity-ads-webview/pull/16252)
 
 # Tue Jul 21 18:51:38 UTC 2020
