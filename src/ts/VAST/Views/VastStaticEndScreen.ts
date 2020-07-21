@@ -5,16 +5,19 @@ import VastStaticEndScreenTemplate from 'html/VastStaticEndScreen.html';
 import { VastEndScreen } from 'VAST/Views/VastEndScreen';
 import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
+import { AdUnitContainer, ViewConfiguration } from 'Ads/AdUnits/Containers/AdUnitContainer';
 
 export class VastStaticEndScreen extends VastEndScreen implements IPrivacyHandlerView {
 
     private _privacy: AbstractPrivacy;
+    private _adUnitContainer: AdUnitContainer;
 
     constructor(parameters: IAdUnitParameters<VastCampaign>, attachTap?: boolean | undefined) {
         super(parameters, attachTap);
 
         this._privacy = parameters.privacy;
         this._template = new Template(VastStaticEndScreenTemplate);
+        this._adUnitContainer = parameters.container;
         const landscape = this._campaign.getStaticLandscape();
         const portrait = this._campaign.getStaticPortrait();
 
@@ -53,8 +56,11 @@ export class VastStaticEndScreen extends VastEndScreen implements IPrivacyHandle
     }
 
     public show(): Promise<void> {
-        super.show();
-        return Promise.resolve();
+        return this._adUnitContainer.reconfigure(ViewConfiguration.ENDSCREEN).then(() => {
+            this._adUnitContainer.reorient(false, this._adUnitContainer.getLockedOrientation()).then(() => {
+                super.show();
+            });
+        });
     }
 
     public remove(): void {
