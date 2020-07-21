@@ -1,5 +1,6 @@
 # Pending
 
+* [VAST Endcard] Lock Screen Orientation on Show [#16495](https://github.com/Applifier/unity-ads-webview/pull/16495)
 * [AUI] Make MAB reverse AB test explicit [#16436](https://github.com/Applifier/unity-ads-webview/pull/16436)
 * [VAST Endcard PR1] Refactor show method to be async and add more unit tests [#16252](https://github.com/Applifier/unity-ads-webview/pull/16252)
 
