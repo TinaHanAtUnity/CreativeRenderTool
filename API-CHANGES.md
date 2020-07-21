@@ -18,6 +18,15 @@ All API methods are referred with class.method notation, e.g. VideoPlayer.play
 
 * iOS 14.0 ATTrackingManager methods.
 
+## 3.4.8
+
+* Added IosDeviceInfo.getDeviceName
+* Added IosDeviceInfo.getVendorIdentifier
+* Added IosDeviceInfo.getCurrentUITheme
+* Added IosDeviceInfo.getLocaleList
+* Added IosDeviceInfo.getAdNetworkIdsPlist
+* Added IosDeviceInfo.getSystemBootTime
+
 ## 3.4.0
 
 * Added ClassDetection API
