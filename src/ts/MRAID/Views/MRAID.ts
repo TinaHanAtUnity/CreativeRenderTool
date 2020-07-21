@@ -122,7 +122,7 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
             if (CustomFeatures.isNestedIframePlayable(this._creativeId)) {
                 iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin');
             }
-        }).catch(e => {
+        }).catch((e: Error) => {
             this._core.Sdk.logError('failed to create mraid: ' + e.message);
 
             SessionDiagnostics.trigger('create_mraid_error', {
