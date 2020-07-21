@@ -1,3 +1,7 @@
+# Pending
+
+* [VAST Endcard PR1] Refactor show method to be async and add more unit tests [#16252](https://github.com/Applifier/unity-ads-webview/pull/16252)
+
 # Tue Jul 21 18:51:38 UTC 2020
 
 * [Chore] Fix MRAID Error Logging [#16439](https://github.com/Applifier/unity-ads-webview/pull/16439)
