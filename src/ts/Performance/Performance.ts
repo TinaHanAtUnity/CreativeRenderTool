@@ -10,7 +10,7 @@ import { IARApi } from 'AR/AR';
 import { PerformanceAdUnitWithAutomatedExperimentParametersFactory } from 'MabExperimentation/Performance/PerformanceAdUnitWithAutomatedExperimentParametersFactory';
 import { PerformanceAdUnitWithAutomatedExperimentFactory } from 'MabExperimentation/Performance/PerformanceAdUnitWithAutomatedExperimentFactory';
 import { AutomatedExperimentManager } from 'MabExperimentation/AutomatedExperimentManager';
-import { MabDisabledABTest } from 'Core/Models/ABGroup';
+import { MabReverseABTest } from 'Core/Models/ABGroup';
 
 export class Performance extends AbstractParserModule {
     constructor(ar: IARApi, core: ICore, aem: AutomatedExperimentManager, ads: IAds) {
@@ -18,7 +18,7 @@ export class Performance extends AbstractParserModule {
         const parser = new CometCampaignParser(core);
 
         let performanceFactory: PerformanceAdUnitFactory;
-        if (!MabDisabledABTest.isValid(core.Config.getAbGroup())) {
+        if (MabReverseABTest.isValid(core.Config.getAbGroup())) {
             performanceFactory = new PerformanceAdUnitWithAutomatedExperimentFactory(
                 new PerformanceAdUnitWithAutomatedExperimentParametersFactory(core, aem));
         } else {
