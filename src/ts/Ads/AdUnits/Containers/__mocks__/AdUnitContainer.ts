@@ -7,6 +7,8 @@ export type AdUnitContainerMock = Base & {
     close: jest.Mock;
     reconfigure: jest.Mock;
     setViewFrame: jest.Mock;
+    reorient: jest.Mock;
+    getLockedOrientation: jest.Mock;
 };
 
 export const AdUnitContainer = jest.fn(() => {
@@ -16,6 +18,8 @@ export const AdUnitContainer = jest.fn(() => {
         open: jest.fn().mockResolvedValue(Promise.resolve()),
         close: jest.fn().mockResolvedValue(Promise.resolve()),
         reconfigure: jest.fn().mockResolvedValue(Promise.resolve()),
-        setViewFrame: jest.fn().mockResolvedValue(Promise.resolve())
+        setViewFrame: jest.fn().mockResolvedValue(Promise.resolve()),
+        reorient: jest.fn().mockResolvedValue(Promise.resolve()),
+        getLockedOrientation: jest.fn().mockResolvedValue(Promise.resolve())
     };
 });
