@@ -63,23 +63,29 @@ jest.mock('html/VastStaticEndScreen.html', () => {
         });
 
         describe('when endcard is rendered', () => {
-            it('the inner HTML should not be null', () => {
+            beforeEach(() => {
                 staticEndScreen.render();
+            });
+            it('the inner HTML should not be null', () => {
                 expect(staticEndScreen.container().innerHTML).toEqual('HTMLRenderTest');
             });
         });
 
         describe('when endcard is removed', () => {
-            it('the privacy should hide', () => {
+            beforeEach(() => {
                 staticEndScreen.remove();
+            });
+            it('the privacy should hide', () => {
                 expect(privacy.hide).toHaveBeenCalled();
             });
 
         });
 
         describe('on privacy closed', () => {
-            it('the privacy should hide', () => {
+            beforeEach(() => {
                 staticEndScreen.onPrivacyClose();
+            });
+            it('the privacy should hide', () => {
                 expect(privacy.hide).toHaveBeenCalled();
             });
         });
