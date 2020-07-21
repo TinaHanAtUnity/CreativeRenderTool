@@ -1,5 +1,6 @@
 # Pending
 
+* [Release 3.4.8] Add Webview Release Support [#16431](https://github.com/Applifier/unity-ads-webview/pull/16431)
 * [Chore] Update Dependencies [#16430](https://github.com/Applifier/unity-ads-webview/pull/16430)
 
 # Mon Jul 20 21:41:48 UTC 2020
