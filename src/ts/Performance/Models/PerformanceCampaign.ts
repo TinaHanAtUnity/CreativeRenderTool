@@ -40,6 +40,7 @@ export interface IRawPerformanceCampaign extends IRawCampaign {
     appDownloadUrl?: string;
     mraidUrl?: string;
     dynamicMarkup?: string;
+    endScreenType?: string;
     endScreenUrl?: string;
 }
 
@@ -65,6 +66,7 @@ export interface IPerformanceCampaign extends ICampaign {
     store: StoreName;
     adUnitStyle: AdUnitStyle | undefined;
     appDownloadUrl?: string;
+    endScreenType?: string;
     endScreen?: HTML;
 }
 
@@ -93,6 +95,7 @@ export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
             store: ['number'],
             adUnitStyle: ['object', 'undefined'],
             appDownloadUrl: ['string', 'undefined'],
+            endScreenType: ['string', 'undefined'],
             endScreen: ['object', 'undefined']
         }, campaign);
     }
@@ -227,6 +230,10 @@ export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
         return this.get('adUnitStyle');
     }
 
+    public getEndScreenType(): string | undefined {
+        return this.get('endScreenType');
+    }
+
     public getEndScreen(): HTML | undefined {
         return this.get('endScreen');
     }
@@ -286,6 +293,7 @@ export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
             'bypassAppSheet': this.getBypassAppSheet(),
             'store': StoreName[this.getStore()].toLowerCase(),
             'appDownloadUrl': this.getAppDownloadUrl(),
+            'endScreenType': this.getEndScreenType(),
             'endScreen': this.getEndScreen()
         };
     }
