@@ -21,11 +21,11 @@ body.tilted-layout #end-screen {
         width: 100%;
 
         &.landscape {
-          transform: rotate(-15deg) scale(1.35) translate(-5px, 35px); // remove the translation when using the description of the game
+          transform: rotate(-15deg) scale(1.4) translate(-10px, 42px); // remove the translation when using the description of the game, also scale was 1.35
         }
 
         &.square {
-          transform: rotate(-15deg) scale(1.35) translateX(-15px);
+          transform: rotate(-15deg) scale(1.6) translate(-40px, 44px);
         }
       }
     }
@@ -41,7 +41,7 @@ body.tilted-layout #end-screen {
       justify-content: unset;
       z-index: 2;
       height: 35%; // make this 40% when on a regular phone, not stretched
-      transform: translateY(25px); // Note: This is only for iphone X, which is the test device for the concept
+      transform: translateY(30%); // Note: This is only for iphone X, which is the test device for the concept
 
       &::before {
         position: absolute;
@@ -59,7 +59,7 @@ body.tilted-layout #end-screen {
       .end-screen-info {
         display: flex;
         flex-direction: column;
-        transform: rotate(-15deg) translateY(-40%);
+        transform: rotate(-15deg) translateY(-45%);
         padding-left: 2em;
         height: 50%;
         animation: end-screen-info-slide 0.3s ease-out 0s forwards 1;
@@ -139,8 +139,9 @@ body.tilted-layout #end-screen {
       }
 
       .download-cta-container {
-        height: 100%;
+        height: 50%;
         position: relative;
+        transform: translateY(-45%);
         animation: download-container-slide 0.3s ease-out 0s forwards 1;
 
         .download-cta-button {
@@ -180,11 +181,11 @@ body.tilted-layout #end-screen {
 
 @keyframes end-screen-info-slide {
   from {
-    transform: rotate(-15deg) translateY(-40%) translateX(-200%);
+    transform: rotate(-15deg) translateY(-45%) translateX(-200%);
   }
 
   to {
-    transform: rotate(-15deg) translateY(-40%) translateX(0%);
+    transform: rotate(-15deg) translateY(-45%) translateX(0%);
   }
 }
 
@@ -204,6 +205,6 @@ body.tilted-layout #end-screen {
   }
 
   to {
-    transform: translateY(0%);
+    transform: translateY(-45%);
   }
 }

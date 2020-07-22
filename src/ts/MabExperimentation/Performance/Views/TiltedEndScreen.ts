@@ -55,10 +55,17 @@ export class TiltedEndScreen extends PerformanceEndScreen {
             simpleRating: this._simpleRating
         };
 
-        this._bindings.push({
-            event: 'click',
-            listener: (event: Event) => this.onClickCollection(event)
-        });
+        this._bindings.push(
+            {
+                event: 'click',
+                listener: (event: Event) => this.onClickCollection(event)
+            },
+            {
+                event: 'click',
+                listener: (event: Event) => this.onDownloadEvent(event),
+                selector: '.game-creative-image, .download-cta-button'
+            }
+        );
     }
 
     // private fixupScheme(actions: IExperimentActionChoice | undefined) {
