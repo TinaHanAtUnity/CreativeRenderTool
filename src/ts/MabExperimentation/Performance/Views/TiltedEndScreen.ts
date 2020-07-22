@@ -26,8 +26,8 @@ export class TiltedEndScreen extends PerformanceEndScreen {
     // private _formattedCtaAlternativeText: string;
     private _language: string;
     private _automatedExperimentManager: AutomatedExperimentManager;
-    // private _clickHeatMapData: IClickHeatMapEntry[] = [];
-    // private _clickHeatMapDataLimit: number = 10;\
+    private _clickHeatMapData: IClickHeatMapEntry[] = [];
+    private _clickHeatMapDataLimit: number = 10;
     private _simpleRating: string;
 
     constructor(
@@ -55,10 +55,10 @@ export class TiltedEndScreen extends PerformanceEndScreen {
             simpleRating: this._simpleRating
         };
 
-        // this._bindings.push({
-        //     event: 'click',
-        //     listener: (event: Event) => this.onClickCollection(event)
-        // });
+        this._bindings.push({
+            event: 'click',
+            listener: (event: Event) => this.onClickCollection(event)
+        });
     }
 
     // private fixupScheme(actions: IExperimentActionChoice | undefined) {
@@ -232,17 +232,17 @@ export class TiltedEndScreen extends PerformanceEndScreen {
         window.removeEventListener('resize', this.handleResize);
     }
 
-    // protected onDownloadEvent(event: Event): void {
-    //     this.onClickCollection(event);
-    //     this._automatedExperimentManager.setHeatMapData(this._clickHeatMapData);
-    //     super.onDownloadEvent(event);
-    // }
+    protected onDownloadEvent(event: Event): void {
+        this.onClickCollection(event);
+        this._automatedExperimentManager.setHeatMapData(this._clickHeatMapData);
+        super.onDownloadEvent(event);
+    }
 
-    // protected onCloseEvent(event: Event): void {
-    //     this.onClickCollection(event);
-    //     this._automatedExperimentManager.setHeatMapData(this._clickHeatMapData);
-    //     super.onCloseEvent(event);
-    // }
+    protected onCloseEvent(event: Event): void {
+        this.onClickCollection(event);
+        this._automatedExperimentManager.setHeatMapData(this._clickHeatMapData);
+        super.onCloseEvent(event);
+    }
 
     protected getTemplate() {
         return TiltedEndScreenTemplate;
@@ -261,18 +261,18 @@ export class TiltedEndScreen extends PerformanceEndScreen {
         setTimeout(() => element.classList.add('on-show'), 0);
     }
 
-    // private onClickCollection(event: Event): void {
-    //     event.preventDefault();
+    private onClickCollection(event: Event): void {
+        event.preventDefault();
 
-    //     if (this._clickHeatMapData.length >= this._clickHeatMapDataLimit) {
-    //         this._clickHeatMapData.shift();
-    //     }
+        if (this._clickHeatMapData.length >= this._clickHeatMapDataLimit) {
+            this._clickHeatMapData.shift();
+        }
 
-    //     this._clickHeatMapData.push({
-    //         is_portrait: window.innerHeight > window.innerWidth,
-    //         normalized_x: (<MouseEvent>event).pageX / window.innerWidth,
-    //         normalized_y: (<MouseEvent>event).pageY / window.innerHeight,
-    //         target: (<HTMLElement>(<MouseEvent>event).target).className
-    //     });
-    // }
+        this._clickHeatMapData.push({
+            is_portrait: window.innerHeight > window.innerWidth,
+            normalized_x: (<MouseEvent>event).pageX / window.innerWidth,
+            normalized_y: (<MouseEvent>event).pageY / window.innerHeight,
+            target: (<HTMLElement>(<MouseEvent>event).target).className
+        });
+    }
 }
