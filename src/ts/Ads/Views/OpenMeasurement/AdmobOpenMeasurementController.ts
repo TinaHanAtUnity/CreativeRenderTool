@@ -149,7 +149,7 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
         return this._clientInfo.getSdkVersionName();
     }
 
-    public admobImpression(omAdViewBuilder: OpenMeasurementAdViewBuilder) {
+    public admobImpression(omAdViewBuilder: OpenMeasurementAdViewBuilder): void {
         SDKMetrics.reportMetricEvent(AdmobMetric.AdmobOMImpression);
         const viewport = OpenMeasurementUtilities.calculateViewPort(screen.width, screen.height);
         const adView = omAdViewBuilder.buildAdmobImpressionView(this, screen.width, screen.height);

@@ -219,11 +219,9 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
                 width: 0,
                 height: 0
             };
-            if (omController) {
-                const adView = adViewBuilder.buildAdmobAdView([], omController, rect);
-                const viewPort = adViewBuilder.getViewPort();
-                this.geometryChangeDebounce(viewPort, adView, omController);
-            }
+            const adView = adViewBuilder.buildAdmobAdView([], omController, rect);
+            const viewPort = adViewBuilder.getViewPort();
+            this.geometryChangeDebounce(viewPort, adView, omController);
         }
     }
 
@@ -245,11 +243,9 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
                 width: 0,
                 height: 0
             };
-            if (omController) {
-                const adView = adViewBuilder.buildAdmobAdView([ObstructionReasons.BACKGROUNDED], omController, rect);
-                const viewPort = adViewBuilder.getViewPort();
-                this.geometryChangeDebounce(viewPort, adView, omController);
-            }
+            const adView = adViewBuilder.buildAdmobAdView([ObstructionReasons.BACKGROUNDED], omController, rect);
+            const viewPort = adViewBuilder.getViewPort();
+            this.geometryChangeDebounce(viewPort, adView, omController);
         }
     }
 
