@@ -14,12 +14,9 @@ we currently need to use for some native releases.
 
 All API methods are referred with class.method notation, e.g. VideoPlayer.play
 
-## 3.5.0
-
-* iOS 14.0 ATTrackingManager methods.
-
 ## 3.4.8
 
+* Added iOS TrackingManager Api
 * Added IosDeviceInfo.getDeviceName
 * Added IosDeviceInfo.getVendorIdentifier
 * Added IosDeviceInfo.getCurrentUITheme
