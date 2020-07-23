@@ -165,6 +165,7 @@ import { SdkDetectionInfo } from 'Core/Models/SdkDetectionInfo';
 import { IMonetizationApi } from 'Monetization/IMonetization';
 import { MonetizationListenerApi } from 'Monetization/Native/MonetizationListener';
 import { PlacementContentsApi } from 'Monetization/Native/PlacementContents';
+import { TrackingManagerApi } from 'Core/Native/iOS/TrackingManager';
 
 const TestMediaID = 'beefcace-abcdefg-deadbeef';
 export class TestFixtures {
@@ -1038,7 +1039,8 @@ export class TestFixtures {
                 MainBundle: new MainBundleApi(nativeBridge),
                 Notification: new NotificationApi(nativeBridge),
                 Preferences: new IosPreferencesApi(nativeBridge),
-                UrlScheme: new UrlSchemeApi(nativeBridge)
+                UrlScheme: new UrlSchemeApi(nativeBridge),
+                TrackingManager: new TrackingManagerApi(nativeBridge)
             } : undefined
         };
     }

@@ -1,3 +1,20 @@
+# Pending
+
+* [VAST Endcard] Lock Screen Orientation on Show [#16495](https://github.com/Applifier/unity-ads-webview/pull/16495)
+* [AUI] Make MAB reverse AB test explicit [#16436](https://github.com/Applifier/unity-ads-webview/pull/16436)
+* [VAST Endcard PR1] Refactor show method to be async and add more unit tests [#16252](https://github.com/Applifier/unity-ads-webview/pull/16252)
+
+# Tue Jul 21 18:51:38 UTC 2020
+
+* [Chore] Fix MRAID Error Logging [#16439](https://github.com/Applifier/unity-ads-webview/pull/16439)
+* [Load V5] Update Allow List GameIDs [#16438](https://github.com/Applifier/unity-ads-webview/pull/16438)
+* [Release 3.4.8] Add Webview Release Support [#16431](https://github.com/Applifier/unity-ads-webview/pull/16431)
+* [Chore] Update Dependencies [#16430](https://github.com/Applifier/unity-ads-webview/pull/16430)
+
+# Mon Jul 20 21:41:48 UTC 2020
+
+* Increase proxied auction traffic from China to 75% [#16437](https://github.com/Applifier/unity-ads-webview/pull/16437)
+
 # Tue 14 Jul 2020 15:37:54 UTC
 
 * [AUI] Collect click data for heatmap purposes [#16316](https://github.com/Applifier/unity-ads-webview/pull/16316)

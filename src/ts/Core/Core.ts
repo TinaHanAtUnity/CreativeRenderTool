@@ -55,6 +55,7 @@ import { NoGzipCacheManager } from 'Core/Managers/NoGzipCacheManager';
 import { createMetricInstance } from 'Ads/Networking/MetricInstance';
 import { createStopwatch } from 'Core/Utilities/Stopwatch';
 import { IsMadeWithUnity } from 'Ads/Utilities/IsMadeWithUnity';
+import { TrackingManagerApi } from 'Core/Native/iOS/TrackingManager';
 
 export class Core implements ICore {
 
@@ -108,7 +109,8 @@ export class Core implements ICore {
                 MainBundle: new MainBundleApi(nativeBridge),
                 Notification: new NotificationApi(nativeBridge),
                 Preferences: new IosPreferencesApi(nativeBridge),
-                UrlScheme: new UrlSchemeApi(nativeBridge)
+                UrlScheme: new UrlSchemeApi(nativeBridge),
+                TrackingManager: new TrackingManagerApi(nativeBridge)
             } : undefined
         };
 

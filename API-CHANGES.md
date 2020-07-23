@@ -14,6 +14,16 @@ we currently need to use for some native releases.
 
 All API methods are referred with class.method notation, e.g. VideoPlayer.play
 
+## 3.4.8
+
+* Added iOS TrackingManager Api
+* Added IosDeviceInfo.getDeviceName
+* Added IosDeviceInfo.getVendorIdentifier
+* Added IosDeviceInfo.getCurrentUITheme
+* Added IosDeviceInfo.getLocaleList
+* Added IosDeviceInfo.getAdNetworkIdsPlist
+* Added IosDeviceInfo.getSystemBootTime
+
 ## 3.4.0
 
 * Added ClassDetection API
