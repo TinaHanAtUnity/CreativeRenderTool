@@ -256,6 +256,24 @@ class SatisfiesMatcher {
                 loadedCampaign2 = await adRequestManager.requestLoad('rewardedVideo');
             });
 
+            it('should fire correct amount of load tracking events', () => {
+                expect(core.Ads.LoadAndFillEventManager.sendLoadTrackingEvents).toBeCalledTimes(2);
+            });
+
+            it('should call sendLoadTrackingEvents with correct placementIds', () => {
+                expect(core.Ads.LoadAndFillEventManager.sendLoadTrackingEvents).toBeCalledWith('video');
+                expect(core.Ads.LoadAndFillEventManager.sendLoadTrackingEvents).toBeCalledWith('rewardedVideo');
+            });
+
+            it('should fire correct amount of fill tracking events', () => {
+                expect(core.Ads.LoadAndFillEventManager.sendFillTrackingEvents).toBeCalledTimes(2);
+            });
+
+            it('should call sendFillTrackingEvents with correct parameters', () => {
+                expect(core.Ads.LoadAndFillEventManager.sendFillTrackingEvents).toBeCalledWith('video', loadedCampaign1!.campaign);
+                expect(core.Ads.LoadAndFillEventManager.sendFillTrackingEvents).toBeCalledWith('rewardedVideo', loadedCampaign2!.campaign);
+            });
+
             it('should send fill metric', () => {
                 expect(SDKMetrics.reportMetricEventWithTags).toBeCalledWith(LoadV5.LoadRequestFill, expect.anything());
             });
@@ -483,6 +501,33 @@ class SatisfiesMatcher {
 
             it('should getPlacementsForGroupId be called with correct ad unit id', () => {
                 expect(adsConfig.getPlacementsForGroupId).toBeCalledWith('test_group_id');
+            });
+
+            it('should fire correct amount of load tracking events', () => {
+                expect(core.Ads.LoadAndFillEventManager.sendLoadTrackingEvents).toBeCalledTimes(4);
+            });
+
+            it('should call sendLoadTrackingEvents with correct placementIds', () => {
+                expect(core.Ads.LoadAndFillEventManager.sendLoadTrackingEvents).toBeCalledWith('video');
+                expect(core.Ads.LoadAndFillEventManager.sendLoadTrackingEvents).toBeCalledWith('rewardedVideo');
+                expect(core.Ads.LoadAndFillEventManager.sendLoadTrackingEvents).toBeCalledWith('video2');
+                expect(core.Ads.LoadAndFillEventManager.sendLoadTrackingEvents).toBeCalledWith('video3');
+            });
+
+            it('should fire correct amount of fill tracking events', () => {
+                expect(core.Ads.LoadAndFillEventManager.sendFillTrackingEvents).toBeCalledTimes(3);
+            });
+
+            it('should call sendFillTrackingEvents with correct parameters', () => {
+                const additionalCampaigns: IPlacementIdMap<INotCachedLoadedCampaign | undefined> = <IPlacementIdMap<INotCachedLoadedCampaign | undefined>>onAdditionalPlacementsReady.mock.calls[0][1];
+
+                expect(core.Ads.LoadAndFillEventManager.sendFillTrackingEvents).toBeCalledWith('video', loadedCampaign!.campaign);
+                expect(core.Ads.LoadAndFillEventManager.sendFillTrackingEvents).toBeCalledWith('rewardedVideo', additionalCampaigns.rewardedVideo!.notCachedCampaign);
+                expect(core.Ads.LoadAndFillEventManager.sendFillTrackingEvents).toBeCalledWith('video2', additionalCampaigns.video2!.notCachedCampaign);
+            });
+
+            it('should NOT call sendFillTrackingEvents for nofill placements', () => {
+                expect(core.Ads.LoadAndFillEventManager.sendFillTrackingEvents).not.toBeCalledWith('video3', expect.anything());
             });
 
             it('should send fill metric', () => {
@@ -949,6 +994,27 @@ class SatisfiesMatcher {
 
             it('should load single campaigns', () => {
                 expect(loadedCampaign2).toBeDefined();
+            });
+
+            it('should fire correct amount of load tracking events', () => {
+                expect(core.Ads.LoadAndFillEventManager.sendLoadTrackingEvents).toBeCalledTimes(2);
+            });
+
+            it('should call sendLoadTrackingEvents with correct placementIds', () => {
+                expect(core.Ads.LoadAndFillEventManager.sendLoadTrackingEvents).toBeCalledWith('video');
+                expect(core.Ads.LoadAndFillEventManager.sendLoadTrackingEvents).toBeCalledWith('rewardedVideo');
+            });
+
+            it('should fire correct amount of fill tracking events', () => {
+                expect(core.Ads.LoadAndFillEventManager.sendFillTrackingEvents).toBeCalledTimes(1);
+            });
+
+            it('should call sendFillTrackingEvents with correct parameters', () => {
+                expect(core.Ads.LoadAndFillEventManager.sendFillTrackingEvents).toBeCalledWith('rewardedVideo', loadedCampaign2!.campaign);
+            });
+
+            it('should NOT call sendFillTrackingEvents for nofill placements', () => {
+                expect(core.Ads.LoadAndFillEventManager.sendFillTrackingEvents).not.toBeCalledWith('video', expect.anything());
             });
 
             it('should have correct in loadedCampaign2', () => {
