@@ -1,5 +1,6 @@
 # Pending
 
+* [Load V5] Send load api enabled flag to kafka [#16434](https://github.com/Applifier/unity-ads-webview/pull/16434)
 * Add load and fill event manager [#16401](https://github.com/Applifier/unity-ads-webview/pull/16401)
 
 # Tue Jul 21 21:43:41 UTC 2020
