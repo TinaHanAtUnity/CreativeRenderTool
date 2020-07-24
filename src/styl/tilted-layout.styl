@@ -238,6 +238,96 @@ body.tilted-layout #end-screen {
   }
 }
 
+body.tilted-layout.landscape #end-screen {
+  .btn-close-region {
+    color: $white;
+  }
+
+  .campaign-container {
+    display: flex;
+
+    .game-creative-container {
+      width: 55%;
+      height: 100%;
+      position: relative;
+
+      .game-creative-image.portrait {
+        transform: translate(-3em, 1.5em) rotate(-15deg) scale(1.4);
+      }
+    }
+
+    .end-screen-info-background {
+      width: 45%;
+      height: 100%;
+      background: transparent;
+      transform: translateY(0);
+
+      &::before {
+        background: $tilted-layout-black;
+        width: 40em;
+        transform: skewX(15deg);
+      }
+
+      .end-screen-info {
+        transform: rotate(-15deg);
+        display: flex;
+        align-items: flex-start;
+        padding-left: unset;
+        animation: qwerqwer;
+
+        .game-icon-rating-container {
+          transform: translateX(-25%);
+          align-items: center;
+
+          .game-icon {
+            box-shadow: none;
+          }
+        }
+
+        .game-details-container {
+          transform: translateY(0);
+          max-width: 90%;
+
+          .game-name {
+            text-align: left;
+          }
+        }
+      }
+
+      .download-cta-container {
+        transform: translateY(0);
+        animation: qwerqwer;
+
+        .download-cta-button {
+          transform: skewY(-15deg) translateY(62%);
+          animation: qwerqwer;
+          width: 25em;
+          padding-right: 1.5em;
+
+          .download-cta-text {
+            font-size: 2em;
+            justify-content: flex-end;
+          }
+        }
+      }
+    }
+  }
+}
+
+// these handle whether we show the landscape or portrait creative
+// depending on the layout
+body.tilted-layout.landscape {
+  .game-creative-image.landscape {
+    display: none;
+  }
+}
+
+body.tilted-layout.portrait {
+  .game-creative-image.portrait {
+    display: none;
+  }
+}
+
 @keyframes cta-button-bounce {
   0%, 40%, 60%, 100% {
     transform: skewY(-15deg) translateY(50%);

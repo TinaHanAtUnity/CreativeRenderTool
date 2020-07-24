@@ -3,13 +3,14 @@
 </div>
 <div class="campaign-container<%= data.endscreenAlt ? ' ' + data.endscreenAlt : '' %>">
   <div class="game-creative-container">
-    <!-- <div class="game-background game-background-portrait"
-      style="background-image: url('<%= data.endScreenLandscape && data.endScreenLandscape.replace("file://", "") %>')">
-    </div> -->
+    <% if(!!data.endScreenSquare ) { %>
+      <img class="game-creative-image square" src="<%= data.endScreenSquare && data.endScreenSquare.replace("file://", "") %>" />
+    <% } %>
+    <% if(!!data.endScreenPortrait) { %>
+      <img class="game-creative-image portrait" src="<%= data.endScreenPortrait && data.endScreenPortrait.replace("file://", "") %>" />
+    <% } %>
     <% if(!!data.endScreenLandscape) { %>
       <img class="game-creative-image landscape" src="<%= data.endScreenLandscape && data.endScreenLandscape.replace("file://", "") %>" />
-    <% } else if(!!data.endScreenSquare ) { %>
-      <img class="game-creative-image square" src="<%= data.endScreenSquare && data.endScreenSquare.replace("file://", "") %>" />
     <% } %>
   </div>
   <div class="privacy-container">
