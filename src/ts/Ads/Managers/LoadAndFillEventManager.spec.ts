@@ -36,7 +36,7 @@ import { Placement } from 'Ads/Models/__mocks__/Placement';
             storageBridge = StorageBridge();
 
             clientInfo.getGameId.mockReturnValue('testgameid_1');
-            clientInfo.getSdkVersionName.mockReturnValue('3.4.5_test');
+            clientInfo.getSdkVersion.mockReturnValue('3450_test');
             coreConfig.getAbGroup.mockReturnValue(toAbGroup(99));
             coreConfig.getToken.mockReturnValue('test_token');
             coreConfig.isCoppaCompliant.mockReturnValue(true);
@@ -71,7 +71,7 @@ import { Placement } from 'Ads/Models/__mocks__/Placement';
                 if (platform !== Platform.ANDROID) {
                     return;
                 }
-                expect(request.get).toBeCalledWith(`https://tracking.prd.mz.internal.unity3d.com/operative/test_1?eventType=load&token=test_token&abGroup=99&gameId=testgameid_1&campaignId=005472656d6f7220416e6472&adUnitId=test_ad_unit_1&coppa=true&optOutEnabled=false&frameworkName=test_name&frameworkVersion=test_version&platform=${Platform[platform]}&sdkVersion=3.4.5_test`, [], {
+                expect(request.get).toBeCalledWith(`https://tracking.prd.mz.internal.unity3d.com/operative/test_1?eventType=load&token=test_token&abGroup=99&gameId=testgameid_1&campaignId=005472656d6f7220416e6472&adUnitId=test_ad_unit_1&coppa=true&optOutEnabled=false&frameworkName=test_name&frameworkVersion=test_version&platform=${Platform[platform]}&sdkVersion=3450_test`, [], {
                     followRedirects: true,
                     retries: 2,
                     retryDelay: 10000,
@@ -83,7 +83,7 @@ import { Placement } from 'Ads/Models/__mocks__/Placement';
                 if (platform !== Platform.IOS) {
                     return;
                 }
-                expect(request.get).toBeCalledWith(`https://tracking.prd.mz.internal.unity3d.com/operative/test_1?eventType=load&token=test_token&abGroup=99&gameId=testgameid_1&campaignId=00005472656d6f7220694f53&adUnitId=test_ad_unit_1&coppa=true&optOutEnabled=false&frameworkName=test_name&frameworkVersion=test_version&platform=${Platform[platform]}&sdkVersion=3.4.5_test`, [], {
+                expect(request.get).toBeCalledWith(`https://tracking.prd.mz.internal.unity3d.com/operative/test_1?eventType=load&token=test_token&abGroup=99&gameId=testgameid_1&campaignId=00005472656d6f7220694f53&adUnitId=test_ad_unit_1&coppa=true&optOutEnabled=false&frameworkName=test_name&frameworkVersion=test_version&platform=${Platform[platform]}&sdkVersion=3450_test`, [], {
                     followRedirects: true,
                     retries: 2,
                     retryDelay: 10000,
@@ -109,7 +109,7 @@ import { Placement } from 'Ads/Models/__mocks__/Placement';
             });
 
             it('should call requestManager.post with correct parameters', () => {
-                expect(request.get).toBeCalledWith(`https://tracking.prd.mz.internal.unity3d.com/operative/test_2?eventType=fill&token=test_token&abGroup=99&gameId=testgameid_1&campaignId=test_id&adUnitId=test_ad_unit_2&coppa=true&optOutEnabled=false&frameworkName=test_name&frameworkVersion=test_version&platform=${Platform[platform]}&sdkVersion=3.4.5_test`, [], {
+                expect(request.get).toBeCalledWith(`https://tracking.prd.mz.internal.unity3d.com/operative/test_2?eventType=fill&token=test_token&abGroup=99&gameId=testgameid_1&campaignId=test_id&adUnitId=test_ad_unit_2&coppa=true&optOutEnabled=false&frameworkName=test_name&frameworkVersion=test_version&platform=${Platform[platform]}&sdkVersion=3450_test`, [], {
                     followRedirects: true,
                     retries: 2,
                     retryDelay: 10000,
