@@ -805,7 +805,7 @@ export class Ads implements IAds {
     private setupLoadApiEnabled(): void {
         this._loadApiEnabled = this._core.ClientInfo.getUsePerPlacementLoad();
 
-        HttpKafka.sendEvent('ads.events.loadApiEnabled.v1.json', KafkaCommonObjectType.ANONYMOUS, {
+        HttpKafka.sendEvent('ads.sdk.loadApiEnabled.v1.json', KafkaCommonObjectType.ANONYMOUS, {
             'v': 1,
             loadApiEnabled: this._loadApiEnabled
         });
