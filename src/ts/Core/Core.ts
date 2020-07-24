@@ -55,7 +55,7 @@ import { NoGzipCacheManager } from 'Core/Managers/NoGzipCacheManager';
 import { createMetricInstance } from 'Ads/Networking/MetricInstance';
 import { createStopwatch } from 'Core/Utilities/Stopwatch';
 import { IsMadeWithUnity } from 'Ads/Utilities/IsMadeWithUnity';
-import { TrackingManagerApi } from 'Core/Native/iOS/TrackingManager';
+import { TrackingManagerApi, TrackingAuthorizationStatus } from 'Core/Native/iOS/TrackingManager';
 
 export class Core implements ICore {
 
@@ -182,6 +182,20 @@ export class Core implements ICore {
                     this.Api.Sdk.logError(`[Test] Failed to get one of the new fields. Error: ${err}`);
                 });
             }
+
+            this.Api.iOS!.TrackingManager.available().then((isAvailable) => {
+                this.Api.Sdk.logInfo(`[Test] TrackingManager Available: ${isAvailable}`);
+                if (isAvailable) {
+                    this.Api.iOS!.TrackingManager.getTrackingAuthorizationStatus().then((authStatus) => {
+                        this.Api.Sdk.logInfo(`[Test] Tracking Authorization Status: ${authStatus}`);
+                        this.Api.iOS!.TrackingManager.requestTrackingAuthorization().then(() => {
+                            this.Api.iOS!.TrackingManager.getTrackingAuthorizationStatus().then((authStatusUpdated) => {
+                                this.Api.Sdk.logInfo(`[Test] [After request dialog] Tracking Authorization Status: ${authStatusUpdated}`);
+                            });
+                        });
+                    });
+                }
+            });
 
             measurements.reset();
             measurements.start();
