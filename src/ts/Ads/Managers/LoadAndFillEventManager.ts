@@ -1,14 +1,14 @@
+import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
+import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Campaign } from 'Ads/Models/Campaign';
+import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
 import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
+import { ClientInfo } from 'Core/Models/ClientInfo';
+import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
+import { FrameworkMetaData } from 'Core/Models/MetaData/FrameworkMetaData';
 import { StorageBridge } from 'Core/Utilities/StorageBridge';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
-import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
-import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
-import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
-import { ClientInfo } from 'Core/Models/ClientInfo';
-import { Platform } from 'Core/Constants/Platform';
-import { FrameworkMetaData } from 'Core/Models/MetaData/FrameworkMetaData';
 
 enum LoadAndFillEventMacro {
     ZONE = '%ZONE%',
@@ -43,12 +43,12 @@ export class LoadAndFillEventManager extends ThirdPartyEventManager {
         super(core, request, {
             [LoadAndFillEventMacro.TOKEN]: coreConfig.getToken(),
             [LoadAndFillEventMacro.GAME_ID]: clientInfo.getGameId(),
-            [LoadAndFillEventMacro.COPPA]: coreConfig.isCoppaCompliant() ? 'true' : 'false',
+            [LoadAndFillEventMacro.COPPA]: `${coreConfig.isCoppaCompliant()}`,
             [LoadAndFillEventMacro.FRAMEWORK_NAME]: (framework && framework.getName()) ? framework.getName()! : '',
             [LoadAndFillEventMacro.FRAMEWORK_VERSION]: (framework && framework.getVersion()) ? framework.getVersion()! : '',
             [LoadAndFillEventMacro.PLATFORM]: Platform[platform],
-            [LoadAndFillEventMacro.SDK_VERSION]: clientInfo.getSdkVersionName(),
-            [LoadAndFillEventMacro.AB_GROUP]: coreConfig.getAbGroup().toString()
+            [LoadAndFillEventMacro.SDK_VERSION]: `${clientInfo.getSdkVersion()}`,
+            [LoadAndFillEventMacro.AB_GROUP]: `${coreConfig.getAbGroup()}`
         }, storageBridge);
 
         this._platform = platform;
@@ -64,7 +64,7 @@ export class LoadAndFillEventManager extends ThirdPartyEventManager {
             [LoadAndFillEventMacro.ZONE]: placementId,
             [LoadAndFillEventMacro.EVENT_TYPE]: LoadAndFillEventManager.LoadEventName,
             [LoadAndFillEventMacro.AD_UNIT_ID]: adUnitId ? adUnitId : '',
-            [LoadAndFillEventMacro.OPTOUT_ENABLED]: this._privacy.isOptOutEnabled() ? 'true' : 'false',
+            [LoadAndFillEventMacro.OPTOUT_ENABLED]: `${this._privacy.isOptOutEnabled()}`,
             [LoadAndFillEventMacro.CAMPAIGN_ID]: this._platform === Platform.ANDROID ? LoadAndFillEventManager.AndroidCampaignId : LoadAndFillEventManager.IOSCampaignId
         });
     }
@@ -78,7 +78,7 @@ export class LoadAndFillEventManager extends ThirdPartyEventManager {
             [LoadAndFillEventMacro.EVENT_TYPE]: LoadAndFillEventManager.FillEventName,
             [LoadAndFillEventMacro.AD_UNIT_ID]: adUnitId ? adUnitId : '',
             [LoadAndFillEventMacro.CAMPAIGN_ID]: campaign.getId(),
-            [LoadAndFillEventMacro.OPTOUT_ENABLED]: this._privacy.isOptOutEnabled() ? 'true' : 'false'
+            [LoadAndFillEventMacro.OPTOUT_ENABLED]: `${this._privacy.isOptOutEnabled()}`
         });
     }
 }
