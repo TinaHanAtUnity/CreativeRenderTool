@@ -101,6 +101,9 @@ import { AdRequestManager, LoadV5ExperimentType } from 'Ads/Managers/AdRequestMa
 import { PerPlacementLoadManagerV5 } from 'Ads/Managers/PerPlacementLoadManagerV5';
 import { CometCampaignParser } from 'Performance/Parsers/CometCampaignParser';
 import { PerPlacementLoadManagerV5NoInvalidation } from 'Ads/Managers/PerPlacementLoadManagerV5NoInvalidation';
+import { LoadAndFillEventManager } from 'Ads/Managers/LoadAndFillEventManager';
+import { FrameworkMetaData } from 'Core/Models/MetaData/FrameworkMetaData';
+import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 
 export class Ads implements IAds {
 
@@ -140,6 +143,7 @@ export class Ads implements IAds {
     public Analytics: Analytics;
     public Store: IStore;
     public AdRequestManager: AdRequestManager;
+    public LoadAndFillEventManager: LoadAndFillEventManager;
 
     constructor(config: unknown, core: ICore) {
         this.PrivacySDK = PrivacyParser.parse(<IRawAdsConfiguration>config, core.ClientInfo, core.DeviceInfo);
@@ -213,6 +217,8 @@ export class Ads implements IAds {
             PrivacyDataRequestHelper.init(this._core, this.PrivacyManager, this.PrivacySDK);
         }).then(() => {
             return this.setupMediationTrackingManager();
+        }).then(() => {
+            return this.configureLoadAndFillEventManager();
         }).then(() => {
             return this.PrivacyManager.getConsentAndUpdateConfiguration().catch(() => {
                 // do nothing since it's normal to have undefined developer consent
@@ -368,6 +374,22 @@ export class Ads implements IAds {
         } else {
             this.RefreshManager = new CampaignRefreshManager(this._core.NativeBridge.getPlatform(), this._core.Api, this._core.Config, this.Api, this._core.WakeUpManager, this.CampaignManager, this.Config, this._core.FocusManager, this.SessionManager, this._core.ClientInfo, this._core.RequestManager, this._core.CacheManager);
         }
+    }
+
+    private configureLoadAndFillEventManager(): Promise<void> {
+        return this._core.MetaDataManager.fetch(FrameworkMetaData).then((framework) => {
+            this.LoadAndFillEventManager = new LoadAndFillEventManager(
+                this._core.Api,
+                this._core.RequestManager,
+                this._core.NativeBridge.getPlatform(),
+                this._core.ClientInfo,
+                this._core.Config,
+                this._core.StorageBridge,
+                this.PrivacySDK,
+                this.Config,
+                framework
+            );
+        });
     }
 
     private setupMediationTrackingManager(): Promise<void> {
@@ -782,6 +804,11 @@ export class Ads implements IAds {
 
     private setupLoadApiEnabled(): void {
         this._loadApiEnabled = this._core.ClientInfo.getUsePerPlacementLoad();
+
+        HttpKafka.sendEvent('ads.sdk.loadApiEnabled.v1.json', KafkaCommonObjectType.ANONYMOUS, {
+            'v': 1,
+            loadApiEnabled: this._loadApiEnabled
+        });
 
         const loadV5 = this.isLoadV5Enabled();
         const isPSPTestApp = CustomFeatures.isPSPTestAppGame(this._core.ClientInfo.getGameId());
