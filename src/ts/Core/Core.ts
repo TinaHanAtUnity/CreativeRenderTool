@@ -181,21 +181,21 @@ export class Core implements ICore {
                 }).catch(err => {
                     this.Api.Sdk.logError(`[Test] Failed to get one of the new fields. Error: ${err}`);
                 });
-            }
 
-            this.Api.iOS!.TrackingManager.available().then((isAvailable) => {
-                this.Api.Sdk.logInfo(`[Test] TrackingManager Available: ${isAvailable}`);
-                if (isAvailable) {
-                    this.Api.iOS!.TrackingManager.getTrackingAuthorizationStatus().then((authStatus) => {
-                        this.Api.Sdk.logInfo(`[Test] Tracking Authorization Status: ${authStatus}`);
-                        this.Api.iOS!.TrackingManager.requestTrackingAuthorization().then(() => {
-                            this.Api.iOS!.TrackingManager.getTrackingAuthorizationStatus().then((authStatusUpdated) => {
-                                this.Api.Sdk.logInfo(`[Test] [After request dialog] Tracking Authorization Status: ${authStatusUpdated}`);
+                Promise.resolve(this.Api.iOS!.TrackingManager.available()).then((isAvailable) => {
+                    this.Api.Sdk.logInfo(`[Test] TrackingManager Available: ${isAvailable}`);
+                    if (isAvailable) {
+                        return this.Api.iOS!.TrackingManager.getTrackingAuthorizationStatus().then((authStatus) => {
+                            this.Api.Sdk.logInfo(`[Test] Tracking Authorization Status: ${authStatus}`);
+                            return this.Api.iOS!.TrackingManager.requestTrackingAuthorization().then(() => {
+                                return this.Api.iOS!.TrackingManager.getTrackingAuthorizationStatus().then((authStatusUpdated) => {
+                                    this.Api.Sdk.logInfo(`[Test] [After request dialog] Tracking Authorization Status: ${authStatusUpdated}`);
+                                });
                             });
                         });
-                    });
-                }
-            });
+                    }
+                });
+            }
 
             measurements.reset();
             measurements.start();
