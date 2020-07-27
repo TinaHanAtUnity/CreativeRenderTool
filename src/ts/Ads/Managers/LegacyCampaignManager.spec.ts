@@ -153,7 +153,7 @@ const AuctionV6Response = require('json/AuctionV6Response.json');
 
             it('should change endpoint accordingly', () => {
                 expect(requestManager.post).toHaveBeenCalledWith(
-                    `https://auction.unityads.unity3d.cn/v6/games/test/requests?&deviceModel=&platform=${Platform[platform].toLowerCase()}&sdkVersion=3420&stores=&screenWidth=567&screenHeight=1234&connectionType=&networkType=0`,
+                    `https://auction.unityads.unity.cn/v6/games/test/requests?&deviceModel=&platform=${Platform[platform].toLowerCase()}&sdkVersion=3420&stores=&screenWidth=567&screenHeight=1234&connectionType=&networkType=0`,
                     expect.anything(),
                     expect.anything(),
                     expect.anything()
