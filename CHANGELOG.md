@@ -1,4 +1,4 @@
-# Pending
+# Mon Jul 27 23:16:58 UTC 2020
 
 * Make all china auction traffic go through the proxy [#16559])(https://github.com/Applifier/unity-ads-webview/pull/16559)
 
