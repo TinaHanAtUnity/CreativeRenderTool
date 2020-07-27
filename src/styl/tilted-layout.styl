@@ -1,18 +1,18 @@
-@import 'vars.styl';
-@import 'tilted-layout-vars.styl';
-@import 'iphone-x-series.styl';
+@import "vars.styl";
+@import "tilted-layout-vars.styl";
+@import "iphone-x-series.styl";
 
 @font-face {
-  font-family: 'AldotheApache';
-  src: url('../fonts/MabExperimentation//AldotheApache.ttf') format('truetype');
+  font-family: "AldotheApache";
+  src: url("../fonts/MabExperimentation//AldotheApache.ttf") format("truetype");
 }
 
 body.tilted-layout #end-screen {
   .campaign-container {
     position: relative;
     display: block;
-    background: $black;
     overflow: hidden;
+    background: $black;
 
     .game-creative-container {
       width: 100%;
@@ -37,12 +37,12 @@ body.tilted-layout #end-screen {
       width: 100%;
 
       .privacy-button {
-        bottom: unset;
         right: .5em;
+        bottom: unset;
         left: unset;
+        z-index: 900;
         margin-left: unset;
         transform: rotate(-15deg);
-        z-index: 900;
 
         .icon-gdpr {
           color: $white;
@@ -57,72 +57,72 @@ body.tilted-layout #end-screen {
 
         .china-advertisement {
           position: unset;
-          padding: unset;
-          color: $white;
           right: unset;
           bottom: unset;
+          padding: unset;
+          color: $white;
+          text-shadow: 0 0 4px $black;
           font-size: .75em;
           opacity: .6;
-          text-shadow: 0px 0 4px $black;
         }
 
         .unityads-logo {
+          position: unset;
           bottom: unset;
           left: unset;
-          width: unset;
-          position: unset;
           max-height: unset;
+          width: unset;
           color: $white;
+          text-shadow: 0 0 4px $black;
           font-size: 1.5rem;
           opacity: .5;
-          text-shadow: 0px 0 4px $black;
         }
       }
     }
 
     .gdpr-pop-up {
       bottom: unset;
-      transform: skewY(-15deg) translateY(-1.5em);
-      height: 3em;
+      z-index: unset;
       align-items: flex-start;
       padding-top: .5em;
-      z-index: unset;
+      height: 3em;
+      transform: skewY(-15deg) translateY(-1.5em);
 
       .icon-gdpr {
         transform: skewY(15deg) rotate(-15deg);
       }
 
       .gdpr-text {
+        padding: unset;
         transform: skewY(15deg) rotate(-15deg);
         font-size: .55em;
-        padding: unset;
       }
     }
 
     .end-screen-info-background {
-      background: $tilted-layout-black;
-      color: $tilted-layout-white;
       position: relative;
+      z-index: 2;
       display: flex;
       flex-direction: column;
+      justify-content: unset;
       align-items: unset;
       align-content: unset;
-      justify-content: unset;
-      z-index: 2;
       height: 35%; // make this 40% when on a regular phone, not stretched
+      background: $tilted-layout-black;
+      color: $tilted-layout-white;
       transform: translateY(30%); // Note: This is only for iphone X, which is the test device for the concept
 
       &::before {
         position: absolute;
-        display: block;
-        background: inherit;
         top: 0;
-        left: 0;
         right: 0;
-        content: '';
-        height: 100%;
-        transform: skewY(-15deg) translateY(-50px);
+        left: 0;
         z-index: -1;
+        display: block;
+        height: 100%;
+        background: inherit;
+        content: "";
+        transform: skewY(-15deg) translateY(-50px);
       }
 
       .end-screen-info {
@@ -140,18 +140,18 @@ body.tilted-layout #end-screen {
 
           .game-rating-stars-top, .game-rating-stars-bottom {
             .icon-star {
-              vertical-align: baseline;
               margin-left: -.15em;
+              vertical-align: baseline;
 
               &::before {
-                content: '\2605';
+                content: "\2605";
               }
             }
           }
 
           .game-icon {
             margin-bottom: 0;
-            box-shadow: 0px 0px 15px 2px $tilted-layout-black;
+            box-shadow: 0 0 15px 2px $tilted-layout-black;
           }
 
           .game-rating-container {
@@ -164,8 +164,8 @@ body.tilted-layout #end-screen {
             }
 
             .game-rating {
-              vertical-align: unset;
               margin-top: unset;
+              vertical-align: unset;
               text-align: unset;
               line-height: .6em;
             }
@@ -176,10 +176,10 @@ body.tilted-layout #end-screen {
 
             .game-rating-number {
               display: flex;
-              font-family: 'AldotheApache', Helvetica, sans-serif;
-              line-height: .8;
-              font-size: 1.2em;
               align-items: baseline;
+              font-size: 1.2em;
+              font-family: "AldotheApache", Helvetica, sans-serif;
+              line-height: .8;
 
               .game-rating-scale {
                 font-size: .45em;
@@ -194,10 +194,10 @@ body.tilted-layout #end-screen {
           transform: translateX(-1.5em);
 
           .game-name {
-            font-family: 'AldotheApache', Helvetica, sans-serif;
-            text-transform: uppercase;
             font-size: 1.6em; // without description, this fits well at 1.75em;
+            font-family: "AldotheApache", Helvetica, sans-serif;
             line-height: 1em;
+            text-transform: uppercase;
           }
 
           .game-description {
@@ -208,28 +208,28 @@ body.tilted-layout #end-screen {
       }
 
       .download-cta-container {
-        height: 50%;
         position: relative;
+        height: 50%;
         transform: translateY(-45%);
         animation: download-container-slide .3s ease-out 0s forwards 1;
 
         .download-cta-button {
-          transform: skewY(-15deg) translateY(50%);
+          position: absolute;
+          right: 0;
+          bottom: 0;
+          width: 100%;
+          height: 9em;
           background: $tilted-layout-blue;
           text-transform: uppercase;
-          font-family: 'AldotheApache', Helvetica, sans-serif;
-          width: 100%;
-          position: absolute;
-          bottom: 0;
-          right: 0;
-          height: 9em;
+          font-family: "AldotheApache", Helvetica, sans-serif;
+          transform: skewY(-15deg) translateY(50%);
           animation: cta-button-bounce 2s cubic-bezier(.39, .58, .57, 1) .5s infinite;
 
           .download-cta-text {
-            font-size: 1.5em;
-            line-height: 1.5em;
             display: flex;
             justify-content: center;
+            font-size: 1.5em;
+            line-height: 1.5em;
             transform: skewY(15deg) rotate(-15deg);
           }
         }
@@ -239,7 +239,7 @@ body.tilted-layout #end-screen {
 }
 
 // landscape styling
-body.tilted-layout.landscape #end-screen {
+body.tilted-layout.landscape #end-screen { // @stylint ignore;
   .btn-close-region {
     color: $white;
   }
@@ -248,9 +248,9 @@ body.tilted-layout.landscape #end-screen {
     display: flex;
 
     .game-creative-container {
+      position: relative;
       width: 55%;
       height: 100%;
-      position: relative;
       animation: landscape-game-creative-slide .3s ease-out 0s forwards 1;
 
       .game-creative-image.portrait {
@@ -269,8 +269,8 @@ body.tilted-layout.landscape #end-screen {
       transform: translateY(0);
 
       &::before {
-        background: $tilted-layout-black;
         width: 40em;
+        background: $tilted-layout-black;
         transform: skewX(15deg);
       }
 
@@ -305,10 +305,10 @@ body.tilted-layout.landscape #end-screen {
         animation: landscape-download-container-slide .3s ease-out 0s forwards 1;
 
         .download-cta-button {
-          transform: skewY(-15deg) translateY(70%);
-          animation: landscape-cta-button-bounce 2s cubic-bezier(.39,.58,.57,1) .5s infinite;
-          width: 30em;
           padding-right: 1.5em;
+          width: 30em;
+          transform: skewY(-15deg) translateY(70%);
+          animation: landscape-cta-button-bounce 2s cubic-bezier(.39, .58, .57, 1) .5s infinite;
 
           .download-cta-text {
             font-size: 2em;
@@ -320,15 +320,15 @@ body.tilted-layout.landscape #end-screen {
   }
 }
 
-// these handle whether we show the landscape or portrait creative
-// depending on the layout
-body.tilted-layout.landscape {
+// these handle whether we show the landscape or
+// portrait creative depending on the layout
+body.tilted-layout.landscape { // @stylint ignore;
   .game-creative-image.landscape {
     display: none;
   }
 }
 
-body.tilted-layout.portrait {
+body.tilted-layout.portrait { // @stylint ignore;
   .game-creative-image.portrait {
     display: none;
   }
