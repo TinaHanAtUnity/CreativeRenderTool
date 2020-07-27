@@ -1,5 +1,9 @@
 # Pending
 
+* Make all china auction traffic go through the proxy [#16559])(https://github.com/Applifier/unity-ads-webview/pull/16559)
+
+# Fri Jul 24 21:41:51 UTC 2020
+
 * [Load V5] Fix Event Protocol and Cleanup [#16560](https://github.com/Applifier/unity-ads-webview/pull/16560)
 * [Load V5] Send load api enabled flag to kafka [#16434](https://github.com/Applifier/unity-ads-webview/pull/16434)
 * Add load and fill event manager [#16401](https://github.com/Applifier/unity-ads-webview/pull/16401)

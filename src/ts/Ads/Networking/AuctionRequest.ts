@@ -211,7 +211,7 @@ export class AuctionRequest {
         this._privacy = RequestPrivacyFactory.create(params.privacySDK, this._deviceInfo.getLimitAdTracking());
         this._privacySDK = params.privacySDK;
         this._userPrivacyManager = params.userPrivacyManager;
-        this._useChinaAuctionEndpoint = (CustomFeatures.sampleAtGivenPercent(75) && params.coreConfig.getCountry() === 'CN');
+        this._useChinaAuctionEndpoint = (params.coreConfig.getCountry() === 'CN');
         this.assignBaseUrl();
     }
 
