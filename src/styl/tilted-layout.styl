@@ -238,6 +238,7 @@ body.tilted-layout #end-screen {
   }
 }
 
+// landscape styling
 body.tilted-layout.landscape #end-screen {
   .btn-close-region {
     color: $white;
@@ -250,9 +251,14 @@ body.tilted-layout.landscape #end-screen {
       width: 55%;
       height: 100%;
       position: relative;
+      animation: landscape-game-creative-slide .3s ease-out 0s forwards 1;
 
       .game-creative-image.portrait {
         transform: translate(-3em, 1.5em) rotate(-15deg) scale(1.4);
+      }
+
+      .game-creative-image.square {
+        transform: rotate(-15deg) scale(1.25);
       }
     }
 
@@ -273,7 +279,7 @@ body.tilted-layout.landscape #end-screen {
         display: flex;
         align-items: flex-start;
         padding-left: unset;
-        animation: qwerqwer;
+        animation: landscape-end-screen-info-slide .3s ease-out 0s forwards 1;
 
         .game-icon-rating-container {
           transform: translateX(-25%);
@@ -296,12 +302,12 @@ body.tilted-layout.landscape #end-screen {
 
       .download-cta-container {
         transform: translateY(0);
-        animation: qwerqwer;
+        animation: landscape-download-container-slide .3s ease-out 0s forwards 1;
 
         .download-cta-button {
-          transform: skewY(-15deg) translateY(62%);
-          animation: qwerqwer;
-          width: 25em;
+          transform: skewY(-15deg) translateY(70%);
+          animation: landscape-cta-button-bounce 2s cubic-bezier(.39,.58,.57,1) .5s infinite;
+          width: 30em;
           padding-right: 1.5em;
 
           .download-cta-text {
@@ -328,6 +334,7 @@ body.tilted-layout.portrait {
   }
 }
 
+// portrait animations
 @keyframes cta-button-bounce {
   0%, 40%, 60%, 100% {
     transform: skewY(-15deg) translateY(50%);
@@ -365,5 +372,46 @@ body.tilted-layout.portrait {
 
   to {
     transform: translateY(-45%);
+  }
+}
+
+// landscape animations
+@keyframes landscape-cta-button-bounce {
+  0%, 40%, 60%, 100% {
+    transform: skewY(-15deg) translateY(70%);
+  }
+
+  50% {
+    transform: skewY(-15deg) translateY(65%);
+  }
+}
+
+@keyframes landscape-end-screen-info-slide {
+  from {
+    transform: rotate(-15deg) translateX(200%);
+  }
+
+  to {
+    transform: rotate(-15deg) translateX(0%);
+  }
+}
+
+@keyframes landscape-game-creative-slide {
+  from {
+    transform: translateX(-200%);
+  }
+
+  to {
+    transform: translateX(0%);
+  }
+}
+
+@keyframes landscape-download-container-slide {
+  from {
+    transform: translateY(155%);
+  }
+
+  to {
+    transform: translateY(0%);
   }
 }
