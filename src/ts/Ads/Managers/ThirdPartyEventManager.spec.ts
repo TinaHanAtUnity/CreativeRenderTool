@@ -66,6 +66,14 @@ describe('ThirdPartyEventManagerTest', () => {
 
             expect(request.get).toHaveBeenCalledWith('http://foo.biz/123?is_om_enabled=%25OM_ENABLED%25&om_vendors=%25OM_VENDORS%25&adUnitId=test_adunit_id', expect.anything(), expect.anything());
         });
+
+        it('should replace adUnitId for operative events', () => {
+
+            urlTemplate = urlTemplate + '&adUnitId=%25AD_UNIT_ID%25';
+            thirdPartyEventManager.sendWithGet('eventName', 'sessionId', urlTemplate);
+
+            expect(request.get).toHaveBeenCalledWith('http://foo.biz/123?is_om_enabled=%25OM_ENABLED%25&om_vendors=%25OM_VENDORS%25&adUnitId=test_adunit_id', expect.anything(), expect.anything());
+        });
     });
 
     describe('sendTrackingEvents', () => {
