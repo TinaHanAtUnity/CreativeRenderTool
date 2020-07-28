@@ -4,7 +4,7 @@ import { Ads } from 'Ads/__mocks__/Ads';
 import { ClientInfo, ClientInfoMock } from 'Core/Models/__mocks__/ClientInfo.ts';
 import { Core } from 'Core/__mocks__/Core';
 
-import { ThirdPartyEventMacro } from 'Ads/Managers/ThirdPartyEventManager';
+import { ThirdPartyEventMacro, UnityEventMacro } from 'Ads/Managers/ThirdPartyEventManager';
 import { AdMobAdUnitParametersFactory } from 'AdMob/AdUnits/AdMobAdUnitParametersFactory';
 import { AbstractAdUnitParametersFactory } from 'Ads/AdUnits/AdUnitParametersFactory';
 import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
@@ -47,6 +47,7 @@ describe('AdUnitParametersFactoryTest', () => {
             placement = new Placement();
             thirdPartyEventManagerFactory = ads.ThirdPartyEventManagerFactory;
             adUnitParametersFactory = new AdMobAdUnitParametersFactory(core, ads);
+            placement.getAdUnitId.mockReturnValue('test_ad_unit_1');
         });
 
         describe('when getBaseParameters', () => {
@@ -60,7 +61,9 @@ describe('AdUnitParametersFactoryTest', () => {
                     [ThirdPartyEventMacro.OM_ENABLED]: 'false',
                     [ThirdPartyEventMacro.OM_VENDORS]: '',
                     [ThirdPartyEventMacro.OMIDPARTNER]: 'Unity3d/1.2.10',
-                    [ThirdPartyEventMacro.CACHEBUSTING]: '-1'
+                    [ThirdPartyEventMacro.CACHEBUSTING]: '-1',
+                    [UnityEventMacro.AD_UNIT_ID_IMPRESSION]: 'test_ad_unit_1',
+                    [UnityEventMacro.AD_UNIT_ID_OPERATIVE]: 'test_ad_unit_1'
                 });
             });
         });

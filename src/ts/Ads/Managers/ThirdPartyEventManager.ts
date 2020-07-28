@@ -28,6 +28,11 @@ export enum ThirdPartyEventMacro {
     CACHEBUSTING = '[CACHEBUSTING]'
 }
 
+export enum UnityEventMacro {
+    AD_UNIT_ID_OPERATIVE = '%AD_UNIT_ID%',
+    AD_UNIT_ID_IMPRESSION = '%25AD_UNIT_ID%25'
+}
+
 export enum TrackingEvent {
     IMPRESSION = 'impression',
     CLICK = 'click',
