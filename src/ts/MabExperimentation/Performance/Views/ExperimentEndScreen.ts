@@ -76,8 +76,6 @@ export class ExperimentEndScreen extends PerformanceEndScreen {
                     this._tintColor = true;
                     break;
                 default:
-                    // When color matching is unavailable, use green as a CTA color
-                    this._downloadButtonColor = Color.hexToCssRgba(EndScreenExperimentDeclaration.color.GREEN);
                     SDKMetrics.reportMetricEvent(AUIMetric.ColorMatchingNotSupported);
             }
         }
