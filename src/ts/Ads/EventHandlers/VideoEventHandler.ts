@@ -16,7 +16,7 @@ import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { Double } from 'Core/Utilities/Double';
 import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
 import { CreativeBlocking, BlockingReason } from 'Core/Utilities/CreativeBlocking';
-import { VideoMetric } from 'Ads/Utilities/SDKMetrics';
+import { VideoMetric, SDKMetrics, VideoLengthMetric } from 'Ads/Utilities/SDKMetrics';
 
 export class VideoEventHandler extends BaseVideoEventHandler implements IVideoEventHandler {
 
@@ -130,7 +130,7 @@ export class VideoEventHandler extends BaseVideoEventHandler implements IVideoEv
         }
 
         this._adUnit.setVideoState(VideoState.READY);
-
+        SDKMetrics.reportTimingEvent(VideoLengthMetric.SDKLength, duration / 1000);
         if (duration > VideoFileInfo._maxVideoDuration) {
             CreativeBlocking.report(this._campaign.getCreativeId(), this._campaign.getSeatId(), this._campaign.getId(), BlockingReason.VIDEO_TOO_LONG, {
                 videoLength: duration

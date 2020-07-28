@@ -21,7 +21,7 @@ import { VastCompanionAdIframeResource } from 'VAST/Models/VastCompanionAdIframe
 import { DEFAULT_VENDOR_KEY } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
-import { SDKMetrics, OMMetric } from 'Ads/Utilities/SDKMetrics';
+import { SDKMetrics, OMMetric, VideoLengthMetric } from 'Ads/Utilities/SDKMetrics';
 import { MacroUtil } from 'Ads/Utilities/MacroUtil';
 import { OMID_P } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
 
@@ -497,6 +497,7 @@ export class VastParserStrict {
         }
 
         const mediaDuration = creative.getDuration();
+        SDKMetrics.reportTimingEvent(VideoLengthMetric.ReportedLength, mediaDuration);
         const skipOffset = creativeElement.getAttribute(VastAttributeNames.SKIP_OFFSET);
         if (skipOffset) {
             if (skipOffset.charAt(skipOffset.length - 1) === '%') {
