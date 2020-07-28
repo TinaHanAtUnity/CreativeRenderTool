@@ -616,6 +616,46 @@ class SatisfiesMatcher {
                 expect(trackingUrls1).not.toEqual(trackingUrls2);
             });
 
+            it('should have different correct tracking urls for video', () => {
+                const trackingUrls: ICampaignTrackingUrls = loadedCampaign!.trackingUrls;
+
+                expect(Object.keys(trackingUrls).length).toEqual(12);
+
+                Object.keys(trackingUrls).forEach(event => {
+                    trackingUrls[event].forEach(url => {
+                        expect(url.endsWith('&video')).toEqual(true);
+                    });
+                });
+            });
+
+            it('should have different correct tracking urls for rewardedVideo', () => {
+                const additionalCampaigns: IPlacementIdMap<INotCachedLoadedCampaign | undefined> = <IPlacementIdMap<INotCachedLoadedCampaign | undefined>>onAdditionalPlacementsReady.mock.calls[0][1];
+
+                const trackingUrls: ICampaignTrackingUrls = additionalCampaigns.rewardedVideo!.notCachedTrackingUrls;
+
+                expect(Object.keys(trackingUrls).length).toEqual(12);
+
+                Object.keys(trackingUrls).forEach(event => {
+                    trackingUrls[event].forEach(url => {
+                        expect(url.endsWith('&rewardedVideo')).toEqual(true);
+                    });
+                });
+            });
+
+            it('should have different correct tracking urls for video2', () => {
+                const additionalCampaigns: IPlacementIdMap<INotCachedLoadedCampaign | undefined> = <IPlacementIdMap<INotCachedLoadedCampaign | undefined>>onAdditionalPlacementsReady.mock.calls[0][1];
+
+                const trackingUrls: ICampaignTrackingUrls = additionalCampaigns.video2!.notCachedTrackingUrls;
+
+                expect(Object.keys(trackingUrls).length).toEqual(12);
+
+                Object.keys(trackingUrls).forEach(event => {
+                    trackingUrls[event].forEach(url => {
+                        expect(url.endsWith('&video2')).toEqual(true);
+                    });
+                });
+            });
+
             it('should cache only 1 campaigns', () => {
                 expect(assetManager.setup).toBeCalledTimes(1);
             });
