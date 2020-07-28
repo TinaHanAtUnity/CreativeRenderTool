@@ -737,14 +737,14 @@ body.tilted-layout.portrait { // @stylint ignore;
         .end-screen-info-container {
           &::before {
             transform: skewY(-15deg) translateY(-3em);
+          }
 
-            .end-screen-info {
-              transform: rotate(-15deg) translateY(-75%);
-            }
+          .end-screen-info {
+            transform: rotate(-15deg) translateY(-75%);
           }
 
           .download-cta-container .download-cta-button .download-cta-text {
-            margin-left: 2em;
+            margin-left: 3em;
             font-size: 1.75em;
           }
         }
@@ -758,6 +758,62 @@ body.tilted-layout.portrait { // @stylint ignore;
 
       to {
         transform: rotate(-15deg) translateY(-75%) translateX(0%);
+      }
+    }
+  }
+
+  @media (min-height: 1366px) {
+    body.tilted-layout #end-screen {
+      .campaign-container {
+        .game-creative-container {
+          .game-creative-image {
+            &.landscape {
+              transform: translate(1em, -1em) rotate(-15deg) scale(1.25);
+            }
+
+            &.square {
+              transform: rotate(-15deg) scale(1.25);
+            }
+          }
+
+          .china-ad-unity-logo {
+            width: 100%;
+            transform: translateY(.25em) rotate(-15deg);
+          }
+        }
+
+        .gdpr-pop-up {
+          transform: skewY(-15deg) translateY(-3em);
+
+          .gdpr-text {
+            width: 60%;
+          }
+        }
+
+        .end-screen-info-container {
+          &::before {
+            transform: skewY(-15deg) translateY(-3.2em);
+          }
+
+          .end-screen-info {
+            transform: rotate(-15deg) translateY(-70%);
+          }
+
+          .download-cta-container .download-cta-button .download-cta-text {
+            margin-left: 3em;
+            font-size: 1.75em;
+          }
+        }
+      }
+    }
+
+    @keyframes end-screen-info-slide {
+      from {
+        transform: rotate(-15deg) translateY(-70%) translateX(-200%);
+      }
+
+      to {
+        transform: rotate(-15deg) translateY(-70%) translateX(0%);
       }
     }
   }
@@ -1093,6 +1149,65 @@ body.tilted-layout.portrait { // @stylint ignore;
 
       to {
         transform: rotate(-15deg) translateX(-.6em);
+      }
+    }
+  }
+
+  @media (min-width: 1366px) {
+    body.tilted-layout.landscape #end-screen { // @stylint ignore;
+      .campaign-container {
+        .game-creative-container {
+          .game-creative-image {
+            &.portrait {
+              transform: translateY(4em) rotate(-15deg) scale(1.9);
+            }
+
+            &.square {
+              transform: translateY(2em) rotate(-15deg) scale(1.5);
+            }
+          }
+
+          .china-ad-unity-logo {
+            width: 100%;
+            transform: rotate(-15deg) translate(2.5em, -.5em);
+
+            .unityads-logo {
+              font-size: 1.5rem;
+            }
+          }
+        }
+
+        .gdpr-pop-up {
+          transform: rotate(-15deg) scale(1.2) translateY(.5em);
+
+          .gdpr-text {
+            margin-right: 3em;
+            width: 71%;
+            font-size: .5em;
+          }
+        }
+
+        .end-screen-info-container {
+          font-size: 1rem;
+
+          .end-screen-info {
+            transform: rotate(-15deg) translateX(-1em);
+
+            .privacy-button {
+              transform: translateY(6em);
+            }
+          }
+        }
+      }
+    }
+
+    @keyframes landscape-end-screen-info-slide {
+      from {
+        transform: rotate(-15deg) translateX(200%);
+      }
+
+      to {
+        transform: rotate(-15deg) translateX(-1em);
       }
     }
   }
