@@ -29,6 +29,7 @@ export class TiltedEndScreen extends PerformanceEndScreen {
     private _clickHeatMapData: IClickHeatMapEntry[] = [];
     private _clickHeatMapDataLimit: number = 10;
     private _simpleRating: string;
+    private _gameNameLength: number;
 
     constructor(
         combination: IExperimentActionChoice | undefined,
@@ -44,15 +45,20 @@ export class TiltedEndScreen extends PerformanceEndScreen {
         // this.fixupCtaText(combination.cta_text);
         this._automatedExperimentManager = automatedExperimentManager;
         this._simpleRating = campaign.getRating().toFixed(1);
+        this._gameNameLength = campaign.getGameName().length;
 
-        console.log(this._templateData);
+        if (this._gameNameLength >= 35) {
+           this._templateData.gameName = campaign.getGameName().substring(0, 35);
+        }
+
         // combination.animation will be defined at this point
         // this._animation = combination.animation!;
         this._language = parameters.language;
         this._templateData = {
             ...this._templateData,
             isEnglish: this._language.indexOf('en') !== -1,
-            simpleRating: this._simpleRating
+            simpleRating: this._simpleRating,
+            nameLength: this._gameNameLength
         };
 
         this._bindings.push(
@@ -229,6 +235,10 @@ export class TiltedEndScreen extends PerformanceEndScreen {
 
     public show(): void {
         document.body.classList.add('tilted-layout');
+        if (this._gameNameLength >= 35) {
+            const ellipsis = <HTMLElement> this._container.querySelector('.game-name-ellipsis');
+            ellipsis.classList.add('show-ellipsis');
+        }
         super.show();
         window.addEventListener('resize', this.handleResize, false);
     }
