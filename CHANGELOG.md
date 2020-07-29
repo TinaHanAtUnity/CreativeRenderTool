@@ -1,3 +1,7 @@
+# Pending
+
+* [Load V5] Use Publisher configuration to enable Load V5 [#16435](https://github.com/Applifier/unity-ads-webview/pull/16435)
+
 # Mon Jul 27 23:16:58 UTC 2020
 
 * Make all china auction traffic go through the proxy [#16559])(https://github.com/Applifier/unity-ads-webview/pull/16559)
