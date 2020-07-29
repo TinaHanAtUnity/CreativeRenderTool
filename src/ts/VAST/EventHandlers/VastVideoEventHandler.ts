@@ -6,7 +6,7 @@ import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
 import { VastAdUnit } from 'VAST/AdUnits/VastAdUnit';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
-import { SDKMetrics, VastMetric } from 'Ads/Utilities/SDKMetrics';
+import { SDKMetrics, VastMetric, VideoLengthMetric } from 'Ads/Utilities/SDKMetrics';
 import { VastOpenMeasurementController } from 'Ads/Views/OpenMeasurement/VastOpenMeasurementController';
 import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurementUtilities';
 import { VideoPlayerState, VideoPosition } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
@@ -94,6 +94,17 @@ export class VastVideoEventHandler extends VideoEventHandler {
         const moat = MoatViewabilityService.getMoat();
         if (moat) {
             moat.init(MoatViewabilityService.getMoatIds(), duration / 1000, url, MoatViewabilityService.getMoatData(), this._vastAdUnit.getVolume());
+        }
+
+        const vastAd = this._vastCampaign.getVast().getAd();
+        if (vastAd) {
+            const reportedDuration = vastAd.getDuration();
+            if (reportedDuration) {
+                const lengthDiff = (duration / 1000) - reportedDuration;
+                if (lengthDiff >= 1) {
+                    SDKMetrics.reportTimingEvent(VideoLengthMetric.LengthDifference, lengthDiff);
+                }
+            }
         }
 
         if (this._om && !this._omStartCalled) {

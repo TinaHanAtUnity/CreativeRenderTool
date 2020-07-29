@@ -497,7 +497,6 @@ export class VastParserStrict {
         }
 
         const mediaDuration = creative.getDuration();
-        SDKMetrics.reportTimingEvent(VideoLengthMetric.ReportedLength, mediaDuration);
         const skipOffset = creativeElement.getAttribute(VastAttributeNames.SKIP_OFFSET);
         if (skipOffset) {
             if (skipOffset.charAt(skipOffset.length - 1) === '%') {
