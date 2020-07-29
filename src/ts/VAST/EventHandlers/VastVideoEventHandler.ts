@@ -101,7 +101,7 @@ export class VastVideoEventHandler extends VideoEventHandler {
             const reportedDuration = vastAd.getDuration();
             if (reportedDuration) {
                 const lengthDiff = (duration / 1000) - reportedDuration;
-                if (lengthDiff >= 1) {
+                if (Math.abs(lengthDiff) >= 1) {
                     SDKMetrics.reportTimingEvent(VideoLengthMetric.LengthDifference, lengthDiff);
                 }
             }
