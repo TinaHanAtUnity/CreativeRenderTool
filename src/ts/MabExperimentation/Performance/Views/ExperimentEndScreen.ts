@@ -11,6 +11,7 @@ import { IColorTheme } from 'Performance/Utilities/Swatch';
 import { ColorTheme } from 'Core/Utilities/ColorTheme';
 import { ColorUtils } from 'MabExperimentation/Utilities/ColorUtils';
 import { AutomatedExperimentManager } from 'MabExperimentation/AutomatedExperimentManager';
+import TiltedEndScreenTemplate from 'html/mabexperimentation/TiltedEndScreenTemplate.html';
 
 export interface IClickHeatMapEntry {
     is_portrait: boolean;
@@ -29,11 +30,17 @@ export class ExperimentEndScreen extends PerformanceEndScreen {
     private _automatedExperimentManager: AutomatedExperimentManager;
     private _clickHeatMapData: IClickHeatMapEntry[] = [];
     private _clickHeatMapDataLimit: number = 10;
+    private _tiltedLayout: boolean;
+    private _isEnglish: boolean;
+    private _simpleRating: string;
+    private _gameNameLength: number;
 
     constructor(combination: IExperimentActionChoice | undefined, parameters: IEndScreenParameters, campaign: PerformanceCampaign, automatedExperimentManager: AutomatedExperimentManager, country?: string) {
         super(parameters, campaign, country);
         combination = this.fixupExperimentChoices(combination);
-
+        if (combination.scheme === 'tilted') {
+            this._tiltedLayout = true;
+        }
         this.fixupScheme(combination);
         this.fixupCtaText(combination.cta_text);
         this._automatedExperimentManager = automatedExperimentManager;
@@ -41,6 +48,7 @@ export class ExperimentEndScreen extends PerformanceEndScreen {
         // combination.animation will be defined at this point
         this._animation = combination.animation!;
         this._language = parameters.language;
+        this._isEnglish = this._language.indexOf('en') !== -1;
         this._templateData = {
             ...this._templateData,
             hasShadow: this._animation === EndScreenExperimentDeclaration.animation.BOUNCING,
@@ -52,6 +60,29 @@ export class ExperimentEndScreen extends PerformanceEndScreen {
             event: 'click',
             listener: (event: Event) => this.onClickCollection(event)
         });
+
+        if (this._tiltedLayout) {
+            this._simpleRating = campaign.getRating().toFixed(1);
+            this._gameNameLength = campaign.getGameName().length;
+
+            this._templateData = {
+                ...this._templateData,
+                simpleRating: this._simpleRating,
+                gameName: this._gameNameLength >= 40 ? campaign.getGameName().substring(0, 40) : campaign.getGameName()
+            };
+
+            this._bindings.push(
+                {
+                    event: 'click',
+                    listener: (event: Event) => this.onClickCollection(event)
+                },
+                {
+                    event: 'click',
+                    listener: (event: Event) => this.onDownloadEvent(event),
+                    selector: '.game-creative-image, .download-cta-button'
+                }
+            );
+        }
     }
 
     private fixupScheme(actions: IExperimentActionChoice | undefined) {
@@ -74,6 +105,9 @@ export class ExperimentEndScreen extends PerformanceEndScreen {
                     break;
                 case EndScreenExperimentDeclaration.scheme.COLORMATCHING:
                     this._tintColor = true;
+                    break;
+                case EndScreenExperimentDeclaration.scheme.TILTED:
+                    this._tiltedLayout = true;
                     break;
                 default:
             }
@@ -164,6 +198,10 @@ export class ExperimentEndScreen extends PerformanceEndScreen {
                     SDKMetrics.reportMetricEvent(error.tag);
                 });
         }
+        if (this._gameNameLength >= 40) {
+            const ellipsis = <HTMLElement> this._container.querySelector('.game-name-ellipsis');
+            ellipsis.classList.add('show-ellipsis');
+        }
     }
 
     private applyDarkMode() {
@@ -201,6 +239,9 @@ export class ExperimentEndScreen extends PerformanceEndScreen {
     }
 
     public show(): void {
+        if (this._tiltedLayout) {
+            this.applyTiltedLayout();
+        }
         super.show();
         window.addEventListener('resize', this.handleResize, false);
         if (this._darkMode) {
@@ -229,6 +270,10 @@ export class ExperimentEndScreen extends PerformanceEndScreen {
     }
 
     protected getTemplate() {
+        console.log(this._tiltedLayout);
+        if (!this._tiltedLayout) {
+            return TiltedEndScreenTemplate;
+        }
         if (this.getEndscreenAlt() === SQUARE_END_SCREEN) {
             return ExperimentSquareEndScreenTemplate;
         }
@@ -261,5 +306,9 @@ export class ExperimentEndScreen extends PerformanceEndScreen {
             normalized_y: (<MouseEvent>event).pageY / window.innerHeight,
             target: (<HTMLElement>(<MouseEvent>event).target).className
         });
+    }
+
+    private applyTiltedLayout() {
+        document.body.classList.add('tilted-layout');
     }
 }

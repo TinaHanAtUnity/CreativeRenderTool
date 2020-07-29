@@ -37,13 +37,21 @@ export class PerformanceAdUnitWithAutomatedExperimentParametersFactory extends P
 
         const endScreenCombination: IExperimentActionChoice | undefined = this._automatedExperimentManager.activateSelectedExperiment(baseParams.campaign, AutomatedExperimentsCategories.PERFORMANCE_ENDCARD);
 
-        const endScreen = new TiltedEndScreen(
+        let endScreen: ExperimentEndScreen | ColorBlurEndScreen | ExternalEndScreen;
+
+        if (this._campaign.getEndScreen()) {
+            endScreen = new ExternalEndScreen(endScreenCombination, endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
+        } else if (endScreenCombination && endScreenCombination.scheme === EndScreenExperimentDeclaration.scheme.COLORBLUR) {
+            endScreen = new ColorBlurEndScreen(endScreenCombination, endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
+        } else {
+            endScreen = new ExperimentEndScreen(
                 endScreenCombination,
                 endScreenParameters,
                 baseParams.campaign,
                 this._automatedExperimentManager,
                 baseParams.coreConfig.getCountry()
             );
+        }
 
         return {
             ...baseParams,
