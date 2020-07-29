@@ -4,7 +4,7 @@ import { Ads } from 'Ads/__mocks__/Ads';
 import { ClientInfo, ClientInfoMock } from 'Core/Models/__mocks__/ClientInfo.ts';
 import { Core } from 'Core/__mocks__/Core';
 
-import { ThirdPartyEventMacro, UnityEventMacro } from 'Ads/Managers/ThirdPartyEventManager';
+import { ThirdPartyEventMacro } from 'Ads/Managers/ThirdPartyEventManager';
 import { AdMobAdUnitParametersFactory } from 'AdMob/AdUnits/AdMobAdUnitParametersFactory';
 import { AbstractAdUnitParametersFactory } from 'Ads/AdUnits/AdUnitParametersFactory';
 import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
