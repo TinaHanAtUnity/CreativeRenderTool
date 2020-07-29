@@ -17,6 +17,7 @@ export interface IRawAdsConfiguration {
     ageGateLimit: number | undefined;
     hidePrivacy: boolean | undefined;
     legalFramework: LegalFramework | undefined;
+    loadV5Enabled: boolean | undefined;
 }
 
 export interface IAdsConfiguration {
@@ -26,6 +27,7 @@ export interface IAdsConfiguration {
     defaultBannerPlacement: Placement | undefined;
     hidePrivacy: boolean | undefined;
     hasArPlacement: boolean;
+    loadV5Enabled: boolean;
 }
 
 export class AdsConfiguration extends Model<IAdsConfiguration> {
@@ -35,7 +37,8 @@ export class AdsConfiguration extends Model<IAdsConfiguration> {
         defaultPlacement: ['object'],
         defaultBannerPlacement: ['string', 'undefined'],
         hidePrivacy: ['boolean', 'undefined'],
-        hasArPlacement: ['boolean']
+        hasArPlacement: ['boolean'],
+        loadV5Enabled: ['boolean']
     };
 
     constructor(data: IAdsConfiguration) {
@@ -120,6 +123,10 @@ export class AdsConfiguration extends Model<IAdsConfiguration> {
 
     public getHasArPlacement(): boolean {
         return this.get('hasArPlacement');
+    }
+
+    public isLoadV5Enabled(): boolean {
+        return this.get('loadV5Enabled');
     }
 
     public getDTO(): { [key: string]: unknown } {
