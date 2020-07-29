@@ -3,6 +3,7 @@ import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
 import { DeviceInfo, IDeviceInfo } from 'Core/Models/DeviceInfo';
 import { IosUiTheme } from 'Core/Native/iOS/DeviceInfo';
+import { TrackingManagerApi } from 'Core/Native/iOS/TrackingManager';
 
 export interface IIosDeviceInfo extends IDeviceInfo {
     userInterfaceIdiom: UIUserInterfaceIdiom;
@@ -18,6 +19,7 @@ export interface IIosDeviceInfo extends IDeviceInfo {
     currentUiTheme: IosUiTheme;
     adNetworksPlist: string[];
     systemBootTime: number;
+    trackingAuthorizationStatus: number;
 }
 
 export class IosDeviceInfo extends DeviceInfo<IIosDeviceInfo> {
@@ -25,6 +27,7 @@ export class IosDeviceInfo extends DeviceInfo<IIosDeviceInfo> {
     constructor(core: ICoreApi) {
         super('IosDeviceInfo', {
             ... DeviceInfo.Schema,
+            ... TrackingManagerApi,
             userInterfaceIdiom: ['number'],
             screenScale: ['number'],
             statusBarHeight: ['number'],
@@ -37,7 +40,8 @@ export class IosDeviceInfo extends DeviceInfo<IIosDeviceInfo> {
             localeList: ['array'],
             currentUiTheme: ['number'],
             adNetworksPlist: ['array'],
-            systemBootTime: ['number']
+            systemBootTime: ['number'],
+            trackingAuthorizationStatus: ['number']
         }, Platform.IOS, core);
     }
 
@@ -58,6 +62,7 @@ export class IosDeviceInfo extends DeviceInfo<IIosDeviceInfo> {
             promises.push(this._core.DeviceInfo.Ios!.getCurrentUITheme().then(currentUiTheme => this.set('currentUiTheme', currentUiTheme)).catch(err => this.handleDeviceInfoError(err)));
             promises.push(this._core.DeviceInfo.Ios!.getAdNetworkIdsPlist().then(adNetworksPlist => this.set('adNetworksPlist', adNetworksPlist)).catch(err => this.handleDeviceInfoError(err)));
             promises.push(this._core.DeviceInfo.Ios!.getSystemBootTime().then(systemBootTime => this.set('systemBootTime', systemBootTime)).catch(err => this.handleDeviceInfoError(err)));
+            promises.push(this._core.iOS!.TrackingManager.getTrackingAuthorizationStatus().then(trackingAuthorizationStatus => this.set('trackingAuthorizationStatus', trackingAuthorizationStatus)).catch(err => this.handleDeviceInfoError(err)));
 
             return Promise.all(promises);
         });
@@ -109,6 +114,10 @@ export class IosDeviceInfo extends DeviceInfo<IIosDeviceInfo> {
 
     public getSystemBootTime(): number {
         return this.get('systemBootTime');
+    }
+
+    public getTrackingAuthorizationStatus(): number {
+        return this.get('trackingAuthorizationStatus');
     }
 
     public isStatusBarHidden(): Promise<boolean> {
