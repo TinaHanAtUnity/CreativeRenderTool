@@ -1232,7 +1232,8 @@ export class TestFixtures {
             getCurrentUITheme: sinon.stub().returns(Promise.resolve(1)),
             getLocaleList: sinon.stub().returns(Promise.resolve(['en', 'fi'])),
             getAdNetworkIdsPlist: sinon.stub().returns(Promise.resolve(['adNetwork'])),
-            getSystemBootTime: sinon.stub().returns(Promise.resolve(1))
+            getSystemBootTime: sinon.stub().returns(Promise.resolve(1)),
+            getTrackingAuthorizationStatus: sinon.stub().returns(Promise.resolve(0))
         };
     }
 
