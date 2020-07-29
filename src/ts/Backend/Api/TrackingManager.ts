@@ -1,6 +1,6 @@
 import { BackendApi } from 'Backend/BackendApi';
 
-export class DeviceInfo extends BackendApi {
+export class TrackingManager extends BackendApi {
 
     public getTrackingAuthorizationStatus() {
         return 0;
