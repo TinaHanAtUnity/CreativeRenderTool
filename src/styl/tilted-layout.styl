@@ -1,16 +1,15 @@
-@import 'vars.styl';
-@import 'tilted-layout-vars.styl';
-@import 'iphone-x-series.styl';
+@import "vars.styl";
+@import "tilted-layout-vars.styl";
+@import "iphone-x-series.styl";
 
 @font-face {
-  font-family: 'AldotheApache';
-  src: url('../fonts/MabExperimentation//AldotheApache.ttf') format('truetype');
+  font-family: "AldotheApache";
+  src: url("../fonts/MabExperimentation//AldotheApache.ttf") format("truetype");
 }
 
 body.tilted-layout #end-screen {
-
   .btn-close-region {
-    text-shadow: 0.03em 0.05em 0.18em $black;
+    text-shadow: .03em .05em .18em $black;
   }
 
   .campaign-container {
@@ -126,7 +125,7 @@ body.tilted-layout #end-screen {
         display: block;
         height: 100%;
         background: inherit;
-        content: '';
+        content: "";
         transform: skewY(-15deg) translateY(-50px);
       }
 
@@ -149,7 +148,7 @@ body.tilted-layout #end-screen {
               vertical-align: baseline;
 
               &::before {
-                content: '\2605';
+                content: "\2605";
               }
             }
           }
@@ -183,7 +182,7 @@ body.tilted-layout #end-screen {
               display: flex;
               align-items: baseline;
               font-size: 1.2em;
-              font-family: 'AldotheApache', Helvetica, sans-serif;
+              font-family: "AldotheApache", Helvetica, sans-serif;
               line-height: .8;
 
               .game-rating-scale {
@@ -200,7 +199,7 @@ body.tilted-layout #end-screen {
 
           .game-name {
             font-size: 1.6em; // without description, this fits well at 1.75em;
-            font-family: 'AldotheApache', Helvetica, sans-serif;
+            font-family: "AldotheApache", Helvetica, sans-serif;
             line-height: 1em;
             text-transform: uppercase;
           }
@@ -226,7 +225,7 @@ body.tilted-layout #end-screen {
           height: 9em;
           background: $tilted-layout-blue;
           text-transform: uppercase;
-          font-family: 'AldotheApache', Helvetica, sans-serif;
+          font-family: "AldotheApache", Helvetica, sans-serif;
           transform: skewY(-15deg) translateY(50%);
           animation: cta-button-bounce 2s cubic-bezier(.39, .58, .57, 1) .5s infinite;
 
