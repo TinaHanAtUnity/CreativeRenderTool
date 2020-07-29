@@ -21,7 +21,7 @@ import { VastCompanionAdIframeResource } from 'VAST/Models/VastCompanionAdIframe
 import { DEFAULT_VENDOR_KEY } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
-import { SDKMetrics, OMMetric, VideoLengthMetric } from 'Ads/Utilities/SDKMetrics';
+import { SDKMetrics, OMMetric } from 'Ads/Utilities/SDKMetrics';
 import { MacroUtil } from 'Ads/Utilities/MacroUtil';
 import { OMID_P } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
 
