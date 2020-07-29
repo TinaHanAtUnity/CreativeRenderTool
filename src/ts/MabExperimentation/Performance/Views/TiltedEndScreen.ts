@@ -47,8 +47,8 @@ export class TiltedEndScreen extends PerformanceEndScreen {
         this._simpleRating = campaign.getRating().toFixed(1);
         this._gameNameLength = campaign.getGameName().length;
 
-        if (this._gameNameLength >= 35) {
-           this._templateData.gameName = campaign.getGameName().substring(0, 35);
+        if (this._gameNameLength >= 40) {
+           this._templateData.gameName = campaign.getGameName().substring(0, 40);
         }
 
         // combination.animation will be defined at this point
@@ -235,7 +235,7 @@ export class TiltedEndScreen extends PerformanceEndScreen {
 
     public show(): void {
         document.body.classList.add('tilted-layout');
-        if (this._gameNameLength >= 35) {
+        if (this._gameNameLength >= 40) {
             const ellipsis = <HTMLElement> this._container.querySelector('.game-name-ellipsis');
             ellipsis.classList.add('show-ellipsis');
         }
