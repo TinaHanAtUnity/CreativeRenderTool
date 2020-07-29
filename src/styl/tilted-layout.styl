@@ -1,13 +1,18 @@
-@import "vars.styl";
-@import "tilted-layout-vars.styl";
-@import "iphone-x-series.styl";
+@import 'vars.styl';
+@import 'tilted-layout-vars.styl';
+@import 'iphone-x-series.styl';
 
 @font-face {
-  font-family: "AldotheApache";
-  src: url("../fonts/MabExperimentation//AldotheApache.ttf") format("truetype");
+  font-family: 'AldotheApache';
+  src: url('../fonts/MabExperimentation//AldotheApache.ttf') format('truetype');
 }
 
 body.tilted-layout #end-screen {
+
+  .btn-close-region {
+    text-shadow: 0.03em 0.05em 0.18em $black;
+  }
+
   .campaign-container {
     position: relative;
     display: block;
@@ -121,7 +126,7 @@ body.tilted-layout #end-screen {
         display: block;
         height: 100%;
         background: inherit;
-        content: "";
+        content: '';
         transform: skewY(-15deg) translateY(-50px);
       }
 
@@ -144,7 +149,7 @@ body.tilted-layout #end-screen {
               vertical-align: baseline;
 
               &::before {
-                content: "\2605";
+                content: '\2605';
               }
             }
           }
@@ -178,7 +183,7 @@ body.tilted-layout #end-screen {
               display: flex;
               align-items: baseline;
               font-size: 1.2em;
-              font-family: "AldotheApache", Helvetica, sans-serif;
+              font-family: 'AldotheApache', Helvetica, sans-serif;
               line-height: .8;
 
               .game-rating-scale {
@@ -195,7 +200,7 @@ body.tilted-layout #end-screen {
 
           .game-name {
             font-size: 1.6em; // without description, this fits well at 1.75em;
-            font-family: "AldotheApache", Helvetica, sans-serif;
+            font-family: 'AldotheApache', Helvetica, sans-serif;
             line-height: 1em;
             text-transform: uppercase;
           }
@@ -221,7 +226,7 @@ body.tilted-layout #end-screen {
           height: 9em;
           background: $tilted-layout-blue;
           text-transform: uppercase;
-          font-family: "AldotheApache", Helvetica, sans-serif;
+          font-family: 'AldotheApache', Helvetica, sans-serif;
           transform: skewY(-15deg) translateY(50%);
           animation: cta-button-bounce 2s cubic-bezier(.39, .58, .57, 1) .5s infinite;
 
@@ -666,6 +671,55 @@ body.tilted-layout.portrait { // @stylint ignore;
     }
   }
 
+  @media (min-height: 737px) and (max-height: 770px) {
+    body.tilted-layout #end-screen {
+      .campaign-container {
+        .game-creative-container {
+          .game-creative-image {
+            &.landscape {
+              transform: rotate(-15deg) scale(1.4);
+            }
+
+            &.square {
+              transform: translate(-1em, 3em) rotate(-15deg) scale(1.5);
+            }
+          }
+
+          .china-ad-unity-logo {
+            width: 100%;
+            transform: translateY(1.5em) rotate(-15deg);
+          }
+        }
+
+        .gdpr-pop-up {
+          .gdpr-text {
+            font-size: .6em;
+          }
+        }
+
+        .end-screen-info-container {
+          &::before {
+            transform: skewY(-15deg) translateY(-55px);
+          }
+
+          .end-screen-info {
+            transform: rotate(-15deg) translateY(-53%);
+          }
+        }
+      }
+    }
+
+    @keyframes end-screen-info-slide {
+      from {
+        transform: rotate(-15deg) translateY(-53%) translateX(-200%);
+      }
+
+      to {
+        transform: rotate(-15deg) translateY(-53%) translateX(0%);
+      }
+    }
+  }
+
   @media (min-height: 813px) and (max-height: 1023px) {
     body.tilted-layout #end-screen {
       .campaign-container {
@@ -1039,6 +1093,65 @@ body.tilted-layout.portrait { // @stylint ignore;
 
             .privacy-button {
               transform: translate(-.25em, 4em);
+            }
+          }
+        }
+      }
+    }
+
+    @keyframes landscape-end-screen-info-slide {
+      from {
+        transform: rotate(-15deg) translateX(200%);
+      }
+
+      to {
+        transform: rotate(-15deg) translateX(-.3em);
+      }
+    }
+  }
+
+  @media (min-width: 737px) and (max-width: 770px) {
+    body.tilted-layout.landscape #end-screen { // @stylint ignore;
+      .campaign-container {
+        .game-creative-container {
+          .game-creative-image {
+            &.portrait {
+              transform: translate(1em, 1em) rotate(-15deg) scale(1.5);
+            }
+
+            &.square {
+              transform: translateX(-1em) rotate(-15deg) scale(1.2);
+            }
+          }
+
+          .china-ad-unity-logo {
+            width: 100%;
+            transform: rotate(-15deg) translateX(1.75em);
+
+            .unityads-logo {
+              font-size: 1.75rem;
+            }
+          }
+        }
+
+        .gdpr-pop-up {
+          transform: rotate(-15deg) scale(1.2) translateY(1em);
+
+          .gdpr-text {
+            margin-right: 4em;
+            width: 55%;
+            font-size: .5em;
+          }
+        }
+
+        .end-screen-info-container {
+          font-size: 1.1rem;
+
+          .end-screen-info {
+            transform: rotate(-15deg) translate(-.3em);
+
+            .privacy-button {
+              transform: translate(-.25em, 3.85em);
             }
           }
         }
