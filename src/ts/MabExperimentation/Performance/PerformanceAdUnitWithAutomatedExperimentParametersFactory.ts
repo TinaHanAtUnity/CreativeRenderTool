@@ -10,7 +10,6 @@ import { AutomatedExperimentsCategories, EndScreenExperimentDeclaration } from '
 import { PerformanceAdUnitParametersFactory } from 'Performance/AdUnits/PerformanceAdUnitParametersFactory';
 import { IExperimentActionChoice } from 'MabExperimentation/Models/AutomatedExperiment';
 import { ExternalEndScreen } from 'ExternalEndScreen/Views/ExternalEndScreen';
-import { TiltedEndScreen } from 'MabExperimentation/Performance/Views/TiltedEndScreen';
 
 export class PerformanceAdUnitWithAutomatedExperimentParametersFactory extends PerformanceAdUnitParametersFactory {
     private _automatedExperimentManager: AutomatedExperimentManager;
