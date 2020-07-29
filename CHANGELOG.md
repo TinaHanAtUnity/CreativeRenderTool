@@ -1,5 +1,10 @@
 # Pending
 
+* Replace adunitid macro for impression and operative tracking events [#16600](https://github.com/Applifier/unity-ads-webview/pull/16600)
+* [Load V5] Use Publisher configuration to enable Load V5 [#16435](https://github.com/Applifier/unity-ads-webview/pull/16435)
+
+# Mon Jul 27 23:16:58 UTC 2020
+
 * Make all china auction traffic go through the proxy [#16559])(https://github.com/Applifier/unity-ads-webview/pull/16559)
 
 # Fri Jul 24 21:41:51 UTC 2020

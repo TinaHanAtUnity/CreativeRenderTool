@@ -820,13 +820,13 @@ export class Ads implements IAds {
 
     private isLoadV5Enabled(): boolean {
         const loadV5Test = LoadV5.isValid(this._core.Config.getAbGroup());
-        const loadV5Game = CustomFeatures.isLoadV5Game(this._core.ClientInfo.getGameId());
+        const loadV5Game = CustomFeatures.isLoadV5Game(this._core.ClientInfo.getGameId()) || this.Config.isLoadV5Enabled();
 
         return (loadV5Test && loadV5Game) || this._forceLoadV5;
     }
 
     private isLoadV5Supported(): boolean {
-        const loadV5Game = CustomFeatures.isLoadV5Game(this._core.ClientInfo.getGameId());
+        const loadV5Game = CustomFeatures.isLoadV5Game(this._core.ClientInfo.getGameId()) || this.Config.isLoadV5Enabled();
 
         return (this._loadApiEnabled && loadV5Game) || this._forceLoadV5;
     }

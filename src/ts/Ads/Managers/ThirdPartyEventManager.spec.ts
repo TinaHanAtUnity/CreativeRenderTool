@@ -5,6 +5,7 @@ import { ThirdPartyEventMacro, ThirdPartyEventManager, TrackingEvent } from 'Ads
 import { OMID_P } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
 import { ICoreApi } from 'Core/ICore';
 import { Campaign } from 'Ads/Models/__mocks__/Campaign';
+import { Placement } from 'Ads/Models/__mocks__/Placement';
 
 describe('ThirdPartyEventManagerTest', () => {
     let thirdPartyEventManager: ThirdPartyEventManager;
@@ -16,7 +17,7 @@ describe('ThirdPartyEventManagerTest', () => {
         request = new RequestManager();
         urlTemplate = 'http://foo.biz/123?is_om_enabled=%25OM_ENABLED%25&om_vendors=%25OM_VENDORS%25';
 
-        thirdPartyEventManager = new ThirdPartyEventManager(core, request, { [ThirdPartyEventMacro.OMIDPARTNER]: OMID_P, [ThirdPartyEventMacro.CACHEBUSTING]: '-1' });
+        thirdPartyEventManager = new ThirdPartyEventManager(core, request, { [ThirdPartyEventMacro.OMIDPARTNER]: OMID_P, [ThirdPartyEventMacro.CACHEBUSTING]: '-1', [ThirdPartyEventMacro.AD_UNIT_ID_IMPRESSION]: 'test_adunit_id', [ThirdPartyEventMacro.AD_UNIT_ID_OPERATIVE]: 'test_adunit_id' });
     });
 
     describe('when replacing Open Measurement Macros', () => {
@@ -53,6 +54,25 @@ describe('ThirdPartyEventManagerTest', () => {
             thirdPartyEventManager.sendWithGet('eventName', 'sessionId', urlTemplate, undefined, undefined, { '%5BREASON%5D': '1' });
 
             expect(request.get).toHaveBeenCalledWith('http://foo.biz/123?is_om_enabled=%25OM_ENABLED%25&om_vendors=%25OM_VENDORS%25&reason=1', expect.anything(), expect.anything());
+        });
+    });
+
+    describe('when replacing AdUnitId macro', () => {
+
+        it('should replace adUnitId for oprative events', () => {
+
+            urlTemplate = urlTemplate + '&adUnitId=%AD_UNIT_ID%';
+            thirdPartyEventManager.sendWithGet('eventName', 'sessionId', urlTemplate);
+
+            expect(request.get).toHaveBeenCalledWith('http://foo.biz/123?is_om_enabled=%25OM_ENABLED%25&om_vendors=%25OM_VENDORS%25&adUnitId=test_adunit_id', expect.anything(), expect.anything());
+        });
+
+        it('should replace adUnitId for operative events', () => {
+
+            urlTemplate = urlTemplate + '&adUnitId=%25AD_UNIT_ID%25';
+            thirdPartyEventManager.sendWithGet('eventName', 'sessionId', urlTemplate);
+
+            expect(request.get).toHaveBeenCalledWith('http://foo.biz/123?is_om_enabled=%25OM_ENABLED%25&om_vendors=%25OM_VENDORS%25&adUnitId=test_adunit_id', expect.anything(), expect.anything());
         });
     });
 
