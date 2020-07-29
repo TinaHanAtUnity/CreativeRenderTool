@@ -12,6 +12,7 @@ import { ColorTheme } from 'Core/Utilities/ColorTheme';
 import { ColorUtils } from 'MabExperimentation/Utilities/ColorUtils';
 import { AutomatedExperimentManager } from 'MabExperimentation/AutomatedExperimentManager';
 import TiltedEndScreenTemplate from 'html/mabexperimentation/TiltedEndScreenTemplate.html';
+import { Template } from 'Core/Utilities/Template';
 
 export interface IClickHeatMapEntry {
     is_portrait: boolean;
@@ -37,18 +38,19 @@ export class ExperimentEndScreen extends PerformanceEndScreen {
 
     constructor(combination: IExperimentActionChoice | undefined, parameters: IEndScreenParameters, campaign: PerformanceCampaign, automatedExperimentManager: AutomatedExperimentManager, country?: string) {
         super(parameters, campaign, country);
+
+        this._language = parameters.language;
+        this._isEnglish = this._language.indexOf('en') !== -1;
+
         combination = this.fixupExperimentChoices(combination);
-        if (combination.scheme === 'tilted') {
-            this._tiltedLayout = true;
-        }
+
         this.fixupScheme(combination);
         this.fixupCtaText(combination.cta_text);
         this._automatedExperimentManager = automatedExperimentManager;
 
         // combination.animation will be defined at this point
         this._animation = combination.animation!;
-        this._language = parameters.language;
-        this._isEnglish = this._language.indexOf('en') !== -1;
+
         this._templateData = {
             ...this._templateData,
             hasShadow: this._animation === EndScreenExperimentDeclaration.animation.BOUNCING,
@@ -62,6 +64,7 @@ export class ExperimentEndScreen extends PerformanceEndScreen {
         });
 
         if (this._tiltedLayout) {
+            this._template = new Template(this.getTemplate(), this._localization);
             this._simpleRating = campaign.getRating().toFixed(1);
             this._gameNameLength = campaign.getGameName().length;
 
@@ -107,7 +110,9 @@ export class ExperimentEndScreen extends PerformanceEndScreen {
                     this._tintColor = true;
                     break;
                 case EndScreenExperimentDeclaration.scheme.TILTED:
-                    this._tiltedLayout = true;
+                    if (this._isEnglish) {
+                        this._tiltedLayout = true;
+                    }
                     break;
                 default:
             }
@@ -167,6 +172,11 @@ export class ExperimentEndScreen extends PerformanceEndScreen {
                 SDKMetrics.reportMetricEvent(AUIMetric.InvalidSchemeAndColorCoordination);
                 return EndScreenExperiment.getDefaultActions();
             }
+        }
+
+        if (actions.scheme === EndScreenExperimentDeclaration.scheme.TILTED && !this._isEnglish) {
+            SDKMetrics.reportMetricEvent(AUIMetric.TiltedLayoutNotSupported);
+                return EndScreenExperiment.getDefaultActions();
         }
 
         if (!EndScreenExperiment.isValid(actions)) {
@@ -270,8 +280,7 @@ export class ExperimentEndScreen extends PerformanceEndScreen {
     }
 
     protected getTemplate() {
-        console.log(this._tiltedLayout);
-        if (!this._tiltedLayout) {
+        if (this._tiltedLayout) {
             return TiltedEndScreenTemplate;
         }
         if (this.getEndscreenAlt() === SQUARE_END_SCREEN) {
