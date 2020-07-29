@@ -25,10 +25,7 @@ export enum ThirdPartyEventMacro {
     OM_ENABLED = '%25OM_ENABLED%25',
     OM_VENDORS = '%25OM_VENDORS%25',
     OMIDPARTNER = '[OMIDPARTNER]',
-    CACHEBUSTING = '[CACHEBUSTING]'
-}
-
-export enum UnityEventMacro {
+    CACHEBUSTING = '[CACHEBUSTING]',
     AD_UNIT_ID_OPERATIVE = '%AD_UNIT_ID%',
     AD_UNIT_ID_IMPRESSION = '%25AD_UNIT_ID%25'
 }

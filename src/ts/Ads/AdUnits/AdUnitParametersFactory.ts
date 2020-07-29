@@ -8,7 +8,7 @@ import { AdUnitContainer, Orientation } from 'Ads/AdUnits/Containers/AdUnitConta
 import { FocusManager } from 'Core/Managers/FocusManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
-import { ThirdPartyEventMacro, UnityEventMacro } from 'Ads/Managers/ThirdPartyEventManager';
+import { ThirdPartyEventMacro } from 'Ads/Managers/ThirdPartyEventManager';
 import { IThirdPartyEventManagerFactory } from 'Ads/Managers/ThirdPartyEventManagerFactory';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
@@ -123,8 +123,8 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
                 [ThirdPartyEventMacro.OM_VENDORS]: '',
                 [ThirdPartyEventMacro.OMIDPARTNER]: OMID_P,
                 [ThirdPartyEventMacro.CACHEBUSTING]: '-1',
-                [UnityEventMacro.AD_UNIT_ID_IMPRESSION]: this._adUnitId,
-                [UnityEventMacro.AD_UNIT_ID_OPERATIVE]: this._adUnitId
+                [ThirdPartyEventMacro.AD_UNIT_ID_IMPRESSION]: this._adUnitId,
+                [ThirdPartyEventMacro.AD_UNIT_ID_OPERATIVE]: this._adUnitId
             }),
             operativeEventManager: this.getOperativeEventManager(),
             placement: this._placement,

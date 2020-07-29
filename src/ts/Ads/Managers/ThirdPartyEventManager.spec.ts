@@ -1,7 +1,7 @@
 import { RequestManager, RequestManagerMock } from 'Core/Managers/__mocks__/RequestManager';
 import { Core } from 'Core/__mocks__/Core';
 
-import { ThirdPartyEventMacro, ThirdPartyEventManager, TrackingEvent, UnityEventMacro } from 'Ads/Managers/ThirdPartyEventManager';
+import { ThirdPartyEventMacro, ThirdPartyEventManager, TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
 import { OMID_P } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
 import { ICoreApi } from 'Core/ICore';
 import { Campaign } from 'Ads/Models/__mocks__/Campaign';
@@ -17,7 +17,7 @@ describe('ThirdPartyEventManagerTest', () => {
         request = new RequestManager();
         urlTemplate = 'http://foo.biz/123?is_om_enabled=%25OM_ENABLED%25&om_vendors=%25OM_VENDORS%25';
 
-        thirdPartyEventManager = new ThirdPartyEventManager(core, request, { [ThirdPartyEventMacro.OMIDPARTNER]: OMID_P, [ThirdPartyEventMacro.CACHEBUSTING]: '-1', [UnityEventMacro.AD_UNIT_ID_IMPRESSION]: 'test_adunit_id', [UnityEventMacro.AD_UNIT_ID_OPERATIVE]: 'test_adunit_id' });
+        thirdPartyEventManager = new ThirdPartyEventManager(core, request, { [ThirdPartyEventMacro.OMIDPARTNER]: OMID_P, [ThirdPartyEventMacro.CACHEBUSTING]: '-1', [ThirdPartyEventMacro.AD_UNIT_ID_IMPRESSION]: 'test_adunit_id', [ThirdPartyEventMacro.AD_UNIT_ID_OPERATIVE]: 'test_adunit_id' });
     });
 
     describe('when replacing Open Measurement Macros', () => {

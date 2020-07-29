@@ -62,8 +62,8 @@ describe('AdUnitParametersFactoryTest', () => {
                     [ThirdPartyEventMacro.OM_VENDORS]: '',
                     [ThirdPartyEventMacro.OMIDPARTNER]: 'Unity3d/1.2.10',
                     [ThirdPartyEventMacro.CACHEBUSTING]: '-1',
-                    [UnityEventMacro.AD_UNIT_ID_IMPRESSION]: 'test_ad_unit_1',
-                    [UnityEventMacro.AD_UNIT_ID_OPERATIVE]: 'test_ad_unit_1'
+                    [ThirdPartyEventMacro.AD_UNIT_ID_IMPRESSION]: 'test_ad_unit_1',
+                    [ThirdPartyEventMacro.AD_UNIT_ID_OPERATIVE]: 'test_ad_unit_1'
                 });
             });
         });
