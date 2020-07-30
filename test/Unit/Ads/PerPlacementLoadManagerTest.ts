@@ -32,7 +32,6 @@ import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
 import 'mocha';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { LoadCalledCounter } from 'Core/Utilities/LoadCalledCounter';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { ILoadedCampaign } from 'Ads/Managers/CampaignManager';
@@ -109,16 +108,13 @@ describe('PerPlacementLoadManagerTest', () => {
             let sandbox: sinon.SinonSandbox;
             let loadCampaignStub: sinon.SinonStub;
             let sendReadyEventStub: sinon.SinonStub;
-            let loadCalledKafkaStub: sinon.SinonStub;
 
             beforeEach(() => {
                 sandbox = sinon.createSandbox();
                 placementId = 'premium';
                 loadCampaignStub = sandbox.stub(campaignManager, 'loadCampaign');
                 sendReadyEventStub = sandbox.stub(ads.Listener, 'sendReadyEvent');
-                loadCalledKafkaStub = sandbox.stub(LoadCalledCounter, 'report').callsFake(() => {
-                    return Promise.resolve(<INativeResponse>{});
-                });
+
                 // To silence diagnostic messages
                 sandbox.stub(Diagnostics, 'trigger').callsFake(() => {
                     return Promise.resolve(<INativeResponse>{});

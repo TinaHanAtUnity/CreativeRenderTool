@@ -9,7 +9,6 @@ import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { FocusManager } from 'Core/Managers/FocusManager';
 import { SDKMetrics, LoadMetric } from 'Ads/Utilities/SDKMetrics';
-import { LoadCalledCounter } from 'Core/Utilities/LoadCalledCounter';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 
 export class PerPlacementLoadManager extends RefreshManager {
@@ -93,18 +92,6 @@ export class PerPlacementLoadManager extends RefreshManager {
 
     // count is the number of times load was called for a placementId before we could process it
     protected loadPlacement(placementId: string, count: number) {
-
-        LoadCalledCounter.report({
-            gameId: this._clientInfo.getGameId(),
-            placementId: placementId,
-            country: this._coreConfig.getCountry(),
-            count: count,
-            abGroup: this._coreConfig.getAbGroup(),
-            organizationId: this._coreConfig.getOrganizationId(),
-            sdkVersion: this._clientInfo.getSdkVersion(),
-            gamerToken: this._coreConfig.getToken()
-        });
-
         const placement = this._adsConfig.getPlacement(placementId);
         if (placement && this.shouldLoadCampaignForPlacement(placement)) {
             this.setPlacementState(placementId, PlacementState.WAITING);
