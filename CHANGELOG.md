@@ -1,3 +1,41 @@
+# Pending
+
+* [AUI] Default to green when color matching is not supported [#16557](https://github.com/Applifier/unity-ads-webview/pull/16557)
+* [Chore] Add tests to verify tracking urls in Load V5 [#16599](https://github.com/Applifier/unity-ads-webview/pull/16599)
+* [Load V5] Remove load v5 allow list from WebView [#16605](https://github.com/Applifier/unity-ads-webview/pull/16605)
+
+# Wed Jul 29 22:30:08 UTC 2020
+
+* Replace adunitid macro for impression and operative tracking events [#16600](https://github.com/Applifier/unity-ads-webview/pull/16600)
+* [Load V5] Use Publisher configuration to enable Load V5 [#16435](https://github.com/Applifier/unity-ads-webview/pull/16435)
+
+# Mon Jul 27 23:16:58 UTC 2020
+
+* Make all china auction traffic go through the proxy [#16559])(https://github.com/Applifier/unity-ads-webview/pull/16559)
+
+# Fri Jul 24 21:41:51 UTC 2020
+
+* [Load V5] Fix Event Protocol and Cleanup [#16560](https://github.com/Applifier/unity-ads-webview/pull/16560)
+* [Load V5] Send load api enabled flag to kafka [#16434](https://github.com/Applifier/unity-ads-webview/pull/16434)
+* Add load and fill event manager [#16401](https://github.com/Applifier/unity-ads-webview/pull/16401)
+
+# Tue Jul 21 21:43:41 UTC 2020
+
+* [VAST Endcard] Lock Screen Orientation on Show [#16495](https://github.com/Applifier/unity-ads-webview/pull/16495)
+* [AUI] Make MAB reverse AB test explicit [#16436](https://github.com/Applifier/unity-ads-webview/pull/16436)
+* [VAST Endcard PR1] Refactor show method to be async and add more unit tests [#16252](https://github.com/Applifier/unity-ads-webview/pull/16252)
+
+# Tue Jul 21 18:51:38 UTC 2020
+
+* [Chore] Fix MRAID Error Logging [#16439](https://github.com/Applifier/unity-ads-webview/pull/16439)
+* [Load V5] Update Allow List GameIDs [#16438](https://github.com/Applifier/unity-ads-webview/pull/16438)
+* [Release 3.4.8] Add Webview Release Support [#16431](https://github.com/Applifier/unity-ads-webview/pull/16431)
+* [Chore] Update Dependencies [#16430](https://github.com/Applifier/unity-ads-webview/pull/16430)
+
+# Mon Jul 20 21:41:48 UTC 2020
+
+* Increase proxied auction traffic from China to 75% [#16437](https://github.com/Applifier/unity-ads-webview/pull/16437)
+
 # Tue 14 Jul 2020 15:37:54 UTC
 
 * [AUI] Collect click data for heatmap purposes [#16316](https://github.com/Applifier/unity-ads-webview/pull/16316)

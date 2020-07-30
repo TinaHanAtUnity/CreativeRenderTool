@@ -93,6 +93,7 @@ export class ExperimentEndScreen extends PerformanceEndScreen {
                     }
                     break;
                 default:
+                    SDKMetrics.reportMetricEvent(AUIMetric.ColorMatchingNotSupported);
             }
         }
     }

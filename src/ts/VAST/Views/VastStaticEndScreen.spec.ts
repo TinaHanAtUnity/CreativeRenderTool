@@ -3,7 +3,7 @@ import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
 import { VastCampaign } from 'VAST/Models/__mocks__/VastCampaign';
 import { VastCampaign as VastCampaignBase } from 'VAST/Models/VastCampaign';
 import { AdUnitContainer } from 'Ads/AdUnits/Containers/__mocks__/AdUnitContainer';
-import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
+import { Orientation, ViewConfiguration } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { Ads } from 'Ads/__mocks__/Ads';
 import { FocusManager } from 'Core/Managers/__mocks__/FocusManager';
 import { RequestManager } from 'Core/Managers/__mocks__/RequestManager';
@@ -30,12 +30,13 @@ jest.mock('html/VastStaticEndScreen.html', () => {
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe('VastStaticEndScreen', () => {
         const privacy = new AbstractPrivacy();
+        const adUnitContainer = new AdUnitContainer();
         const baseParams = jest.fn(() => {
 
             return <IAdUnitParameters<VastCampaignBase>>{
                 forceOrientation: Orientation.LANDSCAPE,
                 focusManager: new FocusManager(),
-                container: new AdUnitContainer(),
+                container: adUnitContainer,
                 deviceInfo: new DeviceInfo(),
                 clientInfo: new ClientInfo(),
                 thirdPartyEventManager: new ThirdPartyEventManager(),
@@ -62,24 +63,42 @@ jest.mock('html/VastStaticEndScreen.html', () => {
             staticEndScreen = new VastStaticEndScreen(baseParams());
         });
 
+        describe('when endcard is showing', () => {
+            beforeEach(async () => {
+                await staticEndScreen.show();
+            });
+            it('it should reconfigure the view configuration to ENDSCREEN', () => {
+                expect(adUnitContainer.reconfigure).toHaveBeenCalledWith(ViewConfiguration.ENDSCREEN);
+            });
+            it('the screen orientation should be locked', () => {
+                expect(adUnitContainer.reorient).toHaveBeenCalledWith(false, expect.anything());
+            });
+        });
+
         describe('when endcard is rendered', () => {
-            it('the inner HTML should not be null', () => {
+            beforeEach(() => {
                 staticEndScreen.render();
+            });
+            it('the inner HTML should not be null', () => {
                 expect(staticEndScreen.container().innerHTML).toEqual('HTMLRenderTest');
             });
         });
 
         describe('when endcard is removed', () => {
-            it('the privacy should hide', () => {
+            beforeEach(() => {
                 staticEndScreen.remove();
+            });
+            it('the privacy should hide', () => {
                 expect(privacy.hide).toHaveBeenCalled();
             });
 
         });
 
         describe('on privacy closed', () => {
-            it('the privacy should hide', () => {
+            beforeEach(() => {
                 staticEndScreen.onPrivacyClose();
+            });
+            it('the privacy should hide', () => {
                 expect(privacy.hide).toHaveBeenCalled();
             });
         });

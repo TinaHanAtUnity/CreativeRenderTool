@@ -26,7 +26,7 @@ import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { CometCampaignParser } from 'Performance/Parsers/CometCampaignParser';
 import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
 import CometVideoPlcCampaign from 'json/OnCometVideoPlcCampaign.json';
-import { MabDisabledABTest } from 'Core/Models/ABGroup';
+import { MabReverseABTest } from 'Core/Models/ABGroup';
 
 import 'mocha';
 import * as sinon from 'sinon';
@@ -384,7 +384,7 @@ describe('AutomatedExperimentManagerTests', () => {
         (<sinon.SinonStub>adMobSignalFactory.getAdRequestSignal).returns(Promise.resolve(new AdMobSignal()));
         (<sinon.SinonStub>adMobSignalFactory.getOptionalSignal).returns(Promise.resolve(new AdMobOptionalSignal()));
 
-        sandbox.stub(MabDisabledABTest, 'isValid').returns(true);
+        sandbox.stub(MabReverseABTest, 'isValid').returns(true);
 
         const mockRequest = sinon.mock(requestManager);
         mockRequest.expects('post').returns(Promise.resolve({

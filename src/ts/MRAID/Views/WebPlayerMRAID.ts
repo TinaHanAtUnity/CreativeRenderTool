@@ -78,7 +78,9 @@ export class WebPlayerMRAID extends MRAIDView<IMRAIDViewHandler> {
             mraid = this._platform === Platform.ANDROID ? encodeURIComponent(mraid) : mraid;
 
             return this.setWebPlayerContainerData(webPlayerContainer, mraid);
-        }).catch(e => this._core.Sdk.logError('failed to create mraid: ' + e));
+        }).catch((e: Error) => {
+            this._core.Sdk.logError('failed to create mraid: ' + e.message);
+        });
     }
 
     public onBridgeSendStats(totalTime: number, playTime: number, frameCount: number) {
