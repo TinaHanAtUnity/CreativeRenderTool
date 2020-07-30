@@ -76,6 +76,7 @@ export class ExperimentEndScreen extends PerformanceEndScreen {
                     this._tintColor = true;
                     break;
                 default:
+                    SDKMetrics.reportMetricEvent(AUIMetric.ColorMatchingNotSupported);
             }
         }
     }

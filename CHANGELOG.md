@@ -1,5 +1,11 @@
 # Pending
 
+* [AUI] Default to green when color matching is not supported [#16557](https://github.com/Applifier/unity-ads-webview/pull/16557)
+* [Chore] Add tests to verify tracking urls in Load V5 [#16599](https://github.com/Applifier/unity-ads-webview/pull/16599)
+* [Load V5] Remove load v5 allow list from WebView [#16605](https://github.com/Applifier/unity-ads-webview/pull/16605)
+
+# Wed Jul 29 22:30:08 UTC 2020
+
 * Replace adunitid macro for impression and operative tracking events [#16600](https://github.com/Applifier/unity-ads-webview/pull/16600)
 * [Load V5] Use Publisher configuration to enable Load V5 [#16435](https://github.com/Applifier/unity-ads-webview/pull/16435)
 
