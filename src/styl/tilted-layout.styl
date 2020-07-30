@@ -37,12 +37,13 @@ body.tilted-layout #end-screen {
     }
 
     .privacy-button {
-      right: .5em;
+      top: 0;
+      right: 0;
       bottom: unset;
       left: unset;
       z-index: 900;
       margin-left: unset;
-      transform: translate(1.5em, 1.25em);
+      transform: translate(1.4em, 1.25em);
 
       .icon-gdpr {
         color: $white;
@@ -132,9 +133,9 @@ body.tilted-layout #end-screen {
       .end-screen-info {
         display: flex;
         flex-direction: column;
-        transform: rotate(-15deg) translateY(-45%);
+        transform: rotate(-15deg) translateY(-34%);
         padding-left: 2em;
-        height: 50%;
+        height: 100%;
         animation: end-screen-info-slide .3s ease-out 0s forwards 1;
 
         .game-icon-rating-container {
@@ -144,7 +145,7 @@ body.tilted-layout #end-screen {
 
           .game-rating-stars-top, .game-rating-stars-bottom {
             .icon-star {
-              margin-left: -.15em;
+              margin-left: 0;
               vertical-align: baseline;
 
               &::before {
@@ -162,16 +163,15 @@ body.tilted-layout #end-screen {
             display: flex;
             flex-direction: column;
             padding: .5em;
+            padding-bottom: .25em;
 
             .game-rating-stars-container {
-              line-height: 0;
             }
 
             .game-rating {
               margin-top: unset;
               vertical-align: unset;
               text-align: unset;
-              line-height: .6em;
             }
 
             .game-rating-count {
@@ -181,6 +181,7 @@ body.tilted-layout #end-screen {
             .game-rating-number {
               display: flex;
               align-items: baseline;
+              margin-bottom: -.15em;
               font-size: 1.2em;
               font-family: "AldotheApache", Helvetica, sans-serif;
               line-height: .8;
@@ -200,7 +201,7 @@ body.tilted-layout #end-screen {
           .game-name-container {
             display: flex;
             align-items: center;
-            height: 2.75em;
+            height: 2.8em;
             font-size: 1.5em;
             font-family: "AldotheApache", Helvetica, sans-serif;
             line-height: 1em;
@@ -227,7 +228,7 @@ body.tilted-layout #end-screen {
       .download-cta-container {
         position: relative;
         height: 50%;
-        transform: translateY(-45%);
+        transform: translateY(-70%);
         animation: download-container-slide .3s ease-out 0s forwards 1;
 
         .download-cta-button {
@@ -302,7 +303,7 @@ body.tilted-layout.landscape #end-screen { // @stylint ignore;
         animation: landscape-end-screen-info-slide .3s ease-out 0s forwards 1;
 
         .game-icon-rating-container {
-          transform: translateX(-25%);
+          transform: translateX(-19%);
           align-items: center;
 
           .game-icon {
@@ -358,7 +359,8 @@ body.tilted-layout.landscape #end-screen { // @stylint ignore;
     }
 
     .china-ad-unity-logo {
-      transform: rotate(-15deg) translate(2.5em, -2.5em);
+      width: 100%;
+      transform: rotate(-15deg) translate(1.75em, .25em);
 
       .unityads-logo {
         font-size: 2rem;
@@ -367,10 +369,11 @@ body.tilted-layout.landscape #end-screen { // @stylint ignore;
 
     .privacy-button {
       position: absolute;
+      top: unset;
       right: unset;
       bottom: 0;
       left: 0;
-      transform: translate(-.35em, 3em);
+      transform: translateY(.25em);
     }
   }
 }
@@ -402,11 +405,11 @@ body.tilted-layout.portrait { // @stylint ignore;
 
 @keyframes end-screen-info-slide {
   from {
-    transform: rotate(-15deg) translateY(-45%) translateX(-200%);
+    transform: rotate(-15deg) translateY(-34%) translateX(-200%);
   }
 
   to {
-    transform: rotate(-15deg) translateY(-45%) translateX(0%);
+    transform: rotate(-15deg) translateY(-34%) translateX(0%);
   }
 }
 
@@ -426,7 +429,7 @@ body.tilted-layout.portrait { // @stylint ignore;
   }
 
   to {
-    transform: translateY(-45%);
+    transform: translateY(-70%);
   }
 }
 
