@@ -270,6 +270,9 @@ export class ExperimentEndScreen extends PerformanceEndScreen {
         if (this._darkMode) {
             document.body.classList.remove('dark-mode');
         }
+        if (this._tiltedLayout) {
+            document.body.classList.remove('tilted-layout');
+        }
     }
 
     protected onDownloadEvent(event: Event): void {
