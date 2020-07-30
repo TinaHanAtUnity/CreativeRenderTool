@@ -150,7 +150,6 @@ describe('PerPlacementLoadManagerTest', () => {
                     setPlacementStateStub.callsFake((id: string, state: PlacementState) => {
                         if (placementId === id && state !== PlacementState.WAITING) {
                             const testCampaign = loadManager.getCampaign(placementId);
-                            sinon.assert.called(loadCalledKafkaStub);
                             assert.instanceOf(testCampaign, Campaign, `Campaign with placementID '${placementId}' was not a defined Campaign`);
                             assert.equal(testCampaign, t.expectedCampaign, 'Loaded campaign was not the correct campaign');
                             assert.notEqual(testCampaign, t.unexpectedCampaign, 'Loaded campaign was not the correct campaign');
@@ -190,7 +189,6 @@ describe('PerPlacementLoadManagerTest', () => {
                 loadDict[placementId] = 1;
                 ads.LoadApi.onLoad.trigger(loadDict);
 
-                sinon.assert.called(loadCalledKafkaStub);
                 sinon.assert.notCalled(loadCampaignStub);
                 sinon.assert.notCalled(sendReadyEventStub);
                 sinon.assert.calledWith(<sinon.SinonStub>SDKMetrics.reportMetricEvent, LoadMetric.LoadAuctionRequestBlocked);
@@ -207,7 +205,6 @@ describe('PerPlacementLoadManagerTest', () => {
                 loadDict[placementId] = 1;
                 ads.LoadApi.onLoad.trigger(loadDict);
 
-                sinon.assert.called(loadCalledKafkaStub);
                 sinon.assert.notCalled(loadCampaignStub);
                 sinon.assert.calledWith(sendReadyEventStub, placementId);
                 sinon.assert.calledWith(<sinon.SinonStub>SDKMetrics.reportMetricEvent, LoadMetric.LoadAuctionRequestBlocked);
@@ -228,7 +225,6 @@ describe('PerPlacementLoadManagerTest', () => {
                 placement.setState(PlacementState.READY);
                 placement.setCurrentCampaign(campaign);
 
-                sinon.assert.called(loadCalledKafkaStub);
                 sinon.assert.called(loadCampaignStub);
             });
 
@@ -245,7 +241,6 @@ describe('PerPlacementLoadManagerTest', () => {
                     const placement = adsConfig.getPlacement(placementId);
                     placement.setState(state);
                     return loadManager.initialize().then(() => {
-                        sinon.assert.called(loadCalledKafkaStub);
                         sinon.assert.called(loadCampaignStub);
                     });
                 });
