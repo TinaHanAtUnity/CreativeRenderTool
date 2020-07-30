@@ -63,29 +63,7 @@ export class ExperimentEndScreen extends PerformanceEndScreen {
             listener: (event: Event) => this.onClickCollection(event)
         });
 
-        if (this._tiltedLayout) {
-            this._template = new Template(this.getTemplate(), this._localization);
-            this._simpleRating = campaign.getRating().toFixed(1);
-            this._gameNameLength = campaign.getGameName().length;
-
-            this._templateData = {
-                ...this._templateData,
-                simpleRating: this._simpleRating,
-                gameName: this._gameNameLength >= 40 ? campaign.getGameName().substring(0, 40) : campaign.getGameName()
-            };
-
-            this._bindings.push(
-                {
-                    event: 'click',
-                    listener: (event: Event) => this.onClickCollection(event)
-                },
-                {
-                    event: 'click',
-                    listener: (event: Event) => this.onDownloadEvent(event),
-                    selector: '.game-creative-image, .download-cta-button'
-                }
-            );
-        }
+        this.fixupTiltedLayout(campaign);
     }
 
     private fixupScheme(actions: IExperimentActionChoice | undefined) {
@@ -187,6 +165,32 @@ export class ExperimentEndScreen extends PerformanceEndScreen {
         return actions;
     }
 
+    private fixupTiltedLayout(campaign: PerformanceCampaign) {
+        if (this._tiltedLayout) {
+            this._template = new Template(this.getTemplate(), this._localization);
+            this._simpleRating = campaign.getRating().toFixed(1);
+            this._gameNameLength = campaign.getGameName().length;
+
+            this._templateData = {
+                ...this._templateData,
+                simpleRating: this._simpleRating,
+                gameName: this._gameNameLength >= 40 ? campaign.getGameName().substring(0, 40) : campaign.getGameName()
+            };
+
+            this._bindings.push(
+                {
+                    event: 'click',
+                    listener: (event: Event) => this.onClickCollection(event)
+                },
+                {
+                    event: 'click',
+                    listener: (event: Event) => this.onDownloadEvent(event),
+                    selector: '.game-creative-image, .download-cta-button'
+                }
+            );
+        }
+    }
+
     public render(): void {
         super.render();
         this._container.classList.add(`${this._animation}-download-button-end-screen`);
@@ -208,7 +212,7 @@ export class ExperimentEndScreen extends PerformanceEndScreen {
                     SDKMetrics.reportMetricEvent(error.tag);
                 });
         }
-        if (this._gameNameLength >= 40) {
+        if (this._tiltedLayout && this._gameNameLength >= 40) {
             const ellipsis = <HTMLElement> this._container.querySelector('.game-name-ellipsis');
             ellipsis.classList.add('show-ellipsis');
         }
