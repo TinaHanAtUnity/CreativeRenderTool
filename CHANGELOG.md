@@ -1,3 +1,7 @@
+# Pending
+
+* [Load V5] Remove load v5 allow list from WebView [#16605](https://github.com/Applifier/unity-ads-webview/pull/16605)
+
 # Wed Jul 29 22:30:08 UTC 2020
 
 * Replace adunitid macro for impression and operative tracking events [#16600](https://github.com/Applifier/unity-ads-webview/pull/16600)
