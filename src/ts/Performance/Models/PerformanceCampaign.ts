@@ -185,14 +185,7 @@ export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
     }
 
     public getRequiredAssets() {
-        const assets: Asset[] = [];
-
-        const endScreen = this.getEndScreen();
-        if (endScreen) {
-            assets.push(endScreen);
-        }
-
-        return assets;
+        return [];
     }
 
     public getOptionalAssets() {
@@ -213,6 +206,11 @@ export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
         const portrait = this.getPortrait();
         if (portrait) {
             assets.push(portrait);
+        }
+
+        const endScreen = this.getEndScreen();
+        if (endScreen) {
+            assets.push(endScreen);
         }
 
         return assets;
