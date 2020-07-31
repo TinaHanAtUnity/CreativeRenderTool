@@ -38,7 +38,7 @@ export class PerformanceAdUnitWithAutomatedExperimentParametersFactory extends P
 
         let endScreen: ExperimentEndScreen | ColorBlurEndScreen | ExternalEndScreen;
 
-        if (this._campaign.getEndScreen()) {
+        if (this._campaign.getEndScreenType() === 'iframe') {
             endScreen = new ExternalEndScreen(endScreenCombination, endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
         } else if (endScreenCombination && endScreenCombination.scheme === EndScreenExperimentDeclaration.scheme.COLORBLUR) {
             endScreen = new ColorBlurEndScreen(endScreenCombination, endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
