@@ -18,6 +18,7 @@ export interface IIosDeviceInfo extends IDeviceInfo {
     currentUiTheme: IosUiTheme;
     adNetworksPlist: string[];
     systemBootTime: number;
+    trackingAuthorizationStatus: number;
 }
 
 export class IosDeviceInfo extends DeviceInfo<IIosDeviceInfo> {
@@ -37,7 +38,8 @@ export class IosDeviceInfo extends DeviceInfo<IIosDeviceInfo> {
             localeList: ['array'],
             currentUiTheme: ['number'],
             adNetworksPlist: ['array'],
-            systemBootTime: ['number']
+            systemBootTime: ['number'],
+            trackingAuthorizationStatus: ['number']
         }, Platform.IOS, core);
     }
 
@@ -58,6 +60,7 @@ export class IosDeviceInfo extends DeviceInfo<IIosDeviceInfo> {
             promises.push(this._core.DeviceInfo.Ios!.getCurrentUITheme().then(currentUiTheme => this.set('currentUiTheme', currentUiTheme)).catch(err => this.handleDeviceInfoError(err)));
             promises.push(this._core.DeviceInfo.Ios!.getAdNetworkIdsPlist().then(adNetworksPlist => this.set('adNetworksPlist', adNetworksPlist)).catch(err => this.handleDeviceInfoError(err)));
             promises.push(this._core.DeviceInfo.Ios!.getSystemBootTime().then(systemBootTime => this.set('systemBootTime', systemBootTime)).catch(err => this.handleDeviceInfoError(err)));
+            promises.push(this._core.iOS!.TrackingManager.getTrackingAuthorizationStatus().then(trackingAuthorizationStatus => this.set('trackingAuthorizationStatus', trackingAuthorizationStatus)).catch(err => this.handleDeviceInfoError(err)));
 
             return Promise.all(promises);
         });
@@ -99,7 +102,7 @@ export class IosDeviceInfo extends DeviceInfo<IIosDeviceInfo> {
         return this.get('localeList');
     }
 
-    public getCurrentUiTheme(): IosUiTheme {
+    public getCurrentUiTheme(): number {
         return this.get('currentUiTheme');
     }
 
@@ -109,6 +112,10 @@ export class IosDeviceInfo extends DeviceInfo<IIosDeviceInfo> {
 
     public getSystemBootTime(): number {
         return this.get('systemBootTime');
+    }
+
+    public getTrackingAuthorizationStatus(): number {
+        return this.get('trackingAuthorizationStatus');
     }
 
     public isStatusBarHidden(): Promise<boolean> {
