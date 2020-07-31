@@ -1226,7 +1226,13 @@ export class TestFixtures {
             getStatusBarHeight: sinon.stub().returns(Promise.resolve(40)),
             getStatusBarWidth: sinon.stub().returns(Promise.resolve(768)),
             getDeviceMaxVolume: sinon.stub().returns(Promise.resolve(1)),
-            getSensorList: sinon.stub().returns(Promise.resolve([]))
+            getSensorList: sinon.stub().returns(Promise.resolve([])),
+            getDeviceName: sinon.stub().returns(Promise.resolve('fakeDeviceName')),
+            getVendorIdentifier: sinon.stub().returns(Promise.resolve('fakeVendor')),
+            getCurrentUITheme: sinon.stub().returns(Promise.resolve(1)),
+            getLocaleList: sinon.stub().returns(Promise.resolve(['en', 'fi'])),
+            getAdNetworkIdsPlist: sinon.stub().returns(Promise.resolve(['adNetwork'])),
+            getSystemBootTime: sinon.stub().returns(Promise.resolve(1))
         };
     }
 
