@@ -152,7 +152,8 @@ export enum AUIMetric {
     InvalidImageAssets = 'invalid_image_assets',
     InvalidCtaText = 'invalid_cta_text',
     InvalidSchemeAndColorCoordination = 'invalid_scheme_and_color_coordination',
-    ColorMatchingNotSupported = 'color_matching_not_supported'
+    ColorMatchingNotSupported = 'color_matching_not_supported',
+    TiltedLayoutNotSupported = 'tilted_layout_not_supported'
 }
 
 export enum ExternalEndScreenMetric {

@@ -10,13 +10,15 @@ export const EndScreenExperimentDeclaration: IExperimentDeclaration = {
         DARK: 'dark',
         LIGHT: 'light',
         COLORMATCHING: 'color_matching',
-        COLORBLUR: 'color_blur'
+        COLORBLUR: 'color_blur',
+        TILTED: 'tilted'
     },
     animation: {
         STATIC: 'static',
         HEARTBEATING: 'heartbeating',
         BOUNCING: 'bouncing',
-        SHINING: 'shining'
+        SHINING: 'shining',
+        UNDEFINED: undefined
     },
     color: {
         BLUE: '167dfb',
