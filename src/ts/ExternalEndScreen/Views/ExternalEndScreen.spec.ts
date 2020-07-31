@@ -97,16 +97,10 @@ import { PerformanceCampaign } from 'Performance/Models/__mocks__/PerformanceCam
             expect(externalEndScreen.container().innerHTML).toContain('iframe-end-screen');
         });
 
-        it('should not close the end screen when iframe is ready', () => {
+        it('should close the end screen when iframe is ready', () => {
             externalEndScreen.render();
-            // Wait for iframe.onload
-            return new Promise(resolve => {
-                setTimeout(() => {
-                    externalEndScreen.show();
-                    expect(eventHandler.onEndScreenClose).toBeCalledTimes(0);
-                    resolve();
-                }, 0);
-            });
+            externalEndScreen.show();
+            expect(eventHandler.onEndScreenClose).toBeCalledTimes(1);
         });
 
         it('should listen for close event from iframe', () => {
