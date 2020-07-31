@@ -23,6 +23,9 @@ All API methods are referred with class.method notation, e.g. VideoPlayer.play
 * Added IosDeviceInfo.getLocaleList
 * Added IosDeviceInfo.getAdNetworkIdsPlist
 * Added IosDeviceInfo.getSystemBootTime
+* Added iOS StoreKit Api
+* Added SKAdNetwork.updateConversionValue
+* Added SKAdNetwork.registerAppForAdNetworkAttribution;
 
 ## 3.4.0
 

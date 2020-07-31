@@ -35,6 +35,7 @@ import { StorageApi } from 'Core/Native/__mocks__/StorageApi';
 import { StorageBridge } from 'Core/Utilities/__mocks__/StorageBridge';
 import { NativeErrorApi } from 'Core/__mocks__/NativeErrorApi';
 import { SdkDetectionInfo } from 'Core/Models/__mocks__/SdkDetectionInfo';
+import { SKAdNetworkApi } from 'Core/Native/iOS/__mocks__/SKAdNetworkApi';
 
 import { ICore } from 'Core/ICore';
 
@@ -64,7 +65,8 @@ export const Core = jest.fn(() => {
                 Notification: new NotificationApi(),
                 Preferences: new IosPreferencesApi(),
                 UrlScheme: new UrlSchemeApi(),
-                TrackingManager: new TrackingManagerApi()
+                TrackingManager: new TrackingManagerApi(),
+                SKAdNetwork: new SKAdNetworkApi()
             }
         },
         NativeBridge: new NativeBridge(),

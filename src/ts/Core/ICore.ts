@@ -37,6 +37,7 @@ import { NativeErrorApi } from 'Core/Api/NativeErrorApi';
 import { ClassDetectionApi } from 'Core/Native/ClassDetection';
 import { SdkDetectionInfo } from 'Core/Models/SdkDetectionInfo';
 import { TrackingManagerApi } from 'Core/Native/iOS/TrackingManager';
+import { SKAdNetworkApi } from 'Core/Native/iOS/SKAdNetwork';
 
 export interface ICoreApi extends IModuleApi {
     Cache: CacheApi;
@@ -63,6 +64,7 @@ export interface ICoreApi extends IModuleApi {
         Notification: NotificationApi;
         Preferences: IosPreferencesApi;
         UrlScheme: UrlSchemeApi;
+        SKAdNetwork: SKAdNetworkApi;
     };
 }
 
