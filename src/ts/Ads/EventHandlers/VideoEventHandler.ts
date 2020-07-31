@@ -130,7 +130,7 @@ export class VideoEventHandler extends BaseVideoEventHandler implements IVideoEv
         }
 
         this._adUnit.setVideoState(VideoState.READY);
-        
+
         if (duration > VideoFileInfo._maxVideoDuration) {
             CreativeBlocking.report(this._campaign.getCreativeId(), this._campaign.getSeatId(), this._campaign.getId(), BlockingReason.VIDEO_TOO_LONG, {
                 videoLength: duration
