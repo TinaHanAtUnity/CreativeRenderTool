@@ -229,7 +229,9 @@ export enum InitializationFailureMetric {
 }
 
 export enum VideoLengthMetric {
-    LengthDifference = 'sdk_minus_dsp_video_length'
+    LengthOverreported = 'dsp_video_length_overreported',
+    LengthUnderreported = 'dsp_video_length_underreported'
+
 }
 
 export type TimingEvent = InitializationMetric | MediationMetric | GeneralTimingMetric | ChinaAucionEndpoint | VideoLengthMetric;
