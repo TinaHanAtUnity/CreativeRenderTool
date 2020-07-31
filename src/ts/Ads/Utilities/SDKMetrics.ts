@@ -152,14 +152,21 @@ export enum AUIMetric {
     InvalidImageAssets = 'invalid_image_assets',
     InvalidCtaText = 'invalid_cta_text',
     InvalidSchemeAndColorCoordination = 'invalid_scheme_and_color_coordination',
-    ColorMatchingNotSupported = 'color_matching_not_supported'
+    ColorMatchingNotSupported = 'color_matching_not_supported',
+    TiltedLayoutNotSupported = 'tilted_layout_not_supported'
 }
 
 export enum ExternalEndScreenMetric {
-    IframeTimeout = 'external_end_screen_iframe_timeout',
     GameIconImageMissing = 'external_end_screen_game_icon_missing',
     ImageMissing = 'external_end_screen_image_missing',
-    UnableToGetDataUrl = 'external_end_screen_image_unable_to_get_data_url'
+    UnableToGetDataUrl = 'external_end_screen_image_unable_to_get_data_url',
+    NotReadyInTime = 'external_end_screen_not_ready_in_time',
+    StartInitIframe = 'external_end_screen_start_init_iframe',
+    ShowIframe = 'external_end_screen_show_iframe',
+    UseOriginalUrl = 'external_end_screen_use_original_url',
+    DefaultRouteUsed = 'external_end_screen_default_route_used',
+    AutoCloseInvoked = 'external_end_screen_auto_close_invoked',
+    BadIframeContent = 'external_end_screen_iframe_bad_content'
 }
 
 export enum GeneralTimingMetric {
