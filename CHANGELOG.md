@@ -1,4 +1,4 @@
-# Pending
+# Fri Jul 31 15:52:44 UTC 2020
 
 * [AUI] Add TiltedEndScreen to AutomatedExperiment [#16566](https://github.com/Applifier/unity-ads-webview/pull/16566)
 * Improve metrics and iframe loading [#16603](https://github.com/Applifier/unity-ads-webview/pull/16603)
