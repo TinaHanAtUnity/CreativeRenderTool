@@ -50,13 +50,16 @@ export class AdsConfigurationParser {
         const cacheMode = this._isBrowserBuild ? CacheMode.DISABLED : this.parseCacheMode(configJson);
         hasArPlacement = this._hasArPlacement ? true : hasArPlacement;
 
+        const loadV5Enabled = configJson.loadV5Enabled ? configJson.loadV5Enabled : false;
+
         const configurationParams: IAdsConfiguration = {
             cacheMode: cacheMode,
             placements: placements,
             defaultPlacement: defaultPlacement,
             defaultBannerPlacement: defaultBannerPlacement,
             hidePrivacy: configJson.hidePrivacy,
-            hasArPlacement: hasArPlacement
+            hasArPlacement: hasArPlacement,
+            loadV5Enabled: loadV5Enabled
         };
 
         return new AdsConfiguration(configurationParams);

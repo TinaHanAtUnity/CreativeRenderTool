@@ -11,7 +11,7 @@ export class AdUnitStyle extends Model<IAdUnitStyle> {
 
     public static getDefaultAdUnitStyle(): AdUnitStyle {
         return new AdUnitStyle({
-            ctaButtonColor: '#167dfb'
+            ctaButtonColor: '#33cc00'
         });
     }
 
