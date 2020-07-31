@@ -87,7 +87,6 @@ export const FakeReverseABTest = new ReverseABTest(16, 17);
 export const FakeZyngaFilteredReverseABTest = new ZyngaFilteredReverseABTest(16, 17);
 
 // Active AB Tests
-export const MediationCacheModeAllowedTest = new ReverseABTest(5);
 export const MabReverseABTest = new ZyngaFilteredReverseABTest(7);
 export const GooglePlayDetectionTest = new ABTest(8);
 export const PrivacySDKTest = new ABTest(16);
