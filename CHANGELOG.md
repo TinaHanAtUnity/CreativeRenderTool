@@ -1,3 +1,7 @@
+# Pending
+
+* Improve metrics and iframe loading [#16603](https://github.com/Applifier/unity-ads-webview/pull/16603)
+
 # Fri Jul 31 08:14:05 UTC 2020
 
 * [Latency] Remove Dynamic CacheMode Experiment and Blocklist [#16601](https://github.com/Applifier/unity-ads-webview/pull/16601)
