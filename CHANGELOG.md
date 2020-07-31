@@ -1,5 +1,6 @@
 # Pending
 
+* Added endScreenType to CometCampaignParser [#16526](https://github.com/Applifier/unity-ads-webview/pull/16526)
 * [AUI] Default to green when color matching is not supported [#16557](https://github.com/Applifier/unity-ads-webview/pull/16557)
 * [Chore] Add tests to verify tracking urls in Load V5 [#16599](https://github.com/Applifier/unity-ads-webview/pull/16599)
 * [Load V5] Remove load v5 allow list from WebView [#16605](https://github.com/Applifier/unity-ads-webview/pull/16605)

@@ -143,6 +143,7 @@ describe('CometCampaignParser', () => {
                 assert.equal(perfCampaign.getStreamingVideo()!.getUrl(), Url.encode(content.trailerStreaming), 'Downloadable Trailer URL is not equal');
                 assert.equal(perfCampaign.getLandscape()!.getOriginalUrl(), Url.encode(content.endScreenLandscape), 'Landscape URL is not equal');
                 assert.equal(perfCampaign.getPortrait()!.getOriginalUrl(), Url.encode(content.endScreenPortrait), 'Portrait URL is not equal');
+                assert.equal(perfCampaign.getEndScreenType(), content.endScreenType, 'End Screen type is not equal');
                 assert.equal(perfCampaign.getEndScreen()!.getUrl(), Url.encode(content.endScreenUrl), 'End Screen URL is not equal');
 
             });
@@ -273,6 +274,7 @@ describe('CometCampaignParser', () => {
                 assert.equal(perfCampaign.getVideo()!.getUrl(), Url.encode(content.trailerDownloadable), 'Downloadable Trailer URL is not equal');
                 assert.equal(perfCampaign.getStreamingVideo()!.getUrl(), Url.encode(content.trailerStreaming), 'Downloadable Trailer URL is not equal');
                 assert.equal(perfCampaign.getSquare()!.getOriginalUrl(), Url.encode(content.endScreen), 'Square URL is not equal');
+                assert.equal(perfCampaign.getEndScreenType(), content.endScreenType, 'End Screen type is not equal');
                 assert.equal(perfCampaign.getEndScreen()!.getUrl(), Url.encode(content.endScreenUrl), 'End Screen URL is not equal');
 
             });
