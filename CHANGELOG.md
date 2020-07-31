@@ -1,4 +1,4 @@
-# Pending
+# Fri Jul 31 08:14:05 UTC 2020
 
 * [Latency] Remove Dynamic CacheMode Experiment and Blocklist [#16601](https://github.com/Applifier/unity-ads-webview/pull/16601)
 * Added endScreenType to CometCampaignParser [#16526](https://github.com/Applifier/unity-ads-webview/pull/16526)
