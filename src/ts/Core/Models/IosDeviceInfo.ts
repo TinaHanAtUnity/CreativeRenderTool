@@ -3,7 +3,6 @@ import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
 import { DeviceInfo, IDeviceInfo } from 'Core/Models/DeviceInfo';
 import { IosUiTheme } from 'Core/Native/iOS/DeviceInfo';
-import { ClientInfo } from 'Core/Models/ClientInfo';
 
 export interface IIosDeviceInfo extends IDeviceInfo {
     userInterfaceIdiom: UIUserInterfaceIdiom;
@@ -23,8 +22,6 @@ export interface IIosDeviceInfo extends IDeviceInfo {
 }
 
 export class IosDeviceInfo extends DeviceInfo<IIosDeviceInfo> {
-
-    public ClientInfo: ClientInfo;
 
     constructor(core: ICoreApi) {
         super('IosDeviceInfo', {
