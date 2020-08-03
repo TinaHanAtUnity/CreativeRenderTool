@@ -38,6 +38,7 @@ import { AdUnitContainer, IAdUnit, Orientation, ViewConfiguration } from 'Ads/Ad
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
 import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManagerFactory';
+import { LoadAndFillEventManager } from 'Ads/Managers/LoadAndFillEventManager';
 
 export class TestContainer extends AdUnitContainer {
     public open(adUnit: IAdUnit, views: string[], allowRotation: boolean, forceOrientation: Orientation, disableBackbutton: boolean, options: any): Promise<void> {
@@ -108,6 +109,7 @@ describe('PerPlacementLoadAdapterTest', () => {
     let adMobSignalFactory: AdMobSignalFactory;
     let metaDataManager: MetaDataManager;
     let campaignParserManager: ContentTypeHandlerManager;
+    let loadAndFillEventManager: LoadAndFillEventManager;
 
     beforeEach(() => {
         clientInfo = TestFixtures.getClientInfo();
@@ -135,6 +137,7 @@ describe('PerPlacementLoadAdapterTest', () => {
         privacySDK = TestFixtures.getPrivacySDK(core);
         metaDataManager = new MetaDataManager(core);
         campaignParserManager = sinon.createStubInstance(ContentTypeHandlerManager);
+        loadAndFillEventManager = sinon.createStubInstance(LoadAndFillEventManager);
 
         privacyManager = new UserPrivacyManager(platform, core, coreConfig, adsConfig, clientInfo, deviceInfo, request, privacySDK);
         campaignManager = new LegacyCampaignManager(platform, coreModule, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, privacySDK, privacyManager);
@@ -147,6 +150,8 @@ describe('PerPlacementLoadAdapterTest', () => {
         let sendReadyEventStub: sinon.SinonStub;
         let sendPlacementStateChangedEventStub: sinon.SinonStub;
         let clock: sinon.SinonFakeTimers;
+        let sendLoadEventStub: sinon.SinonStub;
+        let sendFillEventStub: sinon.SinonStub;
 
         beforeEach(() => {
             placementID = 'premium';
@@ -156,8 +161,10 @@ describe('PerPlacementLoadAdapterTest', () => {
             sendReadyEventStub = sandbox.stub(ads.Listener, 'sendReadyEvent');
             sendPlacementStateChangedEventStub = sandbox.stub(ads.Listener, 'sendPlacementStateChangedEvent');
             clock = sinon.useFakeTimers();
+            sendLoadEventStub = <sinon.SinonStub>loadAndFillEventManager.sendLoadTrackingEvents;
+            sendFillEventStub = <sinon.SinonStub>loadAndFillEventManager.sendFillTrackingEvents;
 
-            perPlacementLoadAdapter = new PerPlacementLoadAdapter(platform, core, coreConfig, ads, wakeUpManager, campaignManager, adsConfig, focusManager, sessionManager, clientInfo, request, cache);
+            perPlacementLoadAdapter = new PerPlacementLoadAdapter(platform, core, coreConfig, ads, wakeUpManager, campaignManager, adsConfig, focusManager, sessionManager, clientInfo, request, cache, loadAndFillEventManager);
         });
 
         afterEach(() => {
@@ -186,6 +193,7 @@ describe('PerPlacementLoadAdapterTest', () => {
             sinon.assert.calledWith(sendPlacementStateChangedEventStub, placementID, 'NOT_AVAILABLE', 'WAITING');
             sinon.assert.calledWith(sendPlacementStateChangedEventStub, placementID, 'WAITING', 'NO_FILL');
             sinon.assert.notCalled(sendReadyEventStub);
+            sinon.assert.called(sendLoadEventStub);
         });
 
         it('should report no fill on not available placement', async () => {
@@ -209,6 +217,7 @@ describe('PerPlacementLoadAdapterTest', () => {
 
             sinon.assert.calledWith(sendPlacementStateChangedEventStub, placementID, 'WAITING', 'NO_FILL');
             sinon.assert.notCalled(sendReadyEventStub);
+            sinon.assert.called(sendLoadEventStub);
         });
 
         it('should report no fill if placement does not exists', async () => {
@@ -228,6 +237,8 @@ describe('PerPlacementLoadAdapterTest', () => {
             sinon.assert.calledWith(sendPlacementStateChangedEventStub, 'does_not_exists', 'NOT_AVAILABLE', 'WAITING');
             sinon.assert.calledWith(sendPlacementStateChangedEventStub, 'does_not_exists', 'WAITING', 'NO_FILL');
             sinon.assert.notCalled(sendReadyEventStub);
+
+            sinon.assert.called(sendLoadEventStub);
         });
 
         it('should update state after load', async () => {
@@ -252,6 +263,9 @@ describe('PerPlacementLoadAdapterTest', () => {
             sinon.assert.calledWith(sendPlacementStateChangedEventStub, placementID, 'NOT_AVAILABLE', 'WAITING');
             sinon.assert.calledWith(sendPlacementStateChangedEventStub, placementID, 'WAITING', 'READY');
             sinon.assert.calledWith(sendReadyEventStub, placementID);
+
+            sinon.assert.called(sendLoadEventStub);
+            sinon.assert.called(sendFillEventStub);
         });
 
         it('should update state after load while load called during ad request', async () => {
@@ -280,6 +294,9 @@ describe('PerPlacementLoadAdapterTest', () => {
             sinon.assert.calledWith(sendPlacementStateChangedEventStub, placementID, 'NOT_AVAILABLE', 'WAITING');
             sinon.assert.notCalled(sendReadyEventStub);
 
+            sinon.assert.called(sendLoadEventStub);
+            sinon.assert.notCalled(sendFillEventStub);
+
             requestPromiseResolve();
 
             await refreshPromise;
@@ -288,6 +305,7 @@ describe('PerPlacementLoadAdapterTest', () => {
 
             sinon.assert.calledWith(sendPlacementStateChangedEventStub, placementID, 'WAITING', 'READY');
             sinon.assert.calledWith(sendReadyEventStub, placementID);
+            sinon.assert.called(sendFillEventStub);
         });
 
         it('should update state after load while load called before RefreshManager initialized', async () => {
@@ -318,6 +336,9 @@ describe('PerPlacementLoadAdapterTest', () => {
             sinon.assert.calledWith(sendPlacementStateChangedEventStub, placementID, 'NOT_AVAILABLE', 'WAITING');
             sinon.assert.calledWith(sendPlacementStateChangedEventStub, placementID, 'WAITING', 'READY');
             sinon.assert.calledWith(sendReadyEventStub, placementID);
+
+            sinon.assert.called(sendLoadEventStub);
+            sinon.assert.called(sendFillEventStub);
         });
 
         it('should update properly handle no fill', async () => {
@@ -342,6 +363,8 @@ describe('PerPlacementLoadAdapterTest', () => {
             sinon.assert.calledWith(sendPlacementStateChangedEventStub, placementID, 'NOT_AVAILABLE', 'WAITING');
             sinon.assert.calledWith(sendPlacementStateChangedEventStub, placementID, 'WAITING', 'NO_FILL');
             sinon.assert.notCalled(sendReadyEventStub);
+
+            sinon.assert.called(sendLoadEventStub);
         });
 
         it('should update properly handle ready to no fill', async () => {
