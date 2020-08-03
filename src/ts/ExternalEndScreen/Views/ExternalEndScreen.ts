@@ -77,6 +77,8 @@ export class ExternalEndScreen extends View<IEndScreenHandler> implements IPriva
                 this.sendParameters();
             } else if (event.data.type === 'close') {
                 this.onCloseEvent();
+            } else if (event.data.type === 'metric') {
+                SDKMetrics.reportMetricEvent(event.data.metric);
             }
         };
         window.addEventListener('message', this._messageListener);
