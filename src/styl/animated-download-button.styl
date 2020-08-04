@@ -130,6 +130,12 @@
     .download-container {
       position: relative;
       overflow: hidden;
+
+      // This fixes a bug on ios where the "shining" object
+      // would overflow even though overflow: hidden is set,
+      // It has something to do with overflow and the border
+      // radius on the download button
+      transform: translateZ(0);
     }
 
     .download-container:before {
