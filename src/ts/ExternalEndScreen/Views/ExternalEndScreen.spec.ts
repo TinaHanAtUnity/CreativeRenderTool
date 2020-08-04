@@ -10,7 +10,8 @@ jest.mock('Ads/Utilities/SDKMetrics', () => {
         ...actual,
         'SDKMetrics': {
             ...actual.SDKMetrics,
-            reportMetricEvent: jest.fn(() => Promise.resolve())
+            reportMetricEvent: jest.fn(() => Promise.resolve()),
+            reportMetricEventWithTags: jest.fn(() => Promise.resolve())
         }
     };
 });
@@ -139,7 +140,7 @@ import { SDKMetrics } from 'Ads/Utilities/SDKMetrics';
 
             return sendMetricEvent(metric)
                 .then(() => {
-                    expect(SDKMetrics.reportMetricEvent).toHaveBeenCalledWith(metric);
+                    expect(SDKMetrics.reportMetricEventWithTags).toHaveBeenCalledWith(metric, {});
                 });
         });
 
