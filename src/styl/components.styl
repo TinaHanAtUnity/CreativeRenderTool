@@ -38,7 +38,7 @@ $game-icon-default($scale-size, $radius-size = .75, $with-styles = true) {
   $set-image($scale-size * $default-size, $scale-size * $default-size, $scale-size * $default-size * $radius-size);
 }
 
-$unityads-logo-default($scale-size) {
+$icon-unity-ads-logo-default($scale-size) {
   bottom: 0;
   left: 0;
   display: flex;
@@ -51,14 +51,9 @@ $unityads-logo-default($scale-size) {
     position: absolute;
     z-index: 5;
     max-height: $scale-size * $default-size * 1;
-    color: $unityads-logo-color;
+    color: $icon-unity-ads-logo-color;
     font-size: $default-font-size;
     opacity: .3;
-  }
-
-  &:after {
-    content: "\e00b";
-    font-family: "unityicons" !important; // @stylint ignore;
   }
 }
 
