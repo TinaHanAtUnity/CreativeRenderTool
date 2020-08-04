@@ -4,18 +4,6 @@ jest.mock('html/ExternalEndScreen.html', () => {
     };
 });
 
-jest.mock('Ads/Utilities/SDKMetrics', () => {
-    const actual = jest.requireActual('Ads/Utilities/SDKMetrics');
-    return {
-        ...actual,
-        'SDKMetrics': {
-            ...actual.SDKMetrics,
-            reportMetricEvent: jest.fn(() => Promise.resolve()),
-            reportMetricEventWithTags: jest.fn(() => Promise.resolve())
-        }
-    };
-});
-
 import { ClientInfo } from 'Core/Models/__mocks__/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/__mocks__/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/__mocks__/DeviceInfo';
