@@ -8,6 +8,7 @@ import { PerformanceMRAIDEventHandler } from 'MRAID/EventHandlers/PerformanceMRA
 import { ProgrammaticMRAIDEventHandler } from 'MRAID/EventHandlers/ProgrammaticMRAIDEventHandler';
 import { WebPlayerMRAIDAdUnit } from 'MRAID/AdUnits/WebPlayerMRAIDAdUnit';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
+import { MraidWebplayer } from 'Core/Models/ABGroup';
 
 export class MRAIDAdUnitFactory extends AbstractAdUnitFactory<MRAIDCampaign, IMRAIDAdUnitParameters> {
     public createAdUnit(parameters: IMRAIDAdUnitParameters): MRAIDAdUnit {
@@ -23,7 +24,8 @@ export class MRAIDAdUnitFactory extends AbstractAdUnitFactory<MRAIDCampaign, IMR
 
         const isPerformanceMRAID = parameters.campaign instanceof PerformanceMRAIDCampaign;
         const isARMRAID = parameters.mraid instanceof ARMRAID;
-        const isProgrammaticWebPlayerTest = CustomFeatures.isWebPlayerTestProjects(parameters.clientInfo.getGameId(), parameters.campaign.getCreativeId()) && !isPerformanceMRAID && !isARMRAID;
+        const isProgrammaticWebPlayerTest = MraidWebplayer.isValid(parameters.coreConfig.getAbGroup()) && !isPerformanceMRAID && !isARMRAID;
+        console.log('boolean 2: ' + isProgrammaticWebPlayerTest);
 
         if (isProgrammaticWebPlayerTest) {
             return new ProgrammaticMRAIDEventHandler(mraidAdUnit, parameters);
@@ -41,7 +43,8 @@ export class MRAIDAdUnitFactory extends AbstractAdUnitFactory<MRAIDCampaign, IMR
 
         const isPerformanceMRAID = parameters.campaign instanceof PerformanceMRAIDCampaign;
         const isARMRAID = parameters.mraid instanceof ARMRAID;
-        const isProgrammaticWebPlayerTest = CustomFeatures.isWebPlayerTestProjects(parameters.clientInfo.getGameId(), parameters.campaign.getCreativeId()) && !isPerformanceMRAID && !isARMRAID;
+        const isProgrammaticWebPlayerTest = MraidWebplayer.isValid(parameters.coreConfig.getAbGroup()) && !isPerformanceMRAID && !isARMRAID;
+        console.log('boolean 3: ' + isProgrammaticWebPlayerTest);
 
         if (isProgrammaticWebPlayerTest) {
             mraidAdUnit = new WebPlayerMRAIDAdUnit(parameters);
