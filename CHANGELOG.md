@@ -1,5 +1,6 @@
 # Pending
 
+* [AUI] Fix a bug with the Shining button animation on iOS [#16692](https://github.com/Applifier/unity-ads-webview/pull/16692)
 * Add more creative IDs to NestedIframePlayableCreatives [#16696](https://github.com/Applifier/unity-ads-webview/pull/16696)
 
 # Fri Jul 31 15:52:44 UTC 2020
