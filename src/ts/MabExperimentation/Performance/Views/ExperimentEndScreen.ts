@@ -235,7 +235,7 @@ export class ExperimentEndScreen extends PerformanceEndScreen {
         const gameNameContainer: HTMLElement | null = this._container.querySelector('.name-container');
         const gameRatingContainer: HTMLElement | null = this._container.querySelector('.game-rating-count');
         const privacyIconContainer: HTMLElement | null = this._container.querySelector('.bottom-container .icon-gdpr');
-        const unityIconContainer: HTMLElement | null = this._container.querySelector('.bottom-container .unityads-logo');
+        const unityIconContainer: HTMLElement | null = this._container.querySelector('.bottom-container .icon-unity-ads-logo');
         const chinaAdvertisementElement: HTMLElement | null = this._container.querySelector('.bottom-container .china-advertisement');
 
         if (backgroundElement && downloadContainer && gameNameContainer && gameRatingContainer && privacyIconContainer && unityIconContainer && chinaAdvertisementElement) {

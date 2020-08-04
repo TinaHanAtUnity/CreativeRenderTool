@@ -12,21 +12,27 @@ import { AdsConfiguration } from 'Ads/Models/__mocks__/AdsConfiguration';
 import { AbstractPrivacy } from 'Ads/Views/__mocks__/AbstractPrivacy';
 import { Core } from 'Core/__mocks__/Core';
 import { IEndScreenHandler, IEndScreenParameters } from 'Ads/Views/EndScreen';
-import { ExternalEndScreen } from 'ExternalEndScreen/Views/ExternalEndScreen';
+import { ExternalEndScreen, ExternalEndScreenEventType } from 'ExternalEndScreen/Views/ExternalEndScreen';
 import { EndScreenExperimentDeclaration } from 'MabExperimentation/Models/AutomatedExperimentsList';
 import { PerformanceCampaign } from 'Performance/Models/__mocks__/PerformanceCampaign';
+import { SDKMetrics } from 'Ads/Utilities/SDKMetrics';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe('ExternalEndScreen', () => {
-        const sendEvent = (type: string, url?: string) => {
+        const sendEvent = (type: string, options: { url?: string; metric?: string }) => {
             return new Promise((res) => {
                 window.postMessage({
                     type,
-                    url
+                    ...options
                 }, '*');
                 setTimeout(res);
             });
         };
+
+        const sendOpenEvent = (url: string) => sendEvent(ExternalEndScreenEventType.Open, { url });
+        const sendMetricEvent = (metric: string) => sendEvent(ExternalEndScreenEventType.Metric, { metric });
+        const sendGetParameterEvent = () => sendEvent(ExternalEndScreenEventType.GetParameters, {});
+        const sendCloseEvent = () => sendEvent(ExternalEndScreenEventType.Close, {});
 
         const endScreenUrl = '/iframe-end-screen.html';
         const experimentDescription = {
@@ -104,22 +110,31 @@ import { PerformanceCampaign } from 'Performance/Models/__mocks__/PerformanceCam
         });
 
         it('should listen for close event from iframe', () => {
-            return sendEvent('close')
+            return sendCloseEvent()
                 .then(() => {
                     expect(eventHandler.onEndScreenClose).toHaveBeenCalledTimes(1);
                 });
         });
 
         it('should listen for download event from iframe', () => {
-            return sendEvent('open', 'sdk://download')
+            return sendOpenEvent('sdk://download')
                 .then(() => {
                     expect(eventHandler.onEndScreenDownload).toHaveBeenCalledTimes(1);
                 });
         });
 
+        it('should listen for metric event from iframe', () => {
+            const metric = 'external_end_screen_event';
+
+            return sendMetricEvent(metric)
+                .then(() => {
+                    expect(SDKMetrics.reportMetricEventWithTags).toHaveBeenCalledWith(metric, {});
+                });
+        });
+
         describe('Privacy handling', () => {
             it('should open privacy\'s pop-up', () => {
-                return sendEvent('open', 'sdk://privacy')
+                return sendOpenEvent('sdk://privacy')
                     .then(() => {
                         expect(endScreenParameters.privacy.show).toHaveBeenCalledTimes(1);
                     });
