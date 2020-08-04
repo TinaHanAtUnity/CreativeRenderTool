@@ -26,7 +26,7 @@ import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { PARTNER_NAME, OM_JS_VERSION } from 'Ads/Views/OpenMeasurement/OpenMeasurement';
 import { AgeGateChoice, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { SDKMetrics, ChinaAucionEndpoint } from 'Ads/Utilities/SDKMetrics';
-import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
+import { IosUiTheme } from 'Core/Native/iOS/DeviceInfo';
 
 export interface IAuctionResponse {
     correlationId: string;
@@ -116,6 +116,13 @@ interface IAuctionRequestBody {
     omidPartnerName: string;
     omidJSVersion: string;
     agreedOverAgeLimit: AgeGateChoice;
+    plist: string[] | undefined;
+    idfv: string | undefined;
+    deviceName: string | undefined;
+    locales: string[] | undefined;
+    currentUiTheme: IosUiTheme | undefined;
+    systemBootTime: number | undefined;
+    trackingAuthStatus: number | undefined;
 }
 
 /**
@@ -487,7 +494,14 @@ export class AuctionRequest {
                     omidPartnerName: PARTNER_NAME,
                     omidJSVersion: OM_JS_VERSION,
                     legalFramework: this._privacySDK.getLegalFramework(),
-                    agreedOverAgeLimit: this._userPrivacyManager.getAgeGateChoice()
+                    agreedOverAgeLimit: this._userPrivacyManager.getAgeGateChoice(),
+                    plist: this._deviceInfo instanceof IosDeviceInfo ? this._deviceInfo.getAdNetworksPlist() : undefined,
+                    idfv: this._deviceInfo instanceof IosDeviceInfo ? this._deviceInfo.getVendorIdentifier() : undefined,
+                    deviceName: this._deviceInfo instanceof IosDeviceInfo ? this._deviceInfo.getDeviceName() : undefined,
+                    locales: this._deviceInfo instanceof IosDeviceInfo ? this._deviceInfo.getLocaleList() : undefined,
+                    currentUiTheme: this._deviceInfo instanceof IosDeviceInfo ? this._deviceInfo.getCurrentUiTheme() : undefined,
+                    systemBootTime: this._deviceInfo instanceof IosDeviceInfo ? this._deviceInfo.getSystemBootTime() : undefined,
+                    trackingAuthStatus: this._deviceInfo instanceof IosDeviceInfo ? this._deviceInfo.getTrackingAuthorizationStatus() : undefined
                 };
             });
         });

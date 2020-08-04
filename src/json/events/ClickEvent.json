@@ -288,6 +288,48 @@
       "required": "no",
       "queryString": false,
       "body": true
+    },
+    {
+      "parameter": "plist",
+      "required": "ios",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "idfv",
+      "required": "ios",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "deviceName",
+      "required": "ios",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "locales",
+      "required": "ios",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "currentUiTheme",
+      "required": "ios",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "systemBootTime",
+      "required": "ios",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "trackingAuthStatus",
+      "required": "ios",
+      "queryString": false,
+      "body": true
     }
   ]
 }

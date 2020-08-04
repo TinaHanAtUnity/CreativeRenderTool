@@ -670,5 +670,26 @@
     "description": "Tracking Authorization Status",
     "provider": "SDK",
     "platforms": "ios"
+  },
+  {
+    "key": "locales",
+    "type": "object",
+    "description": "Array representation of localeList",
+    "provider": "SDK",
+    "platforms": "ios"
+  },
+  {
+    "key": "plist",
+    "type": "object",
+    "description": "Array representation of adNetworkPlist",
+    "provider": "SDK",
+    "platforms": "ios"
+  },
+  {
+    "key": "idfv",
+    "type": "string",
+    "description": "Vendor Identifier string",
+    "provider": "SDK",
+    "platforms": "ios"
   }
 ]
