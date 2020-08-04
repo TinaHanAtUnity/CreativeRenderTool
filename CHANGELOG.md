@@ -1,4 +1,4 @@
-# Pending
+# Tue  4 Aug 2020 21:09:26 UTC
 
 * [EES] Support for metrics coming from iframe [#16698](https://github.com/Applifier/unity-ads-webview/pull/16698)
 * Rename unityads-logo to icon-unity-ads-logo for clarity [#16699](https://github.com/Applifier/unity-ads-webview/pull/16699)
