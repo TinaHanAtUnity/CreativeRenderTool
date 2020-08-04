@@ -166,6 +166,7 @@ import { IMonetizationApi } from 'Monetization/IMonetization';
 import { MonetizationListenerApi } from 'Monetization/Native/MonetizationListener';
 import { PlacementContentsApi } from 'Monetization/Native/PlacementContents';
 import { TrackingManagerApi } from 'Core/Native/iOS/TrackingManager';
+import { SKAdNetworkApi } from 'Core/Native/iOS/SKAdNetwork';
 
 const TestMediaID = 'beefcace-abcdefg-deadbeef';
 export class TestFixtures {
@@ -1040,7 +1041,8 @@ export class TestFixtures {
                 Notification: new NotificationApi(nativeBridge),
                 Preferences: new IosPreferencesApi(nativeBridge),
                 UrlScheme: new UrlSchemeApi(nativeBridge),
-                TrackingManager: new TrackingManagerApi(nativeBridge)
+                TrackingManager: new TrackingManagerApi(nativeBridge),
+                SKAdNetwork: new SKAdNetworkApi(nativeBridge)
             } : undefined
         };
     }
@@ -1226,7 +1228,14 @@ export class TestFixtures {
             getStatusBarHeight: sinon.stub().returns(Promise.resolve(40)),
             getStatusBarWidth: sinon.stub().returns(Promise.resolve(768)),
             getDeviceMaxVolume: sinon.stub().returns(Promise.resolve(1)),
-            getSensorList: sinon.stub().returns(Promise.resolve([]))
+            getSensorList: sinon.stub().returns(Promise.resolve([])),
+            getDeviceName: sinon.stub().returns(Promise.resolve('fakeDeviceName')),
+            getVendorIdentifier: sinon.stub().returns(Promise.resolve('fakeVendor')),
+            getCurrentUITheme: sinon.stub().returns(Promise.resolve(1)),
+            getLocaleList: sinon.stub().returns(Promise.resolve(['en', 'fi'])),
+            getAdNetworkIdsPlist: sinon.stub().returns(Promise.resolve(['adNetwork'])),
+            getSystemBootTime: sinon.stub().returns(Promise.resolve(1)),
+            getTrackingAuthorizationStatus: sinon.stub().returns(Promise.resolve(0))
         };
     }
 

@@ -83,7 +83,7 @@ import { Analytics } from 'Analytics/Analytics';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { PrivacyParser } from 'Privacy/Parsers/PrivacyParser';
 import { Promises } from 'Core/Utilities/Promises';
-import { MediationCacheModeAllowedTest, LoadV5, LoadV5NoInvalidation, LoadV5GroupId } from 'Core/Models/ABGroup';
+import { LoadV5, LoadV5NoInvalidation, LoadV5GroupId } from 'Core/Models/ABGroup';
 import { PrivacyMetrics } from 'Privacy/PrivacyMetrics';
 import { PrivacySDKUnit } from 'Ads/AdUnits/PrivacySDKUnit';
 import { PerPlacementLoadAdapter } from 'Ads/Managers/PerPlacementLoadAdapter';
@@ -410,9 +410,9 @@ export class Ads implements IAds {
 
                     if (this.isLoadV5Enabled() && this._webViewEnabledLoad) {
                         experimentType = MediationExperimentType.LoadV5;
-                    } else if (!CustomFeatures.isExcludedGameFromCacheModeTest(this._core.ClientInfo.getGameId()) && MediationCacheModeAllowedTest.isValid(this._core.Config.getAbGroup())) {
+                    } else {
+                        // Set CacheMode for Mediation to Allowed for initial request if not on V5
                         this.Config.set('cacheMode', CacheMode.ALLOWED);
-                        experimentType = MediationExperimentType.DynamicCacheMode;
                     }
 
                     this._mediationName = mediation.getName()!;
@@ -557,7 +557,7 @@ export class Ads implements IAds {
             this.AssetManager.stopCaching();
         }
 
-        if (this.MediationLoadTrackingManager && this.MediationLoadTrackingManager.getCurrentExperiment() === MediationExperimentType.DynamicCacheMode) {
+        if (this.MediationLoadTrackingManager) {
             this.AssetManager.overrideCacheMode(CacheMode.FORCED);
 
             // This change is not necessary for the experiment, but it aligns the field for anything which accesses it after this point
@@ -820,13 +820,13 @@ export class Ads implements IAds {
 
     private isLoadV5Enabled(): boolean {
         const loadV5Test = LoadV5.isValid(this._core.Config.getAbGroup());
-        const loadV5Game = CustomFeatures.isLoadV5Game(this._core.ClientInfo.getGameId());
+        const loadV5Game = this.Config.isLoadV5Enabled();
 
         return (loadV5Test && loadV5Game) || this._forceLoadV5;
     }
 
     private isLoadV5Supported(): boolean {
-        const loadV5Game = CustomFeatures.isLoadV5Game(this._core.ClientInfo.getGameId());
+        const loadV5Game = this.Config.isLoadV5Enabled();
 
         return (this._loadApiEnabled && loadV5Game) || this._forceLoadV5;
     }

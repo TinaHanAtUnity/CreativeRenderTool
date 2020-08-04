@@ -8,8 +8,6 @@ import { View } from 'Core/Views/View';
 import { AbstractPrivacy, IPrivacyHandlerView } from 'Ads/Views/AbstractPrivacy';
 import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
 import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
-import { Observable0 } from 'Core/Utilities/Observable';
-import { IObserver0 } from 'Core/Utilities/IObserver';
 import { Image } from 'Ads/Models/Assets/Image';
 import { ExternalEndScreenMetric, SDKMetrics } from 'Ads/Utilities/SDKMetrics';
 import { Platform } from 'Core/Constants/Platform';
@@ -45,8 +43,6 @@ export class ExternalEndScreen extends View<IEndScreenHandler> implements IPriva
     private _gdprPopupClicked: boolean;
     private _messageListener: (event: MessageEvent) => void;
     private _isIframeReady = false;
-    private readonly _onIframeReady = new Observable0();
-    private _observer: IObserver0;
     private _country: string;
     private _endScreenParameters: Promise<IExternalEndScreenUrlParameters>;
 
@@ -75,6 +71,9 @@ export class ExternalEndScreen extends View<IEndScreenHandler> implements IPriva
             if (event.data.type === 'open') {
                 this.route(event.data.url);
             } else if (event.data.type === 'getParameters') {
+                // The iframe asked for the parameters, witch means it is loaded.
+                this._isIframeReady = true;
+
                 this.sendParameters();
             } else if (event.data.type === 'close') {
                 this.onCloseEvent();
@@ -109,17 +108,17 @@ export class ExternalEndScreen extends View<IEndScreenHandler> implements IPriva
             }
         };
 
-        if (!this._isIframeReady) {
-            this._observer = this._onIframeReady.subscribe(() => {
-                this._onIframeReady.unsubscribe(this._observer);
-                displayContainer();
-            });
-        } else {
+        if (this._isIframeReady) {
+            SDKMetrics.reportMetricEvent(ExternalEndScreenMetric.ShowIframe);
             displayContainer();
+        } else {
+            SDKMetrics.reportMetricEvent(ExternalEndScreenMetric.NotReadyInTime);
+            this.onCloseEvent();
         }
 
         if (AbstractAdUnit.getAutoClose()) {
             setTimeout(() => {
+                SDKMetrics.reportMetricEvent(ExternalEndScreenMetric.AutoCloseInvoked);
                 this.onCloseEvent();
             }, AbstractAdUnit.getAutoCloseDelay());
         }
@@ -145,20 +144,9 @@ export class ExternalEndScreen extends View<IEndScreenHandler> implements IPriva
     // External End Screen
     //
     private initIframe(): void {
+        SDKMetrics.reportMetricEvent(ExternalEndScreenMetric.StartInitIframe);
+
         const iframe = this._iframe = <HTMLIFrameElement> this._container.querySelector('#iframe-end-screen');
-
-        // Handle timeout with the iframe if content is not loaded.
-        const timeoutId = setTimeout(() => {
-            SDKMetrics.reportMetricEvent(ExternalEndScreenMetric.IframeTimeout);
-            this.onCloseEvent();
-        }, 3000);
-
-        iframe.onload = () => {
-            clearTimeout(timeoutId);
-
-            this._isIframeReady = true;
-            this._onIframeReady.trigger();
-        };
 
         iframe.src = this._endScreenUrl;
     }
@@ -185,13 +173,13 @@ export class ExternalEndScreen extends View<IEndScreenHandler> implements IPriva
                 this.onDownloadEvent();
             }
         } else {
+            SDKMetrics.reportMetricEvent(ExternalEndScreenMetric.DefaultRouteUsed);
             this.onDownloadEvent();
         }
     }
 
     public onCloseEvent(): void {
         window.removeEventListener('message', this._messageListener);
-        this._onIframeReady.unsubscribe(this._observer);
 
         this._handlers.forEach(handler => handler.onEndScreenClose());
     }
@@ -200,6 +188,11 @@ export class ExternalEndScreen extends View<IEndScreenHandler> implements IPriva
     // Cache API is only available with 2.1.0 and works only on ios for this purpose.
     private getImage(image: Image): Promise<string | undefined> {
         const originalUrl = image.getOriginalUrl();
+
+        if (!image.isCached()) {
+            SDKMetrics.reportMetricEvent(ExternalEndScreenMetric.UseOriginalUrl);
+            return Promise.resolve(originalUrl);
+        }
 
         // After 2.1.0
         const imageExt = originalUrl.split('.').pop();

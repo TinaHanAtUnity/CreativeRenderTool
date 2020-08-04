@@ -6,7 +6,6 @@ import { GameSessionCounters } from 'Ads/Utilities/GameSessionCounters';
 const INITIAL_AD_REQUEST_WAIT_TIME_IN_MS = 250;
 
 export enum MediationExperimentType {
-    DynamicCacheMode = 'dcm',
     LoadV5 = 'lv5',
     None = 'none'
 }

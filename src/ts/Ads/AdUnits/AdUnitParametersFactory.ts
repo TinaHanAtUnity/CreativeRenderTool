@@ -65,6 +65,7 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
     private _privacySDK: PrivacySDK;
 
     private _playerMetadataServerId: string;
+    private _adUnitId: string;
     private _loadV5Support: boolean;
     private _options: unknown;
 
@@ -96,6 +97,7 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
         this._options = options;
         this._playerMetadataServerId = playerMetadataServerId;
         this._loadV5Support = loadV5Support;
+        this._adUnitId = placement.getAdUnitId() || '';
         const defaultParams = this.getBaseParameters();
         return this.createParameters(defaultParams);
     }
@@ -120,7 +122,9 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
                 [ThirdPartyEventMacro.OM_ENABLED]: 'false',
                 [ThirdPartyEventMacro.OM_VENDORS]: '',
                 [ThirdPartyEventMacro.OMIDPARTNER]: OMID_P,
-                [ThirdPartyEventMacro.CACHEBUSTING]: '-1'
+                [ThirdPartyEventMacro.CACHEBUSTING]: '-1',
+                [ThirdPartyEventMacro.AD_UNIT_ID_IMPRESSION]: this._adUnitId,
+                [ThirdPartyEventMacro.AD_UNIT_ID_OPERATIVE]: this._adUnitId
             }),
             operativeEventManager: this.getOperativeEventManager(),
             placement: this._placement,

@@ -150,6 +150,48 @@
       "required": "no",
       "queryString": true,
       "body": false
+    },
+    {
+      "parameter": "deviceName",
+      "required": "ios",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "vendorIdentifier",
+      "required": "ios",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "localeList",
+      "required": "ios",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "currentUiTheme",
+      "required": "ios",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "adNetworkPlist",
+      "required": "ios",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "systemBootTime",
+      "required": "ios",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "trackingAuthStatus",
+      "required": "ios",
+      "queryString": true,
+      "body": false
     }
   ]
 }

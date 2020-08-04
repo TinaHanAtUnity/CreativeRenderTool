@@ -64,7 +64,8 @@ describe('AdsConfigurationTest', () => {
             defaultPlacement: placements.placement_1,
             defaultBannerPlacement: undefined,
             hidePrivacy: undefined,
-            hasArPlacement: false
+            hasArPlacement: false,
+            loadV5Enabled: false
         };
 
         adsConfiguration = new AdsConfiguration(configurationParams);

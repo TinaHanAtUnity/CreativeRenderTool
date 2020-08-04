@@ -40,6 +40,7 @@ export interface IRawPerformanceCampaign extends IRawCampaign {
     appDownloadUrl?: string;
     mraidUrl?: string;
     dynamicMarkup?: string;
+    endScreenType?: string;
     endScreenUrl?: string;
 }
 
@@ -65,6 +66,7 @@ export interface IPerformanceCampaign extends ICampaign {
     store: StoreName;
     adUnitStyle: AdUnitStyle | undefined;
     appDownloadUrl?: string;
+    endScreenType?: string;
     endScreen?: HTML;
 }
 
@@ -93,6 +95,7 @@ export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
             store: ['number'],
             adUnitStyle: ['object', 'undefined'],
             appDownloadUrl: ['string', 'undefined'],
+            endScreenType: ['string', 'undefined'],
             endScreen: ['object', 'undefined']
         }, campaign);
     }
@@ -182,14 +185,7 @@ export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
     }
 
     public getRequiredAssets() {
-        const assets: Asset[] = [];
-
-        const endScreen = this.getEndScreen();
-        if (endScreen) {
-            assets.push(endScreen);
-        }
-
-        return assets;
+        return [];
     }
 
     public getOptionalAssets() {
@@ -212,6 +208,11 @@ export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
             assets.push(portrait);
         }
 
+        const endScreen = this.getEndScreen();
+        if (endScreen) {
+            assets.push(endScreen);
+        }
+
         return assets;
     }
 
@@ -225,6 +226,10 @@ export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
 
     public getAdUnitStyle(): AdUnitStyle | undefined {
         return this.get('adUnitStyle');
+    }
+
+    public getEndScreenType(): string | undefined {
+        return this.get('endScreenType');
     }
 
     public getEndScreen(): HTML | undefined {
@@ -286,6 +291,7 @@ export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
             'bypassAppSheet': this.getBypassAppSheet(),
             'store': StoreName[this.getStore()].toLowerCase(),
             'appDownloadUrl': this.getAppDownloadUrl(),
+            'endScreenType': this.getEndScreenType(),
             'endScreen': this.getEndScreen()
         };
     }
