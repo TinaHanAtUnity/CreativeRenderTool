@@ -1,5 +1,6 @@
 # Pending
 
+* [EES] Support for metrics coming from iframe [#16698](https://github.com/Applifier/unity-ads-webview/pull/16698)
 * Rename unityads-logo to icon-unity-ads-logo for clarity [#16699](https://github.com/Applifier/unity-ads-webview/pull/16699)
 * [AUI] Fix a bug with the Shining button animation on iOS [#16692](https://github.com/Applifier/unity-ads-webview/pull/16692)
 * Add more creative IDs to NestedIframePlayableCreatives [#16696](https://github.com/Applifier/unity-ads-webview/pull/16696)
