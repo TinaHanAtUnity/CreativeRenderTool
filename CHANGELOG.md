@@ -1,3 +1,7 @@
+# Pending
+
+* Add more creative IDs to NestedIframePlayableCreatives [#16696](https://github.com/Applifier/unity-ads-webview/pull/16696)
+
 # Fri Jul 31 15:52:44 UTC 2020
 
 * [AUI] Add TiltedEndScreen to AutomatedExperiment [#16566](https://github.com/Applifier/unity-ads-webview/pull/16566)
