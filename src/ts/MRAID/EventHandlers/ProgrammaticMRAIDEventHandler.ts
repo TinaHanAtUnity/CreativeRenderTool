@@ -4,6 +4,7 @@ import { ClickDiagnostics } from 'Ads/Utilities/ClickDiagnostics';
 import { WebViewTopCalculator } from 'Ads/Utilities/WebPlayer/WebViewTopCalculator';
 import { JaegerSpan } from 'Core/Jaeger/JaegerSpan';
 import { Url } from 'Core/Utilities/Url';
+import { SDKMetrics, MraidWebplayerMetric } from 'Ads/Utilities/SDKMetrics';
 
 export class ProgrammaticMRAIDEventHandler extends MRAIDEventHandler implements IMRAIDViewHandler {
 
@@ -13,6 +14,8 @@ export class ProgrammaticMRAIDEventHandler extends MRAIDEventHandler implements 
         if (this._jaegerSpan) {
             this._jaegerSpan.addAnnotation(`onMRAIDClick from ProgrammaticMRAIDEventHandler after onBridgeOpen ${url}`);
         }
+        console.log('mraid ad clicked');
+        SDKMetrics.reportMetricEvent(MraidWebplayerMetric.MraidAdClicked);
         super.onMraidClick(url);
 
         this._mraidView.setCallButtonEnabled(false);

@@ -17,6 +17,7 @@ import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { JaegerSpan } from 'Core/Jaeger/JaegerSpan';
 import { ProgrammaticMRAIDEventHandler } from 'MRAID/EventHandlers/ProgrammaticMRAIDEventHandler';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
+import { SDKMetrics, MraidWebplayerMetric } from 'Ads/Utilities/SDKMetrics';
 
 export class WebPlayerMRAID extends MRAIDView<IMRAIDViewHandler> {
 
@@ -75,6 +76,8 @@ export class WebPlayerMRAID extends MRAIDView<IMRAIDViewHandler> {
             this._core.Sdk.logDebug('setting webplayer srcdoc (' + mraid.length + ')');
             SdkStats.setFrameSetStartTimestamp(this._placement.getId());
             this._core.Sdk.logDebug('Unity Ads placement ' + this._placement.getId() + ' set webplayer data started ' + SdkStats.getFrameSetStartTimestamp(this._placement.getId()));
+            console.log('mraid webplayer loaded');
+            SDKMetrics.reportMetricEvent(MraidWebplayerMetric.MraidWebplayerLoaded);
             mraid = this._platform === Platform.ANDROID ? encodeURIComponent(mraid) : mraid;
 
             return this.setWebPlayerContainerData(webPlayerContainer, mraid);

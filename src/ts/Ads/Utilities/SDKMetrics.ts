@@ -236,9 +236,15 @@ export enum InitializationFailureMetric {
     InitializeFailed = 'webview_fail_to_initialize'
 }
 
+export enum MraidWebplayerMetric {
+    MraidAdClicked = 'mraid_ad_clicked',
+    MraidIframeLoaded = 'load_iframe',
+    MraidWebplayerLoaded = 'load_webplayer'
+}
+
 export type TimingEvent = InitializationMetric | MediationMetric | GeneralTimingMetric | ChinaAucionEndpoint;
 
-export type PTSEvent = VideoMetric | TimingEvent | AuctionV6 | AdmobMetric | BannerMetric | CachingMetric | ChinaMetric | VastMetric | MraidMetric | MiscellaneousMetric | LoadMetric | ErrorMetric | OMMetric | AUIMetric | LoadV5 | ChinaAucionEndpoint | ExternalEndScreenMetric | InitializationFailureMetric;
+export type PTSEvent = VideoMetric | TimingEvent | AuctionV6 | AdmobMetric | BannerMetric | CachingMetric | ChinaMetric | VastMetric | MraidMetric | MiscellaneousMetric | LoadMetric | ErrorMetric | OMMetric | AUIMetric | LoadV5 | ChinaAucionEndpoint | ExternalEndScreenMetric | InitializationFailureMetric | MraidWebplayerMetric;
 
 export class SDKMetrics {
 
