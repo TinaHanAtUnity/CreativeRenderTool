@@ -1,3 +1,7 @@
+# Pending
+
+* Adding metric events for reported length vs actual length of videos [#16598](https://github.com/Applifier/unity-ads-webview/pull/16598)
+
 # Tue  4 Aug 2020 21:09:26 UTC
 
 * [EES] Support for metrics coming from iframe [#16698](https://github.com/Applifier/unity-ads-webview/pull/16698)
