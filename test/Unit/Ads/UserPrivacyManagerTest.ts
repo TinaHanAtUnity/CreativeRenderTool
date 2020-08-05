@@ -732,7 +732,7 @@ describe('UserPrivacyManagerTest', () => {
                     assert.equal(eventData.firstRequest, true);
                     assert.equal(eventData.v, 4);
                     assert.equal(eventData.agreedVersion, gamePrivacy.getVersion());
-                    assert.equal(eventData.scalable, OptOutScope.PROJECT_SCOPE);
+                    assert.equal(eventData.scope, OptOutScope.PROJECT_SCOPE);
                 });
             });
 
