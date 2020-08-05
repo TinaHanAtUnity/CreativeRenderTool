@@ -38,7 +38,7 @@ export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParameters
     }
 
     private createEndscreen(endScreenParameters: IEndScreenParameters, campaign: PerformanceCampaign, country: string): PerformanceEndScreen | ExternalEndScreen {
-        return campaign.getEndScreen()
+        return campaign.getEndScreenType() === 'iframe'
             ? new ExternalEndScreen(undefined, endScreenParameters, campaign, country)
             : new PerformanceEndScreen(endScreenParameters, campaign, country);
     }
