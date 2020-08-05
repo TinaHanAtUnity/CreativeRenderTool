@@ -2,7 +2,7 @@ import {
     AgeGateChoice,
     GDPREventAction,
     GDPREventSource,
-    LegalFramework,
+    LegalFramework, OptOutScope,
     UserPrivacyManager
 } from 'Ads/Managers/UserPrivacyManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
@@ -730,8 +730,9 @@ describe('UserPrivacyManagerTest', () => {
                     assert.equal(eventData.abGroup, expectedAbGroup);
                     assert.equal(eventData.layout, '');
                     assert.equal(eventData.firstRequest, true);
-                    assert.equal(eventData.v, 3);
+                    assert.equal(eventData.v, 4);
                     assert.equal(eventData.agreedVersion, gamePrivacy.getVersion());
+                    assert.equal(eventData.scalable, OptOutScope.PROJECT_SCOPE);
                 });
             });
 
