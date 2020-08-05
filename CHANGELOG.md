@@ -1,4 +1,4 @@
-# Pending
+# Wed Aug  5 22:26:46 UTC 2020
 
 * Adding metric events for reported length vs actual length of videos [#16598](https://github.com/Applifier/unity-ads-webview/pull/16598)
 
