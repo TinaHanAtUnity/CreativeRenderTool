@@ -1,4 +1,4 @@
-# Pending
+# Thu Aug  6 11:24:22 UTC 2020
 
 * Added check for EndScreenType inside PerformanceAdUnitParametersFactory [#16729](https://github.com/Applifier/unity-ads-webview/pull/16729)
 * Disable Privacy SDK A/B test [#16700](https://github.com/Applifier/unity-ads-webview/pull/16700)
