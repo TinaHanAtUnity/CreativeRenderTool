@@ -407,8 +407,11 @@ class SatisfiesMatcher {
                         video: {
                             campaignAvailable: true,
                             ttlInSeconds: 3600,
-                            data: 'test-data-preload-1'
+                            dataIndex: '0'
                         }
+                    },
+                    encryptedPreloadData: {
+                        0: 'test-data-preload-1'
                     }
                 }), [], {
                     followRedirects: false,
@@ -432,8 +435,11 @@ class SatisfiesMatcher {
                         rewardedVideo: {
                             campaignAvailable: true,
                             ttlInSeconds: 3600,
-                            data: 'test-data-preload-2'
+                            dataIndex: '1'
                         }
+                    },
+                    encryptedPreloadData: {
+                        '1': 'test-data-preload-2'
                     }
                 }), [], {
                     followRedirects: false,
@@ -537,13 +543,17 @@ class SatisfiesMatcher {
                         video: {
                             campaignAvailable: true,
                             ttlInSeconds: 3600,
-                            data: 'test-data-preload-1'
+                            dataIndex: '0'
                         },
                         rewardedVideo: {
                             campaignAvailable: true,
                             ttlInSeconds: 3600,
-                            data: 'test-data-preload-2'
+                            dataIndex: '1'
                         }
+                    },
+                    encryptedPreloadData: {
+                        0: 'test-data-preload-1',
+                        1: 'test-data-preload-2'
                     }
                 }), [], {
                     followRedirects: false,
@@ -745,10 +755,10 @@ class SatisfiesMatcher {
                     },
                     preloadData: {
                         video: {
-                            campaignAvailable: false,
-                            data: ''
+                            campaignAvailable: false
                         }
-                    }
+                    },
+                    encryptedPreloadData: {}
                 }), [], {
                     followRedirects: false,
                     retries: 3,
@@ -841,8 +851,7 @@ class SatisfiesMatcher {
                     },
                     preloadData: {
                         video: {
-                            campaignAvailable: false,
-                            data: ''
+                            campaignAvailable: false
                         }
                     }
                 }), [], {
@@ -1488,8 +1497,11 @@ class SatisfiesMatcher {
                         rewardedVideo: {
                             campaignAvailable: true,
                             ttlInSeconds: 3600,
-                            data: 'test-data-reload-2'
+                            dataIndex: '1'
                         }
+                    },
+                    encryptedPreloadData: {
+                        1: 'test-data-reload-2'
                     }
                 }), [], {
                     followRedirects: false,

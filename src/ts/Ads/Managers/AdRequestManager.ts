@@ -39,7 +39,7 @@ export interface INotCachedLoadedCampaign {
 export interface IParsedPlacementPreloadData {
     campaignAvailable: boolean;
     ttlInSeconds: number;
-    data: string;
+    dataIndex: string;
 }
 
 interface ILoadV5BodyExtra {
@@ -49,6 +49,7 @@ interface ILoadV5BodyExtra {
     preloadPlacements: { [key: string]: unknown };
     placements: { [key: string]: unknown };
     preloadData: { [key: string]: IParsedPlacementPreloadData };
+    encryptedPreloadData: { [key: string]: string} | null;
 }
 
 interface IParsedMediaAndTrackingIds {
@@ -104,6 +105,7 @@ export class AdRequestManager extends CampaignManager {
     private _deviceFreeSpace: number;
     private _userPrivacyManager: UserPrivacyManager;
     private _currentSession: Session | null;
+    private _encryptedPreloadData: { [key: string]: string};
 
     public readonly onAdditionalPlacementsReady = new Observable2<string | undefined, IPlacementIdMap<INotCachedLoadedCampaign | undefined>>();
 
@@ -471,6 +473,7 @@ export class AdRequestManager extends CampaignManager {
         }
 
         const preloadData: IPlacementIdMap<IParsedPlacementPreloadData> = {};
+        this._encryptedPreloadData = response.encryptedPreloadData ? response.encryptedPreloadData : {};
 
         for (const placementPreloadData in response.preloadData) {
             if (response.preloadData.hasOwnProperty(placementPreloadData)) {
@@ -478,7 +481,7 @@ export class AdRequestManager extends CampaignManager {
                 preloadData[placementPreloadData] = {
                     ttlInSeconds: value.ttlInSeconds,
                     campaignAvailable: value.campaignAvailable,
-                    data: response.encryptedPreloadData ? response.encryptedPreloadData[value.dataIndex] || '' : ''
+                    dataIndex: value.dataIndex
                 };
             }
         }
@@ -731,6 +734,27 @@ export class AdRequestManager extends CampaignManager {
         return body;
     }
 
+    private makeRequestPreloadData(preloadData: IPlacementIdMap<IParsedPlacementPreloadData>, encryptedPreloadData: { [key: string]: string }): { [key: string]: string } {
+        const currentDataIndex: string[] = [];
+        for (const placementPreloadData in preloadData) {
+            if (preloadData.hasOwnProperty(placementPreloadData)) {
+            const value = preloadData[placementPreloadData];
+            currentDataIndex.push(value.dataIndex);
+            }
+        }
+
+        // tslint:disable-next-line: no-unnecessary-local-variable
+        const currentEncryptedProloadData = Object.keys(encryptedPreloadData)
+            .filter(key => currentDataIndex.includes(key))
+            .reduce((obj: {[key: string]: string}, key) => {
+                obj[key] = encryptedPreloadData[key];
+                return obj;
+        }, {});
+
+        return currentEncryptedProloadData;
+
+    }
+
     private makeLoadBody(body: ILoadV5BodyExtra, placementId: string, additionalPlacements: string[]): unknown {
         const preloadData: IPlacementIdMap<IParsedPlacementPreloadData> = {};
 
@@ -762,12 +786,12 @@ export class AdRequestManager extends CampaignManager {
             };
             return previousValue;
         }, body.placements);
-
         body.auctionId = this._currentSession.getId();
         body.load = true;
         body.preload = false;
         body.preloadData = preloadData;
         body.preloadPlacements = {};
+        body.encryptedPreloadData = this.makeRequestPreloadData(preloadData, this._encryptedPreloadData);
         return body;
     }
 
