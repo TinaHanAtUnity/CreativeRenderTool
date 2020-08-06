@@ -56,7 +56,6 @@ export class MRAIDAdUnitParametersFactory extends AbstractAdUnitParametersFactor
 
         baseParams.gameSessionId = baseParams.gameSessionId || 0;
         const isProgrammaticWebPlayerTest = MraidWebplayer.isValid(baseParams.coreConfig.getAbGroup()) && !(baseParams.campaign instanceof PerformanceMRAIDCampaign) && !ARUtil.isARCreative(baseParams.campaign) && !MRAIDAdUnitParametersFactory._forcedExtendedMRAID && !MRAIDAdUnitParametersFactory._forcedARMRAID;
-        console.log('boolean 1: ' + isProgrammaticWebPlayerTest);
 
         if (isProgrammaticWebPlayerTest) {
             mraid = new WebPlayerMRAID(baseParams.platform, baseParams.core, baseParams.deviceInfo, baseParams.placement, baseParams.campaign, baseParams.privacy, showGDPRBanner, baseParams.coreConfig.getAbGroup(), baseParams.gameSessionId, baseParams.adsConfig.getHidePrivacy());
