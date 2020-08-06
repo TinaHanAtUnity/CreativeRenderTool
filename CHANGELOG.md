@@ -1,5 +1,10 @@
 # Pending
 
+* Added check for EndScreenType inside PerformanceAdUnitParametersFactory [#16729](https://github.com/Applifier/unity-ads-webview/pull/16729)
+* Disable Privacy SDK A/B test [#16700](https://github.com/Applifier/unity-ads-webview/pull/16700)
+
+# Wed Aug  5 22:26:46 UTC 2020
+
 * Adding metric events for reported length vs actual length of videos [#16598](https://github.com/Applifier/unity-ads-webview/pull/16598)
 
 # Tue  4 Aug 2020 21:09:26 UTC
