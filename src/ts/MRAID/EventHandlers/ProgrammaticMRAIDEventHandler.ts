@@ -14,7 +14,6 @@ export class ProgrammaticMRAIDEventHandler extends MRAIDEventHandler implements 
         if (this._jaegerSpan) {
             this._jaegerSpan.addAnnotation(`onMRAIDClick from ProgrammaticMRAIDEventHandler after onBridgeOpen ${url}`);
         }
-        console.log('mraid ad clicked');
         SDKMetrics.reportMetricEvent(MraidWebplayerMetric.MraidAdClicked);
         super.onMraidClick(url);
 
