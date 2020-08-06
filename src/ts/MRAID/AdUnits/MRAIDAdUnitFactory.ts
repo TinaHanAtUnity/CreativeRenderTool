@@ -25,7 +25,6 @@ export class MRAIDAdUnitFactory extends AbstractAdUnitFactory<MRAIDCampaign, IMR
         const isPerformanceMRAID = parameters.campaign instanceof PerformanceMRAIDCampaign;
         const isARMRAID = parameters.mraid instanceof ARMRAID;
         const isProgrammaticWebPlayerTest = MraidWebplayer.isValid(parameters.coreConfig.getAbGroup()) && !isPerformanceMRAID && !isARMRAID;
-        console.log('boolean 2: ' + isProgrammaticWebPlayerTest);
 
         if (isProgrammaticWebPlayerTest) {
             return new ProgrammaticMRAIDEventHandler(mraidAdUnit, parameters);
@@ -44,7 +43,6 @@ export class MRAIDAdUnitFactory extends AbstractAdUnitFactory<MRAIDCampaign, IMR
         const isPerformanceMRAID = parameters.campaign instanceof PerformanceMRAIDCampaign;
         const isARMRAID = parameters.mraid instanceof ARMRAID;
         const isProgrammaticWebPlayerTest = MraidWebplayer.isValid(parameters.coreConfig.getAbGroup()) && !isPerformanceMRAID && !isARMRAID;
-        console.log('boolean 3: ' + isProgrammaticWebPlayerTest);
 
         if (isProgrammaticWebPlayerTest) {
             mraidAdUnit = new WebPlayerMRAIDAdUnit(parameters);
