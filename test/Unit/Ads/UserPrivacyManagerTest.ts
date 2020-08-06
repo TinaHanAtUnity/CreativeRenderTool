@@ -640,7 +640,7 @@ describe('UserPrivacyManagerTest', () => {
 
         it('with proper fields', () => {
             const expectedKafkaObject = {
-                v: 3,
+                v: 4,
                 advertisingId: testAdvertisingId,
                 abGroup: abGroup,
                 layout: layout,
@@ -659,7 +659,8 @@ describe('UserPrivacyManagerTest', () => {
                 permissions: permissions,
                 legalFramework: 'none',
                 agreedOverAgeLimit: 'missing',
-                ageGateSource: 'missing'
+                ageGateSource: 'missing',
+                scope: 'project'
             };
 
             return privacyManager.updateUserPrivacy(permissions, source, action, layout).then(() => {
