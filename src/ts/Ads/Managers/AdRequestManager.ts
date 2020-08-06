@@ -49,7 +49,7 @@ interface ILoadV5BodyExtra {
     preloadPlacements: { [key: string]: unknown };
     placements: { [key: string]: unknown };
     preloadData: { [key: string]: IParsedPlacementPreloadData };
-    encryptedPreloadData: { [key: string]: string} | null;
+    encryptedPreloadData?: { [key: string]: string};
 }
 
 interface IParsedMediaAndTrackingIds {
@@ -105,7 +105,7 @@ export class AdRequestManager extends CampaignManager {
     private _deviceFreeSpace: number;
     private _userPrivacyManager: UserPrivacyManager;
     private _currentSession: Session | null;
-    private _encryptedPreloadData: { [key: string]: string};
+    private _encryptedPreloadData: { [key: string]: string} | undefined;
 
     public readonly onAdditionalPlacementsReady = new Observable2<string | undefined, IPlacementIdMap<INotCachedLoadedCampaign | undefined>>();
 
@@ -131,6 +131,7 @@ export class AdRequestManager extends CampaignManager {
         this._ongoingLoadRequests = {};
         this._reloadResults = {};
         this._preloadData = null;
+        this._encryptedPreloadData = {};
         this._preloadFailed = false;
         this._ongoingPreloadRequest = new Promise((resolve) => { this._ongoingPreloadRequestResolve = resolve; });
         this._activePreload = false;
@@ -473,7 +474,7 @@ export class AdRequestManager extends CampaignManager {
         }
 
         const preloadData: IPlacementIdMap<IParsedPlacementPreloadData> = {};
-        this._encryptedPreloadData = response.encryptedPreloadData ? response.encryptedPreloadData : {};
+        this._encryptedPreloadData = response.encryptedPreloadData;
 
         for (const placementPreloadData in response.preloadData) {
             if (response.preloadData.hasOwnProperty(placementPreloadData)) {
@@ -734,40 +735,37 @@ export class AdRequestManager extends CampaignManager {
         return body;
     }
 
-    private makeRequestPreloadData(preloadData: IPlacementIdMap<IParsedPlacementPreloadData>, encryptedPreloadData: { [key: string]: string }): { [key: string]: string } {
-        const currentDataIndex: string[] = [];
-        for (const placementPreloadData in preloadData) {
-            if (preloadData.hasOwnProperty(placementPreloadData)) {
-            const value = preloadData[placementPreloadData];
-            currentDataIndex.push(value.dataIndex);
-            }
+    private makeEncryptedPreloadData(currentDataIndex: string[], encryptedPreloadData: { [key: string]: string } | undefined): { [key: string]: string } | undefined {
+
+        if (!encryptedPreloadData) {
+            return;
         }
 
-        // tslint:disable-next-line: no-unnecessary-local-variable
-        const currentEncryptedProloadData = Object.keys(encryptedPreloadData)
+        return Object.keys(encryptedPreloadData)
             .filter(key => currentDataIndex.includes(key))
             .reduce((obj: {[key: string]: string}, key) => {
                 obj[key] = encryptedPreloadData[key];
                 return obj;
         }, {});
 
-        return currentEncryptedProloadData;
-
     }
 
     private makeLoadBody(body: ILoadV5BodyExtra, placementId: string, additionalPlacements: string[]): unknown {
         const preloadData: IPlacementIdMap<IParsedPlacementPreloadData> = {};
+        const currentDataIndex: string[] = [];
 
         if (this._preloadData !== null) {
             const tempPreloadData = this._preloadData;
 
             if (tempPreloadData !== undefined) {
                 preloadData[placementId] = tempPreloadData[placementId];
+                currentDataIndex.push(tempPreloadData[placementId].dataIndex);
             }
 
             additionalPlacements.reduce((previousValue, currentValue) => {
                 if (tempPreloadData[currentValue] !== undefined) {
                     previousValue[currentValue] = tempPreloadData[currentValue];
+                    currentDataIndex.push(tempPreloadData[currentValue].dataIndex);
                 }
                 return previousValue;
             }, preloadData);
@@ -786,12 +784,13 @@ export class AdRequestManager extends CampaignManager {
             };
             return previousValue;
         }, body.placements);
+
         body.auctionId = this._currentSession.getId();
         body.load = true;
         body.preload = false;
         body.preloadData = preloadData;
         body.preloadPlacements = {};
-        body.encryptedPreloadData = this.makeRequestPreloadData(preloadData, this._encryptedPreloadData);
+        body.encryptedPreloadData = this.makeEncryptedPreloadData(currentDataIndex, this._encryptedPreloadData);
         return body;
     }
 

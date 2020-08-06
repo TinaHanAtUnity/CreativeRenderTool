@@ -757,8 +757,7 @@ class SatisfiesMatcher {
                         video: {
                             campaignAvailable: false
                         }
-                    },
-                    encryptedPreloadData: {}
+                    }
                 }), [], {
                     followRedirects: false,
                     retries: 3,
