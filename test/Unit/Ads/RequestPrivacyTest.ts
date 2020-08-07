@@ -30,7 +30,7 @@ describe('RequestPrivacyFactoryTests', () => {
                 beforeEach(() => {
                     userPrivacy = UserPrivacy.createUnrecorded();
                     gamePrivacy = new GamePrivacy({ method: method });
-                    privacySDK = new PrivacySDK(gamePrivacy, userPrivacy, true, 0, LegalFramework.GDPR);
+                    privacySDK = new PrivacySDK(gamePrivacy, userPrivacy, true, 0, LegalFramework.GDPR, false);
                 });
 
                 context('and limitAdTracking = true', () => {
@@ -75,7 +75,7 @@ describe('RequestPrivacyFactoryTests', () => {
                 beforeEach(() => {
                     userPrivacy = new UserPrivacy({ method: method, version: 20190101, permissions: userPermissions });
                     gamePrivacy = new GamePrivacy({ method: method });
-                    privacySDK = new PrivacySDK(gamePrivacy, userPrivacy, true, 0, LegalFramework.GDPR);
+                    privacySDK = new PrivacySDK(gamePrivacy, userPrivacy, true, 0, LegalFramework.GDPR, false);
                 });
 
                 context('and limitAdTracking is false', () => {
@@ -104,7 +104,7 @@ describe('RequestPrivacyFactoryTests', () => {
                 beforeEach(() => {
                     userPrivacy = new UserPrivacy({ method: PrivacyMethod.LEGITIMATE_INTEREST, version: 0, permissions: anyPermissions });
                     gamePrivacy = new GamePrivacy({ method: method });
-                    privacySDK = new PrivacySDK(gamePrivacy, userPrivacy, true, 0, LegalFramework.GDPR);
+                    privacySDK = new PrivacySDK(gamePrivacy, userPrivacy, true, 0, LegalFramework.GDPR, false);
                     result = RequestPrivacyFactory.create(privacySDK, false);
                 });
                 it('should not affect set privacy method', () => assert.notEqual(result!.method, method));
@@ -118,7 +118,7 @@ describe('RequestPrivacyFactoryTests', () => {
         beforeEach(() => {
             userPrivacy = new UserPrivacy({ method: PrivacyMethod.UNITY_CONSENT, version: 0, permissions: expectedPermissions });
             gamePrivacy = new GamePrivacy({ method: PrivacyMethod.UNITY_CONSENT });
-            privacySDK = new PrivacySDK(gamePrivacy, userPrivacy, true, 0, LegalFramework.GDPR);
+            privacySDK = new PrivacySDK(gamePrivacy, userPrivacy, true, 0, LegalFramework.GDPR, false);
             result = RequestPrivacyFactory.create(privacySDK, false);
         });
         it('should strip away all:true and replace with granular permissions',
@@ -131,7 +131,7 @@ describe('RequestPrivacyFactoryTests', () => {
         beforeEach(() => {
             userPrivacy = new UserPrivacy({ method: PrivacyMethod.LEGITIMATE_INTEREST, version: 0, permissions: anyPermissions });
             gamePrivacy = new GamePrivacy({ method: PrivacyMethod.LEGITIMATE_INTEREST });
-            privacySDK = new PrivacySDK(gamePrivacy, userPrivacy, true, 0, LegalFramework.GDPR);
+            privacySDK = new PrivacySDK(gamePrivacy, userPrivacy, true, 0, LegalFramework.GDPR, false);
             result = RequestPrivacyFactory.create(privacySDK, false);
         });
         it('should return legitimate_interest privacy object', () => {

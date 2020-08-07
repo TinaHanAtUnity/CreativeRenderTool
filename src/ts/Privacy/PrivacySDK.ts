@@ -8,13 +8,15 @@ export class PrivacySDK {
     private _gdprEnabled: boolean;
     private _ageGateLimit: number;
     private _legalFramework: LegalFramework;
+    private _useUnityAttDialog: boolean;
 
-    constructor(gamePrivacy: GamePrivacy, userPrivacy: UserPrivacy, gdprEnabled: boolean, ageGateLimit: number, legalFramework: LegalFramework) {
+    constructor(gamePrivacy: GamePrivacy, userPrivacy: UserPrivacy, gdprEnabled: boolean, ageGateLimit: number, legalFramework: LegalFramework, useUnityAttDialog: boolean) {
         this._gamePrivacy = gamePrivacy;
         this._userPrivacy = userPrivacy;
         this._gdprEnabled = gdprEnabled;
         this._ageGateLimit = ageGateLimit;
         this._legalFramework = legalFramework;
+        this._useUnityAttDialog = useUnityAttDialog;
     }
 
     public getGamePrivacy(): GamePrivacy {
@@ -59,5 +61,9 @@ export class PrivacySDK {
     public getLegalFramework(): LegalFramework {
         return PrivacyTestEnvironment.isSet('legalFramework') ?
             PrivacyTestEnvironment.get<LegalFramework>('legalFramework') : this._legalFramework;
+    }
+
+    public isUnityAttDialog(): boolean {
+        return this._useUnityAttDialog;
     }
 }
