@@ -85,7 +85,6 @@
 | optOutEnabled | boolean | Whether the user has opted out from behavioral ads targeting in current game | Server | all |
 | abGroup | number | AB Group number assigned to this user from configuration | Server | all |
 | unityCreativeId | string | Creative id of the shown creative | SDK | all |
-| imei | string | default or slot 0 from getDeviceId  | SDK | android |
 | analyticsUserId | string | Unity Analytics user ID in Unity Engine (does not apply to analytics events Unity Ads SDK is sending) | SDK | all |
 | analyticsSessionId | string | Unity Analytics session ID in Unity Engine (does not apply to analytics events Unity Ads SDK is sending), note: sent as string to avoid problems with 64 bit integers being over JavaScript safe number limit | SDK | all |
 | privacy | object | Contains the GDPR consent information, combines data received from configuration-service and data collected from user in SDK | SDK | all |
@@ -101,6 +100,13 @@
 | preloadPlacements | object | All placements received in configuration | SDK | all |
 | preloadData | object | Preload Data for all placements received in configuration | SDK | all |
 | loadV5Support | boolean | Indicates if client can work with Load V5 or not | SDK | all |
+| deviceName | string | Device name associated with an iOS device | SDK | ios |
+| vendorIdentifier | string | Vendor Identifier string | SDK | ios |
+| localeList | string | A list of locale strings (e.g. ["en_US"] for English language | SDK | ios |
+| currentUiTheme | number | Indicates the iOS device current ui color theme | SDK | ios |
+| adNetworkPlist | string | List of SKAdNetworks included in an iOS game Plist | SDK | ios |
+| systemBootTime | number | Time that the system booted | SDK | ios |
+| trackingAuthStatus | number | Tracking Authorization Status | SDK | ios |
 
 
 
@@ -130,9 +136,15 @@
 | frameworkVersion | no | True | False | string | Unity engine version | SDK | all |
 | adapterName | no | True | False | string | Unity adapter between game code and SDK, "AssetStore" for Asset Store package and "Engine" for Unity engine integration layer | SDK | all |
 | adapterVersion | no | True | False | string | SDK version name for adapter, should be in sync with SDK version | SDK | all |
-| imei | no | True | False | string | default or slot 0 from getDeviceId  | SDK | android |
 | analyticsUserId | no | True | False | string | Unity Analytics user ID in Unity Engine (does not apply to analytics events Unity Ads SDK is sending) | SDK | all |
 | analyticsSessionId | no | True | False | string | Unity Analytics session ID in Unity Engine (does not apply to analytics events Unity Ads SDK is sending), note: sent as string to avoid problems with 64 bit integers being over JavaScript safe number limit | SDK | all |
+| deviceName | ios | True | False | string | Device name associated with an iOS device | SDK | ios |
+| vendorIdentifier | ios | True | False | string | Vendor Identifier string | SDK | ios |
+| localeList | ios | True | False | string | A list of locale strings (e.g. ["en_US"] for English language | SDK | ios |
+| currentUiTheme | ios | True | False | number | Indicates the iOS device current ui color theme | SDK | ios |
+| adNetworkPlist | ios | True | False | string | List of SKAdNetworks included in an iOS game Plist | SDK | ios |
+| systemBootTime | ios | True | False | number | Time that the system booted | SDK | ios |
+| trackingAuthStatus | ios | True | False | number | Tracking Authorization Status | SDK | ios |
 
 
 
@@ -254,7 +266,6 @@
 | optOutEnabled | all | False | True | boolean | Whether the user has opted out from behavioral ads targeting in current game | Server | all |
 | optOutRecorded | all | False | True | boolean | Whether the user has seen the opt-out banner in current game | Server | all |
 | unityCreativeId | all | False | True | string | Creative id of the shown creative | SDK | all |
-| imei | no | False | True | string | default or slot 0 from getDeviceId  | SDK | android |
 | privacy | yes | False | True | object | Contains the GDPR consent information, combines data received from configuration-service and data collected from user in SDK | SDK | all |
 | deviceFreeSpace | yes | False | True | number | Free space in kilobytes | SDK | all |
 | isLoadEnabled | all | False | True | boolean | Flag describing if the campaign was loaded using Load API or from Precached Initialization | SDK | all |
@@ -309,7 +320,6 @@
 | optOutRecorded | all | False | True | boolean | Whether the user has seen the opt-out banner in current game | Server | all |
 | videoOrientation | no | False | True | string | Chosen video orientation | SDK | all |
 | unityCreativeId | all | False | True | string | Creative id of the shown creative | SDK | all |
-| imei | no | False | True | string | default or slot 0 from getDeviceId  | SDK | android |
 | privacy | yes | False | True | object | Contains the GDPR consent information, combines data received from configuration-service and data collected from user in SDK | SDK | all |
 | deviceFreeSpace | yes | False | True | number | Free space in kilobytes | SDK | all |
 | isLoadEnabled | all | False | True | boolean | Flag describing if the campaign was loaded using Load API or from Precached Initialization | SDK | all |

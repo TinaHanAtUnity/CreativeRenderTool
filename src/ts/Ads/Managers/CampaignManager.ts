@@ -327,6 +327,16 @@ export abstract class CampaignManager {
                     body.loadV5Support = loadV5Support;
                 }
 
+                if (deviceInfo instanceof IosDeviceInfo) {
+                    body.plist = deviceInfo.getAdNetworksPlist();
+                    body.idfv = deviceInfo.getVendorIdentifier();
+                    body.deviceName = deviceInfo.getDeviceName();
+                    body.locales = deviceInfo.getLocaleList();
+                    body.currentUiTheme = deviceInfo.getCurrentUiTheme();
+                    body.systemBootTime = deviceInfo.getSystemBootTime();
+                    body.trackingAuthStatus = deviceInfo.getTrackingAuthorizationStatus();
+                }
+
                 return body;
             });
         });

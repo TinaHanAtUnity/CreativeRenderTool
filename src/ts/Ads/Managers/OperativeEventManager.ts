@@ -29,6 +29,8 @@ import { TrackingIdentifierFilter } from 'Ads/Utilities/TrackingIdentifierFilter
 import { PrivacyMethod } from 'Privacy/Privacy';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { AgeGateChoice, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
+import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
+import { IosUiTheme } from 'Core/Native/iOS/DeviceInfo';
 
 export interface IOperativeEventManagerParams<T extends Campaign> {
     request: RequestManager;
@@ -112,6 +114,13 @@ export interface IInfoJson {
     legalFramework: string;
     agreedOverAgeLimit: AgeGateChoice;
     loadV5Support?: boolean;
+    plist?: string[];
+    idfv?: string;
+    deviceName?: string;
+    locales?: string[];
+    currentUiTheme?: IosUiTheme;
+    systemBootTime?: number;
+    trackingAuthStatus?: number;
 }
 
 export class OperativeEventManager {
@@ -442,6 +451,19 @@ export class OperativeEventManager {
                     'deviceMake': this._deviceInfo.getManufacturer(),
                     'screenDensity': this._deviceInfo.getScreenDensity(),
                     'screenSize': this._deviceInfo.getScreenLayout()
+                };
+            }
+
+            if (this._platform === Platform.IOS && this._deviceInfo instanceof IosDeviceInfo) {
+                infoJson = {
+                    ... infoJson,
+                    plist: this._deviceInfo.getAdNetworksPlist(),
+                    idfv: this._deviceInfo.getVendorIdentifier(),
+                    deviceName: this._deviceInfo.getDeviceName(),
+                    locales: this._deviceInfo.getLocaleList(),
+                    currentUiTheme: this._deviceInfo.getCurrentUiTheme(),
+                    systemBootTime: this._deviceInfo.getSystemBootTime(),
+                    trackingAuthStatus: this._deviceInfo.getTrackingAuthorizationStatus()
                 };
             }
 

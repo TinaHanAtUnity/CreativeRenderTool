@@ -55,6 +55,8 @@ import { NoGzipCacheManager } from 'Core/Managers/NoGzipCacheManager';
 import { createMetricInstance } from 'Ads/Networking/MetricInstance';
 import { createStopwatch } from 'Core/Utilities/Stopwatch';
 import { IsMadeWithUnity } from 'Ads/Utilities/IsMadeWithUnity';
+import { TrackingManagerApi, TrackingAuthorizationStatus } from 'Core/Native/iOS/TrackingManager';
+import { SKAdNetworkApi } from 'Core/Native/iOS/SKAdNetwork';
 
 export class Core implements ICore {
 
@@ -108,7 +110,9 @@ export class Core implements ICore {
                 MainBundle: new MainBundleApi(nativeBridge),
                 Notification: new NotificationApi(nativeBridge),
                 Preferences: new IosPreferencesApi(nativeBridge),
-                UrlScheme: new UrlSchemeApi(nativeBridge)
+                UrlScheme: new UrlSchemeApi(nativeBridge),
+                TrackingManager: new TrackingManagerApi(nativeBridge),
+                SKAdNetwork: new SKAdNetworkApi(nativeBridge)
             } : undefined
         };
 
@@ -160,6 +164,40 @@ export class Core implements ICore {
             }
 
             this.Api.Request.setConcurrentRequestCount(8);
+
+            if (this.NativeBridge.getPlatform() === Platform.IOS) {
+                Promise.all([
+                    this.Api.DeviceInfo.Ios!.getDeviceName(),
+                    this.Api.DeviceInfo.Ios!.getVendorIdentifier(),
+                    this.Api.DeviceInfo.Ios!.getLocaleList(),
+                    this.Api.DeviceInfo.Ios!.getCurrentUITheme(),
+                    this.Api.DeviceInfo.Ios!.getAdNetworkIdsPlist(),
+                    this.Api.DeviceInfo.Ios!.getSystemBootTime()
+                ]).then(([deviceName, vendorIdentifer, localeList, currentTheme, adNetworks, systemBootTime]) => {
+                    this.Api.Sdk.logInfo(`[Test] Device name: ${deviceName}`);
+                    this.Api.Sdk.logInfo(`[Test] Vendor identifier: ${vendorIdentifer}`);
+                    this.Api.Sdk.logInfo(`[Test] Locale list: ${localeList.join(', ')}`);
+                    this.Api.Sdk.logInfo(`[Test] Current theme: ${currentTheme}`);
+                    this.Api.Sdk.logInfo(`[Test] Ad Networks: ${adNetworks}`);
+                    this.Api.Sdk.logInfo(`[Test] System boot time: ${systemBootTime}`);
+                }).catch(err => {
+                    this.Api.Sdk.logError(`[Test] Failed to get one of the new fields. Error: ${err}`);
+                });
+
+                Promise.resolve(this.Api.iOS!.TrackingManager.available()).then((isAvailable) => {
+                    this.Api.Sdk.logInfo(`[Test] TrackingManager Available: ${isAvailable}`);
+                    if (isAvailable) {
+                        return this.Api.iOS!.TrackingManager.getTrackingAuthorizationStatus().then((authStatus) => {
+                            this.Api.Sdk.logInfo(`[Test] Tracking Authorization Status: ${authStatus}`);
+                            return this.Api.iOS!.TrackingManager.requestTrackingAuthorization().then(() => {
+                                return this.Api.iOS!.TrackingManager.getTrackingAuthorizationStatus().then((authStatusUpdated) => {
+                                    this.Api.Sdk.logInfo(`[Test] [After request dialog] Tracking Authorization Status: ${authStatusUpdated}`);
+                                });
+                            });
+                        });
+                    }
+                });
+            }
 
             measurements.reset();
             measurements.start();
