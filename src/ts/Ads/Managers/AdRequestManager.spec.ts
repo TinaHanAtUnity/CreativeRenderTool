@@ -859,7 +859,6 @@ class SatisfiesMatcher {
 
                 await adRequestManager.requestPreload();
                 await adRequestManager.requestLoad('video');
-
                 loadedCampaign = await adRequestManager.requestLoad('video');
             });
 
