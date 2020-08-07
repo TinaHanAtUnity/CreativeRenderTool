@@ -829,10 +829,10 @@ class SatisfiesMatcher {
             });
 
             it('should not send fill metric', () => {
-                expect(SDKMetrics.reportMetricEvent).not.toBeCalledWith(LoadV5.LoadRequestFill);
+                expect(SDKMetrics.reportMetricEventWithTags).not.toBeCalledWith(LoadV5.LoadRequestFill, expect.anything());
             });
 
-            it('should not trigger error metric', () => {
+            it('should trigger error metric', () => {
                 expect(SDKMetrics.reportMetricEventWithTags).toBeCalledWith(LoadV5.LoadRequestFailed, expect.anything());
             });
         });
@@ -859,6 +859,7 @@ class SatisfiesMatcher {
 
                 await adRequestManager.requestPreload();
                 await adRequestManager.requestLoad('video');
+
                 loadedCampaign = await adRequestManager.requestLoad('video');
             });
 
@@ -866,12 +867,8 @@ class SatisfiesMatcher {
                 expect(loadedCampaign).toBeUndefined();
             });
 
-            it('should not send fill metric', () => {
-                expect(SDKMetrics.reportMetricEvent).not.toBeCalledWith(LoadV5.LoadRequestFill, expect.anything());
-            });
-
-            it('should not trigger error metric', () => {
-                expect(SDKMetrics.reportMetricEventWithTags).toBeCalledWith(LoadV5.LoadRequestFailed, expect.anything());
+            it('should trigger metric', () => {
+                expect(SDKMetrics.reportMetricEventWithTags).toBeCalledWith(LoadV5.LoadRequestFrequencyCap, expect.anything());
             });
         });
 
@@ -924,8 +921,8 @@ class SatisfiesMatcher {
                 expect(SDKMetrics.reportMetricEventWithTags).toBeCalledWith(LoadV5.LoadRequestFill, expect.anything());
             });
 
-            it('should not trigger error metric', () => {
-                expect(SDKMetrics.reportMetricEventWithTags).toBeCalledWith(LoadV5.LoadRequestFailed, expect.anything());
+            it('should not trigger metric', () => {
+                expect(SDKMetrics.reportMetricEventWithTags).not.toBeCalledWith(LoadV5.LoadRequestFrequencyCap, expect.anything());
             });
         });
 

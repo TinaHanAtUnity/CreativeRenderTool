@@ -205,6 +205,7 @@ export enum LoadV5 {
     LoadRequestStarted = 'v5_load_request_started',
     LoadRequestParsingResponse = 'v5_load_request_parsing_response',
     LoadRequestFailed = 'v5_load_request_failed',
+    LoadRequestFrequencyCap = 'v5_load_request_frequency_cap',
     LoadRequestWasCanceled = 'v5_load_request_was_canceled',
     LoadRequestFill = 'v5_load_request_fill',
     LoadRequestParseCampaignFailed = 'v5_load_request_parse_campaign_failed',
