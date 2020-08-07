@@ -55,7 +55,7 @@ import { NoGzipCacheManager } from 'Core/Managers/NoGzipCacheManager';
 import { createMetricInstance } from 'Ads/Networking/MetricInstance';
 import { createStopwatch } from 'Core/Utilities/Stopwatch';
 import { IsMadeWithUnity } from 'Ads/Utilities/IsMadeWithUnity';
-import { TrackingManagerApi, TrackingAuthorizationStatus } from 'Core/Native/iOS/TrackingManager';
+import { TrackingManagerApi } from 'Core/Native/iOS/TrackingManager';
 import { SKAdNetworkApi } from 'Core/Native/iOS/SKAdNetwork';
 
 export class Core implements ICore {
