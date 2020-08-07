@@ -833,7 +833,11 @@ class SatisfiesMatcher {
             });
 
             it('should trigger error metric', () => {
-                expect(SDKMetrics.reportMetricEventWithTags).toBeCalledWith(LoadV5.LoadRequestFailed, expect.anything());
+                expect(SDKMetrics.reportMetricEventWithTags).toBeCalledWith(LoadV5.LoadRequestFailed, expect.objectContaining({ 'rsn': 'frequency_cap_first' }));
+            });
+
+            it('should not trigger metric', () => {
+                expect(SDKMetrics.reportMetricEventWithTags).not.toBeCalledWith(LoadV5.LoadRequestFrequencyCap, expect.anything());
             });
         });
 
