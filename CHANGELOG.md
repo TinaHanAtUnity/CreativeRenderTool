@@ -1,5 +1,10 @@
 # Pending
 
+* [Load V5] Add support for frequency capping [#16695](https://github.com/Applifier/unity-ads-webview/pull/16695)
+* MDP-225 Bump up optout event to v4 [#16761](https://github.com/Applifier/unity-ads-webview/pull/16761)
+
+# Pending
+
 * [3.4.8] Merge to Master [#16793](https://github.com/Applifier/unity-ads-webview/pull/16793)
 * [3.4.8] Add TrackingManagerApi [#16223](https://github.com/Applifier/unity-ads-webview/pull/16223)
 * [3.4.8] Add support for new iOS 14 device info fields [#16432](https://github.com/Applifier/unity-ads-webview/pull/16432)
@@ -9,8 +14,6 @@
 * [3.4.8] Add New iOS Fields to Configuration Request [#16693](https://github.com/Applifier/unity-ads-webview/pull/16693)
 * [3.4.8] Add iOS fields to Auction Request and Operative Events [#16697](https://github.com/Applifier/unity-ads-webview/pull/16697)
 * [3.4.8] Add Logging for App Tracking Transparency for Testing [#16563](https://github.com/Applifier/unity-ads-webview/pull/16563)
-* [Load V5] Add support for frequency capping [#16695](https://github.com/Applifier/unity-ads-webview/pull/16695)
-* MDP-225 Bump up optout event to v4 [#16761](https://github.com/Applifier/unity-ads-webview/pull/16761)
 
 # Thu Aug  6 11:24:22 UTC 2020
 
