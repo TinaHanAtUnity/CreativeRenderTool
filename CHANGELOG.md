@@ -1,4 +1,4 @@
-# Pending
+# Fri Aug  7 19:26:43 UTC 2020
 
 * [Load V5] Add support for frequency capping [#16695](https://github.com/Applifier/unity-ads-webview/pull/16695)
 * MDP-225 Bump up optout event to v4 [#16761](https://github.com/Applifier/unity-ads-webview/pull/16761)
