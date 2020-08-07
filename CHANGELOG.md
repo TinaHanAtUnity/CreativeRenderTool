@@ -1,3 +1,7 @@
+# Pending
+
+* Revert Testing PR's [#16825](https://github.com/Applifier/unity-ads-webview/pull/16825)
+
 # Fri Aug  7 19:26:43 UTC 2020
 
 * [Load V5] Add support for frequency capping [#16695](https://github.com/Applifier/unity-ads-webview/pull/16695)
