@@ -74,6 +74,11 @@ export enum AgeGateSource {
     DEVELOPER = 'developer'
 }
 
+export enum OptOutScope {
+    PROJECT_SCOPE = 'project',
+    NETWORK_SCOPE = 'network'
+}
+
 export interface IUserPrivacyStorageDataGdpr {
     gdpr: {
         consent: {
@@ -254,7 +259,7 @@ export class UserPrivacyManager {
 
     private sendPrivacyEvent(permissions: IPrivacyPermissions, source: GDPREventSource, action: GDPREventAction, layout = '', firstRequest: boolean): Promise<INativeResponse> {
         const infoJson: unknown = {
-            'v': 3,
+            'v': 4,
             advertisingId: this._deviceInfo.getAdvertisingIdentifier(),
             abGroup: this._coreConfig.getAbGroup(),
             layout: layout,
@@ -273,7 +278,8 @@ export class UserPrivacyManager {
             permissions: permissions,
             legalFramework: this._privacy.getLegalFramework(),
             agreedOverAgeLimit: this._ageGateChoice,
-            ageGateSource: this._ageGateSource
+            ageGateSource: this._ageGateSource,
+            scope: OptOutScope.PROJECT_SCOPE
         };
 
         if (CustomFeatures.sampleAtGivenPercent(1)) {
