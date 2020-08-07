@@ -55,7 +55,7 @@ export class MRAIDAdUnitParametersFactory extends AbstractAdUnitParametersFactor
         const showGDPRBanner = this.showGDPRBanner(baseParams);
 
         baseParams.gameSessionId = baseParams.gameSessionId || 0;
-        const isProgrammaticWebPlayerTest = MraidWebplayer.isValid(baseParams.coreConfig.getAbGroup()) && !(baseParams.campaign instanceof PerformanceMRAIDCampaign) && !ARUtil.isARCreative(baseParams.campaign) && !MRAIDAdUnitParametersFactory._forcedExtendedMRAID && !MRAIDAdUnitParametersFactory._forcedARMRAID;
+        const isProgrammaticWebPlayerTest = true;//MraidWebplayer.isValid(baseParams.coreConfig.getAbGroup()) && !(baseParams.campaign instanceof PerformanceMRAIDCampaign) && !ARUtil.isARCreative(baseParams.campaign) && !MRAIDAdUnitParametersFactory._forcedExtendedMRAID && !MRAIDAdUnitParametersFactory._forcedARMRAID;
 
         if (isProgrammaticWebPlayerTest) {
             mraid = new WebPlayerMRAID(baseParams.platform, baseParams.core, baseParams.deviceInfo, baseParams.placement, baseParams.campaign, baseParams.privacy, showGDPRBanner, baseParams.coreConfig.getAbGroup(), baseParams.gameSessionId, baseParams.adsConfig.getHidePrivacy());
