@@ -1,3 +1,15 @@
+# Pending
+
+* [3.4.8] Merge to Master [#16793](https://github.com/Applifier/unity-ads-webview/pull/16793)
+* [3.4.8] Add TrackingManagerApi [#16223](https://github.com/Applifier/unity-ads-webview/pull/16223)
+* [3.4.8] Add support for new iOS 14 device info fields [#16432](https://github.com/Applifier/unity-ads-webview/pull/16432)
+* [3.4.8] Test Logs [#16433](https://github.com/Applifier/unity-ads-webview/pull/16433)
+* [3.4.8] Add iOS 14 Fields to iOSDeviceInfo Model [#16567](https://github.com/Applifier/unity-ads-webview/pull/16567)
+* [3.4.8] Add SKAdNetwork API methods [#16527](https://github.com/Applifier/unity-ads-webview/pull/16527)
+* [3.4.8] Add New iOS Fields to Configuration Request [#16693](https://github.com/Applifier/unity-ads-webview/pull/16693)
+* [3.4.8] Add iOS fields to Auction Request and Operative Events [#16697](https://github.com/Applifier/unity-ads-webview/pull/16697)
+* [3.4.8] Add Logging for App Tracking Transparency for Testing [#16563](https://github.com/Applifier/unity-ads-webview/pull/16563)
+
 # Thu Aug  6 11:24:22 UTC 2020
 
 * Added check for EndScreenType inside PerformanceAdUnitParametersFactory [#16729](https://github.com/Applifier/unity-ads-webview/pull/16729)
