@@ -1,4 +1,13 @@
-# Pending
+# Thu Aug  6 11:24:22 UTC 2020
+
+* Added check for EndScreenType inside PerformanceAdUnitParametersFactory [#16729](https://github.com/Applifier/unity-ads-webview/pull/16729)
+* Disable Privacy SDK A/B test [#16700](https://github.com/Applifier/unity-ads-webview/pull/16700)
+
+# Wed Aug  5 22:26:46 UTC 2020
+
+* Adding metric events for reported length vs actual length of videos [#16598](https://github.com/Applifier/unity-ads-webview/pull/16598)
+
+# Tue  4 Aug 2020 21:09:26 UTC
 
 * [EES] Support for metrics coming from iframe [#16698](https://github.com/Applifier/unity-ads-webview/pull/16698)
 * Rename unityads-logo to icon-unity-ads-logo for clarity [#16699](https://github.com/Applifier/unity-ads-webview/pull/16699)
