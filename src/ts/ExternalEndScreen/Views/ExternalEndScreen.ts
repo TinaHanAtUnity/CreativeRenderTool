@@ -13,6 +13,13 @@ import { ExternalEndScreenMetric, SDKMetrics } from 'Ads/Utilities/SDKMetrics';
 import { Platform } from 'Core/Constants/Platform';
 import { XHRequest } from 'Core/Utilities/XHRequest';
 
+export enum ExternalEndScreenEventType {
+    Close = 'close',
+    Open = 'open',
+    GetParameters = 'getParameters',
+    Metric = 'metric'
+}
+
 interface IExternalEndScreenUrlParameters {
     gameIcon: string | undefined;
     squareImage: string | undefined;
@@ -68,15 +75,19 @@ export class ExternalEndScreen extends View<IEndScreenHandler> implements IPriva
         // Communication channel
         //
         this._messageListener = event => {
-            if (event.data.type === 'open') {
+            if (event.data.type === ExternalEndScreenEventType.Open) {
                 this.route(event.data.url);
-            } else if (event.data.type === 'getParameters') {
+            } else if (event.data.type === ExternalEndScreenEventType.GetParameters) {
                 // The iframe asked for the parameters, witch means it is loaded.
                 this._isIframeReady = true;
 
                 this.sendParameters();
-            } else if (event.data.type === 'close') {
+            } else if (event.data.type === ExternalEndScreenEventType.Close) {
                 this.onCloseEvent();
+            } else if (event.data.type === ExternalEndScreenEventType.Metric) {
+                SDKMetrics.reportMetricEventWithTags(event.data.metric, {
+                    ...event.data.tags
+                });
             }
         };
         window.addEventListener('message', this._messageListener);

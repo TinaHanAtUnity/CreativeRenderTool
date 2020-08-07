@@ -236,13 +236,19 @@ export enum InitializationFailureMetric {
     InitializeFailed = 'webview_fail_to_initialize'
 }
 
+export enum VideoLengthMetric {
+    LengthOverreported = 'dsp_video_length_overreported',
+    LengthUnderreported = 'dsp_video_length_underreported'
+
+}
+
 export enum MraidWebplayerMetric {
     MraidAdClicked = 'mraid_ad_clicked',
     MraidIframeLoaded = 'load_iframe',
     MraidWebplayerLoaded = 'load_webplayer'
 }
 
-export type TimingEvent = InitializationMetric | MediationMetric | GeneralTimingMetric | ChinaAucionEndpoint;
+export type TimingEvent = InitializationMetric | MediationMetric | GeneralTimingMetric | ChinaAucionEndpoint | VideoLengthMetric;
 
 export type PTSEvent = VideoMetric | TimingEvent | AuctionV6 | AdmobMetric | BannerMetric | CachingMetric | ChinaMetric | VastMetric | MraidMetric | MiscellaneousMetric | LoadMetric | ErrorMetric | OMMetric | AUIMetric | LoadV5 | ChinaAucionEndpoint | ExternalEndScreenMetric | InitializationFailureMetric | MraidWebplayerMetric;
 
