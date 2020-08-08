@@ -735,19 +735,21 @@ export class AdRequestManager extends CampaignManager {
         return body;
     }
 
-    private makeEncryptedPreloadData(currentDataIndex: string[], encryptedPreloadData: { [key: string]: string } | undefined): { [key: string]: string } | undefined {
-
-        if (!encryptedPreloadData) {
+    private makeEncryptedPreloadData(currentPreloadData: IPlacementIdMap<IParsedPlacementPreloadData>, encryptedPreloadData: { [key: string]: string } | undefined): { [key: string]: string } | undefined {
+        if (encryptedPreloadData == null) {
             return;
         }
 
-        return Object.keys(encryptedPreloadData)
-            .filter(key => currentDataIndex.includes(key))
-            .reduce((obj: {[key: string]: string}, key) => {
-                obj[key] = encryptedPreloadData[key];
-                return obj;
-        }, {});
-
+        const currentEncryptedProloadData: { [key: string]: string } = {};
+        for (const placementPreloadData in currentPreloadData) {
+            if (currentPreloadData.hasOwnProperty(placementPreloadData)) {
+                const value = currentPreloadData[placementPreloadData];
+                if (currentEncryptedProloadData[value.dataIndex] == null) {
+                    currentEncryptedProloadData[value.dataIndex] = encryptedPreloadData[value.dataIndex];
+                }
+            }
+        }
+        return currentEncryptedProloadData;
     }
 
     private makeLoadBody(body: ILoadV5BodyExtra, placementId: string, additionalPlacements: string[]): unknown {
@@ -790,7 +792,7 @@ export class AdRequestManager extends CampaignManager {
         body.preload = false;
         body.preloadData = preloadData;
         body.preloadPlacements = {};
-        body.encryptedPreloadData = this.makeEncryptedPreloadData(currentDataIndex, this._encryptedPreloadData);
+        body.encryptedPreloadData = this.makeEncryptedPreloadData(preloadData, this._encryptedPreloadData);
         return body;
     }
 
