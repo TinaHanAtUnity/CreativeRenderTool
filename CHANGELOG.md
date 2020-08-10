@@ -1,5 +1,6 @@
 # Pending
 
+* [EES] Remove default route for the external end screen [#16886](https://github.com/Applifier/unity-ads-webview/pull/16886)
 * [Chore] Remove load called counter [#16662](https://github.com/Applifier/unity-ads-webview/pull/16662)
 * [Load V5] Revert placement grouping experiment [#16855](https://github.com/Applifier/unity-ads-webview/pull/16855)
 * [Chore] Send frequency cap as separate metric [#16854](https://github.com/Applifier/unity-ads-webview/pull/16854)
