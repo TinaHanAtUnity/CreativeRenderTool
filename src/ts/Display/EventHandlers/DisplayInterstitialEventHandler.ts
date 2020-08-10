@@ -8,6 +8,7 @@ import {
 import { DisplayInterstitialCampaign } from 'Display/Models/DisplayInterstitialCampaign';
 import { IDisplayInterstitialHandler } from 'Display/Views/DisplayInterstitial';
 import { TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
+import { EventType } from 'Ads/Models/Session';
 
 export class DisplayInterstitialEventHandler extends GDPREventHandler implements IDisplayInterstitialHandler {
     private _operativeEventManager: OperativeEventManager;
@@ -31,6 +32,9 @@ export class DisplayInterstitialEventHandler extends GDPREventHandler implements
         this._operativeEventManager.sendView(params);
 
         // Temporary for PTS Migration Investigation
+        if (!this._campaign.getSession().getEventSent(EventType.THIRD_QUARTILE)) {
+            this._adUnit.sendTrackingEvent(TrackingEvent.THIRD_QUARTILE);
+        }
         this._adUnit.sendTrackingEvent(TrackingEvent.COMPLETE);
 
         this._adUnit.hide();

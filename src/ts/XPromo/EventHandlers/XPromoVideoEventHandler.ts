@@ -59,6 +59,10 @@ export class XPromoVideoEventHandler extends VideoEventHandler {
         // Not sent for Xpromos
     }
 
+    protected handleThirdQuartileEvent(progress: number): void {
+        this.sendTrackingEvent(TrackingEvent.THIRD_QUARTILE);
+    }
+
     protected handleCompleteEvent(): void {
         this._xpromoOperativeEventManager.sendView(this.getXPromoOperativeEventParams());
         this.sendTrackingEvent(TrackingEvent.COMPLETE);
