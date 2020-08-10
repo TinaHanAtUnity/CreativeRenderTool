@@ -1,5 +1,6 @@
 # Pending
 
+* [Chore] Send frequency cap as separate metric [#16854](https://github.com/Applifier/unity-ads-webview/pull/16854)
 * [Open Measurement] Refactor AdViewBuilder PR1: Utilize screen.width and screen.height  [#15533](https://github.com/Applifier/unity-ads-webview/pull/15533)
 * Revert Testing PR's [#16825](https://github.com/Applifier/unity-ads-webview/pull/16825)
 
