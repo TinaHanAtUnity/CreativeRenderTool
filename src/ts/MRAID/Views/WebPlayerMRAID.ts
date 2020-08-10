@@ -17,7 +17,6 @@ import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { JaegerSpan } from 'Core/Jaeger/JaegerSpan';
 import { ProgrammaticMRAIDEventHandler } from 'MRAID/EventHandlers/ProgrammaticMRAIDEventHandler';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
-import { SDKMetrics, MraidWebplayerMetric } from 'Ads/Utilities/SDKMetrics';
 
 export class WebPlayerMRAID extends MRAIDView<IMRAIDViewHandler> {
 

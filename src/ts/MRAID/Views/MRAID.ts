@@ -19,7 +19,6 @@ import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { MRAIDIFrameEventAdapter } from 'MRAID/EventBridge/MRAIDIFrameEventAdapter';
 import { Localization } from 'Core/Utilities/Localization';
 import { MacroUtil } from 'Ads/Utilities/MacroUtil';
-import { SDKMetrics, MraidWebplayerMetric } from 'Ads/Utilities/SDKMetrics';
 
 export class MRAID extends MRAIDView<IMRAIDViewHandler> {
 
