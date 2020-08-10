@@ -2,6 +2,7 @@ import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 import { IObserver1 } from 'Core/Utilities/IObserver';
 import { MRAIDEventAdapter, IMRAIDOrientationProperties, MRAIDEvents, IMRAIDHandler } from 'MRAID/EventBridge/MRAIDEventAdapter';
 import { ICoreApi } from 'Core/ICore';
+import { SDKMetrics, MraidWebplayerMetric } from 'Ads/Utilities/SDKMetrics';
 
 export class MRAIDWebPlayerEventAdapter extends MRAIDEventAdapter {
     private _container: WebPlayerContainer;
@@ -42,6 +43,11 @@ export class MRAIDWebPlayerEventAdapter extends MRAIDEventAdapter {
         const params = args.shift();
 
         this._core.Sdk.logDebug(`mraid: event=${eventType}, data=${params}`);
+
+        if (eventType === MRAIDEvents.OPEN) {
+            SDKMetrics.reportMetricEvent(MraidWebplayerMetric.MraidClickReceived);
+        }
+
         if (eventType in this._mraidHandlers) {
             const handler = this._mraidHandlers[eventType];
             handler(<{ [key: string]: unknown }>params);

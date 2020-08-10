@@ -120,7 +120,6 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
             this._core.Sdk.logDebug('Unity Ads placement ' + this._placement.getId() + ' set iframe.src started ' + SdkStats.getFrameSetStartTimestamp(this._placement.getId()));
             iframe.srcdoc = mraid;
 
-            SDKMetrics.reportMetricEvent(MraidWebplayerMetric.MraidIframeLoaded);
             if (CustomFeatures.isNestedIframePlayable(this._creativeId)) {
                 iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin');
             }

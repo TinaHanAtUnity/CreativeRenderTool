@@ -19,6 +19,7 @@ import { IMRAIDViewHandler, IOrientationProperties, MRAIDView } from 'MRAID/View
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 import { ICampaignTrackingUrls } from 'Ads/Models/Campaign';
+import { SDKMetrics, MraidWebplayerMetric } from 'Ads/Utilities/SDKMetrics';
 
 export interface IMRAIDAdUnitParameters extends IAdUnitParameters<MRAIDCampaign> {
     mraid: MRAIDView<IMRAIDViewHandler>;
@@ -144,6 +145,7 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     }
 
     public sendClick(): void {
+        SDKMetrics.reportMetricEvent(MraidWebplayerMetric.MraidClickSent);
         this.sendTrackingEvent(TrackingEvent.CLICK);
     }
 

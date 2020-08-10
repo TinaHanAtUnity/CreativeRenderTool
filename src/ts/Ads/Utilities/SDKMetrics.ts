@@ -239,13 +239,11 @@ export enum InitializationFailureMetric {
 export enum VideoLengthMetric {
     LengthOverreported = 'dsp_video_length_overreported',
     LengthUnderreported = 'dsp_video_length_underreported'
-
 }
 
 export enum MraidWebplayerMetric {
-    MraidAdClicked = 'mraid_ad_clicked',
-    MraidIframeLoaded = 'load_iframe',
-    MraidWebplayerLoaded = 'load_webplayer'
+    MraidClickSent = 'mraid_ad_clicked',
+    MraidClickReceived = 'mraid_click_received'
 }
 
 export type TimingEvent = InitializationMetric | MediationMetric | GeneralTimingMetric | ChinaAucionEndpoint | VideoLengthMetric;

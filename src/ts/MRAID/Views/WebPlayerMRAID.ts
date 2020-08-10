@@ -76,7 +76,6 @@ export class WebPlayerMRAID extends MRAIDView<IMRAIDViewHandler> {
             this._core.Sdk.logDebug('setting webplayer srcdoc (' + mraid.length + ')');
             SdkStats.setFrameSetStartTimestamp(this._placement.getId());
             this._core.Sdk.logDebug('Unity Ads placement ' + this._placement.getId() + ' set webplayer data started ' + SdkStats.getFrameSetStartTimestamp(this._placement.getId()));
-            SDKMetrics.reportMetricEvent(MraidWebplayerMetric.MraidWebplayerLoaded);
             mraid = this._platform === Platform.ANDROID ? encodeURIComponent(mraid) : mraid;
 
             return this.setWebPlayerContainerData(webPlayerContainer, mraid);
