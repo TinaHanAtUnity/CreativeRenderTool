@@ -27,6 +27,8 @@ import { IPlacementIdMap } from 'Ads/Managers/PlacementManager';
 // eslint-disable-next-line
 const LoadV5PreloadResponse = require('json/LoadV5PreloadResponse.json');
 // eslint-disable-next-line
+const LoadV5PreloadResponse_LongTTL = require('json/LoadV5PreloadResponse_LongTTL.json');
+// eslint-disable-next-line
 const LoadV5PreloadResponse_NoFill = require('json/LoadV5PreloadResponse_NoFill.json');
 // eslint-disable-next-line
 const LoadV5LoadResponse = require('json/LoadV5LoadResponse.json');
@@ -36,6 +38,8 @@ const LoadV5LoadResponse_2 = require('json/LoadV5LoadResponse_2.json');
 const LoadV5LoadResponseWithAdditionalPlacements = require('json/LoadV5LoadResponseWithAdditionalPlacements.json');
 // eslint-disable-next-line
 const LoadV5LoadResponse_NoFill = require('json/LoadV5LoadResponse_NoFill.json');
+// eslint-disable-next-line
+const LoadV5LoadResponse_FrequencyCapping = require('json/LoadV5LoadResponse_FrequencyCapping.json');
 // eslint-disable-next-line
 const LoadV5ReloadResponse = require('json/LoadV5ReloadResponse.json');
 
@@ -254,24 +258,6 @@ class SatisfiesMatcher {
                 await adRequestManager.requestPreload();
                 loadedCampaign1 = await adRequestManager.requestLoad('video');
                 loadedCampaign2 = await adRequestManager.requestLoad('rewardedVideo');
-            });
-
-            it('should fire correct amount of load tracking events', () => {
-                expect(core.Ads.LoadAndFillEventManager.sendLoadTrackingEvents).toBeCalledTimes(2);
-            });
-
-            it('should call sendLoadTrackingEvents with correct placementIds', () => {
-                expect(core.Ads.LoadAndFillEventManager.sendLoadTrackingEvents).toBeCalledWith('video');
-                expect(core.Ads.LoadAndFillEventManager.sendLoadTrackingEvents).toBeCalledWith('rewardedVideo');
-            });
-
-            it('should fire correct amount of fill tracking events', () => {
-                expect(core.Ads.LoadAndFillEventManager.sendFillTrackingEvents).toBeCalledTimes(2);
-            });
-
-            it('should call sendFillTrackingEvents with correct parameters', () => {
-                expect(core.Ads.LoadAndFillEventManager.sendFillTrackingEvents).toBeCalledWith('video', loadedCampaign1!.campaign);
-                expect(core.Ads.LoadAndFillEventManager.sendFillTrackingEvents).toBeCalledWith('rewardedVideo', loadedCampaign2!.campaign);
             });
 
             it('should send fill metric', () => {
@@ -501,33 +487,6 @@ class SatisfiesMatcher {
 
             it('should getPlacementsForGroupId be called with correct ad unit id', () => {
                 expect(adsConfig.getPlacementsForGroupId).toBeCalledWith('test_group_id');
-            });
-
-            it('should fire correct amount of load tracking events', () => {
-                expect(core.Ads.LoadAndFillEventManager.sendLoadTrackingEvents).toBeCalledTimes(4);
-            });
-
-            it('should call sendLoadTrackingEvents with correct placementIds', () => {
-                expect(core.Ads.LoadAndFillEventManager.sendLoadTrackingEvents).toBeCalledWith('video');
-                expect(core.Ads.LoadAndFillEventManager.sendLoadTrackingEvents).toBeCalledWith('rewardedVideo');
-                expect(core.Ads.LoadAndFillEventManager.sendLoadTrackingEvents).toBeCalledWith('video2');
-                expect(core.Ads.LoadAndFillEventManager.sendLoadTrackingEvents).toBeCalledWith('video3');
-            });
-
-            it('should fire correct amount of fill tracking events', () => {
-                expect(core.Ads.LoadAndFillEventManager.sendFillTrackingEvents).toBeCalledTimes(3);
-            });
-
-            it('should call sendFillTrackingEvents with correct parameters', () => {
-                const additionalCampaigns: IPlacementIdMap<INotCachedLoadedCampaign | undefined> = <IPlacementIdMap<INotCachedLoadedCampaign | undefined>>onAdditionalPlacementsReady.mock.calls[0][1];
-
-                expect(core.Ads.LoadAndFillEventManager.sendFillTrackingEvents).toBeCalledWith('video', loadedCampaign!.campaign);
-                expect(core.Ads.LoadAndFillEventManager.sendFillTrackingEvents).toBeCalledWith('rewardedVideo', additionalCampaigns.rewardedVideo!.notCachedCampaign);
-                expect(core.Ads.LoadAndFillEventManager.sendFillTrackingEvents).toBeCalledWith('video2', additionalCampaigns.video2!.notCachedCampaign);
-            });
-
-            it('should NOT call sendFillTrackingEvents for nofill placements', () => {
-                expect(core.Ads.LoadAndFillEventManager.sendFillTrackingEvents).not.toBeCalledWith('video3', expect.anything());
             });
 
             it('should send fill metric', () => {
@@ -833,11 +792,140 @@ class SatisfiesMatcher {
             });
 
             it('should not send fill metric', () => {
-                expect(SDKMetrics.reportMetricEvent).not.toBeCalledWith(LoadV5.LoadRequestFill);
+                expect(SDKMetrics.reportMetricEventWithTags).not.toBeCalledWith(LoadV5.LoadRequestFill, expect.anything());
             });
 
             it('should not trigger error metric', () => {
                 expect(SDKMetrics.reportMetricEventWithTags).not.toBeCalledWith(LoadV5.LoadRequestFailed, expect.anything());
+            });
+        });
+
+        describe('successful load request with no fill when frequency capping', () => {
+            let loadedCampaign: ILoadedCampaign | undefined;
+
+            beforeEach(async () => {
+                request.post.mockResolvedValueOnce({
+                    url: '',
+                    response: JSON.stringify(LoadV5PreloadResponse),
+                    responseCode: 200,
+                    headers: {}
+                }).mockResolvedValueOnce({
+                    url: '',
+                    response: JSON.stringify(LoadV5LoadResponse_FrequencyCapping),
+                    responseCode: 200,
+                    headers: {}
+                });
+
+                adsConfig.getPlacement.mockImplementation(Placement);
+
+                contentTypeHandlerManager.getParser.mockReturnValue(new CometCampaignParser(core));
+
+                await adRequestManager.requestPreload();
+                loadedCampaign = await adRequestManager.requestLoad('video');
+            });
+
+            it('should not load campaign', () => {
+                expect(loadedCampaign).toBeUndefined();
+            });
+
+            it('should not send fill metric', () => {
+                expect(SDKMetrics.reportMetricEvent).not.toBeCalledWith(LoadV5.LoadRequestFill);
+            });
+
+            it('should not trigger error metric', () => {
+                expect(SDKMetrics.reportMetricEventWithTags).toBeCalledWith(LoadV5.LoadRequestFailed, expect.anything());
+            });
+        });
+
+        describe('successful load request with no fill when frequency capping with following request', () => {
+            let loadedCampaign: ILoadedCampaign | undefined;
+
+            beforeEach(async () => {
+                request.post.mockResolvedValueOnce({
+                    url: '',
+                    response: JSON.stringify(LoadV5PreloadResponse),
+                    responseCode: 200,
+                    headers: {}
+                }).mockResolvedValueOnce({
+                    url: '',
+                    response: JSON.stringify(LoadV5LoadResponse_FrequencyCapping),
+                    responseCode: 200,
+                    headers: {}
+                });
+
+                adsConfig.getPlacement.mockImplementation(Placement);
+
+                contentTypeHandlerManager.getParser.mockReturnValue(new CometCampaignParser(core));
+
+                await adRequestManager.requestPreload();
+                await adRequestManager.requestLoad('video');
+                loadedCampaign = await adRequestManager.requestLoad('video');
+            });
+
+            it('should not load campaign', () => {
+                expect(loadedCampaign).toBeUndefined();
+            });
+
+            it('should not send fill metric', () => {
+                expect(SDKMetrics.reportMetricEvent).not.toBeCalledWith(LoadV5.LoadRequestFill, expect.anything());
+            });
+
+            it('should not trigger error metric', () => {
+                expect(SDKMetrics.reportMetricEventWithTags).toBeCalledWith(LoadV5.LoadRequestFailed, expect.anything());
+            });
+        });
+
+        describe('successful load request with no fill when frequency capping with following request after timeout', () => {
+            let loadedCampaign: ILoadedCampaign | undefined;
+            let dateNowSpy: jest.SpyInstance;
+
+            beforeEach(async () => {
+                request.post.mockResolvedValueOnce({
+                    url: '',
+                    response: JSON.stringify(LoadV5PreloadResponse_LongTTL),
+                    responseCode: 200,
+                    headers: {}
+                }).mockResolvedValueOnce({
+                    url: '',
+                    response: JSON.stringify(LoadV5LoadResponse_FrequencyCapping),
+                    responseCode: 200,
+                    headers: {}
+                }).mockResolvedValueOnce({
+                    url: '',
+                    response: JSON.stringify(LoadV5LoadResponse),
+                    responseCode: 200,
+                    headers: {}
+                });
+
+                dateNowSpy = jest.spyOn(Date, 'now');
+                dateNowSpy.mockReturnValue(0);
+
+                adsConfig.getPlacement.mockImplementation(Placement);
+
+                contentTypeHandlerManager.getParser.mockReturnValue(new CometCampaignParser(core));
+
+                await adRequestManager.requestPreload();
+                await adRequestManager.requestLoad('video');
+
+                dateNowSpy.mockReturnValue(24 * 3600 * 1000 + 1);
+
+                loadedCampaign = await adRequestManager.requestLoad('video');
+            });
+
+            afterEach(() => {
+                dateNowSpy.mockRestore();
+            });
+
+            it('should have a fill', () => {
+                expect(loadedCampaign).toBeDefined();
+            });
+
+            it('should send fill metric', () => {
+                expect(SDKMetrics.reportMetricEventWithTags).toBeCalledWith(LoadV5.LoadRequestFill, expect.anything());
+            });
+
+            it('should not trigger error metric', () => {
+                expect(SDKMetrics.reportMetricEventWithTags).toBeCalledWith(LoadV5.LoadRequestFailed, expect.anything());
             });
         });
 
@@ -994,27 +1082,6 @@ class SatisfiesMatcher {
 
             it('should load single campaigns', () => {
                 expect(loadedCampaign2).toBeDefined();
-            });
-
-            it('should fire correct amount of load tracking events', () => {
-                expect(core.Ads.LoadAndFillEventManager.sendLoadTrackingEvents).toBeCalledTimes(2);
-            });
-
-            it('should call sendLoadTrackingEvents with correct placementIds', () => {
-                expect(core.Ads.LoadAndFillEventManager.sendLoadTrackingEvents).toBeCalledWith('video');
-                expect(core.Ads.LoadAndFillEventManager.sendLoadTrackingEvents).toBeCalledWith('rewardedVideo');
-            });
-
-            it('should fire correct amount of fill tracking events', () => {
-                expect(core.Ads.LoadAndFillEventManager.sendFillTrackingEvents).toBeCalledTimes(1);
-            });
-
-            it('should call sendFillTrackingEvents with correct parameters', () => {
-                expect(core.Ads.LoadAndFillEventManager.sendFillTrackingEvents).toBeCalledWith('rewardedVideo', loadedCampaign2!.campaign);
-            });
-
-            it('should NOT call sendFillTrackingEvents for nofill placements', () => {
-                expect(core.Ads.LoadAndFillEventManager.sendFillTrackingEvents).not.toBeCalledWith('video', expect.anything());
             });
 
             it('should have correct in loadedCampaign2', () => {

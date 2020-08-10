@@ -15,6 +15,7 @@ import { ProgrammaticMraidParser } from 'MRAID/Parsers/ProgrammaticMraidParser';
 import { PerformanceAdUnitFactory } from 'Performance/AdUnits/PerformanceAdUnitFactory';
 import { ProgrammaticVastParser } from 'VAST/Parsers/ProgrammaticVastParser';
 import { ProgrammaticVPAIDParser } from 'VPAID/Parsers/ProgrammaticVPAIDParser';
+import { LoadAndFillEventManagerMock, LoadAndFillEventManager } from 'Ads/Managers/__mocks__/LoadAndFillEventManager';
 
 [Platform.IOS, Platform.ANDROID].forEach((platform) => {
     describe(`PerPlacementLoadManagerV5NoInvalidation(${Platform[platform]})`, () => {
@@ -24,6 +25,7 @@ import { ProgrammaticVPAIDParser } from 'VPAID/Parsers/ProgrammaticVPAIDParser';
         let adRequestManager: AdRequestManagerMock;
         let clientInfo: ClientInfoMock;
         let focusManager: FocusManagerMock;
+        let loadAndFillEventManager: LoadAndFillEventManagerMock;
         let refreshManager: PerPlacementLoadManagerV5NoInvalidation;
 
         describe('invalidating campaigns', () => {
@@ -34,7 +36,9 @@ import { ProgrammaticVPAIDParser } from 'VPAID/Parsers/ProgrammaticVPAIDParser';
                 adRequestManager = AdRequestManager();
                 clientInfo = ClientInfo();
                 focusManager = FocusManager();
-                refreshManager = new PerPlacementLoadManagerV5NoInvalidation(adsApi, adsConfiguration, coreConfiguration, adRequestManager, clientInfo, focusManager, false);
+                loadAndFillEventManager = LoadAndFillEventManager();
+
+                refreshManager = new PerPlacementLoadManagerV5NoInvalidation(adsApi, adsConfiguration, coreConfiguration, adRequestManager, clientInfo, focusManager, false, loadAndFillEventManager);
             });
 
             [

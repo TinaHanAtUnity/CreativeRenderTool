@@ -36,6 +36,7 @@ import { LoadCalledCounter } from 'Core/Utilities/LoadCalledCounter';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { ILoadedCampaign } from 'Ads/Managers/CampaignManager';
+import { LoadAndFillEventManager } from 'Ads/Managers/LoadAndFillEventManager';
 
 describe('PerPlacementLoadManagerTest', () => {
     let deviceInfo: DeviceInfo;
@@ -62,6 +63,7 @@ describe('PerPlacementLoadManagerTest', () => {
     let campaignParserManager: ContentTypeHandlerManager;
     let privacySDK: PrivacySDK;
     let userPrivacyManager: UserPrivacyManager;
+    let loadAndFillEventManager: LoadAndFillEventManager;
 
     beforeEach(() => {
         platform = Platform.ANDROID;
@@ -76,6 +78,7 @@ describe('PerPlacementLoadManagerTest', () => {
         sinon.stub(SDKMetrics, 'reportMetricEvent').returns(Promise.resolve());
         campaignParserManager = sinon.createStubInstance(ContentTypeHandlerManager);
         adMobSignalFactory = sinon.createStubInstance(AdMobSignalFactory);
+        loadAndFillEventManager = sinon.createStubInstance(LoadAndFillEventManager);
 
         coreConfig = CoreConfigurationParser.parse(ConfigurationAuctionPlc);
         adsConfig = AdsConfigurationParser.parse(ConfigurationAuctionPlc);
@@ -91,7 +94,7 @@ describe('PerPlacementLoadManagerTest', () => {
         assetManager = new AssetManager(platform, core.Api, cache, CacheMode.DISABLED, deviceInfo, cacheBookkeeping);
         userPrivacyManager = new UserPrivacyManager(platform, core.Api, coreConfig, adsConfig, clientInfo, deviceInfo, request, privacySDK);
         campaignManager = new LegacyCampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, privacySDK, userPrivacyManager);
-        loadManager = new PerPlacementLoadManager(ads, adsConfig, coreConfig, campaignManager, clientInfo, focusManager);
+        loadManager = new PerPlacementLoadManager(ads, adsConfig, coreConfig, campaignManager, clientInfo, focusManager, loadAndFillEventManager);
     });
 
     describe('getCampaign and initialize', () => {
@@ -110,6 +113,8 @@ describe('PerPlacementLoadManagerTest', () => {
             let loadCampaignStub: sinon.SinonStub;
             let sendReadyEventStub: sinon.SinonStub;
             let loadCalledKafkaStub: sinon.SinonStub;
+            let sendLoadEventStub: sinon.SinonStub;
+            let sendFillEventStub: sinon.SinonStub;
 
             beforeEach(() => {
                 sandbox = sinon.createSandbox();
@@ -119,6 +124,8 @@ describe('PerPlacementLoadManagerTest', () => {
                 loadCalledKafkaStub = sandbox.stub(LoadCalledCounter, 'report').callsFake(() => {
                     return Promise.resolve(<INativeResponse>{});
                 });
+                sendLoadEventStub = <sinon.SinonStub>loadAndFillEventManager.sendLoadTrackingEvents;
+                sendFillEventStub = <sinon.SinonStub>loadAndFillEventManager.sendFillTrackingEvents;
                 // To silence diagnostic messages
                 sandbox.stub(Diagnostics, 'trigger').callsFake(() => {
                     return Promise.resolve(<INativeResponse>{});
@@ -159,6 +166,8 @@ describe('PerPlacementLoadManagerTest', () => {
                             assert.equal(testCampaign, t.expectedCampaign, 'Loaded campaign was not the correct campaign');
                             assert.notEqual(testCampaign, t.unexpectedCampaign, 'Loaded campaign was not the correct campaign');
                             assert.isUndefined(loadManager.getCampaign('banner'), 'Campaign with placementID \'banner\' was loaded incorrectly');
+                            sinon.assert.called(sendLoadEventStub);
+                            sinon.assert.called(sendFillEventStub);
                             done();
                         }
                     });
@@ -198,6 +207,7 @@ describe('PerPlacementLoadManagerTest', () => {
                 sinon.assert.notCalled(loadCampaignStub);
                 sinon.assert.notCalled(sendReadyEventStub);
                 sinon.assert.calledWith(<sinon.SinonStub>SDKMetrics.reportMetricEvent, LoadMetric.LoadAuctionRequestBlocked);
+                sinon.assert.called(sendLoadEventStub);
             });
 
             it('should not attempt to load a campaign that\'s ready and not expired', () => {
@@ -215,6 +225,8 @@ describe('PerPlacementLoadManagerTest', () => {
                 sinon.assert.notCalled(loadCampaignStub);
                 sinon.assert.calledWith(sendReadyEventStub, placementId);
                 sinon.assert.calledWith(<sinon.SinonStub>SDKMetrics.reportMetricEvent, LoadMetric.LoadAuctionRequestBlocked);
+                sinon.assert.called(sendLoadEventStub);
+                sinon.assert.called(sendFillEventStub);
             });
 
             it('should attempt to load a campaign that\'s ready and expired', () => {
@@ -234,6 +246,7 @@ describe('PerPlacementLoadManagerTest', () => {
 
                 sinon.assert.called(loadCalledKafkaStub);
                 sinon.assert.called(loadCampaignStub);
+                sinon.assert.called(sendLoadEventStub);
             });
 
             const stateTests: PlacementState[] = [PlacementState.NOT_AVAILABLE, PlacementState.NO_FILL];
@@ -251,6 +264,8 @@ describe('PerPlacementLoadManagerTest', () => {
                     return loadManager.initialize().then(() => {
                         sinon.assert.called(loadCalledKafkaStub);
                         sinon.assert.called(loadCampaignStub);
+                        sinon.assert.called(sendLoadEventStub);
+                        sinon.assert.called(sendFillEventStub);
                     });
                 });
             });

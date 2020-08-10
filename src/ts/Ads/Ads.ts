@@ -359,16 +359,16 @@ export class Ads implements IAds {
         // AdRequestManager will be set only if Load V5 is enabled.
         if (this.AdRequestManager) {
             if (LoadV5NoInvalidation.isValid(this._core.Config.getAbGroup())) {
-                this.RefreshManager = new PerPlacementLoadManagerV5NoInvalidation(this.Api, this.Config, this._core.Config, this.AdRequestManager, this._core.ClientInfo, this._core.FocusManager, false);
+                this.RefreshManager = new PerPlacementLoadManagerV5NoInvalidation(this.Api, this.Config, this._core.Config, this.AdRequestManager, this._core.ClientInfo, this._core.FocusManager, false, this.LoadAndFillEventManager);
             } else {
                 const useGroupIds = this.useGroupIdSupport();
-                this.RefreshManager = new PerPlacementLoadManagerV5(this.Api, this.Config, this._core.Config, this.AdRequestManager, this._core.ClientInfo, this._core.FocusManager, useGroupIds);
+                this.RefreshManager = new PerPlacementLoadManagerV5(this.Api, this.Config, this._core.Config, this.AdRequestManager, this._core.ClientInfo, this._core.FocusManager, useGroupIds, this.LoadAndFillEventManager);
             }
             return;
         }
 
         if (this._loadApiEnabled && this._webViewEnabledLoad) {
-            this.RefreshManager = new PerPlacementLoadManager(this.Api, this.Config, this._core.Config, this.CampaignManager, this._core.ClientInfo, this._core.FocusManager);
+            this.RefreshManager = new PerPlacementLoadManager(this.Api, this.Config, this._core.Config, this.CampaignManager, this._core.ClientInfo, this._core.FocusManager, this.LoadAndFillEventManager);
         } else if (this._loadApiEnabled) {
             this.RefreshManager = new PerPlacementLoadAdapter(this._core.NativeBridge.getPlatform(), this._core.Api, this._core.Config, this.Api, this._core.WakeUpManager, this.CampaignManager, this.Config, this._core.FocusManager, this.SessionManager, this._core.ClientInfo, this._core.RequestManager, this._core.CacheManager, this.LoadAndFillEventManager);
         } else {

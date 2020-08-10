@@ -13,6 +13,7 @@ import { PerPlacementLoadManager } from 'Ads/Managers/PerPlacementLoadManager';
 import { LoadV5, SDKMetrics } from 'Ads/Utilities/SDKMetrics';
 import { PerformanceAdUnitFactory } from 'Performance/AdUnits/PerformanceAdUnitFactory';
 import { AdUnitAwareAdRequestManager } from 'Ads/Managers/AdUnitAwareAdRequestManager';
+import { LoadAndFillEventManager } from 'Ads/Managers/LoadAndFillEventManager';
 
 export class PerPlacementLoadManagerV5 extends PerPlacementLoadManager {
     protected _adRequestManager: AdRequestManager;
@@ -20,8 +21,8 @@ export class PerPlacementLoadManagerV5 extends PerPlacementLoadManager {
     private _shouldRefresh: boolean = true;
     protected _lastShownCampaignId: string | undefined;
 
-    constructor(ads: IAdsApi, adsConfig: AdsConfiguration, coreConfig: CoreConfiguration, adRequestManager: AdRequestManager, clientInfo: ClientInfo, focusManager: FocusManager, useGroupIds: boolean) {
-        super(ads, adsConfig, coreConfig, useGroupIds ? new AdUnitAwareAdRequestManager(adRequestManager) : adRequestManager, clientInfo, focusManager);
+    constructor(ads: IAdsApi, adsConfig: AdsConfiguration, coreConfig: CoreConfiguration, adRequestManager: AdRequestManager, clientInfo: ClientInfo, focusManager: FocusManager, useGroupIds: boolean, loadAndFillEventManager: LoadAndFillEventManager) {
+        super(ads, adsConfig, coreConfig, useGroupIds ? new AdUnitAwareAdRequestManager(adRequestManager) : adRequestManager, clientInfo, focusManager, loadAndFillEventManager);
 
         this._adRequestManager = adRequestManager;
 

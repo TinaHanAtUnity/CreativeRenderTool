@@ -22,13 +22,15 @@ import { RequestPrivacyFactory, IRequestPrivacy, ILegacyRequestPrivacy } from 'A
 import { JsonParser } from 'Core/Utilities/JsonParser';
 import { IRawAuctionV5Response, AuctionStatusCode, AuctionResponse } from 'Ads/Models/AuctionResponse';
 import { Session } from 'Ads/Models/Session';
+import { AuctionPlacement } from 'Ads/Models/AuctionPlacement';
 import { CampaignParser } from 'Ads/Parsers/CampaignParser';
 import { SDKMetrics, LoadV5 } from 'Ads/Utilities/SDKMetrics';
 import { RequestError } from 'Core/Errors/RequestError';
 import { SdkStats } from 'Ads/Utilities/SdkStats';
 import { Observable2 } from 'Core/Utilities/Observable';
 import { CampaignAssetInfo } from 'Ads/Utilities/CampaignAssetInfo';
-import { LoadAndFillEventManager } from 'Ads/Managers/LoadAndFillEventManager';
+import { FileInfo } from 'Core/Utilities/FileInfo';
+import { TimeUtils } from 'Ads/Utilities/TimeUtils';
 
 export interface INotCachedLoadedCampaign {
     notCachedCampaign: Campaign;
@@ -93,7 +95,6 @@ export class AdRequestManager extends CampaignManager {
     protected _clientInfo: ClientInfo;
     protected _cacheBookkeeping: CacheBookkeepingManager;
     protected _privacy: PrivacySDK;
-    private _loadFillEventManager: LoadAndFillEventManager;
     private _contentTypeHandlerManager: ContentTypeHandlerManager;
     private _adMobSignalFactory: AdMobSignalFactory;
     private _sessionManager: SessionManager;
@@ -104,6 +105,7 @@ export class AdRequestManager extends CampaignManager {
     private _deviceFreeSpace: number;
     private _userPrivacyManager: UserPrivacyManager;
     private _currentSession: Session | null;
+    private _frequencyCapTimestamp: number | undefined;
 
     public readonly onAdditionalPlacementsReady = new Observable2<string | undefined, IPlacementIdMap<INotCachedLoadedCampaign | undefined>>();
 
@@ -112,7 +114,6 @@ export class AdRequestManager extends CampaignManager {
 
         this._platform = platform;
         this._core = core.Api;
-        this._loadFillEventManager = core.Ads.LoadAndFillEventManager;
         this._coreConfig = coreConfig;
         this._adsConfig = adsConfig;
         this._assetManager = assetManager;
@@ -240,6 +241,16 @@ export class AdRequestManager extends CampaignManager {
         this.reportMetricEvent(LoadV5.LoadRequestStarted, { 'src': 'default' });
 
         return Promise.resolve().then(() => {
+            if (this._frequencyCapTimestamp !== undefined) {
+                if (Date.now() > this._frequencyCapTimestamp) {
+                    this._frequencyCapTimestamp = undefined;
+                }
+            }
+
+            if (this._frequencyCapTimestamp !== undefined) {
+                return Promise.reject(new AdRequestManagerError('Frequency cap reached', 'frequency_cap'));
+            }
+
             if (this.hasPreloadFailed()) {
                 if (rescheduled) {
                     throw new AdRequestManagerError('Preload data is missing due to failure to receive it after load request was rescheduled', 'rescheduled_failed_preload');
@@ -254,11 +265,6 @@ export class AdRequestManager extends CampaignManager {
             if (this._currentSession === null) {
                 throw new AdRequestManagerError('Session is not set', 'no_session');
             }
-
-            // Send Load Event for each placement being requested
-            additionalPlacements.concat(placementId).forEach((placementIdForLoadEvent) => {
-                this._loadFillEventManager.sendLoadTrackingEvents(placementIdForLoadEvent);
-            });
 
             requestPrivacy = RequestPrivacyFactory.create(this._privacy, this._deviceInfo.getLimitAdTracking());
             legacyRequestPrivacy = RequestPrivacyFactory.createLegacy(this._privacy);
@@ -449,6 +455,12 @@ export class AdRequestManager extends CampaignManager {
 
         const auctionStatusCode: number = json.statusCode || AuctionStatusCode.NORMAL;
 
+        if (auctionStatusCode === AuctionStatusCode.FREQUENCY_CAP_REACHED) {
+            const nowInMilliSec = Date.now();
+            this._frequencyCapTimestamp = nowInMilliSec + TimeUtils.getNextUTCDayDeltaSeconds(nowInMilliSec) * 1000;
+            return Promise.reject(new AdRequestManagerError('Frequency cap reached first', 'frequency_cap_first'));
+        }
+
         if (!('placements' in json)) {
             return Promise.reject(new AdRequestManagerError('No placement', 'no_plc'));
         }
@@ -459,13 +471,6 @@ export class AdRequestManager extends CampaignManager {
         ];
 
         return this.parseAllPlacements(json, allPlacements, auctionStatusCode, LoadV5.LoadRequestParseCampaignFailed).then((loadedCampaigns) => {
-            Object.keys(loadedCampaigns).forEach((placementId) => {
-                const loadedFill = loadedCampaigns[placementId];
-                if (loadedFill) {
-                    this._loadFillEventManager.sendFillTrackingEvents(placementId, loadedFill.notCachedCampaign);
-                }
-            });
-
             const additionalCampaigns = additionalPlacements.reduce<IPlacementIdMap<INotCachedLoadedCampaign | undefined>>((previousValue, currentValue, currentIndex) => {
                 previousValue[currentValue] = loadedCampaigns[currentValue];
                 return previousValue;
