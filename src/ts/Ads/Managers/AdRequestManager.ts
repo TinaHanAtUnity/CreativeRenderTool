@@ -772,20 +772,17 @@ export class AdRequestManager extends CampaignManager {
 
     private makeLoadBody(body: ILoadV5BodyExtra, placementId: string, additionalPlacements: string[]): unknown {
         const preloadData: IPlacementIdMap<IParsedPlacementPreloadData> = {};
-        const currentDataIndex: string[] = [];
 
         if (this._preloadData !== null) {
             const tempPreloadData = this._preloadData;
 
             if (tempPreloadData !== undefined) {
                 preloadData[placementId] = tempPreloadData[placementId];
-                currentDataIndex.push(tempPreloadData[placementId].dataIndex);
             }
 
             additionalPlacements.reduce((previousValue, currentValue) => {
                 if (tempPreloadData[currentValue] !== undefined) {
                     previousValue[currentValue] = tempPreloadData[currentValue];
-                    currentDataIndex.push(tempPreloadData[currentValue].dataIndex);
                 }
                 return previousValue;
             }, preloadData);
