@@ -5,6 +5,12 @@ import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { DeviceInfoEvent } from 'Core/Native/DeviceInfoEvent';
 import { Observable1, Observable2 } from 'Core/Utilities/Observable';
 
+export enum IosUiTheme {
+    Unspecified,
+    Light,
+    Dark
+}
+
 export class IosDeviceInfoApi extends NativeApi {
     public readonly onVolumeChanged = new Observable2<number, number>();
     public readonly onMuteChanged = new Observable1<boolean>();
@@ -59,6 +65,30 @@ export class IosDeviceInfoApi extends NativeApi {
 
     public getDeviceMaxVolume(): Promise<number> {
         return this._nativeBridge.invoke<number>(this._fullApiClassName, 'getDeviceMaxVolume');
+    }
+
+    public getDeviceName(): Promise<string> {
+        return this._nativeBridge.invoke<string>(this._fullApiClassName, 'getDeviceName');
+    }
+
+    public getVendorIdentifier(): Promise<string> {
+        return this._nativeBridge.invoke<string>(this._fullApiClassName, 'getVendorIdentifier');
+    }
+
+    public getCurrentUITheme(): Promise<IosUiTheme> {
+        return this._nativeBridge.invoke<IosUiTheme>(this._fullApiClassName, 'getCurrentUITheme');
+    }
+
+    public getLocaleList(): Promise<string[]> {
+        return this._nativeBridge.invoke<string[]>(this._fullApiClassName, 'getLocaleList');
+    }
+
+    public getAdNetworkIdsPlist(): Promise<string[]> {
+        return this._nativeBridge.invoke<string[]>(this._fullApiClassName, 'getAdNetworkIdsPlist');
+    }
+
+    public getSystemBootTime(): Promise<number> {
+        return this._nativeBridge.invoke<number>(this._fullApiClassName, 'getSystemBootTime');
     }
 
     public registerVolumeChangeListener(): Promise<void> {

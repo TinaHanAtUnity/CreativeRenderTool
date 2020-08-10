@@ -2,6 +2,7 @@ import { UIUserInterfaceIdiom } from 'Core/Constants/iOS/UIUserInterfaceIdiom';
 import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
 import { DeviceInfo, IDeviceInfo } from 'Core/Models/DeviceInfo';
+import { IosUiTheme } from 'Core/Native/iOS/DeviceInfo';
 
 export interface IIosDeviceInfo extends IDeviceInfo {
     userInterfaceIdiom: UIUserInterfaceIdiom;
@@ -11,6 +12,13 @@ export interface IIosDeviceInfo extends IDeviceInfo {
     statusBarHidden: boolean;
     simulator: boolean;
     sensorList: string[];
+    deviceName: string;
+    vendorIdentifier: string;
+    localeList: string[];
+    currentUiTheme: IosUiTheme;
+    adNetworksPlist: string[];
+    systemBootTime: number;
+    trackingAuthorizationStatus: number;
 }
 
 export class IosDeviceInfo extends DeviceInfo<IIosDeviceInfo> {
@@ -24,7 +32,14 @@ export class IosDeviceInfo extends DeviceInfo<IIosDeviceInfo> {
             statusBarWidth: ['number'],
             statusBarHidden: ['boolean'],
             simulator: ['boolean'],
-            sensorList: ['array']
+            sensorList: ['array'],
+            deviceName: ['string'],
+            vendorIdentifier: ['string'],
+            localeList: ['array'],
+            currentUiTheme: ['number'],
+            adNetworksPlist: ['array'],
+            systemBootTime: ['number'],
+            trackingAuthorizationStatus: ['number']
         }, Platform.IOS, core);
     }
 
@@ -39,6 +54,13 @@ export class IosDeviceInfo extends DeviceInfo<IIosDeviceInfo> {
             promises.push(this._core.DeviceInfo.Ios!.getStatusBarHeight().then(statusBarHeight => this.set('statusBarHeight', statusBarHeight)).catch(err => this.handleDeviceInfoError(err)));
             promises.push(this._core.DeviceInfo.Ios!.getStatusBarWidth().then(statusBarWidth => this.set('statusBarWidth', statusBarWidth)).catch(err => this.handleDeviceInfoError(err)));
             promises.push(this._core.DeviceInfo.Ios!.getDeviceMaxVolume().then(maxVolume => this.set('maxVolume', maxVolume)).catch(err => this.handleDeviceInfoError(err)));
+            promises.push(this._core.DeviceInfo.Ios!.getDeviceName().then(deviceName => this.set('deviceName', deviceName)).catch(err => this.handleDeviceInfoError(err)));
+            promises.push(this._core.DeviceInfo.Ios!.getVendorIdentifier().then(vendorIdentifier => this.set('vendorIdentifier', vendorIdentifier)).catch(err => this.handleDeviceInfoError(err)));
+            promises.push(this._core.DeviceInfo.Ios!.getLocaleList().then(localeList => this.set('localeList', localeList)).catch(err => this.handleDeviceInfoError(err)));
+            promises.push(this._core.DeviceInfo.Ios!.getCurrentUITheme().then(currentUiTheme => this.set('currentUiTheme', currentUiTheme)).catch(err => this.handleDeviceInfoError(err)));
+            promises.push(this._core.DeviceInfo.Ios!.getAdNetworkIdsPlist().then(adNetworksPlist => this.set('adNetworksPlist', adNetworksPlist)).catch(err => this.handleDeviceInfoError(err)));
+            promises.push(this._core.DeviceInfo.Ios!.getSystemBootTime().then(systemBootTime => this.set('systemBootTime', systemBootTime)).catch(err => this.handleDeviceInfoError(err)));
+            promises.push(this._core.iOS!.TrackingManager.getTrackingAuthorizationStatus().then(trackingAuthorizationStatus => this.set('trackingAuthorizationStatus', trackingAuthorizationStatus)).catch(err => this.handleDeviceInfoError(err)));
 
             return Promise.all(promises);
         });
@@ -66,6 +88,34 @@ export class IosDeviceInfo extends DeviceInfo<IIosDeviceInfo> {
 
     public getStatusBarWidth(): number {
         return this.get('statusBarWidth');
+    }
+
+    public getDeviceName(): string {
+        return this.get('deviceName');
+    }
+
+    public getVendorIdentifier(): string {
+        return this.get('vendorIdentifier');
+    }
+
+    public getLocaleList(): string[] {
+        return this.get('localeList');
+    }
+
+    public getCurrentUiTheme(): number {
+        return this.get('currentUiTheme');
+    }
+
+    public getAdNetworksPlist(): string[] {
+        return this.get('adNetworksPlist');
+    }
+
+    public getSystemBootTime(): number {
+        return this.get('systemBootTime');
+    }
+
+    public getTrackingAuthorizationStatus(): number {
+        return this.get('trackingAuthorizationStatus');
     }
 
     public isStatusBarHidden(): Promise<boolean> {
