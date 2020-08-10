@@ -140,7 +140,7 @@ import { SDKMetrics } from 'Ads/Utilities/SDKMetrics';
             });
 
             const omInstance = sinon.createStubInstance(OpenMeasurement);
-            const omViewBuilder = new OpenMeasurementAdViewBuilder(campaign, deviceInfo, platform);
+            const omViewBuilder = new OpenMeasurementAdViewBuilder(campaign);
             const omController = new VastOpenMeasurementController(platform, placement, [omInstance], omViewBuilder, clientInfo, deviceInfo);
             sandbox.stub(omController, 'skipped');
             sandbox.stub(omController, 'setDeviceVolume');
@@ -344,7 +344,7 @@ import { SDKMetrics } from 'Ads/Utilities/SDKMetrics';
 
         describe('When calling onShowPrivacyPopUp', () => {
             beforeEach(() => {
-                sinon.stub(om!.getOMAdViewBuilder(), 'buildVastAdView').returns(Promise.resolve([]));
+                sinon.stub(om!.getOMAdViewBuilder(), 'buildVastAdView');
                 return vastOverlayEventHandler.onShowPrivacyPopUp(20, 20, 517, 367);
             });
 
@@ -352,7 +352,7 @@ import { SDKMetrics } from 'Ads/Utilities/SDKMetrics';
                 const obstructionReason = [ObstructionReasons.OBSTRUCTED];
                 const rect = OpenMeasurementUtilities.createRectangle(20, 20, 517, 367);
 
-                sinon.assert.calledWith(<sinon.SinonStub>om!.getOMAdViewBuilder().buildVastAdView, obstructionReason, vastAdUnit, rect);
+                sinon.assert.calledWith(<sinon.SinonStub>om!.getOMAdViewBuilder().buildVastAdView, obstructionReason, rect);
                 sinon.assert.called(<sinon.SinonStub>om!.geometryChange);
             });
         });
@@ -364,7 +364,7 @@ import { SDKMetrics } from 'Ads/Utilities/SDKMetrics';
             });
 
             it ('should fire geometry change as a percentage of the adview', () => {
-                sinon.assert.calledWith(<sinon.SinonStub>om!.getOMAdViewBuilder().buildVastAdView, [], vastAdUnit);
+                sinon.assert.calledWith(<sinon.SinonStub>om!.getOMAdViewBuilder().buildVastAdView, []);
                 sinon.assert.called(<sinon.SinonStub>om!.geometryChange);
             });
         });

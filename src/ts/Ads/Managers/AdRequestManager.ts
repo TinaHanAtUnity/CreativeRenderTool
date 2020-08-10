@@ -30,6 +30,7 @@ import { SdkStats } from 'Ads/Utilities/SdkStats';
 import { Observable2 } from 'Core/Utilities/Observable';
 import { CampaignAssetInfo } from 'Ads/Utilities/CampaignAssetInfo';
 import { FileInfo } from 'Core/Utilities/FileInfo';
+import { TimeUtils } from 'Ads/Utilities/TimeUtils';
 
 export interface INotCachedLoadedCampaign {
     notCachedCampaign: Campaign;
@@ -68,8 +69,7 @@ class AdRequestManagerError extends Error {
 
 export enum LoadV5ExperimentType {
     None = 'none',
-    NoInvalidation = 'no_invalidation',
-    GroupId = 'grouping'
+    NoInvalidation = 'no_invalidation'
 }
 
 export class AdRequestManager extends CampaignManager {
@@ -106,6 +106,7 @@ export class AdRequestManager extends CampaignManager {
     private _userPrivacyManager: UserPrivacyManager;
     private _currentSession: Session | null;
     private _encryptedPreloadData: { [key: string]: string} | undefined;
+    private _frequencyCapTimestamp: number | undefined;
 
     public readonly onAdditionalPlacementsReady = new Observable2<string | undefined, IPlacementIdMap<INotCachedLoadedCampaign | undefined>>();
 
@@ -238,6 +239,17 @@ export class AdRequestManager extends CampaignManager {
 
         let requestPrivacy: IRequestPrivacy;
         let legacyRequestPrivacy: ILegacyRequestPrivacy;
+
+        if (this._frequencyCapTimestamp !== undefined) {
+            if (Date.now() > this._frequencyCapTimestamp) {
+                this._frequencyCapTimestamp = undefined;
+            }
+        }
+
+        if (this._frequencyCapTimestamp !== undefined) {
+            this.reportMetricEvent(LoadV5.LoadRequestFrequencyCap);
+            return Promise.resolve(undefined);
+        }
 
         this.reportMetricEvent(LoadV5.LoadRequestStarted, { 'src': 'default' });
 
@@ -445,6 +457,12 @@ export class AdRequestManager extends CampaignManager {
         }
 
         const auctionStatusCode: number = json.statusCode || AuctionStatusCode.NORMAL;
+
+        if (auctionStatusCode === AuctionStatusCode.FREQUENCY_CAP_REACHED) {
+            const nowInMilliSec = Date.now();
+            this._frequencyCapTimestamp = nowInMilliSec + TimeUtils.getNextUTCDayDeltaSeconds(nowInMilliSec) * 1000;
+            return Promise.reject(new AdRequestManagerError('Frequency cap reached first', 'frequency_cap_first'));
+        }
 
         if (!('placements' in json)) {
             return Promise.reject(new AdRequestManagerError('No placement', 'no_plc'));

@@ -1,3 +1,33 @@
+# Pending
+
+* [Chore] Remove load called counter [#16662](https://github.com/Applifier/unity-ads-webview/pull/16662)
+* [Load V5] Revert placement grouping experiment [#16855](https://github.com/Applifier/unity-ads-webview/pull/16855)
+* [Chore] Send frequency cap as separate metric [#16854](https://github.com/Applifier/unity-ads-webview/pull/16854)
+* [Open Measurement] Refactor AdViewBuilder PR1: Utilize screen.width and screen.height  [#15533](https://github.com/Applifier/unity-ads-webview/pull/15533)
+* Revert Testing PR's [#16825](https://github.com/Applifier/unity-ads-webview/pull/16825)
+
+# Fri Aug  7 19:26:43 UTC 2020
+
+* [Load V5] Add support for frequency capping [#16695](https://github.com/Applifier/unity-ads-webview/pull/16695)
+* MDP-225 Bump up optout event to v4 [#16761](https://github.com/Applifier/unity-ads-webview/pull/16761)
+
+# Pending
+
+* [3.4.8] Merge to Master [#16793](https://github.com/Applifier/unity-ads-webview/pull/16793)
+* [3.4.8] Add TrackingManagerApi [#16223](https://github.com/Applifier/unity-ads-webview/pull/16223)
+* [3.4.8] Add support for new iOS 14 device info fields [#16432](https://github.com/Applifier/unity-ads-webview/pull/16432)
+* [3.4.8] Test Logs [#16433](https://github.com/Applifier/unity-ads-webview/pull/16433)
+* [3.4.8] Add iOS 14 Fields to iOSDeviceInfo Model [#16567](https://github.com/Applifier/unity-ads-webview/pull/16567)
+* [3.4.8] Add SKAdNetwork API methods [#16527](https://github.com/Applifier/unity-ads-webview/pull/16527)
+* [3.4.8] Add New iOS Fields to Configuration Request [#16693](https://github.com/Applifier/unity-ads-webview/pull/16693)
+* [3.4.8] Add iOS fields to Auction Request and Operative Events [#16697](https://github.com/Applifier/unity-ads-webview/pull/16697)
+* [3.4.8] Add Logging for App Tracking Transparency for Testing [#16563](https://github.com/Applifier/unity-ads-webview/pull/16563)
+
+# Thu Aug  6 11:24:22 UTC 2020
+
+* Added check for EndScreenType inside PerformanceAdUnitParametersFactory [#16729](https://github.com/Applifier/unity-ads-webview/pull/16729)
+* Disable Privacy SDK A/B test [#16700](https://github.com/Applifier/unity-ads-webview/pull/16700)
+
 # Wed Aug  5 22:26:46 UTC 2020
 
 * Adding metric events for reported length vs actual length of videos [#16598](https://github.com/Applifier/unity-ads-webview/pull/16598)

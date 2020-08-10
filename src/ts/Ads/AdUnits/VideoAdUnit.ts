@@ -271,6 +271,10 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
         return this._ads.VideoPlayer.getVideoViewRectangle();
     }
 
+    public getDeviceInfo(): DeviceInfo {
+        return this._deviceInfo;
+    }
+
     protected unsetReferences() {
         delete this._overlay;
     }

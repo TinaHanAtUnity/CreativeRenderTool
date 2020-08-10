@@ -1,0 +1,19 @@
+{
+    "auctionId": "d301fd4c-4a9e-48e4-82aa-ad8b07977ca5",
+    "correlationId": "crdI5dC67WKlqhsI1RrICm",
+    "media": {
+    },
+    "placements": {
+        "video": {
+            "mediaId": "",
+            "trackingId": ""
+        },
+        "rewardedVideo": {
+            "mediaId": "",
+            "trackingId": ""
+        }
+    },
+    "statusCode": 999,
+    "tracking": {
+    }
+}

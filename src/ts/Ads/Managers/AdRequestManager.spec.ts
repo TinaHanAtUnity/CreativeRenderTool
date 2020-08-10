@@ -27,6 +27,8 @@ import { IPlacementIdMap } from 'Ads/Managers/PlacementManager';
 // eslint-disable-next-line
 const LoadV5PreloadResponse = require('json/LoadV5PreloadResponse.json');
 // eslint-disable-next-line
+const LoadV5PreloadResponse_LongTTL = require('json/LoadV5PreloadResponse_LongTTL.json');
+// eslint-disable-next-line
 const LoadV5PreloadResponse_NoFill = require('json/LoadV5PreloadResponse_NoFill.json');
 // eslint-disable-next-line
 const LoadV5LoadResponse = require('json/LoadV5LoadResponse.json');
@@ -36,6 +38,8 @@ const LoadV5LoadResponse_2 = require('json/LoadV5LoadResponse_2.json');
 const LoadV5LoadResponseWithAdditionalPlacements = require('json/LoadV5LoadResponseWithAdditionalPlacements.json');
 // eslint-disable-next-line
 const LoadV5LoadResponse_NoFill = require('json/LoadV5LoadResponse_NoFill.json');
+// eslint-disable-next-line
+const LoadV5LoadResponse_FrequencyCapping = require('json/LoadV5LoadResponse_FrequencyCapping.json');
 // eslint-disable-next-line
 const LoadV5ReloadResponse = require('json/LoadV5ReloadResponse.json');
 
@@ -797,11 +801,140 @@ class SatisfiesMatcher {
             });
 
             it('should not send fill metric', () => {
-                expect(SDKMetrics.reportMetricEvent).not.toBeCalledWith(LoadV5.LoadRequestFill);
+                expect(SDKMetrics.reportMetricEventWithTags).not.toBeCalledWith(LoadV5.LoadRequestFill, expect.anything());
             });
 
             it('should not trigger error metric', () => {
                 expect(SDKMetrics.reportMetricEventWithTags).not.toBeCalledWith(LoadV5.LoadRequestFailed, expect.anything());
+            });
+        });
+
+        describe('successful load request with no fill when frequency capping', () => {
+            let loadedCampaign: ILoadedCampaign | undefined;
+
+            beforeEach(async () => {
+                request.post.mockResolvedValueOnce({
+                    url: '',
+                    response: JSON.stringify(LoadV5PreloadResponse),
+                    responseCode: 200,
+                    headers: {}
+                }).mockResolvedValueOnce({
+                    url: '',
+                    response: JSON.stringify(LoadV5LoadResponse_FrequencyCapping),
+                    responseCode: 200,
+                    headers: {}
+                });
+
+                adsConfig.getPlacement.mockImplementation(Placement);
+
+                contentTypeHandlerManager.getParser.mockReturnValue(new CometCampaignParser(core));
+
+                await adRequestManager.requestPreload();
+                loadedCampaign = await adRequestManager.requestLoad('video');
+            });
+
+            it('should not load campaign', () => {
+                expect(loadedCampaign).toBeUndefined();
+            });
+
+            it('should not send fill metric', () => {
+                expect(SDKMetrics.reportMetricEventWithTags).not.toBeCalledWith(LoadV5.LoadRequestFill, expect.anything());
+            });
+
+            it('should trigger error metric', () => {
+                expect(SDKMetrics.reportMetricEventWithTags).toBeCalledWith(LoadV5.LoadRequestFailed, expect.objectContaining({ 'rsn': 'frequency_cap_first' }));
+            });
+
+            it('should not trigger metric', () => {
+                expect(SDKMetrics.reportMetricEventWithTags).not.toBeCalledWith(LoadV5.LoadRequestFrequencyCap, expect.anything());
+            });
+        });
+
+        describe('successful load request with no fill when frequency capping with following request', () => {
+            let loadedCampaign: ILoadedCampaign | undefined;
+
+            beforeEach(async () => {
+                request.post.mockResolvedValueOnce({
+                    url: '',
+                    response: JSON.stringify(LoadV5PreloadResponse),
+                    responseCode: 200,
+                    headers: {}
+                }).mockResolvedValueOnce({
+                    url: '',
+                    response: JSON.stringify(LoadV5LoadResponse_FrequencyCapping),
+                    responseCode: 200,
+                    headers: {}
+                });
+
+                adsConfig.getPlacement.mockImplementation(Placement);
+
+                contentTypeHandlerManager.getParser.mockReturnValue(new CometCampaignParser(core));
+
+                await adRequestManager.requestPreload();
+                await adRequestManager.requestLoad('video');
+                loadedCampaign = await adRequestManager.requestLoad('video');
+            });
+
+            it('should not load campaign', () => {
+                expect(loadedCampaign).toBeUndefined();
+            });
+
+            it('should trigger metric', () => {
+                expect(SDKMetrics.reportMetricEventWithTags).toBeCalledWith(LoadV5.LoadRequestFrequencyCap, expect.anything());
+            });
+        });
+
+        describe('successful load request with no fill when frequency capping with following request after timeout', () => {
+            let loadedCampaign: ILoadedCampaign | undefined;
+            let dateNowSpy: jest.SpyInstance;
+
+            beforeEach(async () => {
+                request.post.mockResolvedValueOnce({
+                    url: '',
+                    response: JSON.stringify(LoadV5PreloadResponse_LongTTL),
+                    responseCode: 200,
+                    headers: {}
+                }).mockResolvedValueOnce({
+                    url: '',
+                    response: JSON.stringify(LoadV5LoadResponse_FrequencyCapping),
+                    responseCode: 200,
+                    headers: {}
+                }).mockResolvedValueOnce({
+                    url: '',
+                    response: JSON.stringify(LoadV5LoadResponse),
+                    responseCode: 200,
+                    headers: {}
+                });
+
+                dateNowSpy = jest.spyOn(Date, 'now');
+                dateNowSpy.mockReturnValue(0);
+
+                adsConfig.getPlacement.mockImplementation(Placement);
+
+                contentTypeHandlerManager.getParser.mockReturnValue(new CometCampaignParser(core));
+
+                await adRequestManager.requestPreload();
+                await adRequestManager.requestLoad('video');
+
+                dateNowSpy.mockReturnValue(24 * 3600 * 1000 + 1);
+
+                loadedCampaign = await adRequestManager.requestLoad('video');
+            });
+
+            afterEach(() => {
+                dateNowSpy.mockRestore();
+            });
+
+            it('should have a fill', () => {
+                expect(loadedCampaign).toBeDefined();
+            });
+
+            it('should send fill metric', () => {
+                expect(SDKMetrics.reportMetricEventWithTags).toBeCalledWith(LoadV5.LoadRequestFill, expect.anything());
+            });
+
+            it('should not trigger metric', () => {
+                expect(SDKMetrics.reportMetricEventWithTags).not.toBeCalledWith(LoadV5.LoadRequestFrequencyCap, expect.anything());
             });
         });
 

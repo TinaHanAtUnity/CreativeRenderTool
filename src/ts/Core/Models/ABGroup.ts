@@ -89,12 +89,11 @@ export const FakeZyngaFilteredReverseABTest = new ZyngaFilteredReverseABTest(16,
 // Active AB Tests
 export const MabReverseABTest = new ZyngaFilteredReverseABTest(7);
 export const GooglePlayDetectionTest = new ABTest(8);
-export const PrivacySDKTest = new ABTest(16);
 export const LoadV5NoInvalidation = new ABTest(13);
 export const LoadV5 = new ReverseABTest(14, 15, 18, 19);
-export const LoadV5GroupId = new ABTest(6, 10);
 
 // Disabled AB Tests
 export const OpenMeasurementTest = new DisabledABTest();
 export const IframeEndcardTest = new DisabledABTest();
 export const ConsentUXTest = new DisabledABTest();
+export const PrivacySDKTest = new DisabledABTest();

@@ -122,6 +122,34 @@ export class FakeIosDeviceInfo extends IosDeviceInfo {
         return this._fakeDevice.totalMemory;
     }
 
+    public getDeviceName(): string {
+        return this._fakeDevice.deviceName;
+    }
+
+    public getVendorIdentifier(): string {
+        return this._fakeDevice.vendorIdentifier;
+    }
+
+    public getLocaleList(): string[] {
+        return this._fakeDevice.localeList;
+    }
+
+    public getCurrentUiTheme(): number {
+        return this._fakeDevice.currentUiTheme;
+    }
+
+    public getAdNetworksPlist(): string[] {
+        return this._fakeDevice.adNetworksPlist;
+    }
+
+    public getSystemBootTime(): number {
+        return this._fakeDevice.systemBootTime;
+    }
+
+    public getTrackingAuthorizationStatus(): number {
+        return this._fakeDevice.trackingAuthStatus;
+    }
+
     public getDTO(): Promise<any> {
         return Promise.resolve(this._fakeDevice);
     }
