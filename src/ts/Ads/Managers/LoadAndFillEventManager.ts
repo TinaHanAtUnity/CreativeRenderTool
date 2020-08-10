@@ -9,6 +9,7 @@ import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { FrameworkMetaData } from 'Core/Models/MetaData/FrameworkMetaData';
 import { StorageBridge } from 'Core/Utilities/StorageBridge';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
+import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 
 enum LoadAndFillEventMacro {
     ZONE = '%ZONE%',
@@ -57,6 +58,11 @@ export class LoadAndFillEventManager extends ThirdPartyEventManager {
     }
 
     public sendLoadTrackingEvents(placementId: string, useWebViewUserAgentForTracking?: boolean, headers?: [string, string][]): Promise<INativeResponse> {
+
+        if (!CustomFeatures.shouldSendLoadFillEvent()) {
+            return Promise.resolve(<INativeResponse>{});
+        }
+
         const placement = this._adsConfig.getPlacement(placementId);
         const adUnitId = placement ? placement.getAdUnitId() : undefined;
 
@@ -70,6 +76,11 @@ export class LoadAndFillEventManager extends ThirdPartyEventManager {
     }
 
     public sendFillTrackingEvents(placementId: string, campaign: Campaign, useWebViewUserAgentForTracking?: boolean, headers?: [string, string][]): Promise<INativeResponse> {
+
+        if (!CustomFeatures.shouldSendLoadFillEvent()) {
+            return Promise.resolve(<INativeResponse>{});
+        }
+
         const placement = this._adsConfig.getPlacement(placementId);
         const adUnitId = placement ? placement.getAdUnitId() : undefined;
 
