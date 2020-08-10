@@ -31,7 +31,7 @@ export class VastOpenMeasurementFactory {
     }
 
     public createOpenMeasurementManager(core: ICoreApi, thirdPartyEventManager: ThirdPartyEventManager): VastOpenMeasurementController {
-        const omAdViewBuilder = new OpenMeasurementAdViewBuilder(this.campaign, this.deviceInfo, this.platform);
+        const omAdViewBuilder = new OpenMeasurementAdViewBuilder(this.campaign);
         const omInstances: OpenMeasurement<VastCampaign>[] = this.getOMInstances(this.adVerifications, omAdViewBuilder, core, thirdPartyEventManager);
         const omManager = new VastOpenMeasurementController(this.platform, this.placement, omInstances, omAdViewBuilder, this.clientInfo, this.deviceInfo);
         omManager.addToViewHierarchy();

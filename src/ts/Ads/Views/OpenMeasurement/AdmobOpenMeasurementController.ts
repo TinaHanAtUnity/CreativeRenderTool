@@ -149,54 +149,25 @@ export class AdmobOpenMeasurementController extends OpenMeasurementController {
         return this._clientInfo.getSdkVersionName();
     }
 
-    public admobImpression(omAdViewBuilder: OpenMeasurementAdViewBuilder): Promise<void> {
+    public admobImpression(omAdViewBuilder: OpenMeasurementAdViewBuilder): void {
         SDKMetrics.reportMetricEvent(AdmobMetric.AdmobOMImpression);
-        return Promise.all([this._deviceInfo.getScreenWidth(), this._deviceInfo.getScreenHeight()]).then(([screenWidth, screenHeight]) => {
-            const impressionObject: IImpressionValues = {
-                mediaType: MediaType.VIDEO
-            };
-
-            let viewport: IViewPort;
-            let adView: IAdView;
-
-            if (this._platform === Platform.ANDROID) {
-                viewport = OpenMeasurementUtilities.calculateViewPort(OpenMeasurementUtilities.pxToDpAdmobScreenView(screenWidth, this._deviceInfo), OpenMeasurementUtilities.pxToDpAdmobScreenView(screenHeight, this._deviceInfo));
-            } else {
-                viewport = OpenMeasurementUtilities.calculateViewPort(screenWidth, screenHeight);
+        const viewport = OpenMeasurementUtilities.calculateViewPort(screen.width, screen.height);
+        const adView = omAdViewBuilder.buildAdmobImpressionView(this, screen.width, screen.height);
+        const impressionObject: IImpressionValues = {
+            mediaType: MediaType.VIDEO,
+            viewport: viewport,
+            adView: adView
+        };
+        this._omInstances.forEach((om) => {
+            const verificationresource = om.getVerificationResource();
+            if (CustomFeatures.isDoubleClickGoogle(verificationresource.vendorKey)) {
+                SDKMetrics.reportMetricEventWithTags(AdmobMetric.DoubleClickOMImpressions, {
+                    'dckey': OpenMeasurementUtilities.getDcKeyMetricTag(verificationresource.vendorKey)
+                });
             }
-
-            adView = omAdViewBuilder.buildAdmobImpressionView(this, screenWidth, screenHeight);
-
-            impressionObject.viewport = viewport;
-            impressionObject.adView = adView;
-
-            this._omInstances.forEach((om) => {
-                const verificationresource = om.getVerificationResource();
-                if (CustomFeatures.isDoubleClickGoogle(verificationresource.vendorKey)) {
-                    SDKMetrics.reportMetricEventWithTags(AdmobMetric.DoubleClickOMImpressions, {
-                        'dckey': OpenMeasurementUtilities.getDcKeyMetricTag(verificationresource.vendorKey)
-                    });
-                }
-            });
-            super.impression(impressionObject);
-
-            // TODO: Remove once Admob fixes their issue in Jan 2020
-            this.geometryChange(viewport, adView);
-        }).catch((e) => {
-            const impressionObject: IImpressionValues = {
-                mediaType: MediaType.VIDEO
-            };
-
-            this._omInstances.forEach((om) => {
-                const verificationresource = om.getVerificationResource();
-                if (CustomFeatures.isDoubleClickGoogle((verificationresource.vendorKey))) {
-                    SDKMetrics.reportMetricEventWithTags(AdmobMetric.DoubleClickOMImpressions, {
-                        'dckey': OpenMeasurementUtilities.getDcKeyMetricTag(verificationresource.vendorKey)
-                    });
-                }
-            });
-            super.impression(impressionObject);
         });
+        super.impression(impressionObject);
+        this.geometryChange(viewport, adView);
     }
 
     public getOMInstances(): OpenMeasurement<Campaign>[] {

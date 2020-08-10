@@ -154,7 +154,7 @@ describe('VastVideoEventHandler tests', () => {
 
         privacyManager = sinon.createStubInstance(UserPrivacyManager);
         const omInstance = sinon.createStubInstance(OpenMeasurement);
-        const omViewBuilder = new OpenMeasurementAdViewBuilder(campaign, deviceInfo, platform);
+        const omViewBuilder = new OpenMeasurementAdViewBuilder(campaign);
         const omController = new VastOpenMeasurementController(platform, placement, [omInstance], omViewBuilder, clientInfo, deviceInfo);
         sandbox.stub(omController, 'sessionStart');
         sandbox.stub(omController, 'resume');

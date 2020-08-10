@@ -10,6 +10,8 @@ import { SDKMetrics, VastMetric, VideoLengthMetric } from 'Ads/Utilities/SDKMetr
 import { VastOpenMeasurementController } from 'Ads/Views/OpenMeasurement/VastOpenMeasurementController';
 import { OpenMeasurementUtilities } from 'Ads/Views/OpenMeasurement/OpenMeasurementUtilities';
 import { VideoPlayerState, VideoPosition } from 'Ads/Views/OpenMeasurement/OpenMeasurementDataTypes';
+import { Platform } from 'Core/Constants/Platform';
+import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 
 export class VastVideoEventHandler extends VideoEventHandler {
 
@@ -113,6 +115,12 @@ export class VastVideoEventHandler extends VideoEventHandler {
             this._adUnit.getVideoViewRectangle().then((rect) => {
                 if (this._om) {
                     const view = OpenMeasurementUtilities.createRectangle(rect[0], rect[1], rect[2], rect[3]);
+                    if (this._platform === Platform.ANDROID) {
+                        view.x = OpenMeasurementUtilities.pxToDp(view.x, <AndroidDeviceInfo> this._vastAdUnit.getDeviceInfo());
+                        view.y = OpenMeasurementUtilities.pxToDp(view.y, <AndroidDeviceInfo> this._vastAdUnit.getDeviceInfo());
+                        view.width = OpenMeasurementUtilities.pxToDp(view.width, <AndroidDeviceInfo> this._vastAdUnit.getDeviceInfo());
+                        view.height = OpenMeasurementUtilities.pxToDp(view.height, <AndroidDeviceInfo> this._vastAdUnit.getDeviceInfo());
+                    }
                     this._om.getOMAdViewBuilder().setVideoView(view);
                     this._om.sessionStart();
                     this._omStartCalled = true;
