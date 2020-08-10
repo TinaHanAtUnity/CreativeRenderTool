@@ -32,7 +32,6 @@ import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
 import 'mocha';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { LoadCalledCounter } from 'Core/Utilities/LoadCalledCounter';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { ILoadedCampaign } from 'Ads/Managers/CampaignManager';
@@ -112,7 +111,6 @@ describe('PerPlacementLoadManagerTest', () => {
             let sandbox: sinon.SinonSandbox;
             let loadCampaignStub: sinon.SinonStub;
             let sendReadyEventStub: sinon.SinonStub;
-            let loadCalledKafkaStub: sinon.SinonStub;
             let sendLoadEventStub: sinon.SinonStub;
             let sendFillEventStub: sinon.SinonStub;
 
@@ -121,9 +119,6 @@ describe('PerPlacementLoadManagerTest', () => {
                 placementId = 'premium';
                 loadCampaignStub = sandbox.stub(campaignManager, 'loadCampaign');
                 sendReadyEventStub = sandbox.stub(ads.Listener, 'sendReadyEvent');
-                loadCalledKafkaStub = sandbox.stub(LoadCalledCounter, 'report').callsFake(() => {
-                    return Promise.resolve(<INativeResponse>{});
-                });
                 sendLoadEventStub = <sinon.SinonStub>loadAndFillEventManager.sendLoadTrackingEvents;
                 sendFillEventStub = <sinon.SinonStub>loadAndFillEventManager.sendFillTrackingEvents;
                 // To silence diagnostic messages
@@ -161,7 +156,6 @@ describe('PerPlacementLoadManagerTest', () => {
                     setPlacementStateStub.callsFake((id: string, state: PlacementState) => {
                         if (placementId === id && state !== PlacementState.WAITING) {
                             const testCampaign = loadManager.getCampaign(placementId);
-                            sinon.assert.called(loadCalledKafkaStub);
                             assert.instanceOf(testCampaign, Campaign, `Campaign with placementID '${placementId}' was not a defined Campaign`);
                             assert.equal(testCampaign, t.expectedCampaign, 'Loaded campaign was not the correct campaign');
                             assert.notEqual(testCampaign, t.unexpectedCampaign, 'Loaded campaign was not the correct campaign');
@@ -203,7 +197,6 @@ describe('PerPlacementLoadManagerTest', () => {
                 loadDict[placementId] = 1;
                 ads.LoadApi.onLoad.trigger(loadDict);
 
-                sinon.assert.called(loadCalledKafkaStub);
                 sinon.assert.notCalled(loadCampaignStub);
                 sinon.assert.notCalled(sendReadyEventStub);
                 sinon.assert.calledWith(<sinon.SinonStub>SDKMetrics.reportMetricEvent, LoadMetric.LoadAuctionRequestBlocked);
@@ -221,7 +214,6 @@ describe('PerPlacementLoadManagerTest', () => {
                 loadDict[placementId] = 1;
                 ads.LoadApi.onLoad.trigger(loadDict);
 
-                sinon.assert.called(loadCalledKafkaStub);
                 sinon.assert.notCalled(loadCampaignStub);
                 sinon.assert.calledWith(sendReadyEventStub, placementId);
                 sinon.assert.calledWith(<sinon.SinonStub>SDKMetrics.reportMetricEvent, LoadMetric.LoadAuctionRequestBlocked);
@@ -244,7 +236,6 @@ describe('PerPlacementLoadManagerTest', () => {
                 placement.setState(PlacementState.READY);
                 placement.setCurrentCampaign(campaign);
 
-                sinon.assert.called(loadCalledKafkaStub);
                 sinon.assert.called(loadCampaignStub);
                 sinon.assert.called(sendLoadEventStub);
             });
@@ -262,7 +253,6 @@ describe('PerPlacementLoadManagerTest', () => {
                     const placement = adsConfig.getPlacement(placementId);
                     placement.setState(state);
                     return loadManager.initialize().then(() => {
-                        sinon.assert.called(loadCalledKafkaStub);
                         sinon.assert.called(loadCampaignStub);
                         sinon.assert.called(sendLoadEventStub);
                         sinon.assert.called(sendFillEventStub);

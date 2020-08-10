@@ -22,12 +22,9 @@ export class VastAdUnitPopupEventHandler extends VideoAdUnitPopupEventHandler<Va
 
         if (this._vastOMController) {
             const adViewBuilder = this._vastOMController.getOMAdViewBuilder();
-            adViewBuilder.buildVastAdView([], this._vastAdUnit).then((adView) => {
-                if (this._vastOMController) {
-                    const viewPort = adViewBuilder.getViewPort();
-                    this._vastOMController.geometryChange(viewPort, adView);
-                }
-            });
+            const viewPort = adViewBuilder.getViewPort();
+            const adView = adViewBuilder.buildVastAdView([]);
+            this._vastOMController.geometryChange(viewPort, adView);
         }
     }
 
@@ -44,13 +41,9 @@ export class VastAdUnitPopupEventHandler extends VideoAdUnitPopupEventHandler<Va
 
             const obstructionRectangle = OpenMeasurementUtilities.createRectangle(x, y, width, height);
             const adViewBuilder = this._vastOMController.getOMAdViewBuilder();
-            adViewBuilder.buildVastAdView([ObstructionReasons.OBSTRUCTED], this._vastAdUnit, obstructionRectangle)
-                .then((adView) => {
-                    if (this._vastOMController) {
-                        const viewPort = adViewBuilder.getViewPort();
-                        this._vastOMController.geometryChange(viewPort, adView);
-                    }
-                });
+            const viewPort = adViewBuilder.getViewPort();
+            const adView = adViewBuilder.buildVastAdView([ObstructionReasons.OBSTRUCTED], obstructionRectangle);
+            this._vastOMController.geometryChange(viewPort, adView);
         }
     }
 }

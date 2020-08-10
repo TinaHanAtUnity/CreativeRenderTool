@@ -68,8 +68,7 @@ class AdRequestManagerError extends Error {
 
 export enum LoadV5ExperimentType {
     None = 'none',
-    NoInvalidation = 'no_invalidation',
-    GroupId = 'grouping'
+    NoInvalidation = 'no_invalidation'
 }
 
 export class AdRequestManager extends CampaignManager {
@@ -238,19 +237,20 @@ export class AdRequestManager extends CampaignManager {
         let requestPrivacy: IRequestPrivacy;
         let legacyRequestPrivacy: ILegacyRequestPrivacy;
 
+        if (this._frequencyCapTimestamp !== undefined) {
+            if (Date.now() > this._frequencyCapTimestamp) {
+                this._frequencyCapTimestamp = undefined;
+            }
+        }
+
+        if (this._frequencyCapTimestamp !== undefined) {
+            this.reportMetricEvent(LoadV5.LoadRequestFrequencyCap);
+            return Promise.resolve(undefined);
+        }
+
         this.reportMetricEvent(LoadV5.LoadRequestStarted, { 'src': 'default' });
 
         return Promise.resolve().then(() => {
-            if (this._frequencyCapTimestamp !== undefined) {
-                if (Date.now() > this._frequencyCapTimestamp) {
-                    this._frequencyCapTimestamp = undefined;
-                }
-            }
-
-            if (this._frequencyCapTimestamp !== undefined) {
-                return Promise.reject(new AdRequestManagerError('Frequency cap reached', 'frequency_cap'));
-            }
-
             if (this.hasPreloadFailed()) {
                 if (rescheduled) {
                     throw new AdRequestManagerError('Preload data is missing due to failure to receive it after load request was rescheduled', 'rescheduled_failed_preload');

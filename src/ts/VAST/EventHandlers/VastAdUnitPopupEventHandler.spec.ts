@@ -86,16 +86,13 @@ describe('VastAdUnitPopupEventHandler', () => {
 
     describe('when calling onPopupClosed', () => {
 
-        beforeEach(async () => {
-            const resolvedPromise = Promise.resolve({});
-            oMAdViewBuilder.buildVastAdView = jest.fn().mockReturnValue(resolvedPromise);
+        beforeEach(() => {
+            oMAdViewBuilder.buildVastAdView = jest.fn().mockReturnValue({});
             vastAdUnitPopupEventHandler.onPopupClosed();
-
-            await resolvedPromise;
         });
 
         it('should build VAST ad view', () => {
-            expect(oMAdViewBuilder.buildVastAdView).toHaveBeenCalledWith([], adUnit);
+            expect(oMAdViewBuilder.buildVastAdView).toHaveBeenCalledWith([]);
         });
 
         it('should call geometryChange', () => {
@@ -105,18 +102,15 @@ describe('VastAdUnitPopupEventHandler', () => {
 
     describe('when calling onPopupVisible', () => {
 
-        beforeEach(async () => {
-            const resolvedPromise = Promise.resolve({});
-            oMAdViewBuilder.buildVastAdView = jest.fn().mockReturnValue(resolvedPromise);
+        beforeEach(() => {
+            oMAdViewBuilder.buildVastAdView = jest.fn().mockReturnValue({});
             const testElement = document.createElement('div');
             document.querySelector = jest.fn().mockReturnValue(testElement);
-
             vastAdUnitPopupEventHandler.onPopupVisible();
-            await resolvedPromise;
         });
 
         it('should build VAST ad view', () => {
-            expect(oMAdViewBuilder.buildVastAdView).toHaveBeenCalledWith([ObstructionReasons.OBSTRUCTED], adUnit, testRectangle);
+            expect(oMAdViewBuilder.buildVastAdView).toHaveBeenCalledWith([ObstructionReasons.OBSTRUCTED], testRectangle);
         });
 
         it('should call geometryChange', () => {
