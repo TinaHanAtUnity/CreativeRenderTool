@@ -18,6 +18,7 @@ export interface IRawAdsConfiguration {
     hidePrivacy: boolean | undefined;
     legalFramework: LegalFramework | undefined;
     loadV5Enabled: boolean | undefined;
+    useUnityAttDialog: boolean | undefined;
 }
 
 export interface IAdsConfiguration {
