@@ -1,4 +1,4 @@
-# Pending
+# Tue Aug 11 23:51:16 UTC 2020
 
 * [Load V5] Revert Reverse AB test to Normal AB Test [#16887](https://github.com/Applifier/unity-ads-webview/pull/16887)
 
