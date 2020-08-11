@@ -691,5 +691,47 @@
     "description": "Vendor Identifier string",
     "provider": "SDK",
     "platforms": "ios"
+  },
+  {
+    "key": "totalSpace",
+    "type": "number",
+    "description": "Total Internal Device Space in kilobytes",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "totalMemory",
+    "type": "number",
+    "description": "Total Internal Device Memory in kilobytes",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "totalMemory",
+    "type": "number",
+    "description": "Total Internal Device Memory in kilobytes",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "freeMemory",
+    "type": "number",
+    "description": "Free Device Memory in kilobytes",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "batteryStatus",
+    "type": "number",
+    "description": "Current battery status of the device - [Resource](http://developer.android.com/intl/zh-cn/reference/android/os/BatteryManager.html)",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "screenBrightness",
+    "type": "number",
+    "description": "Current screen brightness percentage (0-100)",
+    "provider": "SDK",
+    "platforms": "all"
   }
 ]

@@ -152,6 +152,48 @@
       "body": false
     },
     {
+      "parameter": "networkOperator",
+      "required": "ios",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "totalSpace",
+      "required": "ios",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "totalMemory",
+      "required": "ios",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "freeMemory",
+      "required": "ios",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "batteryStatus",
+      "required": "ios",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "screenBrightness",
+      "required": "ios",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "volume",
+      "required": "ios",
+      "queryString": true,
+      "body": false
+    },
+    {
       "parameter": "deviceName",
       "required": "ios",
       "queryString": true,

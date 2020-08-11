@@ -153,8 +153,16 @@ export class ConfigManager {
             });
         }
 
+        // Additional signals added for iOS 14 signal mapping suppport
         if (this._platform === Platform.IOS) {
             url = Url.addParameters(url, {
+                networkOperator: this._deviceInfo.getNetworkOperator(),
+                totalSpace: this._deviceInfo.getTotalSpace(),
+                totalMemory: this._deviceInfo.getTotalMemory(),
+                freeMemory: this._deviceInfo.getFreeMemory(),
+                batteryStatus: this._deviceInfo.getBatteryStatus(),
+                screenBrightness: this._deviceInfo.getScreenBrightness(),
+                volume: this._deviceInfo.getDeviceVolume(),
                 deviceName: (<IosDeviceInfo> this._deviceInfo).getDeviceName(),
                 vendorIdentifier: (<IosDeviceInfo> this._deviceInfo).getVendorIdentifier(),
                 localeList: (<IosDeviceInfo> this._deviceInfo).getLocaleList().toString(),
