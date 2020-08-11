@@ -185,7 +185,6 @@ export class ExternalEndScreen extends View<IEndScreenHandler> implements IPriva
             }
         } else {
             SDKMetrics.reportMetricEvent(ExternalEndScreenMetric.DefaultRouteUsed);
-            this.onDownloadEvent();
         }
     }
 

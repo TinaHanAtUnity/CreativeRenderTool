@@ -23,5 +23,12 @@
     "freeSpaceInternal": 1234567,
     "batteryLevel": 0.5,
     "batteryStatus": 1,
-    "freeMemory": 1234567
+    "freeMemory": 1234567,
+    "deviceName": "fakeDeviceName",
+    "vendorIdentifier": "fakeVendorIdentifier",
+    "localeList": ["en_US"],
+    "currentUiTheme": 0,
+    "adNetworksPlist": ["fakeSkAdNetwork"],
+    "systemBootTime": 1,
+    "trackingAuthStatus": 1
 }

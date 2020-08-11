@@ -621,5 +621,75 @@
     "description": "Indicates if client can work with Load V5 or not",
     "provider": "SDK",
     "platforms": "all"
+  }, 
+  {
+    "key": "deviceName",
+    "type": "string",
+    "description": "Device name associated with an iOS device",
+    "provider": "SDK",
+    "platforms": "ios"
+  },
+  {
+    "key": "vendorIdentifier",
+    "type": "string",
+    "description": "Vendor Identifier string",
+    "provider": "SDK",
+    "platforms": "ios"
+  },
+  {
+    "key": "localeList",
+    "type": "string",
+    "description": "A list of locale strings (e.g. [\"en_US\"] for English language",
+    "provider": "SDK",
+    "platforms": "ios"
+  },
+  {
+    "key": "currentUiTheme",
+    "type": "number",
+    "description": "Indicates the iOS device current ui color theme",
+    "provider": "SDK",
+    "platforms": "ios"
+  },
+  {
+    "key": "adNetworkPlist",
+    "type": "string",
+    "description": "List of SKAdNetworks included in an iOS game Plist",
+    "provider": "SDK",
+    "platforms": "ios"
+  },
+  {
+    "key": "systemBootTime",
+    "type": "number",
+    "description": "Time that the system booted",
+    "provider": "SDK",
+    "platforms": "ios"
+  },
+  {
+    "key": "trackingAuthStatus",
+    "type": "number",
+    "description": "Tracking Authorization Status",
+    "provider": "SDK",
+    "platforms": "ios"
+  },
+  {
+    "key": "locales",
+    "type": "object",
+    "description": "Array representation of localeList",
+    "provider": "SDK",
+    "platforms": "ios"
+  },
+  {
+    "key": "plist",
+    "type": "object",
+    "description": "Array representation of adNetworkPlist",
+    "provider": "SDK",
+    "platforms": "ios"
+  },
+  {
+    "key": "idfv",
+    "type": "string",
+    "description": "Vendor Identifier string",
+    "provider": "SDK",
+    "platforms": "ios"
   }
 ]

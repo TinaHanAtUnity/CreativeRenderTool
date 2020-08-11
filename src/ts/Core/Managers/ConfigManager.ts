@@ -17,6 +17,7 @@ import { Url } from 'Core/Utilities/Url';
 import { UnityInfo } from 'Core/Models/UnityInfo';
 import { TrackingIdentifierFilter } from 'Ads/Utilities/TrackingIdentifierFilter';
 import { SDKMetrics, MiscellaneousMetric } from 'Ads/Utilities/SDKMetrics';
+import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
 
 export class ConfigManager {
 
@@ -149,6 +150,18 @@ export class ConfigManager {
                 deviceMake: (<AndroidDeviceInfo> this._deviceInfo).getManufacturer(),
                 screenDensity: (<AndroidDeviceInfo> this._deviceInfo).getScreenDensity(),
                 screenSize: (<AndroidDeviceInfo> this._deviceInfo).getScreenLayout()
+            });
+        }
+
+        if (this._platform === Platform.IOS) {
+            url = Url.addParameters(url, {
+                deviceName: (<IosDeviceInfo> this._deviceInfo).getDeviceName(),
+                vendorIdentifier: (<IosDeviceInfo> this._deviceInfo).getVendorIdentifier(),
+                localeList: (<IosDeviceInfo> this._deviceInfo).getLocaleList().toString(),
+                currentUiTheme: (<IosDeviceInfo> this._deviceInfo).getCurrentUiTheme(),
+                adNetworkPlist: (<IosDeviceInfo> this._deviceInfo).getAdNetworksPlist().toString(),
+                systemBootTime: (<IosDeviceInfo> this._deviceInfo).getSystemBootTime(),
+                trackingAuthStatus: (<IosDeviceInfo> this._deviceInfo).getTrackingAuthorizationStatus()
             });
         }
 
