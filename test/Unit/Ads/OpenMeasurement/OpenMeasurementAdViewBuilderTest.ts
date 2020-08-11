@@ -33,7 +33,7 @@ import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
             } else {
                 deviceInfo = TestFixtures.getIosDeviceInfo(core);
             }
-            return new OpenMeasurementAdViewBuilder(campaign, deviceInfo, platform);
+            return new OpenMeasurementAdViewBuilder(campaign);
         };
 
         describe('Vast Campaign', () => {
@@ -220,7 +220,7 @@ import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 
                 const rect = OpenMeasurementUtilities.createRectangle(0, 0, 200, 200);
                 const testAdView: IAdView = {
-                    percentageInView: platform === Platform.ANDROID ? 49 : 55,
+                    percentageInView: 55,
                     geometry: {
                         x: 0,
                         y: 0,
@@ -239,20 +239,19 @@ import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
                     containerGeometry: {
                         x: 0,
                         y: 0,
-                        width: platform === Platform.ANDROID ? 283 : 567,
-                        height: platform === Platform.ANDROID ? 617 : 1234
+                        width: screen.width,
+                        height: screen.height
                     },
                     onScreenContainerGeometry: {
                         x: 0,
                         y: 0,
-                        width: platform === Platform.ANDROID ? 283 : 567,
-                        height: platform === Platform.ANDROID ? 617 : 1234,
+                        width: screen.width,
+                        height: screen.height,
                         obstructions: [{ x: 0, y: 0, width: 200, height: 200 }]
                     }
                 };
-                return omAdViewBuilder.buildAdmobAdView([reason], omController, rect).then((adview) => {
-                    assert.equal(JSON.stringify(adview), JSON.stringify(testAdView));
-                });
+                const adView = omAdViewBuilder.buildAdmobAdView([reason], omController, rect);
+                assert.equal(JSON.stringify(adView), JSON.stringify(testAdView));
             });
         });
         describe('VastCampaign building vast ad view', () => {
@@ -278,16 +277,15 @@ import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
                             y: 0,
                             width: 0,
                             height: 0,
-                            obstructions: [{ x: 0, y: 0, width: 567, height: 1234 }]
+                            obstructions: [{ x: 0, y: 0, width: screen.width, height: screen.height }]
                         },
                         measuringElement: true,
                         reasons: [ObstructionReasons.BACKGROUNDED]
                     };
 
                     const vastadunit = sinon.createStubInstance(VastAdUnit);
-                    return omAdViewBuilder.buildVastAdView([ObstructionReasons.BACKGROUNDED], vastadunit).then((adview) => {
-                        assert.equal(JSON.stringify(adview), JSON.stringify(testAdView));
-                    });
+                    const adView = omAdViewBuilder.buildVastAdView([ObstructionReasons.BACKGROUNDED]);
+                    assert.equal(JSON.stringify(adView), JSON.stringify(testAdView));
                 });
             });
 
@@ -313,14 +311,13 @@ import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
                     };
                     const vastadunit = sinon.createStubInstance(VastAdUnit);
                     omAdViewBuilder.setVideoView(OpenMeasurementUtilities.createRectangle(0, 200, 300, 300));
-                    return omAdViewBuilder.buildVastAdView([], vastadunit).then((adview) => {
-                        assert.equal(JSON.stringify(adview), JSON.stringify(testAdView));
-                    });
+                    const adView = omAdViewBuilder.buildVastAdView([]);
+                    assert.equal(JSON.stringify(adView), JSON.stringify(testAdView));
                 });
 
                 it ('should return an obstructred foregrounded adview', () => {
                     const testAdView: IAdView = {
-                        percentageInView: 57,
+                        percentageInView: 62,
                         geometry: {
                             x: 0,
                             y: 200,
@@ -340,9 +337,8 @@ import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
                     const vastadunit = sinon.createStubInstance(VastAdUnit);
                     const obstructionRect = OpenMeasurementUtilities.createRectangle(0, 200, 300, 300);
                     omAdViewBuilder.setVideoView(OpenMeasurementUtilities.createRectangle(0, 200, 600, 400));
-                    return omAdViewBuilder.buildVastAdView([ObstructionReasons.OBSTRUCTED], vastadunit, obstructionRect).then((adview) => {
-                        assert.equal(JSON.stringify(adview), JSON.stringify(testAdView));
-                    });
+                    const adView = omAdViewBuilder.buildVastAdView([ObstructionReasons.OBSTRUCTED], obstructionRect);
+                    assert.equal(JSON.stringify(adView), JSON.stringify(testAdView));
                 });
             });
         });
