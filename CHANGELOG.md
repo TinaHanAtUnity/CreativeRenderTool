@@ -1,4 +1,4 @@
-# Pending
+# Tue Aug 11 12:37:02 UTC 2020
 
 * Support new useUnityAttDialog config field [#16822](https://github.com/Applifier/unity-ads-webview/pull/16822)
 
