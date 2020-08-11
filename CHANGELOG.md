@@ -1,3 +1,7 @@
+# Pending
+
+* Support new useUnityAttDialog config field [#16822](https://github.com/Applifier/unity-ads-webview/pull/16822)
+
 # Mon 10 Aug 2020 22:14:28 UTC
 
 * [EES] Remove default route for the external end screen [#16886](https://github.com/Applifier/unity-ads-webview/pull/16886)
