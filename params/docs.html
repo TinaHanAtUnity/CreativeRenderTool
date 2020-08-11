@@ -113,6 +113,7 @@
 <tr><td>totalMemory</td><td>number</td><td>Total Internal Device Memory in kilobytes</td><td>SDK</td><td>all</td></tr>
 <tr><td>freeMemory</td><td>number</td><td>Free Device Memory in kilobytes</td><td>SDK</td><td>all</td></tr>
 <tr><td>batteryStatus</td><td>number</td><td>Current battery status of the device - [Resource](http://developer.android.com/intl/zh-cn/reference/android/os/BatteryManager.html)</td><td>SDK</td><td>all</td></tr>
+<tr><td>batteryLevel</td><td>number</td><td>Current battery level of the device (0-1)</td><td>SDK</td><td>all</td></tr>
 <tr><td>screenBrightness</td><td>number</td><td>Current screen brightness percentage (0-100)</td><td>SDK</td><td>all</td></tr>
  </table><br><br></h3> <a name="configuration-request"></a> <h3> Configuration request </h3> 
  <table> <tr><th>key</th><th>required</th><th>queryString</th><th>body</th><th>type</th><th>description</th><th>provider</th><th>platforms</th></tr>
@@ -146,6 +147,7 @@
 <tr><td>totalMemory</td><td>ios</td><td>True</td><td>False</td><td>number</td><td>Total Internal Device Memory in kilobytes</td><td>SDK</td><td>all</td></tr>
 <tr><td>freeMemory</td><td>ios</td><td>True</td><td>False</td><td>number</td><td>Free Device Memory in kilobytes</td><td>SDK</td><td>all</td></tr>
 <tr><td>batteryStatus</td><td>ios</td><td>True</td><td>False</td><td>number</td><td>Current battery status of the device - [Resource](http://developer.android.com/intl/zh-cn/reference/android/os/BatteryManager.html)</td><td>SDK</td><td>all</td></tr>
+<tr><td>batteryLevel</td><td>ios</td><td>True</td><td>False</td><td>number</td><td>Current battery level of the device (0-1)</td><td>SDK</td><td>all</td></tr>
 <tr><td>screenBrightness</td><td>ios</td><td>True</td><td>False</td><td>number</td><td>Current screen brightness percentage (0-100)</td><td>SDK</td><td>all</td></tr>
 <tr><td>volume</td><td>ios</td><td>True</td><td>False</td><td>number</td><td>On iOS, this is a float between 0 (silent) and 1 (max volume), on Android, this is integer from 0 (silent) to max volume index</td><td>SDK</td><td>all</td></tr>
 <tr><td>deviceName</td><td>ios</td><td>True</td><td>False</td><td>string</td><td>Device name associated with an iOS device</td><td>SDK</td><td>ios</td></tr>

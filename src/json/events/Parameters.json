@@ -728,6 +728,13 @@
     "platforms": "all"
   },
   {
+    "key": "batteryLevel",
+    "type": "number",
+    "description": "Current battery level of the device (0-1)",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
     "key": "screenBrightness",
     "type": "number",
     "description": "Current screen brightness percentage (0-100)",

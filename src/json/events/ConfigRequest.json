@@ -182,6 +182,12 @@
       "body": false
     },
     {
+      "parameter": "batteryLevel",
+      "required": "ios",
+      "queryString": true,
+      "body": false
+    },
+    {
       "parameter": "screenBrightness",
       "required": "ios",
       "queryString": true,

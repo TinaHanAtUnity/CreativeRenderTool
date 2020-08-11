@@ -18,6 +18,7 @@ import { UnityInfo } from 'Core/Models/UnityInfo';
 import { TrackingIdentifierFilter } from 'Ads/Utilities/TrackingIdentifierFilter';
 import { SDKMetrics, MiscellaneousMetric } from 'Ads/Utilities/SDKMetrics';
 import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
+import { BatteryStatus } from 'Core/Constants/Android/BatteryStatus';
 
 export class ConfigManager {
 
@@ -62,60 +63,69 @@ export class ConfigManager {
             return Promise.resolve(this._rawConfig);
         } else {
             return Promise.all([
+                this._deviceInfo.getNetworkOperator(),
+                this._deviceInfo.getFreeMemory(),
+                this._deviceInfo.getBatteryStatus(),
+                this._deviceInfo.getBatteryLevel(),
+                this._deviceInfo.getScreenBrightness(),
+                this._deviceInfo.getDeviceVolume(),
                 this._deviceInfo.getConnectionType(),
                 this._deviceInfo.getScreenHeight(),
-                this._deviceInfo.getScreenWidth(),
-                this._metaDataManager.fetch(FrameworkMetaData),
-                this._metaDataManager.fetch(AdapterMetaData),
-                this.fetchGamerToken()
-            ]).then(([connectionType, screenHeight, screenWidth, framework, adapter, storedGamerToken]) => {
-                let gamerToken: string | undefined;
+                this._deviceInfo.getScreenWidth()
+            ]).then(([networkOperator, freeMemory, batteryStatus, batteryLevel, screenBrightness, volume, connectionType, screenHeight, screenWidth]) => {
+                return Promise.all([
+                    this._metaDataManager.fetch(FrameworkMetaData),
+                    this._metaDataManager.fetch(AdapterMetaData),
+                    this.fetchGamerToken()
+                ]).then(([framework, adapter, storedGamerToken]) => {
+                    let gamerToken: string | undefined;
 
-                // TODO: Fix or remove following code
-                if (this._platform === Platform.IOS && this._core.DeviceInfo.getLimitAdTrackingFlag()) {
-                    // only use stored gamerToken for iOS when ad tracking is limited
-                    gamerToken = storedGamerToken;
-                } else if (storedGamerToken) {
-                    // delete saved token from all other devices, for example when user has toggled limit ad tracking flag to false
-                    this.deleteGamerToken();
-                    SDKMetrics.reportMetricEvent(MiscellaneousMetric.IOSDeleteStoredGamerToken);
-                }
-
-                const url: string = this.createConfigUrl(connectionType, screenHeight, screenWidth, framework, adapter);
-                this._core.Sdk.logInfo('Requesting configuration from ' + url);
-                return this._request.get(url, [], {
-                    retries: 2,
-                    retryDelay: 10000,
-                    followRedirects: false,
-                    retryWithConnectionEvents: true
-                }).then(response => {
-                    try {
-                        this._rawConfig = JsonParser.parse(response.response);
-                        return this._rawConfig;
-                    } catch (error) {
-                        Diagnostics.trigger('config_parsing_failed', {
-                            configUrl: url,
-                            configResponse: response.response
-                        });
-                        this._core.Sdk.logError('Config request failed ' + JSON.stringify(error));
-                        throw new Error(error);
+                    // TODO: Fix or remove following code
+                    if (this._platform === Platform.IOS && this._core.DeviceInfo.getLimitAdTrackingFlag()) {
+                        // only use stored gamerToken for iOS when ad tracking is limited
+                        gamerToken = storedGamerToken;
+                    } else if (storedGamerToken) {
+                        // delete saved token from all other devices, for example when user has toggled limit ad tracking flag to false
+                        this.deleteGamerToken();
+                        SDKMetrics.reportMetricEvent(MiscellaneousMetric.IOSDeleteStoredGamerToken);
                     }
-                }).catch(error => {
-                    let modifiedError = error;
-                    if (modifiedError instanceof RequestError) {
-                        const requestError = modifiedError;
-                        if (requestError.nativeResponse && requestError.nativeResponse.response) {
-                            const responseObj = JsonParser.parse<{ error: string }>(requestError.nativeResponse.response);
-                            modifiedError = new ConfigError((new Error(responseObj.error)));
+
+                    const url: string = this.createConfigUrl(networkOperator, freeMemory, batteryStatus, batteryLevel, screenBrightness, volume, connectionType, screenHeight, screenWidth, framework, adapter);
+                    this._core.Sdk.logInfo('Requesting configuration from ' + url);
+                    return this._request.get(url, [], {
+                        retries: 2,
+                        retryDelay: 10000,
+                        followRedirects: false,
+                        retryWithConnectionEvents: true
+                    }).then(response => {
+                        try {
+                            this._rawConfig = JsonParser.parse(response.response);
+                            return this._rawConfig;
+                        } catch (error) {
+                            Diagnostics.trigger('config_parsing_failed', {
+                                configUrl: url,
+                                configResponse: response.response
+                            });
+                            this._core.Sdk.logError('Config request failed ' + JSON.stringify(error));
+                            throw new Error(error);
                         }
-                    }
-                    throw modifiedError;
+                    }).catch(error => {
+                        let modifiedError = error;
+                        if (modifiedError instanceof RequestError) {
+                            const requestError = modifiedError;
+                            if (requestError.nativeResponse && requestError.nativeResponse.response) {
+                                const responseObj = JsonParser.parse<{ error: string }>(requestError.nativeResponse.response);
+                                modifiedError = new ConfigError((new Error(responseObj.error)));
+                            }
+                        }
+                        throw modifiedError;
+                    });
                 });
             });
         }
     }
 
-    private createConfigUrl(connectionType: string | undefined, screenHeight: number, screenWidth: number, framework?: FrameworkMetaData, adapter?: AdapterMetaData): string {
+    private createConfigUrl(networkOperator: string | null, freeMemory: number, batteryStatus: BatteryStatus, batteryLevel: number, screenBrightness: number, volume: number, connectionType: string | undefined, screenHeight: number, screenWidth: number, framework?: FrameworkMetaData, adapter?: AdapterMetaData): string {
         let url: string = [
             ConfigManager.ConfigBaseUrl,
             this._clientInfo.getGameId(),
@@ -156,13 +166,14 @@ export class ConfigManager {
         // Additional signals added for iOS 14 signal mapping suppport
         if (this._platform === Platform.IOS) {
             url = Url.addParameters(url, {
-                networkOperator: this._deviceInfo.getNetworkOperator(),
+                networkOperator,
+                freeMemory,
+                batteryStatus,
+                batteryLevel,
+                screenBrightness,
+                volume,
                 totalSpace: this._deviceInfo.getTotalSpace(),
                 totalMemory: this._deviceInfo.getTotalMemory(),
-                freeMemory: this._deviceInfo.getFreeMemory(),
-                batteryStatus: this._deviceInfo.getBatteryStatus(),
-                screenBrightness: this._deviceInfo.getScreenBrightness(),
-                volume: this._deviceInfo.getDeviceVolume(),
                 deviceName: (<IosDeviceInfo> this._deviceInfo).getDeviceName(),
                 vendorIdentifier: (<IosDeviceInfo> this._deviceInfo).getVendorIdentifier(),
                 localeList: (<IosDeviceInfo> this._deviceInfo).getLocaleList().toString(),

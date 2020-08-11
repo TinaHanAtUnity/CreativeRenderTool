@@ -115,6 +115,7 @@
 | totalMemory | number | Total Internal Device Memory in kilobytes | SDK | all |
 | freeMemory | number | Free Device Memory in kilobytes | SDK | all |
 | batteryStatus | number | Current battery status of the device - [Resource](http://developer.android.com/intl/zh-cn/reference/android/os/BatteryManager.html) | SDK | all |
+| batteryLevel | number | Current battery level of the device (0-1) | SDK | all |
 | screenBrightness | number | Current screen brightness percentage (0-100) | SDK | all |
 
 
@@ -152,6 +153,7 @@
 | totalMemory | ios | True | False | number | Total Internal Device Memory in kilobytes | SDK | all |
 | freeMemory | ios | True | False | number | Free Device Memory in kilobytes | SDK | all |
 | batteryStatus | ios | True | False | number | Current battery status of the device - [Resource](http://developer.android.com/intl/zh-cn/reference/android/os/BatteryManager.html) | SDK | all |
+| batteryLevel | ios | True | False | number | Current battery level of the device (0-1) | SDK | all |
 | screenBrightness | ios | True | False | number | Current screen brightness percentage (0-100) | SDK | all |
 | volume | ios | True | False | number | On iOS, this is a float between 0 (silent) and 1 (max volume), on Android, this is integer from 0 (silent) to max volume index | SDK | all |
 | deviceName | ios | True | False | string | Device name associated with an iOS device | SDK | ios |
