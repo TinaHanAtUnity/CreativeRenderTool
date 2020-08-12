@@ -4,7 +4,6 @@ import { ClickDiagnostics } from 'Ads/Utilities/ClickDiagnostics';
 import { WebViewTopCalculator } from 'Ads/Utilities/WebPlayer/WebViewTopCalculator';
 import { JaegerSpan } from 'Core/Jaeger/JaegerSpan';
 import { Url } from 'Core/Utilities/Url';
-import { SDKMetrics, MraidWebplayerMetric } from 'Ads/Utilities/SDKMetrics';
 
 export class ProgrammaticMRAIDEventHandler extends MRAIDEventHandler implements IMRAIDViewHandler {
 
