@@ -2,7 +2,7 @@ import { Core } from 'Core/__mocks__/Core';
 import { ICore } from 'Core/ICore';
 import { Platform } from 'Core/Constants/Platform';
 
-import { InstallInfo } from './InstallInfo';
+import { InstallInfo } from 'Core/Models/InstallInfo';
 
 describe('InstallInfo', () => {
     const validIdentifier = 'ffffffff-ffff-ffff-ffff-ffffffffffff';
