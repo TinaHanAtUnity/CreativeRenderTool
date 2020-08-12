@@ -28,17 +28,19 @@ describe('InstallInfo', () => {
         });
 
         it('should attempt to retrieve an identifier from preferences', () => {
-            if (core.Api.Android === undefined) {
+            if (core.Api.Android !== undefined) {
+                expect(core.Api.Android.Preferences.getString).toHaveBeenCalledWith(androidPreferencesSettingsFile, preferencesIdfiKey);
+            } else {
                 fail('core.Api.Android should not be undefined');
             }
-            expect(core.Api.Android.Preferences.getString).toHaveBeenCalledWith(androidPreferencesSettingsFile, preferencesIdfiKey);
         });
 
         it('should store a newly generated identifier to preferences', () => {
-            if (core.Api.Android === undefined) {
+            if (core.Api.Android !== undefined) {
+                expect(core.Api.Android.Preferences.setString).toHaveBeenCalledWith(androidPreferencesSettingsFile, preferencesIdfiKey, validIdentifier);
+            } else {
                 fail('core.Api.Android should not be undefined');
             }
-            expect(core.Api.Android.Preferences.setString).toHaveBeenCalledWith(androidPreferencesSettingsFile, preferencesIdfiKey, validIdentifier);
         });
 
         describe('getIdentifierForInstall', () => {
@@ -62,10 +64,11 @@ describe('InstallInfo', () => {
         });
 
         it('should retrieve the stored identifier from preferences', () => {
-            if (core.Api.Android === undefined) {
+            if (core.Api.Android !== undefined) {
+                expect(core.Api.Android.Preferences.getString).toHaveBeenCalledWith(androidPreferencesSettingsFile, preferencesIdfiKey);
+            } else {
                 fail('core.Api.Android should not be undefined');
             }
-            expect(core.Api.Android.Preferences.getString).toHaveBeenCalledWith(androidPreferencesSettingsFile, preferencesIdfiKey);
         });
 
         describe('getIdentifierForInstall', () => {
