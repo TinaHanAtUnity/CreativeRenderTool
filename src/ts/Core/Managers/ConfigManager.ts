@@ -166,14 +166,8 @@ export class ConfigManager {
 
         // Additional signals added for iOS 14 signal mapping suppport
         if (this._platform === Platform.IOS) {
-            const { networkOperator, freeMemory, batteryStatus, batteryLevel, screenBrightness, volume } = configIosDeviceParams;
             url = Url.addParameters(url, {
-                networkOperator,
-                freeMemory,
-                batteryStatus,
-                batteryLevel,
-                screenBrightness,
-                volume,
+                ...configIosDeviceParams,
                 totalSpace: this._deviceInfo.getTotalSpace(),
                 totalMemory: this._deviceInfo.getTotalMemory(),
                 deviceName: (<IosDeviceInfo> this._deviceInfo).getDeviceName(),
