@@ -82,6 +82,8 @@ export class PerPlacementLoadManagerV5 extends PerPlacementLoadManager {
             }).catch((err) => {
                 // If preload request failed, therefore we cannot make load request.
                 // Therefore we should report no fill, so that we do not cause any timeout.
+
+                this._loadAndFillEventManager.sendLoadTrackingEvents(placementId);
                 this.setPlacementState(placementId, PlacementState.WAITING);
                 this.setPlacementState(placementId, PlacementState.NO_FILL);
             });

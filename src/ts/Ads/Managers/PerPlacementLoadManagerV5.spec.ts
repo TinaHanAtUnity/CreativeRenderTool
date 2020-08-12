@@ -508,6 +508,14 @@ import { LoadAndFillEventManagerMock, LoadAndFillEventManager } from 'Ads/Manage
                 expect(adsApi.Listener.sendPlacementStateChangedEvent).toBeCalledWith('video', 'NOT_AVAILABLE', 'WAITING');
                 expect(adsApi.Listener.sendPlacementStateChangedEvent).toBeCalledWith('video', 'WAITING', 'NO_FILL');
             });
+
+            it('should send load event', () => {
+                expect(loadAndFillEventManager.sendLoadTrackingEvents).toBeCalledTimes(1);
+            });
+
+            it('should send load event with correct placement ID', () => {
+                expect(loadAndFillEventManager.sendLoadTrackingEvents).toBeCalledWith('video');
+            });
         });
 
         describe('load placement with expired data', () => {
