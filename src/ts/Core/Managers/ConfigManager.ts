@@ -20,6 +20,15 @@ import { SDKMetrics, MiscellaneousMetric } from 'Ads/Utilities/SDKMetrics';
 import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
 import { BatteryStatus } from 'Core/Constants/Android/BatteryStatus';
 
+interface IConfigIosDeviceParam {
+    networkOperator: string | null;
+    freeMemory: number;
+    batteryStatus: BatteryStatus;
+    batteryLevel: number;
+    screenBrightness: number;
+    volume: number;
+}
+
 export class ConfigManager {
 
     public static setTestBaseUrl(baseUrl: string): void {
@@ -63,63 +72,56 @@ export class ConfigManager {
             return Promise.resolve(this._rawConfig);
         } else {
             return Promise.all([
-                this._deviceInfo.getNetworkOperator(),
-                this._deviceInfo.getFreeMemory(),
-                this._deviceInfo.getBatteryStatus(),
-                this._deviceInfo.getBatteryLevel(),
-                this._deviceInfo.getScreenBrightness(),
-                this._deviceInfo.getDeviceVolume(),
                 this._deviceInfo.getConnectionType(),
                 this._deviceInfo.getScreenHeight(),
-                this._deviceInfo.getScreenWidth()
-            ]).then(([networkOperator, freeMemory, batteryStatus, batteryLevel, screenBrightness, volume, connectionType, screenHeight, screenWidth]) => {
-                return Promise.all([
-                    this._metaDataManager.fetch(FrameworkMetaData),
-                    this._metaDataManager.fetch(AdapterMetaData),
-                    this.fetchGamerToken()
-                ]).then(([framework, adapter, storedGamerToken]) => {
-                    let gamerToken: string | undefined;
+                this._deviceInfo.getScreenWidth(),
+                this._metaDataManager.fetch(FrameworkMetaData),
+                this._metaDataManager.fetch(AdapterMetaData),
+                this.fetchGamerToken(),
+                this.getConfigDeviceDTO()
+            ]).then(([connectionType, screenHeight, screenWidth, framework, adapter, storedGamerToken,
+                { networkOperator, freeMemory, batteryStatus, batteryLevel, screenBrightness, volume }]) => {
+                let gamerToken: string | undefined;
 
-                    // TODO: Fix or remove following code
-                    if (this._platform === Platform.IOS && this._core.DeviceInfo.getLimitAdTrackingFlag()) {
-                        // only use stored gamerToken for iOS when ad tracking is limited
-                        gamerToken = storedGamerToken;
-                    } else if (storedGamerToken) {
-                        // delete saved token from all other devices, for example when user has toggled limit ad tracking flag to false
-                        this.deleteGamerToken();
-                        SDKMetrics.reportMetricEvent(MiscellaneousMetric.IOSDeleteStoredGamerToken);
+                // TODO: Fix or remove following code
+                if (this._platform === Platform.IOS && this._core.DeviceInfo.getLimitAdTrackingFlag()) {
+                    // only use stored gamerToken for iOS when ad tracking is limited
+                    gamerToken = storedGamerToken;
+                } else if (storedGamerToken) {
+                    // delete saved token from all other devices, for example when user has toggled limit ad tracking flag to false
+                    this.deleteGamerToken();
+                    SDKMetrics.reportMetricEvent(MiscellaneousMetric.IOSDeleteStoredGamerToken);
+                }
+
+                const url: string = this.createConfigUrl(networkOperator, freeMemory, batteryStatus, batteryLevel, screenBrightness, volume, connectionType, screenHeight, screenWidth, framework, adapter);
+                this._core.Sdk.logInfo('Requesting configuration from ' + url);
+                return this._request.get(url, [], {
+                    retries: 2,
+                    retryDelay: 10000,
+                    followRedirects: false,
+                    retryWithConnectionEvents: true
+                }).then(response => {
+                    try {
+                        this._rawConfig = JsonParser.parse(response.response);
+                        return this._rawConfig;
+                    } catch (error) {
+                        Diagnostics.trigger('config_parsing_failed', {
+                            configUrl: url,
+                            configResponse: response.response
+                        });
+                        this._core.Sdk.logError('Config request failed ' + JSON.stringify(error));
+                        throw new Error(error);
                     }
-
-                    const url: string = this.createConfigUrl(networkOperator, freeMemory, batteryStatus, batteryLevel, screenBrightness, volume, connectionType, screenHeight, screenWidth, framework, adapter);
-                    this._core.Sdk.logInfo('Requesting configuration from ' + url);
-                    return this._request.get(url, [], {
-                        retries: 2,
-                        retryDelay: 10000,
-                        followRedirects: false,
-                        retryWithConnectionEvents: true
-                    }).then(response => {
-                        try {
-                            this._rawConfig = JsonParser.parse(response.response);
-                            return this._rawConfig;
-                        } catch (error) {
-                            Diagnostics.trigger('config_parsing_failed', {
-                                configUrl: url,
-                                configResponse: response.response
-                            });
-                            this._core.Sdk.logError('Config request failed ' + JSON.stringify(error));
-                            throw new Error(error);
+                }).catch(error => {
+                    let modifiedError = error;
+                    if (modifiedError instanceof RequestError) {
+                        const requestError = modifiedError;
+                        if (requestError.nativeResponse && requestError.nativeResponse.response) {
+                            const responseObj = JsonParser.parse<{ error: string }>(requestError.nativeResponse.response);
+                            modifiedError = new ConfigError((new Error(responseObj.error)));
                         }
-                    }).catch(error => {
-                        let modifiedError = error;
-                        if (modifiedError instanceof RequestError) {
-                            const requestError = modifiedError;
-                            if (requestError.nativeResponse && requestError.nativeResponse.response) {
-                                const responseObj = JsonParser.parse<{ error: string }>(requestError.nativeResponse.response);
-                                modifiedError = new ConfigError((new Error(responseObj.error)));
-                            }
-                        }
-                        throw modifiedError;
-                    });
+                    }
+                    throw modifiedError;
                 });
             });
         }
@@ -236,5 +238,25 @@ export class ConfigManager {
 
     private deleteGamerToken(): Promise<void[]> {
         return this.deleteValue('gamerToken');
+    }
+
+    private getConfigDeviceDTO(): Promise<IConfigIosDeviceParam> {
+        return Promise.all([
+            this._deviceInfo.getNetworkOperator(),
+            this._deviceInfo.getFreeMemory(),
+            this._deviceInfo.getBatteryStatus(),
+            this._deviceInfo.getBatteryLevel(),
+            this._deviceInfo.getScreenBrightness(),
+            this._deviceInfo.getDeviceVolume()
+        ]).then(([networkOperator, freeMemory, batteryStatus, batteryLevel, screenBrightness, volume]) => {
+            return {
+                networkOperator,
+                freeMemory,
+                batteryStatus,
+                batteryLevel,
+                screenBrightness,
+                volume
+            };
+        });
     }
 }
