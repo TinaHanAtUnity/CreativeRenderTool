@@ -1,43 +1,74 @@
-import { Platform } from 'Core/Constants/Platform';
-import { InstallInfo } from 'Core/Models/InstallInfo';
-import { ICore } from 'Core/ICore';
 import { Core } from 'Core/__mocks__/Core';
+import { ICore } from 'Core/ICore';
+import { Platform } from 'Core/Constants/Platform';
 
-describe('InstallInfoTest', () => {
+import { InstallInfo } from './InstallInfo';
+
+describe('InstallInfo', () => {
     const validIdentifier = 'ffffffff-ffff-ffff-ffff-ffffffffffff';
     const getStringError = 'COULDNT_GET_VALUE';
+    const androidPreferencesSettingsFile = 'uads-instllinfo';
+    const preferencesIdfiKey = 'uads-idfi';
 
-    const platform = Platform.ANDROID;
     let core: ICore;
     let installInfo: InstallInfo;
 
-    describe('getInstallIdentifier ', () => {
-        it('should create and return a new identifier if an identifier is not set', () => {
+    describe('when fetch is called the first time', () => {
+        beforeEach(async () => {
             core = new Core();
-            expect(core).toBeDefined();
-            expect(core.Api).toBeDefined();
-            expect(core.Api.Android).toBeDefined();
-            if (core && core.Api && core.Api.Android) {
-                core.Api.Android.Preferences.getString = jest.fn(() => Promise.reject(getStringError));
-                core.Api.DeviceInfo.getUniqueEventId = jest.fn(() => Promise.resolve(validIdentifier));
-                core.Api.Android.Preferences.setString = jest.fn(() => Promise.resolve());
+            if (core.Api.Android === undefined) {
+                fail('core.Api.Android should not be undefined');
             }
-            installInfo = new InstallInfo(platform, core.Api);
-            installInfo.fetch().then(() => {
+            core.Api.Android.Preferences.getString = jest.fn(() => Promise.reject(getStringError));
+            core.Api.DeviceInfo.getUniqueEventId = jest.fn(() => Promise.resolve(validIdentifier));
+            core.Api.Android.Preferences.setString = jest.fn(() => Promise.resolve());
+            installInfo = new InstallInfo(Platform.ANDROID, core.Api);
+            await installInfo.fetch();
+        });
+
+        it('should attempt to retrieve an identifier from preferences', () => {
+            if (core.Api.Android === undefined) {
+                fail('core.Api.Android should not be undefined');
+            }
+            expect(core.Api.Android.Preferences.getString).toHaveBeenCalledWith(androidPreferencesSettingsFile, preferencesIdfiKey);
+        });
+
+        it('should store a newly generated identifier to preferences', () => {
+            if (core.Api.Android === undefined) {
+                fail('core.Api.Android should not be undefined');
+            }
+            expect(core.Api.Android.Preferences.setString).toHaveBeenCalledWith(androidPreferencesSettingsFile, preferencesIdfiKey, validIdentifier);
+        });
+
+        describe('getIdentifierForInstall', () => {
+            it('should return the retrieved identifier', () => {
                 const idfi = installInfo.getIdentifierForInstall();
-                expect(idfi).toBeDefined();
                 expect(idfi).toBe(validIdentifier);
             });
         });
+    });
 
-        it('should return a identifier if it is set', () => {
-            if (core.Api.Android) {
-                core.Api.Android.Preferences.getString = jest.fn().mockReturnValue(Promise.resolve(validIdentifier));
+    describe('when fetch is called with a stored value', () => {
+        beforeEach(async () => {
+            core = new Core();
+            if (core.Api.Android === undefined) {
+                fail('core.Api.Android should not be undefined');
             }
-            installInfo = new InstallInfo(platform, core.Api);
-            installInfo.fetch().then(() => {
+            core.Api.Android.Preferences.getString = jest.fn(() => Promise.resolve(validIdentifier));
+            installInfo = new InstallInfo(Platform.ANDROID, core.Api);
+            await installInfo.fetch();
+        });
+
+        it('should retrieve the stored identifier from preferences', () => {
+            if (core.Api.Android === undefined) {
+                fail('core.Api.Android should not be undefined');
+            }
+            expect(core.Api.Android.Preferences.getString).toHaveBeenCalledWith(androidPreferencesSettingsFile, preferencesIdfiKey);
+        });
+
+        describe('getIdentifierForInstall', () => {
+            it('should return the retrieved identifier', () => {
                 const idfi = installInfo.getIdentifierForInstall();
-                expect(idfi).toBeDefined();
                 expect(idfi).toBe(validIdentifier);
             });
         });
