@@ -79,8 +79,7 @@ export class ConfigManager {
                 this._metaDataManager.fetch(AdapterMetaData),
                 this.fetchGamerToken(),
                 this.getConfigDeviceDTO()
-            ]).then(([connectionType, screenHeight, screenWidth, framework, adapter, storedGamerToken,
-                { networkOperator, freeMemory, batteryStatus, batteryLevel, screenBrightness, volume }]) => {
+            ]).then(([connectionType, screenHeight, screenWidth, framework, adapter, storedGamerToken, configIosDeviceParams]) => {
                 let gamerToken: string | undefined;
 
                 // TODO: Fix or remove following code
@@ -93,7 +92,7 @@ export class ConfigManager {
                     SDKMetrics.reportMetricEvent(MiscellaneousMetric.IOSDeleteStoredGamerToken);
                 }
 
-                const url: string = this.createConfigUrl(networkOperator, freeMemory, batteryStatus, batteryLevel, screenBrightness, volume, connectionType, screenHeight, screenWidth, framework, adapter);
+                const url: string = this.createConfigUrl(connectionType, screenHeight, screenWidth, framework, adapter, configIosDeviceParams);
                 this._core.Sdk.logInfo('Requesting configuration from ' + url);
                 return this._request.get(url, [], {
                     retries: 2,
@@ -127,7 +126,7 @@ export class ConfigManager {
         }
     }
 
-    private createConfigUrl(networkOperator: string | null, freeMemory: number, batteryStatus: BatteryStatus, batteryLevel: number, screenBrightness: number, volume: number, connectionType: string | undefined, screenHeight: number, screenWidth: number, framework?: FrameworkMetaData, adapter?: AdapterMetaData): string {
+    private createConfigUrl(connectionType: string | undefined, screenHeight: number, screenWidth: number, framework: FrameworkMetaData | undefined, adapter: AdapterMetaData | undefined, configIosDeviceParams: IConfigIosDeviceParam): string {
         let url: string = [
             ConfigManager.ConfigBaseUrl,
             this._clientInfo.getGameId(),
@@ -167,6 +166,7 @@ export class ConfigManager {
 
         // Additional signals added for iOS 14 signal mapping suppport
         if (this._platform === Platform.IOS) {
+            const { networkOperator, freeMemory, batteryStatus, batteryLevel, screenBrightness, volume } = configIosDeviceParams;
             url = Url.addParameters(url, {
                 networkOperator,
                 freeMemory,
