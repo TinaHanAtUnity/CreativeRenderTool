@@ -20,6 +20,10 @@ import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 import { ICampaignTrackingUrls } from 'Ads/Models/Campaign';
 import { SDKMetrics, MraidWebplayerMetric } from 'Ads/Utilities/SDKMetrics';
+import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
+import { MraidWebplayerTest } from 'Core/Models/ABGroup';
+import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCampaign';
+import { ARMRAID } from 'AR/Views/ARMRAID';
 
 export interface IMRAIDAdUnitParameters extends IAdUnitParameters<MRAIDCampaign> {
     mraid: MRAIDView<IMRAIDViewHandler>;
@@ -43,6 +47,7 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     protected _campaign: MRAIDCampaign;
     protected _privacy: AbstractPrivacy;
     protected _additionalTrackingEvents: ICampaignTrackingUrls;
+    protected _coreConfig: CoreConfiguration;
 
     constructor(parameters: IMRAIDAdUnitParameters) {
         super(parameters);
@@ -57,6 +62,7 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         this._campaign = parameters.campaign;
         this._privacy = parameters.privacy;
         this._ar = parameters.ar;
+        this._coreConfig = parameters.coreConfig;
 
         this._mraid.render();
         document.body.appendChild(this._mraid.container());
@@ -145,7 +151,13 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     }
 
     public sendClick(): void {
-        SDKMetrics.reportMetricEvent(MraidWebplayerMetric.MraidClickSent);
+        const isPerformanceMRAID = this._campaign instanceof PerformanceMRAIDCampaign;
+        const isARMRAID = this._mraid instanceof ARMRAID;
+        const isProgrammaticWebPlayerTest = MraidWebplayerTest.isValid(this._coreConfig.getAbGroup()) && !isPerformanceMRAID && !isARMRAID;
+
+        if (isProgrammaticWebPlayerTest) {
+            SDKMetrics.reportMetricEvent(MraidWebplayerMetric.MraidClickSent);
+        }
         this.sendTrackingEvent(TrackingEvent.CLICK);
     }
 

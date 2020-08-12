@@ -7,7 +7,6 @@ import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCam
 import { PerformanceMRAIDEventHandler } from 'MRAID/EventHandlers/PerformanceMRAIDEventHandler';
 import { ProgrammaticMRAIDEventHandler } from 'MRAID/EventHandlers/ProgrammaticMRAIDEventHandler';
 import { WebPlayerMRAIDAdUnit } from 'MRAID/AdUnits/WebPlayerMRAIDAdUnit';
-import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { MraidWebplayerTest } from 'Core/Models/ABGroup';
 
 export class MRAIDAdUnitFactory extends AbstractAdUnitFactory<MRAIDCampaign, IMRAIDAdUnitParameters> {

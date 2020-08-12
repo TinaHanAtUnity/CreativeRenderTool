@@ -43,11 +43,6 @@ export class MRAIDWebPlayerEventAdapter extends MRAIDEventAdapter {
         const params = args.shift();
 
         this._core.Sdk.logDebug(`mraid: event=${eventType}, data=${params}`);
-
-        if (eventType === MRAIDEvents.OPEN) {
-            SDKMetrics.reportMetricEvent(MraidWebplayerMetric.MraidClickReceived);
-        }
-
         if (eventType in this._mraidHandlers) {
             const handler = this._mraidHandlers[eventType];
             handler(<{ [key: string]: unknown }>params);
@@ -65,5 +60,11 @@ export class MRAIDWebPlayerEventAdapter extends MRAIDEventAdapter {
 
     private handleResizeWebview() {
         this._handler.onBridgeResizeWebview();
+    }
+
+    // overriding handleOpen is a temporary addition for this metric
+    protected handleOpen(url: string) {
+        SDKMetrics.reportMetricEvent(MraidWebplayerMetric.MraidClickReceived);
+        super.handleOpen(url);
     }
 }

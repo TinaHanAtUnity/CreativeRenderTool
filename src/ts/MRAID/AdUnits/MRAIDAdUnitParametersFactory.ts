@@ -14,7 +14,6 @@ import { IAds } from 'Ads/IAds';
 import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 import { WebPlayerMRAID } from 'MRAID/Views/WebPlayerMRAID';
 import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCampaign';
-import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { AutomatedExperimentManager } from 'MabExperimentation/AutomatedExperimentManager';
 import { AutomatedExperimentsCategories } from 'MabExperimentation/Models/AutomatedExperimentsList';
 import { arAvailableButtonDecision } from 'AR/Experiments/ARUIExperiments';
