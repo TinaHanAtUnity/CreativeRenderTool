@@ -500,7 +500,7 @@ export class AdRequestManager extends CampaignManager {
                 preloadData[placementPreloadData] = {
                     ttlInSeconds: value.ttlInSeconds,
                     campaignAvailable: value.campaignAvailable,
-                    dataIndex: value.dataIndex
+                    dataIndex: value.dataIndex ? value.dataIndex : '0'
                 };
             }
         }
@@ -754,8 +754,9 @@ export class AdRequestManager extends CampaignManager {
     }
 
     private makeEncryptedPreloadData(currentPreloadData: IPlacementIdMap<IParsedPlacementPreloadData>, encryptedPreloadData: { [key: string]: string } | undefined): { [key: string]: string } | undefined {
-        if (encryptedPreloadData == null) {
-            return;
+        // If preload response has no encryptedPreloadData, we will return {'0': ''}
+        if (encryptedPreloadData === undefined) {
+            return { '0': '' };
         }
 
         const currentEncryptedProloadData: { [key: string]: string } = {};

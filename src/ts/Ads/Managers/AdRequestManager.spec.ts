@@ -759,8 +759,12 @@ class SatisfiesMatcher {
                     },
                     preloadData: {
                         video: {
-                            campaignAvailable: false
+                            campaignAvailable: false,
+                            dataIndex: '0'
                         }
+                    },
+                    encryptedPreloadData: {
+                        0: ''
                     }
                 }), [], {
                     followRedirects: false,
@@ -983,8 +987,12 @@ class SatisfiesMatcher {
                     },
                     preloadData: {
                         video: {
-                            campaignAvailable: false
+                            campaignAvailable: false,
+                            dataIndex: '0'
                         }
+                    },
+                    encryptedPreloadData: {
+                        0: ''
                     }
                 }), [], {
                     followRedirects: false,
