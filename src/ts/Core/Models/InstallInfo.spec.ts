@@ -16,12 +16,13 @@ describe('InstallInfo', () => {
     describe('when fetch is called the first time', () => {
         beforeEach(async () => {
             core = new Core();
-            if (core.Api.Android === undefined) {
+            if (core.Api.Android !== undefined) {
+                core.Api.Android.Preferences.getString = jest.fn(() => Promise.reject(getStringError));
+                core.Api.DeviceInfo.getUniqueEventId = jest.fn(() => Promise.resolve(validIdentifier));
+                core.Api.Android.Preferences.setString = jest.fn(() => Promise.resolve());
+            } else {
                 fail('core.Api.Android should not be undefined');
             }
-            core.Api.Android.Preferences.getString = jest.fn(() => Promise.reject(getStringError));
-            core.Api.DeviceInfo.getUniqueEventId = jest.fn(() => Promise.resolve(validIdentifier));
-            core.Api.Android.Preferences.setString = jest.fn(() => Promise.resolve());
             installInfo = new InstallInfo(Platform.ANDROID, core.Api);
             await installInfo.fetch();
         });
@@ -51,10 +52,11 @@ describe('InstallInfo', () => {
     describe('when fetch is called with a stored value', () => {
         beforeEach(async () => {
             core = new Core();
-            if (core.Api.Android === undefined) {
+            if (core.Api.Android !== undefined) {
+                core.Api.Android.Preferences.getString = jest.fn(() => Promise.resolve(validIdentifier));
+            } else {
                 fail('core.Api.Android should not be undefined');
             }
-            core.Api.Android.Preferences.getString = jest.fn(() => Promise.resolve(validIdentifier));
             installInfo = new InstallInfo(Platform.ANDROID, core.Api);
             await installInfo.fetch();
         });
