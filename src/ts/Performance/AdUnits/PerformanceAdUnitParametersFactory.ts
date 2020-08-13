@@ -10,6 +10,7 @@ import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
 import { VideoOverlay } from 'Ads/Views/VideoOverlay';
 import { ExternalEndScreen } from 'ExternalEndScreen/Views/ExternalEndScreen';
+import { ExternalMRAIDEndScreen } from 'ExternalEndScreen/Views/ExternalMRAIDEndScreen';
 
 export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParametersFactory<PerformanceCampaign, IPerformanceAdUnitParameters> {
 
@@ -37,10 +38,14 @@ export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParameters
         };
     }
 
-    private createEndscreen(endScreenParameters: IEndScreenParameters, campaign: PerformanceCampaign, country: string): PerformanceEndScreen | ExternalEndScreen {
-        return campaign.getEndScreenType() === 'iframe'
-            ? new ExternalEndScreen(undefined, endScreenParameters, campaign, country)
-            : new PerformanceEndScreen(endScreenParameters, campaign, country);
+    private createEndscreen(endScreenParameters: IEndScreenParameters, campaign: PerformanceCampaign, country: string): PerformanceEndScreen | ExternalEndScreen | ExternalMRAIDEndScreen {
+        if (campaign.getEndScreenType() === 'mraid') {
+            return new ExternalMRAIDEndScreen(endScreenParameters, campaign, country);
+        } else if (campaign.getEndScreenType() === 'iframe') {
+            return new ExternalEndScreen(undefined, endScreenParameters, campaign, country);
+        } else {
+            return new PerformanceEndScreen(endScreenParameters, campaign, country);
+        }
     }
 
     protected createVideoOverlay(parameters: IAdUnitParameters<Campaign>, privacy: AbstractPrivacy, showGDPRBanner: boolean, showPrivacyDuringVideo: boolean): VideoOverlay {
