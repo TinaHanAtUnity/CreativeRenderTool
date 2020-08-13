@@ -20,9 +20,6 @@ import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 import { ICampaignTrackingUrls } from 'Ads/Models/Campaign';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
-import { MraidWebplayerTest } from 'Core/Models/ABGroup';
-import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCampaign';
-import { ARMRAID } from 'AR/Views/ARMRAID';
 
 export interface IMRAIDAdUnitParameters extends IAdUnitParameters<MRAIDCampaign> {
     mraid: MRAIDView<IMRAIDViewHandler>;
@@ -46,7 +43,6 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     protected _campaign: MRAIDCampaign;
     protected _privacy: AbstractPrivacy;
     protected _additionalTrackingEvents: ICampaignTrackingUrls;
-    protected _coreConfig: CoreConfiguration;
 
     constructor(parameters: IMRAIDAdUnitParameters) {
         super(parameters);
