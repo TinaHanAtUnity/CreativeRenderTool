@@ -19,7 +19,6 @@ import { IMRAIDViewHandler, IOrientationProperties, MRAIDView } from 'MRAID/View
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 import { ICampaignTrackingUrls } from 'Ads/Models/Campaign';
-import { SDKMetrics, MraidWebplayerMetric } from 'Ads/Utilities/SDKMetrics';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { MraidWebplayerTest } from 'Core/Models/ABGroup';
 import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCampaign';
@@ -62,7 +61,6 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         this._campaign = parameters.campaign;
         this._privacy = parameters.privacy;
         this._ar = parameters.ar;
-        this._coreConfig = parameters.coreConfig;
 
         this._mraid.render();
         document.body.appendChild(this._mraid.container());
@@ -151,13 +149,6 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     }
 
     public sendClick(): void {
-        const isPerformanceMRAID = this._campaign instanceof PerformanceMRAIDCampaign;
-        const isARMRAID = this._mraid instanceof ARMRAID;
-        const isProgrammaticWebPlayerTest = MraidWebplayerTest.isValid(this._coreConfig.getAbGroup()) && !isPerformanceMRAID && !isARMRAID;
-
-        if (isProgrammaticWebPlayerTest) {
-            SDKMetrics.reportMetricEvent(MraidWebplayerMetric.MraidClickSent);
-        }
         this.sendTrackingEvent(TrackingEvent.CLICK);
     }
 
