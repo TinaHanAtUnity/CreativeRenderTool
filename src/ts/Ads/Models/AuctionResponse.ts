@@ -50,6 +50,8 @@ export interface IRawAuctionV6Response {
     placements: { [key: string]: { mediaId: string; tracking: IPlacementTrackingV6 } };
     media: { [key: string]: IAuctionResponse };
     trackingTemplates: string[];
+    preloadData?: { [key: string]: IPlacementPreloadData };
+    encryptedPreloadData?: { [key: string]: string };
 }
 
 export interface IAuctionResponse {
