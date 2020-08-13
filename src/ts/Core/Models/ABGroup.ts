@@ -91,6 +91,7 @@ export const MabReverseABTest = new ZyngaFilteredReverseABTest(7);
 export const GooglePlayDetectionTest = new ABTest(8);
 export const LoadV5NoInvalidation = new ABTest(13);
 export const LoadV5 = new ABTest(14, 15, 18, 19);
+export const LoadV5AuctionV6 = new ABTest(14, 15);
 
 // Disabled AB Tests
 export const OpenMeasurementTest = new DisabledABTest();
