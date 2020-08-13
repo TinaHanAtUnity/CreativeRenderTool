@@ -59,12 +59,12 @@ export class InstallInfo extends Model<IInstallInfo> {
      * Returns the stored idfi, if not found, one is generated and stored.
      */
     private getValidIdentifierForInstall(): Promise<string> {
-        return this.getValueFromPrferences(InstallInfo._idfiKey).then(idfi => {
+        return this.getValueFromPreferences(InstallInfo._idfiKey).then(idfi => {
             if (idfi) {
                 return idfi;
             } else {
                 return this._api.DeviceInfo.getUniqueEventId().then(newIdfi => {
-                    this.setValueInPrferences(InstallInfo._idfiKey, newIdfi);
+                    this.setValueInPreferences(InstallInfo._idfiKey, newIdfi);
                     return newIdfi;
                 });
             }
@@ -77,7 +77,7 @@ export class InstallInfo extends Model<IInstallInfo> {
     /**
      * Looks the value up from preferences.  If not found an empty string is returned.
      */
-    private getValueFromPrferences(key: string): Promise<string> {
+    private getValueFromPreferences(key: string): Promise<string> {
         let nativeIdfiPromise: Promise<string>;
         if (this._platform === Platform.IOS) {
             nativeIdfiPromise = this._api.iOS!.Preferences.getString(key);
@@ -97,7 +97,7 @@ export class InstallInfo extends Model<IInstallInfo> {
     /**
      * Set the value for the key provided in preferences.
      */
-    private setValueInPrferences(key: string, value: string): Promise<void> {
+    private setValueInPreferences(key: string, value: string): Promise<void> {
         let nativeIdfiPromise: Promise<void>;
         if (this._platform === Platform.IOS) {
             nativeIdfiPromise = this._api.iOS!.Preferences.setString(value.toLowerCase(), key);
