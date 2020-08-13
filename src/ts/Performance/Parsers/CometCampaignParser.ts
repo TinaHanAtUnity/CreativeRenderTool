@@ -139,7 +139,8 @@ export class CometCampaignParser extends CampaignParser {
                 store: storeName,
                 adUnitStyle: json.adUnitStyle ? this.parseAdUnitStyle(json.adUnitStyle, session) : undefined,
                 endScreenType: json.endScreenType,
-                endScreen: json.endScreenUrl ? new HTML(this.validateAndEncodeUrl(json.endScreenUrl, session), session, json.creativeId) : undefined
+                endScreen: json.endScreenUrl ? new HTML(this.validateAndEncodeUrl(json.endScreenUrl, session), session, json.creativeId) : undefined,
+                endScreenSettings: json.endScreenSettings
             };
 
             if (json.trailerDownloadable && json.trailerDownloadableSize && json.trailerStreaming) {
