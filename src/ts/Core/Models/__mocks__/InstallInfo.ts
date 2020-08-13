@@ -8,8 +8,8 @@ export type InstallInfoMock = Base & {
 
 export const InstallInfo = jest.fn(() => {
     return <InstallInfoMock>{
-        fetch: jest.fn(),
-        getIdentifierForInstall: jest.fn().mockImplementation(() => 'ffffffff-ffff-ffff-ffff-ffffffffffff'),
-        getDTO: jest.fn()
+        fetch: jest.fn().mockImplementation(() => Promise.resolve()),
+        getIdentifierForInstall: jest.fn().mockReturnValue('ffffffff-ffff-ffff-ffff-ffffffffffff'),
+        getDTO: jest.fn().mockImplementation(() => Promise.resolve())
     };
 });

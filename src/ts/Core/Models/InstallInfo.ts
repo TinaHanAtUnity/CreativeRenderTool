@@ -6,8 +6,9 @@ export interface IInstallInfo {
     idfi: string;
 }
 
-const androidSettingsFile = 'uads-instllinfo';
-const idfiKey = 'uads-idfi';
+const androidSettingsFile = 'unityads-installinfo';
+const idfiKey = 'unityads-idfi';
+const getStringNotFoundError = 'COULDNT_GET_VALUE';
 
 /**
  * InstallInfo contains information about the install.
@@ -55,18 +56,27 @@ export class InstallInfo extends Model<IInstallInfo> {
     }
 
     /**
-     * Returns the stored idfi, if not found, one is generated and stored.
+     * Returns the stored idfi, if not found, one is generated and stored and returned.
      */
     private getValidIdentifierForInstall(): Promise<string> {
-        return this.getValueFromPreferences(idfiKey).then(idfi => {
-            if (idfi) {
+        return this.getPreferenceString(idfiKey).then(idfi => {
+            if (idfi !== '') {
                 return idfi;
-            } else {
+            }
+            return '';
+        }).catch(e => {
+            if (e === getStringNotFoundError) {
+                return Promise.resolve('');
+            }
+            return Promise.reject(e);
+        }).then(idfi => {
+            if (idfi === '') {
                 return this._api.DeviceInfo.getUniqueEventId().then(newIdfi => {
-                    this.setValueInPreferences(idfiKey, newIdfi);
+                    this.setPreferenceString(idfiKey, newIdfi);
                     return newIdfi;
                 });
             }
+            return Promise.resolve(idfi);
         }).then(idfi => {
             this.set('idfi', idfi);
             return idfi;
@@ -76,27 +86,19 @@ export class InstallInfo extends Model<IInstallInfo> {
     /**
      * Looks the value up from preferences.  If not found an empty string is returned.
      */
-    private getValueFromPreferences(key: string): Promise<string> {
-        let nativeIdfiPromise: Promise<string>;
+    private getPreferenceString(key: string): Promise<string> {
         if (this._platform === Platform.IOS) {
-            nativeIdfiPromise = this._api.iOS!.Preferences.getString(key);
-        } else {
-            nativeIdfiPromise = this._api.Android!.Preferences.getString(androidSettingsFile, key);
+           return this._api.iOS!.Preferences.getString(key);
+        } else if (this._platform === Platform.ANDROID) {
+            return this._api.Android!.Preferences.getString(androidSettingsFile, key);
         }
-        return nativeIdfiPromise.then(value => {
-            if (value === undefined) {
-                return Promise.resolve('');
-             }
-            return Promise.resolve(value);
-        }).catch(e => {
-            return Promise.resolve('');
-         });
+        return Promise.reject(new Error('Preferences API is not supported on current platform'));
     }
 
     /**
      * Set the value for the key provided in preferences.
      */
-    private setValueInPreferences(key: string, value: string): Promise<void> {
+    private setPreferenceString(key: string, value: string): Promise<void> {
         let nativeIdfiPromise: Promise<void>;
         if (this._platform === Platform.IOS) {
             nativeIdfiPromise = this._api.iOS!.Preferences.setString(value.toLowerCase(), key);
@@ -112,6 +114,6 @@ export class InstallInfo extends Model<IInstallInfo> {
      * Handle errors.
      */
     private handleInstallInfoError(error: unknown) {
-        this._api.Sdk.logWarning(JSON.stringify(error));
+        this._api.Sdk.logError(`InstalledInfo failed due to reason: ${error}`);
     }
 }
