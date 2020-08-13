@@ -8,7 +8,6 @@ import {
 import { DisplayInterstitialCampaign } from 'Display/Models/DisplayInterstitialCampaign';
 import { IDisplayInterstitialHandler } from 'Display/Views/DisplayInterstitial';
 import { TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
-import { EventType } from 'Ads/Models/Session';
 
 export class DisplayInterstitialEventHandler extends GDPREventHandler implements IDisplayInterstitialHandler {
     private _operativeEventManager: OperativeEventManager;
