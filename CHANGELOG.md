@@ -1,5 +1,6 @@
 # Pending
 
+* [Load] Utilize LoadAndFillEventManager [#16556](https://github.com/Applifier/unity-ads-webview/pull/16556)
 * [Load] Sample Load/Fill Events at 10% [#16856](https://github.com/Applifier/unity-ads-webview/pull/16856)
 
 # Tue Aug 11 23:51:16 UTC 2020
