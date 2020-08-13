@@ -18,6 +18,16 @@ import { UnityInfo } from 'Core/Models/UnityInfo';
 import { TrackingIdentifierFilter } from 'Ads/Utilities/TrackingIdentifierFilter';
 import { SDKMetrics, MiscellaneousMetric } from 'Ads/Utilities/SDKMetrics';
 import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
+import { BatteryStatus } from 'Core/Constants/Android/BatteryStatus';
+
+interface IConfigIosDeviceParam {
+    networkOperator: string | null;
+    freeMemory: number;
+    batteryStatus: BatteryStatus;
+    batteryLevel: number;
+    screenBrightness: number;
+    volume: number;
+}
 
 export class ConfigManager {
 
@@ -67,8 +77,9 @@ export class ConfigManager {
                 this._deviceInfo.getScreenWidth(),
                 this._metaDataManager.fetch(FrameworkMetaData),
                 this._metaDataManager.fetch(AdapterMetaData),
-                this.fetchGamerToken()
-            ]).then(([connectionType, screenHeight, screenWidth, framework, adapter, storedGamerToken]) => {
+                this.fetchGamerToken(),
+                this.getConfigDeviceDTO()
+            ]).then(([connectionType, screenHeight, screenWidth, framework, adapter, storedGamerToken, configIosDeviceParams]) => {
                 let gamerToken: string | undefined;
 
                 // TODO: Fix or remove following code
@@ -81,7 +92,7 @@ export class ConfigManager {
                     SDKMetrics.reportMetricEvent(MiscellaneousMetric.IOSDeleteStoredGamerToken);
                 }
 
-                const url: string = this.createConfigUrl(connectionType, screenHeight, screenWidth, framework, adapter);
+                const url: string = this.createConfigUrl(connectionType, screenHeight, screenWidth, framework, adapter, configIosDeviceParams);
                 this._core.Sdk.logInfo('Requesting configuration from ' + url);
                 return this._request.get(url, [], {
                     retries: 2,
@@ -115,7 +126,7 @@ export class ConfigManager {
         }
     }
 
-    private createConfigUrl(connectionType: string | undefined, screenHeight: number, screenWidth: number, framework?: FrameworkMetaData, adapter?: AdapterMetaData): string {
+    private createConfigUrl(connectionType: string | undefined, screenHeight: number, screenWidth: number, framework: FrameworkMetaData | undefined, adapter: AdapterMetaData | undefined, configIosDeviceParams: IConfigIosDeviceParam): string {
         let url: string = [
             ConfigManager.ConfigBaseUrl,
             this._clientInfo.getGameId(),
@@ -153,8 +164,12 @@ export class ConfigManager {
             });
         }
 
+        // Additional signals added for iOS 14 signal mapping suppport
         if (this._platform === Platform.IOS) {
             url = Url.addParameters(url, {
+                ...configIosDeviceParams,
+                totalSpace: this._deviceInfo.getTotalSpace(),
+                totalMemory: this._deviceInfo.getTotalMemory(),
                 deviceName: (<IosDeviceInfo> this._deviceInfo).getDeviceName(),
                 vendorIdentifier: (<IosDeviceInfo> this._deviceInfo).getVendorIdentifier(),
                 localeList: (<IosDeviceInfo> this._deviceInfo).getLocaleList().toString(),
@@ -217,5 +232,25 @@ export class ConfigManager {
 
     private deleteGamerToken(): Promise<void[]> {
         return this.deleteValue('gamerToken');
+    }
+
+    private getConfigDeviceDTO(): Promise<IConfigIosDeviceParam> {
+        return Promise.all([
+            this._deviceInfo.getNetworkOperator(),
+            this._deviceInfo.getFreeMemory(),
+            this._deviceInfo.getBatteryStatus(),
+            this._deviceInfo.getBatteryLevel(),
+            this._deviceInfo.getScreenBrightness(),
+            this._deviceInfo.getDeviceVolume()
+        ]).then(([networkOperator, freeMemory, batteryStatus, batteryLevel, screenBrightness, volume]) => {
+            return {
+                networkOperator,
+                freeMemory,
+                batteryStatus,
+                batteryLevel,
+                screenBrightness,
+                volume
+            };
+        });
     }
 }
