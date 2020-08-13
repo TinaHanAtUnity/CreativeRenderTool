@@ -169,6 +169,23 @@ export enum ExternalEndScreenMetric {
     BadIframeContent = 'external_end_screen_iframe_bad_content'
 }
 
+export enum ExternalMRAIDEndScreenMetric {
+    Initialize = 'external_mraid_end_screen_initialize',
+    IframeInitialize = 'external_mraid_end_screen_iframe_initialize',
+    CreateMRAID = 'external_mraid_end_screen_create_mraid',
+    Show = 'external_mraid_end_screen_show',
+    Hide = 'external_mraid_end_screen_hide',
+    Close = 'external_mraid_end_screen_close',
+    Click = 'external_mraid_end_screen_click',
+    ShowNotReady = 'external_mraid_end_screen_show_not_ready',
+    MRAIDEventBridgeReady = 'external_mraid_end_screen_mraid_event_bridge_ready',
+    MRAIDEventBridgeLoaded = 'external_mraid_end_screen_mraid_event_bridge_loaded',
+    FetchMRAID = 'external_mraid_end_screen_fetch_mraid',
+    MRAIDFailed = 'external_mraid_end_screen_mraid_failed',
+    MRAIDWarning = 'external_mraid_end_screen_mraid_warning',
+    GDPR = 'external_mraid_end_screen_gdpr'
+}
+
 export enum GeneralTimingMetric {
     AuctionRequest = 'auction_request',
     AuctionHealthGood = 'auction_health_good',
@@ -247,9 +264,9 @@ export enum MraidWebplayerMetric {
     MraidClickReceived = 'mraid_click_received'
 }
 
-export type TimingEvent = InitializationMetric | MediationMetric | GeneralTimingMetric | ChinaAucionEndpoint | VideoLengthMetric;
+export type TimingEvent = InitializationMetric | MediationMetric | GeneralTimingMetric | ChinaAucionEndpoint | VideoLengthMetric | ExternalMRAIDEndScreenMetric;
 
-export type PTSEvent = VideoMetric | TimingEvent | AuctionV6 | AdmobMetric | BannerMetric | CachingMetric | ChinaMetric | VastMetric | MraidMetric | MiscellaneousMetric | LoadMetric | ErrorMetric | OMMetric | AUIMetric | LoadV5 | ChinaAucionEndpoint | ExternalEndScreenMetric | InitializationFailureMetric | MraidWebplayerMetric;
+export type PTSEvent = VideoMetric | TimingEvent | AuctionV6 | AdmobMetric | BannerMetric | CachingMetric | ChinaMetric | VastMetric | MraidMetric | MiscellaneousMetric | LoadMetric | ErrorMetric | OMMetric | AUIMetric | LoadV5 | ChinaAucionEndpoint | ExternalEndScreenMetric | InitializationFailureMetric | MraidWebplayerMetric | ExternalMRAIDEndScreenMetric;
 
 export class SDKMetrics {
 
