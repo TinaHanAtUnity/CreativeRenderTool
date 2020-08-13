@@ -25,6 +25,7 @@ import { RefreshManager } from 'Ads/Managers/RefreshManager';
 import { Analytics } from 'Analytics/Analytics';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { Store } from 'Store/Store';
+import { LoadAndFillEventManager } from 'Ads/Managers/LoadAndFillEventManager';
 
 export interface IAdsApi extends IModuleApi {
     AdsProperties: AdsPropertiesApi;
@@ -61,4 +62,5 @@ export interface IAds extends IApiModule {
     Analytics: Analytics;
     Store: Store;
     PrivacySDK: PrivacySDK;
+    LoadAndFillEventManager: LoadAndFillEventManager;
 }
