@@ -19,7 +19,6 @@ import { IMRAIDViewHandler, IOrientationProperties, MRAIDView } from 'MRAID/View
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 import { ICampaignTrackingUrls } from 'Ads/Models/Campaign';
-import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 
 export interface IMRAIDAdUnitParameters extends IAdUnitParameters<MRAIDCampaign> {
     mraid: MRAIDView<IMRAIDViewHandler>;
