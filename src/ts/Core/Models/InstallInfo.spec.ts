@@ -13,14 +13,17 @@ describe('InstallInfo', () => {
     let core: ICore;
     let installInfo: InstallInfo;
 
+    beforeEach(() => {
+        core = new Core();
+    });
+
     describe('when fetch is called the first time', () => {
-        beforeEach(async () => {
-            core = new Core();
+        beforeEach(() => {
             core.Api.Android!.Preferences.getString = jest.fn(() => Promise.reject(getStringError));
             core.Api.DeviceInfo.getUniqueEventId = jest.fn(() => Promise.resolve(validIdentifier));
             core.Api.Android!.Preferences.setString = jest.fn(() => Promise.resolve());
             installInfo = new InstallInfo(Platform.ANDROID, core.Api);
-            await installInfo.fetch();
+            return installInfo.fetch();
         });
 
         it('should attempt to retrieve an identifier from preferences', () => {
@@ -30,32 +33,30 @@ describe('InstallInfo', () => {
         it('should store a newly generated identifier to preferences', () => {
             expect(core.Api.Android!.Preferences.setString).toHaveBeenCalledWith(androidPreferencesSettingsFile, preferencesIdfiKey, validIdentifier);
         });
-
-        describe('getIdentifierForInstall', () => {
-            it('should return the retrieved identifier', () => {
-                const idfi = installInfo.getIdentifierForInstall();
-                expect(idfi).toBe(validIdentifier);
-            });
-        });
     });
 
     describe('when fetch is called with a stored value', () => {
-        beforeEach(async () => {
-            core = new Core();
+        beforeEach(() => {
             core.Api.Android!.Preferences.getString = jest.fn(() => Promise.resolve(validIdentifier));
             installInfo = new InstallInfo(Platform.ANDROID, core.Api);
-            await installInfo.fetch();
+            return installInfo.fetch();
         });
 
         it('should retrieve the stored identifier from preferences', () => {
             expect(core.Api.Android!.Preferences.getString).toHaveBeenCalledWith(androidPreferencesSettingsFile, preferencesIdfiKey);
         });
+    });
 
-        describe('getIdentifierForInstall', () => {
-            it('should return the retrieved identifier', () => {
-                const idfi = installInfo.getIdentifierForInstall();
-                expect(idfi).toBe(validIdentifier);
-            });
+    describe('getIdentifierForInstall', () => {
+        beforeEach(() => {
+            core.Api.Android!.Preferences.getString = jest.fn(() => Promise.resolve(validIdentifier));
+            installInfo = new InstallInfo(Platform.ANDROID, core.Api);
+            return installInfo.fetch();
+        });
+
+        it('should return the retrieved identifier', () => {
+            const idfi = installInfo.getIdentifierForInstall();
+            expect(idfi).toBe(validIdentifier);
         });
     });
 });

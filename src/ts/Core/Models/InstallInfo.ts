@@ -6,14 +6,13 @@ export interface IInstallInfo {
     idfi: string;
 }
 
+const androidSettingsFile = 'uads-instllinfo';
+const idfiKey = 'uads-idfi';
+
 /**
  * InstallInfo contains information about the install.
  */
 export class InstallInfo extends Model<IInstallInfo> {
-
-    private static _androidSettingsFile = 'uads-instllinfo';
-    private static _idfiKey = 'uads-idfi';
-
     public static Schema: ISchema<IInstallInfo> = {
         idfi: ['string']
     };
@@ -59,12 +58,12 @@ export class InstallInfo extends Model<IInstallInfo> {
      * Returns the stored idfi, if not found, one is generated and stored.
      */
     private getValidIdentifierForInstall(): Promise<string> {
-        return this.getValueFromPreferences(InstallInfo._idfiKey).then(idfi => {
+        return this.getValueFromPreferences(idfiKey).then(idfi => {
             if (idfi) {
                 return idfi;
             } else {
                 return this._api.DeviceInfo.getUniqueEventId().then(newIdfi => {
-                    this.setValueInPreferences(InstallInfo._idfiKey, newIdfi);
+                    this.setValueInPreferences(idfiKey, newIdfi);
                     return newIdfi;
                 });
             }
@@ -82,7 +81,7 @@ export class InstallInfo extends Model<IInstallInfo> {
         if (this._platform === Platform.IOS) {
             nativeIdfiPromise = this._api.iOS!.Preferences.getString(key);
         } else {
-            nativeIdfiPromise = this._api.Android!.Preferences.getString(InstallInfo._androidSettingsFile, key);
+            nativeIdfiPromise = this._api.Android!.Preferences.getString(androidSettingsFile, key);
         }
         return nativeIdfiPromise.then(value => {
             if (value === undefined) {
@@ -102,7 +101,7 @@ export class InstallInfo extends Model<IInstallInfo> {
         if (this._platform === Platform.IOS) {
             nativeIdfiPromise = this._api.iOS!.Preferences.setString(value.toLowerCase(), key);
         } else {
-            nativeIdfiPromise = this._api.Android!.Preferences.setString(InstallInfo._androidSettingsFile, key, value.toLowerCase());
+            nativeIdfiPromise = this._api.Android!.Preferences.setString(androidSettingsFile, key, value.toLowerCase());
         }
         return nativeIdfiPromise.catch(e => {
             return Promise.reject(e);
