@@ -1,5 +1,6 @@
 # Pending
 
+* Add click sent/received metrics for MRAID webplayer [#16792](https://github.com/Applifier/unity-ads-webview/pull/16792)
 * [Signal Mapping] Add Device Fields to Config Request [#16888](https://github.com/Applifier/unity-ads-webview/pull/16888)
 * [Load] Utilize LoadAndFillEventManager [#16556](https://github.com/Applifier/unity-ads-webview/pull/16556)
 * [Load] Sample Load/Fill Events at 10% [#16856](https://github.com/Applifier/unity-ads-webview/pull/16856)
