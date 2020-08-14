@@ -12,7 +12,7 @@ import { Template } from 'Core/Utilities/Template';
 import ExternalMRAIDEndScreenTemplate from 'html/mraidEndScreen/ExternalMRAIDEndScreen.html';
 import { IMRAIDEventBridgeHandler } from 'ExternalEndScreen/MRAIDEventBridge/MRAIDEventBridge';
 import { createStopwatch } from 'Core/Utilities/Stopwatch';
-import { IframeMRAIDEventBridge } from 'ExternalEndScreen/MRAIDEventBridge/IframeMRAIDEventBridge';
+import { MRAIDEventBridgeForIFrame } from 'ExternalEndScreen/MRAIDEventBridge/MRAIDEventBridgeForIFrame';
 
 export class ExternalMRAIDEndScreen extends ExternalEndScreen implements IMRAIDEventBridgeHandler {
     protected _isLoaded: boolean;
@@ -33,7 +33,7 @@ export class ExternalMRAIDEndScreen extends ExternalEndScreen implements IMRAIDE
     private _gdprBanner: HTMLElement;
     private _privacyButton: HTMLElement;
 
-    private _mraidEventBridge: IframeMRAIDEventBridge;
+    private _mraidEventBridge: MRAIDEventBridgeForIFrame;
 
     constructor(parameters: IEndScreenParameters, campaign: PerformanceCampaign, country: string) {
         super(undefined, parameters, campaign, country);
@@ -87,7 +87,7 @@ export class ExternalMRAIDEndScreen extends ExternalEndScreen implements IMRAIDE
         initIframeStopwatch.start();
 
         const iframe = this._iframe = <HTMLIFrameElement> this._container.querySelector('#iframe-end-screen');
-        this._mraidEventBridge = new IframeMRAIDEventBridge(this, this._core, this._iframe);
+        this._mraidEventBridge = new MRAIDEventBridgeForIFrame(this, this._core, this._iframe);
 
         this._closeRegion = <HTMLElement> this._container.querySelector('.close-region');
         this._gdprBanner = <HTMLElement> this._container.querySelector('.gdpr-pop-up');

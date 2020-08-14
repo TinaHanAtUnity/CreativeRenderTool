@@ -1,7 +1,8 @@
 import { IMRAIDEventBridgeHandler, MRAIDEventBridge } from 'ExternalEndScreen/MRAIDEventBridge/MRAIDEventBridge';
 import { ICoreApi } from 'Core/ICore';
+import { ExternalMRAIDEndScreenMetric, SDKMetrics } from 'Ads/Utilities/SDKMetrics';
 
-export class IframeMRAIDEventBridge extends MRAIDEventBridge {
+export class MRAIDEventBridgeForIFrame extends MRAIDEventBridge {
     private _messageListener: (e: MessageEvent) => void;
     private _iframe: HTMLIFrameElement;
 
@@ -31,7 +32,7 @@ export class IframeMRAIDEventBridge extends MRAIDEventBridge {
                 this._handler.onLoaded();
                 break;
             default:
-                this._core.Sdk.logInfo('Unhandled mraid event type: ' + event.data.type);
+                SDKMetrics.reportMetricEventWithTags(ExternalMRAIDEndScreenMetric.UnknownMRAIDEvent, { event: event.data.type });
         }
     }
 

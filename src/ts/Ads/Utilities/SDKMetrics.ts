@@ -183,6 +183,7 @@ export enum ExternalMRAIDEndScreenMetric {
     FetchMRAID = 'external_mraid_end_screen_fetch_mraid',
     MRAIDFailed = 'external_mraid_end_screen_mraid_failed',
     MRAIDWarning = 'external_mraid_end_screen_mraid_warning',
+    UnknownMRAIDEvent = 'external_mraid_end_screen_unknown_mraid_event',
     GDPR = 'external_mraid_end_screen_gdpr'
 }
 

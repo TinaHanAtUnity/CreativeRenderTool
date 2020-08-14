@@ -25,30 +25,29 @@ jest.mock('html/mraidEndScreen/MraidEndScreenContainer.html', () => {
 
 jest.mock('html/mraidEndScreen/ExternalMRAIDEndScreen.html', () => {
     return {
-        'default': '<div class="close-region">\n' +
-            '    <div class="close">\n' +
-            '        <span class="icon-close"></span>\n' +
-            '        <div class="circle-base"></div>\n' +
-            '        <div class="progress-wrapper">\n' +
-            '            <div class="circle-left"></div>\n' +
-            '            <div class="circle-right"></div>\n' +
-            '        </div>\n' +
-            '    </div>\n' +
-            '</div>\n' +
-            '<iframe id="iframe-end-screen" scrolling="no" sandbox="allow-scripts"></iframe>\n' +
-            '<div class="gdpr-pop-up">\n' +
-            '    <div class="icon-gdpr"></div>\n' +
-            '    <div class="gdpr-text">\n' +
-            '        <%= data.t("privacy-legitimate-interest-pop-up-1") %>\n' +
-            '        <span class="gdpr-link"><%= data.t("privacy-legitimate-interest-pop-up-2") %></span>\n' +
-            '        <%= data.t("privacy-legitimate-interest-pop-up-3") %>\n' +
-            '    </div>\n' +
-            '</div>\n' +
-            '\n'
+        'default': `
+<div class="close-region">
+    <div class="close">
+        <span class="icon-close"></span>
+        <div class="circle-base"></div>
+        <div class="progress-wrapper">
+            <div class="circle-left"></div>
+            <div class="circle-right"></div>
+        </div>
+    </div>
+</div>
+<iframe id="iframe-end-screen" scrolling="no" sandbox="allow-scripts"></iframe>
+<div class="gdpr-pop-up">
+    <div class="icon-gdpr"></div>
+    <div class="gdpr-text">
+        <%= data.t("privacy-legitimate-interest-pop-up-1") %>
+        <span class="gdpr-link"><%= data.t("privacy-legitimate-interest-pop-up-2") %></span>
+        <%= data.t("privacy-legitimate-interest-pop-up-3") %>
+    </div>
+</div>
+`
     };
 });
-
-XHRequest.get = jest.fn().mockReturnValue(new Promise(() => ''));
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe('ExternalMRAIDEndScreen on ' + (platform === Platform.ANDROID ? 'android' : 'ios'), () => {
@@ -67,6 +66,8 @@ XHRequest.get = jest.fn().mockReturnValue(new Promise(() => ''));
         const sendCloseEvent = () => sendEvent('close');
         const sendLoadedEvent = () => sendEvent('loaded');
         const sendOpenEvent = () => sendEvent('open');
+
+        const originalXHRequestGet = XHRequest.get;
 
         beforeEach(() => {
             const privacy = new AbstractPrivacy();
@@ -110,6 +111,12 @@ XHRequest.get = jest.fn().mockReturnValue(new Promise(() => ''));
             externalMRAIDEndScreen = new ExternalMRAIDEndScreen(endScreenParameters, campaign, 'US');
             externalMRAIDEndScreen.onCloseEvent = jest.fn();
             externalMRAIDEndScreen.onOpen = jest.fn();
+
+            XHRequest.get = jest.fn().mockReturnValue(new Promise(() => ''));
+        });
+
+        afterEach(() => {
+            XHRequest.get = originalXHRequestGet;
         });
 
         it('should contain iframe-end-screen when rendered', () => {
