@@ -124,7 +124,7 @@ jest.mock('html/mraidEndScreen/ExternalMRAIDEndScreen.html', () => {
             expect(externalMRAIDEndScreen.container().innerHTML).toContain('iframe-end-screen');
         });
 
-        describe('when playable is ready', () => {
+        describe('when playable is loaded and show is called', () => {
             beforeEach(() => {
                 externalMRAIDEndScreen.render();
                 return sendLoadedEvent().then(() => {
