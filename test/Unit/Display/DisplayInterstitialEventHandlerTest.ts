@@ -146,6 +146,10 @@ describe('DisplayInterstitialEventHandler', () => {
                 displayInterstitialEventHandler.onDisplayInterstitialClose();
                 sinon.assert.called(<sinon.SinonSpy>operativeEventManager.sendThirdQuartile);
             });
+            it('should send PTS third quartile diagnostic event', () => {
+                displayInterstitialEventHandler.onDisplayInterstitialClose();
+                sinon.assert.called(<sinon.SinonSpy>displayInterstitialAdUnit.sendTrackingEvent);
+            });
         });
     }
 });
