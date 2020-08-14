@@ -2,6 +2,7 @@ import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 import { IObserver1 } from 'Core/Utilities/IObserver';
 import { MRAIDEventAdapter, IMRAIDOrientationProperties, MRAIDEvents, IMRAIDHandler } from 'MRAID/EventBridge/MRAIDEventAdapter';
 import { ICoreApi } from 'Core/ICore';
+import { SDKMetrics, MraidWebplayerMetric } from 'Ads/Utilities/SDKMetrics';
 
 export class MRAIDWebPlayerEventAdapter extends MRAIDEventAdapter {
     private _container: WebPlayerContainer;
@@ -59,5 +60,11 @@ export class MRAIDWebPlayerEventAdapter extends MRAIDEventAdapter {
 
     private handleResizeWebview() {
         this._handler.onBridgeResizeWebview();
+    }
+
+    // overriding handleOpen is a temporary addition for this metric
+    protected handleOpen(url: string) {
+        SDKMetrics.reportMetricEvent(MraidWebplayerMetric.MraidClickReceived);
+        super.handleOpen(url);
     }
 }

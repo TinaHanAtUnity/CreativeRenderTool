@@ -14,6 +14,7 @@ import { MRAIDAdUnit } from 'MRAID/AdUnits/MRAIDAdUnit';
 import { WebPlayerMRAID } from 'MRAID/Views/WebPlayerMRAID';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
+import { SDKMetrics, MraidWebplayerMetric } from 'Ads/Utilities/SDKMetrics';
 
 export interface IMRAIDAdUnitParameters extends IAdUnitParameters<MRAIDCampaign> {
     mraid: MRAIDView<IMRAIDViewHandler>;
@@ -158,5 +159,11 @@ export class WebPlayerMRAIDAdUnit extends MRAIDAdUnit implements IAdUnitContaine
             this._webPlayerContainer.setSettings(settings, {}),
             this._webPlayerContainer.setEventSettings(events)
         ]);
+    }
+
+    // overriding sendClick is a temporary addition for this metric
+    public sendClick(): void {
+        SDKMetrics.reportMetricEvent(MraidWebplayerMetric.MraidClickSent);
+        super.sendClick();
     }
 }

@@ -240,12 +240,16 @@ export enum InitializationFailureMetric {
 export enum VideoLengthMetric {
     LengthOverreported = 'dsp_video_length_overreported',
     LengthUnderreported = 'dsp_video_length_underreported'
+}
 
+export enum MraidWebplayerMetric {
+    MraidClickSent = 'mraid_ad_clicked',
+    MraidClickReceived = 'mraid_click_received'
 }
 
 export type TimingEvent = InitializationMetric | MediationMetric | GeneralTimingMetric | ChinaAucionEndpoint | VideoLengthMetric;
 
-export type PTSEvent = VideoMetric | TimingEvent | AuctionV6 | AdmobMetric | BannerMetric | CachingMetric | ChinaMetric | VastMetric | MraidMetric | MiscellaneousMetric | LoadMetric | ErrorMetric | OMMetric | AUIMetric | LoadV5 | ChinaAucionEndpoint | ExternalEndScreenMetric | InitializationFailureMetric;
+export type PTSEvent = VideoMetric | TimingEvent | AuctionV6 | AdmobMetric | BannerMetric | CachingMetric | ChinaMetric | VastMetric | MraidMetric | MiscellaneousMetric | LoadMetric | ErrorMetric | OMMetric | AUIMetric | LoadV5 | ChinaAucionEndpoint | ExternalEndScreenMetric | InitializationFailureMetric | MraidWebplayerMetric;
 
 export class SDKMetrics {
 
