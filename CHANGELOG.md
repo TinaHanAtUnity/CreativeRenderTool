@@ -1,4 +1,4 @@
-# Pending
+# Fri Aug 14 23:00:50 UTC 2020
 
 * Add missing third quartile events in PTS [#16978](https://github.com/Applifier/unity-ads-webview/pull/16978)
 * Add click sent/received metrics for MRAID webplayer [#16792](https://github.com/Applifier/unity-ads-webview/pull/16792)
