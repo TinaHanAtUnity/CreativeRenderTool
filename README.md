@@ -40,13 +40,21 @@
 
 ### Browser Build
 
+Build for the browser:
+
 - `make build-browser`
 
-Suggested testing browser is Google Chrome
-
-To build continuously (on file changes), use:
+Or to build continuously (on file changes), use:
 
 - `make watch-browser`
+
+To serve the build use: 
+
+- `make start-server`
+
+Navigate to: http://localhost:8000/build/browser/
+
+Suggested testing browser is Google Chrome
 
 ### Development Build
 
