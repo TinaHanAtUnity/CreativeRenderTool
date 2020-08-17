@@ -72,6 +72,10 @@ export class ExternalMRAIDEndScreen extends ExternalEndScreen implements IMRAIDE
         if (endScreenSettings) {
             this._showCloseButton = endScreenSettings.showCloseButton;
             this._closeButtonDelay = this._closeButtonDelayRemaining = endScreenSettings.closeButtonDelay;
+
+            if (!this._showCloseButton) {
+                this._canClose = true;
+            }
         } else {
             this._showCloseButton = true;
             this._closeButtonDelay = this._closeButtonDelayRemaining = 0;
