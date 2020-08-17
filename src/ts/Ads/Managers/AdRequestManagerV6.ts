@@ -105,6 +105,7 @@ export class AdRequestManagerV6 extends AdRequestManager {
         }
 
         const preloadData: IPlacementIdMap<IParsedPlacementPreloadData> = {};
+        this._encryptedPreloadData = response.encryptedPreloadData;
 
         for (const placementPreloadData in response.preloadData) {
             if (response.preloadData.hasOwnProperty(placementPreloadData)) {
