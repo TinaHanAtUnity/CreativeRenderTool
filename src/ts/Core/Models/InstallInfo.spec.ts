@@ -9,7 +9,7 @@ describe('InstallInfo', () => {
     const getStringNotFoundError = 'COULDNT_GET_VALUE';
     const getStringOtherError = 'OTHER_ERROR';
     const preferencesIdfiKey = 'unityads-idfi';
-    const errorLog = `InstalledInfo failed due to reason: ${getStringOtherError}`;
+    const errorLog = `InstalledInfo failed due to reason: Error: ${getStringOtherError}`;
 
     let core: ICore;
     let installInfo: InstallInfo;
@@ -51,7 +51,7 @@ describe('InstallInfo', () => {
             });
         });
 
-        describe('getIdentifierForInstall', () => {
+        describe('getIdfi', () => {
             beforeEach(() => {
                 core.Api.Android!.Preferences.getString = jest.fn().mockReturnValue(Promise.resolve(validIdentifier));
                 installInfo = new InstallInfo(Platform.ANDROID, core.Api);
@@ -59,7 +59,7 @@ describe('InstallInfo', () => {
             });
 
             it('should return the retrieved identifier', () => {
-                const idfi = installInfo.getIdentifierForInstall();
+                const idfi = installInfo.getIdfi();
                 expect(idfi).toBe(validIdentifier);
             });
         });
@@ -73,7 +73,7 @@ describe('InstallInfo', () => {
 
             it('rejects it', async () => {
                 await installInfo.fetch().catch(e => {
-                    expect(e).toBe(getStringOtherError);
+                    expect(e).toBeDefined();
                 });
                 expect(core.Api.Sdk.logError).toHaveBeenCalledWith(errorLog);
             });
@@ -112,7 +112,7 @@ describe('InstallInfo', () => {
             });
         });
 
-        describe('getIdentifierForInstall', () => {
+        describe('getIdfi', () => {
             beforeEach(() => {
                 core.Api.iOS!.Preferences.getString = jest.fn().mockReturnValue(Promise.resolve(validIdentifier));
                 installInfo = new InstallInfo(Platform.IOS, core.Api);
@@ -120,7 +120,7 @@ describe('InstallInfo', () => {
             });
 
             it('should return the retrieved identifier', () => {
-                const idfi = installInfo.getIdentifierForInstall();
+                const idfi = installInfo.getIdfi();
                 expect(idfi).toBe(validIdentifier);
             });
         });
@@ -134,7 +134,7 @@ describe('InstallInfo', () => {
 
             it('rejects it', async () => {
                 await installInfo.fetch().catch(e => {
-                    expect(e).toBe(getStringOtherError);
+                    expect(e).toBeDefined();
                 });
                 expect(core.Api.Sdk.logError).toHaveBeenCalledWith(errorLog);
             });

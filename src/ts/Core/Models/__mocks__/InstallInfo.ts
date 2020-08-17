@@ -6,10 +6,12 @@ export type InstallInfoMock = Base & {
     getDTO: jest.Mock;
 };
 
+const validIDFI = 'ffffffff-ffff-ffff-ffff-ffffffffffff';
+
 export const InstallInfo = jest.fn(() => {
     return <InstallInfoMock>{
-        fetch: jest.fn().mockImplementation(() => Promise.resolve()),
-        getIdentifierForInstall: jest.fn().mockReturnValue('ffffffff-ffff-ffff-ffff-ffffffffffff'),
-        getDTO: jest.fn().mockImplementation(() => Promise.resolve())
+        fetch: jest.fn().mockImplementation(() => Promise.resolve([])),
+        getIdentifierForInstall: jest.fn().mockReturnValue(validIDFI),
+        getDTO: jest.fn().mockImplementation(() => Promise.resolve({ 'idfi': validIDFI }))
     };
 });
