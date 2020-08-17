@@ -1,5 +1,6 @@
 # Pending
 
+* [LoadV5]Indexed encrypted data in request body [#16791](https://github.com/Applifier/unity-ads-webview/pull/16791)
 * Added endScreenSettings in preparation for the Video + Playable initiative [#16984](https://github.com/Applifier/unity-ads-webview/pull/16984)
 * [Load V5] Auction Protocol V6 support [#16979](https://github.com/Applifier/unity-ads-webview/pull/16979)
 
