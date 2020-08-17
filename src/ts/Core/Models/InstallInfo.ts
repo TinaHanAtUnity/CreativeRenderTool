@@ -57,10 +57,10 @@ export class InstallInfo extends Model<IInstallInfo> {
     }
 
     /**
-     * If the IDFI is undefined or empty, generate and save a IDFI, otherwise return.
+     * If the IDFI is empty, generate and save a IDFI, otherwise return.
      */
     private verifyIdfi(idfi: string): Promise<string> {
-        if (idfi === undefined || idfi === '') {
+        if (idfi === '') {
             return this._api.DeviceInfo.getUniqueEventId().then(newIdfi => {
                 this.setPreferenceString(idfiKey, newIdfi);
                 return newIdfi;
@@ -73,13 +73,6 @@ export class InstallInfo extends Model<IInstallInfo> {
      * Looks the value up from preferences.  If not found an empty string is returned.
      */
     private getPreferenceString(key: string): Promise<string> {
-        // const handleNotFound = ((e: any | undefined) => {
-        //     if ( e === null || e === undefined || e === getStringNotFoundError) {
-        //         return Promise.resolve('');
-        //     }
-        //     return Promise.reject(new Error(e));
-        // });
-
         const handleNotFound = ((e: string) => {
             if (e === getStringNotFoundError) {
                 return Promise.resolve('');
