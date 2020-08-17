@@ -1,4 +1,4 @@
-# Pending
+# Mon Aug 17 22:24:28 UTC 2020
 
 * [LoadV5]Indexed encrypted data in request body [#16791](https://github.com/Applifier/unity-ads-webview/pull/16791)
 * Added endScreenSettings in preparation for the Video + Playable initiative [#16984](https://github.com/Applifier/unity-ads-webview/pull/16984)
