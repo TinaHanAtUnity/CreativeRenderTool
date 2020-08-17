@@ -17,7 +17,7 @@ export class MRAIDEventBridgeForIFrame extends MRAIDEventBridge {
         window.addEventListener('message', this._messageListener);
     }
 
-    private onMessageEvent(event: MessageEvent) {
+    private onMessageEvent(event: MessageEvent): void {
         switch (event.data.type) {
             case 'ready':
                 this._handler.onReady();
@@ -36,7 +36,7 @@ export class MRAIDEventBridgeForIFrame extends MRAIDEventBridge {
         }
     }
 
-    protected postMessage(event: string, data?: unknown) {
+    protected postMessage(event: string, data?: unknown): void {
         if (this._iframe.contentWindow) {
             this._iframe.contentWindow.postMessage({
                 type: event,
@@ -45,7 +45,7 @@ export class MRAIDEventBridgeForIFrame extends MRAIDEventBridge {
         }
     }
 
-    public stop() {
+    public stop(): void {
         window.removeEventListener('message', this._messageListener);
     }
 }

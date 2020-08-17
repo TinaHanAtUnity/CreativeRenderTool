@@ -90,14 +90,14 @@ export class ExternalMRAIDEndScreen extends ExternalEndScreen implements IMRAIDE
         const initIframeStopwatch = createStopwatch();
         initIframeStopwatch.start();
 
-        const iframe = this._iframe = <HTMLIFrameElement> this._container.querySelector('#iframe-end-screen');
+        this._iframe = <HTMLIFrameElement> this._container.querySelector('#iframe-end-screen');
         this._mraidEventBridge = new MRAIDEventBridgeForIFrame(this, this._core, this._iframe);
 
         this._closeRegion = <HTMLElement> this._container.querySelector('.close-region');
         this._gdprBanner = <HTMLElement> this._container.querySelector('.gdpr-pop-up');
         this._privacyButton = <HTMLElement> this._container.querySelector('.icon-gdpr');
 
-        iframe.onload = () => {
+        this._iframe.onload = () => {
             this._isIframeReady = true;
 
             initIframeStopwatch.stopAndSend(ExternalMRAIDEndScreenMetric.IframeInitialize, {});
