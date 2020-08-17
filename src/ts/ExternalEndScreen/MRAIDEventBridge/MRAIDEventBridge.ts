@@ -15,10 +15,10 @@ export abstract class MRAIDEventBridge {
         this._handler = handler;
         this._core = core;
 
-        this.setupEventListener();
+        this.start();
     }
 
-    protected abstract setupEventListener(): void;
+    protected abstract start(): void;
 
     protected abstract postMessage(event: string, data?: unknown): void;
 
@@ -30,5 +30,5 @@ export abstract class MRAIDEventBridge {
         this.postMessage('resize', { width: width, height: height });
     }
 
-    public abstract close(): void;
+    public abstract stop(): void;
 }

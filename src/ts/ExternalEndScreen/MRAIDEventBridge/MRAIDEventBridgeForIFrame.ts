@@ -12,7 +12,7 @@ export class MRAIDEventBridgeForIFrame extends MRAIDEventBridge {
         this._iframe = iframe;
     }
 
-    protected setupEventListener(): void {
+    protected start(): void {
         this._messageListener = (event: MessageEvent) => this.onMessageEvent(event);
         window.addEventListener('message', this._messageListener);
     }
@@ -45,7 +45,7 @@ export class MRAIDEventBridgeForIFrame extends MRAIDEventBridge {
         }
     }
 
-    public close() {
+    public stop() {
         window.removeEventListener('message', this._messageListener);
     }
 }

@@ -232,7 +232,7 @@ export class ExternalMRAIDEndScreen extends ExternalEndScreen implements IMRAIDE
     public onCloseEvent(): void {
         this._handlers.forEach(handler => handler.onEndScreenClose());
 
-        this._mraidEventBridge.close();
+        this._mraidEventBridge.stop();
     }
 
     private choosePrivacyShown(): void {
