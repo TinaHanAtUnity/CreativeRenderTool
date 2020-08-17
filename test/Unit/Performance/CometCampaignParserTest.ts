@@ -14,6 +14,7 @@ import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 
 import OnCometMraidPlcCampaign from 'json/campaigns/performance/CometMraidUrlCampaign.json';
 import OnCometVideoPlcCampaign from 'json/campaigns/performance/CometVideoCampaign.json';
+import OnCometVideoPlusPlayableCampaign from 'json/campaigns/performance/CometVideoPlusPlayableCampaign.json';
 import OnCometVideoPlcCampaignSquareEndScreenAsset from 'json/campaigns/performance/CometVideoCampaignWithSquareEndScreenAsset.json';
 
 import 'mocha';
@@ -277,6 +278,27 @@ describe('CometCampaignParser', () => {
                 assert.equal(perfCampaign.getEndScreenType(), content.endScreenType, 'End Screen type is not equal');
                 assert.equal(perfCampaign.getEndScreen()!.getUrl(), Url.encode(content.endScreenUrl), 'End Screen URL is not equal');
 
+            });
+        });
+
+        describe('when it is a performance campaign with mraid endcard', () => {
+            beforeEach(() => {
+                return parse(OnCometVideoPlusPlayableCampaign);
+            });
+
+            it('should parse and return a performance campaign with proper endScreenType and endScreenSettings props', () => {
+                assert.isNotNull(campaign, 'Campaign is null');
+                assert.isTrue(campaign instanceof PerformanceCampaign, 'Campaign was not a PerformanceCampaign');
+
+                const perfCampaign = <PerformanceCampaign>campaign;
+                const json = OnCometVideoPlusPlayableCampaign;
+                const content = JSON.parse(json.content);
+
+                assertBaseCampaign(content);
+                assert.equal(perfCampaign.getEndScreenType(), content.endScreenType, 'End Screen type is not equal');
+                assert.equal(perfCampaign.getEndScreen()!.getUrl(), Url.encode(content.endScreenUrl), 'End Screen URL is not equal');
+                assert.equal(perfCampaign.getEndScreenSettings()!.showCloseButton, content.endScreenSettings.showCloseButton, 'End Screen settings `showCloseButton` is not equal');
+                assert.equal(perfCampaign.getEndScreenSettings()!.closeButtonDelay, content.endScreenSettings.closeButtonDelay, 'End Screen settings `closeButtonDelay` not equal');
             });
         });
     });

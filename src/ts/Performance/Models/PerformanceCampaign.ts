@@ -13,6 +13,11 @@ export enum StoreName {
     STANDALONE_ANDROID
 }
 
+export interface ICloseButtonSettings {
+    showCloseButton: boolean;
+    closeButtonDelay: number;
+}
+
 export interface IRawPerformanceCampaign extends IRawCampaign {
     appStoreId: string;
     gameId: number;
@@ -42,6 +47,7 @@ export interface IRawPerformanceCampaign extends IRawCampaign {
     dynamicMarkup?: string;
     endScreenType?: string;
     endScreenUrl?: string;
+    endScreenSettings?: ICloseButtonSettings;
 }
 
 export interface IPerformanceCampaign extends ICampaign {
@@ -68,6 +74,7 @@ export interface IPerformanceCampaign extends ICampaign {
     appDownloadUrl?: string;
     endScreenType?: string;
     endScreen?: HTML;
+    endScreenSettings: ICloseButtonSettings | undefined;
 }
 
 export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
@@ -96,7 +103,8 @@ export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
             adUnitStyle: ['object', 'undefined'],
             appDownloadUrl: ['string', 'undefined'],
             endScreenType: ['string', 'undefined'],
-            endScreen: ['object', 'undefined']
+            endScreen: ['object', 'undefined'],
+            endScreenSettings: ['object', 'undefined']
         }, campaign);
     }
 
@@ -236,6 +244,10 @@ export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
         return this.get('endScreen');
     }
 
+    public getEndScreenSettings(): ICloseButtonSettings | undefined {
+        return this.get('endScreenSettings');
+    }
+
     public getDTO(): { [key: string]: unknown } {
         let gameIcon: unknown;
         const gameIconObject = this.getGameIcon();
@@ -292,7 +304,8 @@ export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
             'store': StoreName[this.getStore()].toLowerCase(),
             'appDownloadUrl': this.getAppDownloadUrl(),
             'endScreenType': this.getEndScreenType(),
-            'endScreen': this.getEndScreen()
+            'endScreen': this.getEndScreen(),
+            'endScreenSettings': this.getEndScreenSettings()
         };
     }
 }
