@@ -7,6 +7,11 @@ import MobilityWareGamesJson from 'json/custom_features/MobilityWareGames.json';
 import CacheModeAllowedExperimentGames from 'json/custom_features/CacheModeAllowedExperimentGames.json';
 
 export class CustomFeatures {
+
+    public static shouldSendLoadFillEvent(): boolean {
+        return this.sampleAtGivenPercent(10);
+    }
+
     public static isTencentSeat(seatId: number | undefined): boolean {
         return seatId === 9107 ||
                seatId === 9258;

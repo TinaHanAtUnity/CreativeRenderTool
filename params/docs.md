@@ -107,6 +107,16 @@
 | adNetworkPlist | string | List of SKAdNetworks included in an iOS game Plist | SDK | ios |
 | systemBootTime | number | Time that the system booted | SDK | ios |
 | trackingAuthStatus | number | Tracking Authorization Status | SDK | ios |
+| locales | object | Array representation of localeList | SDK | ios |
+| plist | object | Array representation of adNetworkPlist | SDK | ios |
+| idfv | string | Vendor Identifier string | SDK | ios |
+| totalSpace | number | Total Internal Device Space in kilobytes | SDK | all |
+| totalMemory | number | Total Internal Device Memory in kilobytes | SDK | all |
+| totalMemory | number | Total Internal Device Memory in kilobytes | SDK | all |
+| freeMemory | number | Free Device Memory in kilobytes | SDK | all |
+| batteryStatus | number | Current battery status of the device - [Resource](http://developer.android.com/intl/zh-cn/reference/android/os/BatteryManager.html) | SDK | all |
+| batteryLevel | number | Current battery level of the device (0-1) | SDK | all |
+| screenBrightness | number | Current screen brightness percentage (0-100) | SDK | all |
 
 
 
@@ -138,6 +148,14 @@
 | adapterVersion | no | True | False | string | SDK version name for adapter, should be in sync with SDK version | SDK | all |
 | analyticsUserId | no | True | False | string | Unity Analytics user ID in Unity Engine (does not apply to analytics events Unity Ads SDK is sending) | SDK | all |
 | analyticsSessionId | no | True | False | string | Unity Analytics session ID in Unity Engine (does not apply to analytics events Unity Ads SDK is sending), note: sent as string to avoid problems with 64 bit integers being over JavaScript safe number limit | SDK | all |
+| networkOperator | ios | True | False | string | MCC + MNC codes | SDK | all |
+| totalSpace | ios | True | False | number | Total Internal Device Space in kilobytes | SDK | all |
+| totalMemory | ios | True | False | number | Total Internal Device Memory in kilobytes | SDK | all |
+| freeMemory | ios | True | False | number | Free Device Memory in kilobytes | SDK | all |
+| batteryStatus | ios | True | False | number | Current battery status of the device - [Resource](http://developer.android.com/intl/zh-cn/reference/android/os/BatteryManager.html) | SDK | all |
+| batteryLevel | ios | True | False | number | Current battery level of the device (0-1) | SDK | all |
+| screenBrightness | ios | True | False | number | Current screen brightness percentage (0-100) | SDK | all |
+| volume | ios | True | False | number | On iOS, this is a float between 0 (silent) and 1 (max volume), on Android, this is integer from 0 (silent) to max volume index | SDK | all |
 | deviceName | ios | True | False | string | Device name associated with an iOS device | SDK | ios |
 | vendorIdentifier | ios | True | False | string | Vendor Identifier string | SDK | ios |
 | localeList | ios | True | False | string | A list of locale strings (e.g. ["en_US"] for English language | SDK | ios |
@@ -219,6 +237,13 @@
 | preloadPlacements | no | False | True | object | All placements received in configuration | SDK | all |
 | preloadData | no | False | True | object | Preload Data for all placements received in configuration | SDK | all |
 | loadV5Support | no | False | True | boolean | Indicates if client can work with Load V5 or not | SDK | all |
+| plist | ios | False | True | object | Array representation of adNetworkPlist | SDK | ios |
+| idfv | ios | False | True | string | Vendor Identifier string | SDK | ios |
+| deviceName | ios | False | True | string | Device name associated with an iOS device | SDK | ios |
+| locales | ios | False | True | object | Array representation of localeList | SDK | ios |
+| currentUiTheme | ios | False | True | number | Indicates the iOS device current ui color theme | SDK | ios |
+| systemBootTime | ios | False | True | number | Time that the system booted | SDK | ios |
+| trackingAuthStatus | ios | False | True | number | Tracking Authorization Status | SDK | ios |
 
 
 
@@ -273,6 +298,13 @@
 | agreedOverAgeLimit | all | False | True | string | User answer to age gate "yes" or "no", "missing" if no age gate has been presented | SDK | all |
 | privacyType | no | False | True | string | Privacy method, only sent if it is developer_consent or legitimate_interest | SDK | all |
 | loadV5Support | no | False | True | boolean | Indicates if client can work with Load V5 or not | SDK | all |
+| plist | ios | False | True | object | Array representation of adNetworkPlist | SDK | ios |
+| idfv | ios | False | True | string | Vendor Identifier string | SDK | ios |
+| deviceName | ios | False | True | string | Device name associated with an iOS device | SDK | ios |
+| locales | ios | False | True | object | Array representation of localeList | SDK | ios |
+| currentUiTheme | ios | False | True | number | Indicates the iOS device current ui color theme | SDK | ios |
+| systemBootTime | ios | False | True | number | Time that the system booted | SDK | ios |
+| trackingAuthStatus | ios | False | True | number | Tracking Authorization Status | SDK | ios |
 
 
 
@@ -327,4 +359,11 @@
 | agreedOverAgeLimit | all | False | True | string | User answer to age gate "yes" or "no", "missing" if no age gate has been presented | SDK | all |
 | privacyType | no | False | True | string | Privacy method, only sent if it is developer_consent or legitimate_interest | SDK | all |
 | loadV5Support | no | False | True | boolean | Indicates if client can work with Load V5 or not | SDK | all |
+| plist | ios | False | True | object | Array representation of adNetworkPlist | SDK | ios |
+| idfv | ios | False | True | string | Vendor Identifier string | SDK | ios |
+| deviceName | ios | False | True | string | Device name associated with an iOS device | SDK | ios |
+| locales | ios | False | True | object | Array representation of localeList | SDK | ios |
+| currentUiTheme | ios | False | True | number | Indicates the iOS device current ui color theme | SDK | ios |
+| systemBootTime | ios | False | True | number | Time that the system booted | SDK | ios |
+| trackingAuthStatus | ios | False | True | number | Tracking Authorization Status | SDK | ios |
 

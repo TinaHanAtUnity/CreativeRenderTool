@@ -10,6 +10,7 @@ import { ClientInfo } from 'Core/Models/ClientInfo';
 import { FocusManager } from 'Core/Managers/FocusManager';
 import { SDKMetrics, LoadMetric } from 'Ads/Utilities/SDKMetrics';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
+import { LoadAndFillEventManager } from 'Ads/Managers/LoadAndFillEventManager';
 
 export class PerPlacementLoadManager extends RefreshManager {
     private _ads: IAdsApi;
@@ -20,8 +21,9 @@ export class PerPlacementLoadManager extends RefreshManager {
     protected _coreConfig: CoreConfiguration;
     protected _campaignManager: CampaignManager;
     protected _pts: SDKMetrics;
+    protected _loadAndFillEventManager: LoadAndFillEventManager;
 
-    constructor(ads: IAdsApi, adsConfig: AdsConfiguration, coreConfig: CoreConfiguration, campaignManager: CampaignManager, clientInfo: ClientInfo, focusManager: FocusManager) {
+    constructor(ads: IAdsApi, adsConfig: AdsConfiguration, coreConfig: CoreConfiguration, campaignManager: CampaignManager, clientInfo: ClientInfo, focusManager: FocusManager, loadAndFillEventManager: LoadAndFillEventManager) {
         super();
 
         this._ads = ads;
@@ -30,6 +32,7 @@ export class PerPlacementLoadManager extends RefreshManager {
         this._campaignManager = campaignManager;
         this._clientInfo = clientInfo;
         this._focusManager = focusManager;
+        this._loadAndFillEventManager = loadAndFillEventManager;
 
         this._focusManager.onAppForeground.subscribe(() => this.refresh());
         this._focusManager.onActivityResumed.subscribe((activity) => this.refresh());
@@ -93,18 +96,26 @@ export class PerPlacementLoadManager extends RefreshManager {
     // count is the number of times load was called for a placementId before we could process it
     protected loadPlacement(placementId: string, count: number) {
         const placement = this._adsConfig.getPlacement(placementId);
+
+        this._loadAndFillEventManager.sendLoadTrackingEvents(placementId);
+
         if (placement && this.shouldLoadCampaignForPlacement(placement)) {
             this.setPlacementState(placementId, PlacementState.WAITING);
             this._campaignManager.loadCampaign(placement).then(loadedCampaign => {
                 if (loadedCampaign) {
                     placement.setCurrentCampaign(loadedCampaign.campaign);
                     placement.setCurrentTrackingUrls(loadedCampaign.trackingUrls);
+                    this._loadAndFillEventManager.sendFillTrackingEvents(placementId, loadedCampaign.campaign);
                     this.setPlacementState(placementId, PlacementState.READY);
                 } else {
                     this.setPlacementState(placementId, PlacementState.NO_FILL);
                 }
             });
         } else {
+            const campaign = placement.getCurrentCampaign();
+            if (campaign) {
+                this._loadAndFillEventManager.sendFillTrackingEvents(placementId, campaign);
+            }
             this.alertPlacementReadyStatus(placement);
             SDKMetrics.reportMetricEvent(LoadMetric.LoadAuctionRequestBlocked);
         }

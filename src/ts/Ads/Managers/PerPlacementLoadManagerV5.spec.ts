@@ -14,6 +14,7 @@ import { AbstractAdUnitMock, AbstractAdUnit } from 'Ads/AdUnits/__mocks__/Abstra
 import { ObservableMock } from 'Core/Utilities/__mocks__/Observable';
 import { PerformanceAdUnitFactory } from 'Performance/AdUnits/PerformanceAdUnitFactory';
 import { ProgrammaticMraidParser } from 'MRAID/Parsers/ProgrammaticMraidParser';
+import { LoadAndFillEventManagerMock, LoadAndFillEventManager } from 'Ads/Managers/__mocks__/LoadAndFillEventManager';
 
 [Platform.IOS, Platform.ANDROID].forEach((platform) => {
     describe(`PerPlacementLoadManagerV5(${Platform[platform]})`, () => {
@@ -23,6 +24,7 @@ import { ProgrammaticMraidParser } from 'MRAID/Parsers/ProgrammaticMraidParser';
         let adRequestManager: AdRequestManagerMock;
         let clientInfo: ClientInfoMock;
         let focusManager: FocusManagerMock;
+        let loadAndFillEventManager: LoadAndFillEventManagerMock;
         let refreshManager: PerPlacementLoadManagerV5;
 
         beforeEach(async () => {
@@ -32,8 +34,9 @@ import { ProgrammaticMraidParser } from 'MRAID/Parsers/ProgrammaticMraidParser';
             adRequestManager = AdRequestManager();
             clientInfo = ClientInfo();
             focusManager = FocusManager();
+            loadAndFillEventManager = LoadAndFillEventManager();
 
-            refreshManager = new PerPlacementLoadManagerV5(adsApi, adsConfiguration, coreConfiguration, adRequestManager, clientInfo, focusManager, false);
+            refreshManager = new PerPlacementLoadManagerV5(adsApi, adsConfiguration, coreConfiguration, adRequestManager, clientInfo, focusManager, false, loadAndFillEventManager);
         });
 
         describe('initialization', () => {
@@ -505,6 +508,14 @@ import { ProgrammaticMraidParser } from 'MRAID/Parsers/ProgrammaticMraidParser';
                 expect(adsApi.Listener.sendPlacementStateChangedEvent).toBeCalledWith('video', 'NOT_AVAILABLE', 'WAITING');
                 expect(adsApi.Listener.sendPlacementStateChangedEvent).toBeCalledWith('video', 'WAITING', 'NO_FILL');
             });
+
+            it('should send load event', () => {
+                expect(loadAndFillEventManager.sendLoadTrackingEvents).toBeCalledTimes(1);
+            });
+
+            it('should send load event with correct placement ID', () => {
+                expect(loadAndFillEventManager.sendLoadTrackingEvents).toBeCalledWith('video');
+            });
         });
 
         describe('load placement with expired data', () => {
@@ -575,7 +586,7 @@ import { ProgrammaticMraidParser } from 'MRAID/Parsers/ProgrammaticMraidParser';
                 clientInfo = ClientInfo();
                 focusManager = FocusManager();
 
-                refreshManager = new PerPlacementLoadManagerV5(adsApi, adsConfiguration, coreConfiguration, adRequestManager, clientInfo, focusManager, true);
+                refreshManager = new PerPlacementLoadManagerV5(adsApi, adsConfiguration, coreConfiguration, adRequestManager, clientInfo, focusManager, true, loadAndFillEventManager);
             });
 
             describe('load placement which was load as additional placements', () => {

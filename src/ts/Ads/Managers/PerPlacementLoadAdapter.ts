@@ -13,6 +13,7 @@ import { CacheManager } from 'Core/Managers/CacheManager';
 import { FocusManager } from 'Core/Managers/FocusManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CampaignManager } from 'Ads/Managers/CampaignManager';
+import { LoadAndFillEventManager } from 'Ads/Managers/LoadAndFillEventManager';
 
 export class PerPlacementLoadAdapter extends CampaignRefreshManager {
 
@@ -20,17 +21,32 @@ export class PerPlacementLoadAdapter extends CampaignRefreshManager {
     private _activePlacements: {[key: string]: string } = {};
     private _forceLoadPlacements: {[key: string]: string } = {};
     private _initialized: boolean;
+    private _loadAndFillEventManager: LoadAndFillEventManager;
 
-    constructor(platform: Platform, core: ICoreApi, coreConfig: CoreConfiguration, ads: IAdsApi, wakeUpManager: WakeUpManager, campaignManager: CampaignManager, adsConfig: AdsConfiguration, focusManager: FocusManager, sessionManager: SessionManager, clientInfo: ClientInfo, request: RequestManager, cache: CacheManager) {
+    constructor(platform: Platform,
+                core: ICoreApi,
+                coreConfig: CoreConfiguration,
+                ads: IAdsApi,
+                wakeUpManager: WakeUpManager,
+                campaignManager: CampaignManager,
+                adsConfig: AdsConfiguration,
+                focusManager: FocusManager,
+                sessionManager: SessionManager,
+                clientInfo: ClientInfo,
+                request: RequestManager,
+                cache: CacheManager,
+                loadAndFillEventManager: LoadAndFillEventManager) {
         super(platform, core, coreConfig, ads, wakeUpManager, campaignManager, adsConfig, focusManager, sessionManager, clientInfo, request, cache);
 
         this._ads = ads;
         this._adsConfig = adsConfig;
         this._initialized = false;
+        this._loadAndFillEventManager = loadAndFillEventManager;
 
         this._ads.LoadApi.onLoad.subscribe((placements: {[key: string]: number}) => {
             Object.keys(placements).forEach((placementId) => {
                 if (this._initialized) {
+                    this._loadAndFillEventManager.sendLoadTrackingEvents(placementId);
                     this.sendLoadAPIEvent(placementId);
                 } else {
                    this._forceLoadPlacements[placementId] = placementId;
@@ -42,6 +58,7 @@ export class PerPlacementLoadAdapter extends CampaignRefreshManager {
     public initialize(): Promise<INativeResponse | void> {
         this._initialized = true;
         Object.keys(this._forceLoadPlacements).forEach((placementId) => {
+            this._loadAndFillEventManager.sendLoadTrackingEvents(placementId);
             this._trackablePlacements[placementId] = placementId;
         });
         return super.initialize();
@@ -87,6 +104,14 @@ export class PerPlacementLoadAdapter extends CampaignRefreshManager {
         if (nextState === PlacementState.READY) {
             this._activePlacements[placementId] = placementId;
             this._ads.Listener.sendReadyEvent(placementId);
+
+            const placement = this._adsConfig.getPlacement(placementId);
+            if (placement) {
+                const campaign = placement.getCurrentCampaign();
+                if (campaign) {
+                    this._loadAndFillEventManager.sendFillTrackingEvents(placementId, campaign);
+                }
+            }
         }
     }
 

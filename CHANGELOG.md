@@ -1,5 +1,27 @@
 # Pending
 
+* Added endScreenSettings in preparation for the Video + Playable initiative [#16984](https://github.com/Applifier/unity-ads-webview/pull/16984)
+* [Load V5] Auction Protocol V6 support [#16979](https://github.com/Applifier/unity-ads-webview/pull/16979)
+
+# Fri Aug 14 23:00:50 UTC 2020
+
+* Add missing third quartile events in PTS [#16978](https://github.com/Applifier/unity-ads-webview/pull/16978)
+* Add click sent/received metrics for MRAID webplayer [#16792](https://github.com/Applifier/unity-ads-webview/pull/16792)
+* [Signal Mapping] Add Device Fields to Config Request [#16888](https://github.com/Applifier/unity-ads-webview/pull/16888)
+* [Load] Utilize LoadAndFillEventManager [#16556](https://github.com/Applifier/unity-ads-webview/pull/16556)
+* [Load] Sample Load/Fill Events at 10% [#16856](https://github.com/Applifier/unity-ads-webview/pull/16856)
+
+# Tue Aug 11 23:51:16 UTC 2020
+
+* [Load V5] Revert Reverse AB test to Normal AB Test [#16887](https://github.com/Applifier/unity-ads-webview/pull/16887)
+
+# Tue Aug 11 12:37:02 UTC 2020
+
+* Support new useUnityAttDialog config field [#16822](https://github.com/Applifier/unity-ads-webview/pull/16822)
+
+# Mon 10 Aug 2020 22:14:28 UTC
+
+* [EES] Remove default route for the external end screen [#16886](https://github.com/Applifier/unity-ads-webview/pull/16886)
 * [Chore] Remove load called counter [#16662](https://github.com/Applifier/unity-ads-webview/pull/16662)
 * [Load V5] Revert placement grouping experiment [#16855](https://github.com/Applifier/unity-ads-webview/pull/16855)
 * [Chore] Send frequency cap as separate metric [#16854](https://github.com/Applifier/unity-ads-webview/pull/16854)

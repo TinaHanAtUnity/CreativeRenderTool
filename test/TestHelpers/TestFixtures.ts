@@ -250,7 +250,8 @@ export class TestFixtures {
             bypassAppSheet: json.bypassAppSheet,
             store: storeName,
             adUnitStyle: new AdUnitStyle(json.adUnitStyle),
-            appDownloadUrl: json.appDownloadUrl
+            appDownloadUrl: json.appDownloadUrl,
+            endScreenSettings: undefined
         };
 
         if (json.trailerDownloadable && json.trailerDownloadableSize && json.trailerStreaming) {

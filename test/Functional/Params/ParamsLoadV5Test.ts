@@ -24,6 +24,7 @@ import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { AdRequestManager, LoadV5ExperimentType } from 'Ads/Managers/AdRequestManager';
 import { SDKMetrics } from 'Ads/Utilities/SDKMetrics';
 import { SpecVerifier } from 'Functional/Params/ParamsTest';
+import { LoadAndFillEventManager } from 'Ads/Managers/__mocks__/LoadAndFillEventManager';
 
 describe('Event parameters should match specifications (Load V5)', () => {
 
@@ -50,6 +51,7 @@ describe('Event parameters should match specifications (Load V5)', () => {
             const backend = TestFixtures.getBackend(platform);
             const nativeBridge = TestFixtures.getNativeBridge(platform, backend);
             const coreModule = TestFixtures.getCoreModule(nativeBridge);
+            coreModule.Ads.LoadAndFillEventManager = LoadAndFillEventManager();
             const core = coreModule.Api;
             const privacySDK = TestFixtures.getPrivacySDK(core);
             const ads = TestFixtures.getAdsApi(nativeBridge);
@@ -87,6 +89,7 @@ describe('Event parameters should match specifications (Load V5)', () => {
             const backend = TestFixtures.getBackend(platform);
             const nativeBridge = TestFixtures.getNativeBridge(platform, backend);
             const coreModule = TestFixtures.getCoreModule(nativeBridge);
+            coreModule.Ads.LoadAndFillEventManager = LoadAndFillEventManager();
             const core = coreModule.Api;
             const privacySDK = TestFixtures.getPrivacySDK(core);
             const ads = TestFixtures.getAdsApi(nativeBridge);

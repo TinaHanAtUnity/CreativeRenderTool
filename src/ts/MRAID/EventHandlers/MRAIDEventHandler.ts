@@ -134,6 +134,7 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
         const operativeEventParams: IOperativeEventParams = this.getOperativeEventParams();
         if (!this._campaign.getSession().getEventSent(EventType.THIRD_QUARTILE)) {
             this._operativeEventManager.sendThirdQuartile(operativeEventParams);
+            this._adUnit.sendTrackingEvent(TrackingEvent.THIRD_QUARTILE);
         }
         if (!this._campaign.getSession().getEventSent(EventType.VIEW)) {
             this._operativeEventManager.sendView(operativeEventParams);

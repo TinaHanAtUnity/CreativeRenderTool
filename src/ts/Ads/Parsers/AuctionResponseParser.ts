@@ -25,7 +25,7 @@ const DEFAULT_REFRESH_DELAY = 3600;
 
 export class AuctionResponseParser {
 
-    private static constructTrackingUrls(trackingTemplates: string[], tracking: IPlacementTrackingV6): ICampaignTrackingUrls {
+    public static constructTrackingUrls(trackingTemplates: string[], tracking: IPlacementTrackingV6): ICampaignTrackingUrls {
         const trackingUrls: ICampaignTrackingUrls = {};
 
         const globalParams = tracking.params || {};

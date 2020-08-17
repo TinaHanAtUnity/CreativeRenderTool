@@ -12,6 +12,7 @@ import { StorageBridgeMock, StorageBridge } from 'Core/Utilities/__mocks__/Stora
 import { Campaign } from 'Ads/Models/__mocks__/Campaign';
 import { toAbGroup } from 'Core/Models/ABGroup';
 import { Placement } from 'Ads/Models/__mocks__/Placement';
+import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 
 [Platform.ANDROID, Platform.IOS].forEach((platform) => {
     describe(`LoadAndFillEventManagerTests(${Platform[platform]})`, () => {
@@ -40,6 +41,7 @@ import { Placement } from 'Ads/Models/__mocks__/Placement';
             coreConfig.getAbGroup.mockReturnValue(toAbGroup(99));
             coreConfig.getToken.mockReturnValue('test_token');
             coreConfig.isCoppaCompliant.mockReturnValue(true);
+            CustomFeatures.shouldSendLoadFillEvent = jest.fn().mockReturnValue(true);
 
             framework.setModelValues({
                 keys: [],

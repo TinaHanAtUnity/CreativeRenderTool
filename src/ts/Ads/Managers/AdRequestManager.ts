@@ -58,7 +58,7 @@ interface IParsedMediaAndTrackingIds {
     trackingId: string | undefined;
 }
 
-class AdRequestManagerError extends Error {
+export class AdRequestManagerError extends Error {
     public readonly tag: string;
 
     constructor(message: string, tag: string) {
@@ -75,17 +75,17 @@ export enum LoadV5ExperimentType {
 export class AdRequestManager extends CampaignManager {
     protected static LoadV5BaseUrl: string = 'https://auction-load.unityads.unity3d.com/v5/games';
 
-    private _preloadData: IPlacementIdMap<IParsedPlacementPreloadData> | null;
-    private _preloadDataExpireAt: number;
+    protected _preloadData: IPlacementIdMap<IParsedPlacementPreloadData> | null;
+    protected _preloadDataExpireAt: number;
 
-    private _ongoingPreloadRequest: Promise<void> | null;
-    private _ongoingPreloadRequestResolve: () => void;
-    private _ongoingReloadRequest: Promise<void> | null;
-    private _ongoingLoadRequests: { [key: string]: boolean };
-    private _reloadResults: { [key: string]: ILoadedCampaign };
-    private _preloadFailed: boolean;
-    private _activePreload: boolean;
-    private _currentExperiment: LoadV5ExperimentType;
+    protected _ongoingPreloadRequest: Promise<void> | null;
+    protected _ongoingPreloadRequestResolve: () => void;
+    protected _ongoingReloadRequest: Promise<void> | null;
+    protected _ongoingLoadRequests: { [key: string]: boolean };
+    protected _reloadResults: { [key: string]: ILoadedCampaign };
+    protected _preloadFailed: boolean;
+    protected _activePreload: boolean;
+    protected _currentExperiment: LoadV5ExperimentType;
 
     protected _platform: Platform;
     protected _core: ICoreApi;
@@ -408,7 +408,7 @@ export class AdRequestManager extends CampaignManager {
         return this._preloadFailed;
     }
 
-    private getBaseUrl(): string {
+    protected getBaseUrl(): string {
         return [
             AdRequestManager.LoadV5BaseUrl,
             this._clientInfo.getGameId(),
@@ -416,7 +416,7 @@ export class AdRequestManager extends CampaignManager {
         ].join('/');
     }
 
-    private parsePreloadResponse(response: INativeResponse, gameSessionCounters: IGameSessionCounters, requestPrivacy?: IRequestPrivacy | undefined, legacyRequestPrivacy?: ILegacyRequestPrivacy): Promise<void> {
+    protected parsePreloadResponse(response: INativeResponse, gameSessionCounters: IGameSessionCounters, requestPrivacy?: IRequestPrivacy | undefined, legacyRequestPrivacy?: ILegacyRequestPrivacy): Promise<void> {
         let json: IRawAuctionV5Response;
         try {
             json = JsonParser.parse<IRawAuctionV5Response>(response.response);
@@ -442,7 +442,7 @@ export class AdRequestManager extends CampaignManager {
         return Promise.resolve();
     }
 
-    private parseLoadResponse(response: INativeResponse, placement: Placement, additionalPlacements: string[]): Promise<ILoadedCampaign | undefined> {
+    protected parseLoadResponse(response: INativeResponse, placement: Placement, additionalPlacements: string[]): Promise<ILoadedCampaign | undefined> {
         // time
         let json: IRawAuctionV5Response;
         try {
@@ -669,7 +669,7 @@ export class AdRequestManager extends CampaignManager {
         });
     }
 
-    private parseReloadResponse(response: INativeResponse, placementsToLoad: Placement[], gameSessionCounters: IGameSessionCounters, requestPrivacy?: IRequestPrivacy | undefined, legacyRequestPrivacy?: ILegacyRequestPrivacy): Promise<void> {
+    protected parseReloadResponse(response: INativeResponse, placementsToLoad: Placement[], gameSessionCounters: IGameSessionCounters, requestPrivacy?: IRequestPrivacy | undefined, legacyRequestPrivacy?: ILegacyRequestPrivacy): Promise<void> {
         let json: IRawAuctionV5Response;
         try {
             json = JsonParser.parse<IRawAuctionV5Response>(response.response);
@@ -717,11 +717,11 @@ export class AdRequestManager extends CampaignManager {
         });
     }
 
-    private getCampaignParser(contentType: string): CampaignParser {
+    protected getCampaignParser(contentType: string): CampaignParser {
         return this._contentTypeHandlerManager.getParser(contentType);
     }
 
-    private updatePreloadDataExpiration(): void {
+    protected updatePreloadDataExpiration(): void {
         if (this._preloadData === null) {
             return;
         }
@@ -831,7 +831,7 @@ export class AdRequestManager extends CampaignManager {
         return body;
     }
 
-    private handleError(event: LoadV5, err: unknown, tags: { [key: string]: string } = {}) {
+    protected handleError(event: LoadV5, err: unknown, tags: { [key: string]: string } = {}) {
         let reason: string = 'unknown';
         if (err instanceof AdRequestManagerError) {
             reason = err.tag;

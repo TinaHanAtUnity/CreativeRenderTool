@@ -31,6 +31,7 @@ export class DisplayInterstitialEventHandler extends GDPREventHandler implements
         this._operativeEventManager.sendView(params);
 
         // Temporary for PTS Migration Investigation
+        this._adUnit.sendTrackingEvent(TrackingEvent.THIRD_QUARTILE);
         this._adUnit.sendTrackingEvent(TrackingEvent.COMPLETE);
 
         this._adUnit.hide();

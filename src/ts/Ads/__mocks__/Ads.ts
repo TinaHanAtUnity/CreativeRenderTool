@@ -24,6 +24,7 @@ import { Analytics } from 'Analytics/__mocks__/Analytics';
 import { LoadApi } from 'Core/Native/__mocks__/LoadApi';
 import { PrivacySDK } from 'Privacy/__mocks__/PrivacySDK';
 import { Store } from 'Store/__mocks__/Store';
+import { LoadAndFillEventManager } from 'Ads/Managers/__mocks__/LoadAndFillEventManager';
 
 import { IAds } from 'Ads/IAds';
 
@@ -60,6 +61,7 @@ export const Ads = jest.fn(() => {
         ThirdPartyEventManagerFactory: new ThirdPartyEventManagerFactory(),
         Analytics: new Analytics(),
         Store: new Store(),
-        PrivacySDK: new PrivacySDK()
+        PrivacySDK: new PrivacySDK(),
+        LoadAndFillEventManager: new LoadAndFillEventManager()
     };
 });

@@ -13,6 +13,7 @@ import { PerPlacementLoadManager } from 'Ads/Managers/PerPlacementLoadManager';
 import { LoadV5, SDKMetrics } from 'Ads/Utilities/SDKMetrics';
 import { PerformanceAdUnitFactory } from 'Performance/AdUnits/PerformanceAdUnitFactory';
 import { AdUnitAwareAdRequestManager } from 'Ads/Managers/AdUnitAwareAdRequestManager';
+import { LoadAndFillEventManager } from 'Ads/Managers/LoadAndFillEventManager';
 
 export class PerPlacementLoadManagerV5 extends PerPlacementLoadManager {
     protected _adRequestManager: AdRequestManager;
@@ -20,8 +21,8 @@ export class PerPlacementLoadManagerV5 extends PerPlacementLoadManager {
     private _shouldRefresh: boolean = true;
     protected _lastShownCampaignId: string | undefined;
 
-    constructor(ads: IAdsApi, adsConfig: AdsConfiguration, coreConfig: CoreConfiguration, adRequestManager: AdRequestManager, clientInfo: ClientInfo, focusManager: FocusManager, useGroupIds: boolean) {
-        super(ads, adsConfig, coreConfig, useGroupIds ? new AdUnitAwareAdRequestManager(adRequestManager) : adRequestManager, clientInfo, focusManager);
+    constructor(ads: IAdsApi, adsConfig: AdsConfiguration, coreConfig: CoreConfiguration, adRequestManager: AdRequestManager, clientInfo: ClientInfo, focusManager: FocusManager, useGroupIds: boolean, loadAndFillEventManager: LoadAndFillEventManager) {
+        super(ads, adsConfig, coreConfig, useGroupIds ? new AdUnitAwareAdRequestManager(adRequestManager) : adRequestManager, clientInfo, focusManager, loadAndFillEventManager);
 
         this._adRequestManager = adRequestManager;
 
@@ -81,6 +82,8 @@ export class PerPlacementLoadManagerV5 extends PerPlacementLoadManager {
             }).catch((err) => {
                 // If preload request failed, therefore we cannot make load request.
                 // Therefore we should report no fill, so that we do not cause any timeout.
+
+                this._loadAndFillEventManager.sendLoadTrackingEvents(placementId);
                 this.setPlacementState(placementId, PlacementState.WAITING);
                 this.setPlacementState(placementId, PlacementState.NO_FILL);
             });
