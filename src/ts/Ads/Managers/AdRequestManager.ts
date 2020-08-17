@@ -755,7 +755,7 @@ export class AdRequestManager extends CampaignManager {
 
     private makeEncryptedPreloadData(currentPreloadData: IPlacementIdMap<IParsedPlacementPreloadData>, encryptedPreloadData: { [key: string]: string } | undefined): { [key: string]: string } | undefined {
         if (encryptedPreloadData === undefined) {
-            return;
+            return undefined;
         }
 
         const currentEncryptedProloadData: { [key: string]: string } = {};
