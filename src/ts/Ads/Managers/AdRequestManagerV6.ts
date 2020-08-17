@@ -105,6 +105,7 @@ export class AdRequestManagerV6 extends AdRequestManager {
         }
 
         const preloadData: IPlacementIdMap<IParsedPlacementPreloadData> = {};
+        this._encryptedPreloadData = response.encryptedPreloadData;
 
         for (const placementPreloadData in response.preloadData) {
             if (response.preloadData.hasOwnProperty(placementPreloadData)) {
@@ -112,7 +113,7 @@ export class AdRequestManagerV6 extends AdRequestManager {
                 preloadData[placementPreloadData] = {
                     ttlInSeconds: value.ttlInSeconds,
                     campaignAvailable: value.campaignAvailable,
-                    data: response.encryptedPreloadData ? response.encryptedPreloadData[value.dataIndex] || '' : ''
+                    dataIndex: value.dataIndex
                 };
             }
         }
