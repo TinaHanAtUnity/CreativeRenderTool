@@ -112,7 +112,7 @@ export class AdRequestManagerV6 extends AdRequestManager {
                 preloadData[placementPreloadData] = {
                     ttlInSeconds: value.ttlInSeconds,
                     campaignAvailable: value.campaignAvailable,
-                    data: response.encryptedPreloadData ? response.encryptedPreloadData[value.dataIndex] || '' : ''
+                    dataIndex: value.dataIndex
                 };
             }
         }

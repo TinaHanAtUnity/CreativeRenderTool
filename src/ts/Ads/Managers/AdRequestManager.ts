@@ -95,18 +95,18 @@ export class AdRequestManager extends CampaignManager {
     protected _clientInfo: ClientInfo;
     protected _cacheBookkeeping: CacheBookkeepingManager;
     protected _privacy: PrivacySDK;
-    private _contentTypeHandlerManager: ContentTypeHandlerManager;
-    private _adMobSignalFactory: AdMobSignalFactory;
-    private _sessionManager: SessionManager;
-    private _metaDataManager: MetaDataManager;
-    private _request: RequestManager;
-    private _deviceInfo: DeviceInfo;
-    private _lastAuctionId: string | undefined;
-    private _deviceFreeSpace: number;
-    private _userPrivacyManager: UserPrivacyManager;
-    private _currentSession: Session | null;
-    private _encryptedPreloadData: { [key: string]: string} | undefined;
-    private _frequencyCapTimestamp: number | undefined;
+    protected _contentTypeHandlerManager: ContentTypeHandlerManager;
+    protected _adMobSignalFactory: AdMobSignalFactory;
+    protected _sessionManager: SessionManager;
+    protected _metaDataManager: MetaDataManager;
+    protected _request: RequestManager;
+    protected _deviceInfo: DeviceInfo;
+    protected _lastAuctionId: string | undefined;
+    protected _deviceFreeSpace: number;
+    protected _userPrivacyManager: UserPrivacyManager;
+    protected _currentSession: Session | null;
+    protected _encryptedPreloadData: { [key: string]: string} | undefined;
+    protected _frequencyCapTimestamp: number | undefined;
 
     public readonly onAdditionalPlacementsReady = new Observable2<string | undefined, IPlacementIdMap<INotCachedLoadedCampaign | undefined>>();
 
