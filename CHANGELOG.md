@@ -1,5 +1,6 @@
 # Pending
 
+* [Load V5] Enable Auction V6 protocol [#17045](https://github.com/Applifier/unity-ads-webview/pull/17045)
 * [Load] Ramp Load/Fill Events to 25% [#17050](https://github.com/Applifier/unity-ads-webview/pull/17050)
 * Add Video + Playable Format Support [#17046](https://github.com/Applifier/unity-ads-webview/pull/17046)
 
