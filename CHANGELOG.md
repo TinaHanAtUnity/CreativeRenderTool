@@ -1,3 +1,7 @@
+# Pending
+
+* Enabled Video + Playable experiment [#16982](https://github.com/Applifier/unity-ads-webview/pull/16982)
+
 # Tue Aug 18 10:23:19 UTC 2020
 
 * [Load V5] Enable Auction V6 protocol [#17045](https://github.com/Applifier/unity-ads-webview/pull/17045)
