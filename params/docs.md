@@ -156,6 +156,7 @@
 | batteryLevel | ios | True | False | number | Current battery level of the device (0-1) | SDK | all |
 | screenBrightness | ios | True | False | number | Current screen brightness percentage (0-100) | SDK | all |
 | volume | ios | True | False | number | On iOS, this is a float between 0 (silent) and 1 (max volume), on Android, this is integer from 0 (silent) to max volume index | SDK | all |
+| deviceFreeSpace | ios | True | False | number | Free space in kilobytes | SDK | all |
 | deviceName | ios | True | False | string | Device name associated with an iOS device | SDK | ios |
 | vendorIdentifier | ios | True | False | string | Vendor Identifier string | SDK | ios |
 | localeList | ios | True | False | string | A list of locale strings (e.g. ["en_US"] for English language | SDK | ios |

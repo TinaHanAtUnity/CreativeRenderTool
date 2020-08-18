@@ -200,6 +200,12 @@
       "body": false
     },
     {
+      "parameter": "deviceFreeSpace",
+      "required": "ios",
+      "queryString": true,
+      "body": false
+    },
+    {
       "parameter": "deviceName",
       "required": "ios",
       "queryString": true,

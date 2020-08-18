@@ -27,6 +27,7 @@ interface IConfigIosDeviceParam {
     batteryLevel: number;
     screenBrightness: number;
     volume: number;
+    deviceFreeSpace: number;
 }
 
 export class ConfigManager {
@@ -241,15 +242,17 @@ export class ConfigManager {
             this._deviceInfo.getBatteryStatus(),
             this._deviceInfo.getBatteryLevel(),
             this._deviceInfo.getScreenBrightness(),
-            this._deviceInfo.getDeviceVolume()
-        ]).then(([networkOperator, freeMemory, batteryStatus, batteryLevel, screenBrightness, volume]) => {
+            this._deviceInfo.getDeviceVolume(),
+            this._deviceInfo.getFreeSpace()
+        ]).then(([networkOperator, freeMemory, batteryStatus, batteryLevel, screenBrightness, volume, deviceFreeSpace]) => {
             return {
                 networkOperator,
                 freeMemory,
                 batteryStatus,
                 batteryLevel,
                 screenBrightness,
-                volume
+                volume,
+                deviceFreeSpace
             };
         });
     }
