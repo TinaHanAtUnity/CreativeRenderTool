@@ -83,7 +83,7 @@ import { Analytics } from 'Analytics/Analytics';
 import { PrivacySDK } from 'Privacy/PrivacySDK';
 import { PrivacyParser } from 'Privacy/Parsers/PrivacyParser';
 import { Promises } from 'Core/Utilities/Promises';
-import { LoadV5, LoadV5NoInvalidation } from 'Core/Models/ABGroup';
+import { LoadV5, LoadV5NoInvalidation, LoadV5AuctionV6 } from 'Core/Models/ABGroup';
 import { PrivacyMetrics } from 'Privacy/PrivacyMetrics';
 import { PrivacySDKUnit } from 'Ads/AdUnits/PrivacySDKUnit';
 import { PerPlacementLoadAdapter } from 'Ads/Managers/PerPlacementLoadAdapter';
@@ -104,6 +104,7 @@ import { PerPlacementLoadManagerV5NoInvalidation } from 'Ads/Managers/PerPlaceme
 import { LoadAndFillEventManager } from 'Ads/Managers/LoadAndFillEventManager';
 import { FrameworkMetaData } from 'Core/Models/MetaData/FrameworkMetaData';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
+import { AdRequestManagerV6 } from 'Ads/Managers/AdRequestManagerV6';
 
 export class Ads implements IAds {
 
@@ -336,7 +337,11 @@ export class Ads implements IAds {
                     experiment = LoadV5ExperimentType.NoInvalidation;
                 }
 
-                this.AdRequestManager = new AdRequestManager(this._core.NativeBridge.getPlatform(), this._core, this._core.Config, this.Config, this.AssetManager, this.SessionManager, this.AdMobSignalFactory, this._core.RequestManager, this._core.ClientInfo, this._core.DeviceInfo, this._core.MetaDataManager, this._core.CacheBookkeeping, this.ContentTypeHandlerManager, this.PrivacySDK, this.PrivacyManager, experiment);
+                if (LoadV5AuctionV6.isValid(this._core.Config.getAbGroup())) {
+                    this.AdRequestManager = new AdRequestManagerV6(this._core.NativeBridge.getPlatform(), this._core, this._core.Config, this.Config, this.AssetManager, this.SessionManager, this.AdMobSignalFactory, this._core.RequestManager, this._core.ClientInfo, this._core.DeviceInfo, this._core.MetaDataManager, this._core.CacheBookkeeping, this.ContentTypeHandlerManager, this.PrivacySDK, this.PrivacyManager, experiment);
+                } else {
+                    this.AdRequestManager = new AdRequestManager(this._core.NativeBridge.getPlatform(), this._core, this._core.Config, this.Config, this.AssetManager, this.SessionManager, this.AdMobSignalFactory, this._core.RequestManager, this._core.ClientInfo, this._core.DeviceInfo, this._core.MetaDataManager, this._core.CacheBookkeeping, this.ContentTypeHandlerManager, this.PrivacySDK, this.PrivacyManager, experiment);
+                }
                 this.CampaignManager = this.AdRequestManager;
                 return;
             }
