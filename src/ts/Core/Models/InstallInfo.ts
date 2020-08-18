@@ -6,9 +6,8 @@ export interface IInstallInfo {
     idfi: string;
 }
 
-const androidSettingsFile = 'unityads-installinfo';
-const idfiKey = 'unityads-idfi';
-
+const ANDROID_SETTINGS_FILE = 'unityads-installinfo';
+const IDFI_KEY = 'unityads-idfi';
 const COULDNT_GET_VALUE = 'COULDNT_GET_VALUE';
 
 /**
@@ -33,13 +32,13 @@ export class InstallInfo extends Model<IInstallInfo> {
      * Fetch and cache all properties.
      */
     public fetch(): Promise<unknown[]> {
-        const promises: Promise<unknown>[] = [];
-        promises.push(this.getPreferenceString(idfiKey)
+        const PROMISES: Promise<unknown>[] = [];
+        PROMISES.push(this.getPreferenceString(IDFI_KEY)
             .catch(err => this.handelPreferenceError(err))
             .then(idfi => this.verifyIdfi(idfi))
             .then(idfi => this.set('idfi', idfi))
             .catch(err => this.handleInstallInfoError(err)));
-        return Promise.all(promises);
+        return Promise.all(PROMISES);
     }
 
     /**
@@ -65,7 +64,7 @@ export class InstallInfo extends Model<IInstallInfo> {
         if (this._platform === Platform.IOS) {
             return this._api.iOS!.Preferences.getString(key);
         } else if (this._platform === Platform.ANDROID) {
-            return this._api.Android!.Preferences.getString(androidSettingsFile, key);
+            return this._api.Android!.Preferences.getString(ANDROID_SETTINGS_FILE, key);
         }
         return Promise.reject(new Error('Preferences API is not supported on current platform'));
     }
@@ -86,7 +85,7 @@ export class InstallInfo extends Model<IInstallInfo> {
     private verifyIdfi(idfi: string): Promise<string> {
         if (idfi === '') {
             return this._api.DeviceInfo.getUniqueEventId().then(newIdfi => {
-                this.setPreferenceString(idfiKey, newIdfi);
+                this.setPreferenceString(IDFI_KEY, newIdfi);
                 return newIdfi;
             });
         }
@@ -100,7 +99,7 @@ export class InstallInfo extends Model<IInstallInfo> {
         if (this._platform === Platform.IOS) {
             return this._api.iOS!.Preferences.setString(value.toLowerCase(), key);
         } else if (this._platform === Platform.ANDROID) {
-            return this._api.Android!.Preferences.setString(androidSettingsFile, key, value.toLowerCase());
+            return this._api.Android!.Preferences.setString(ANDROID_SETTINGS_FILE, key, value.toLowerCase());
         }
         return Promise.reject(new Error('Preferences API is not supported on current platform'));
     }
