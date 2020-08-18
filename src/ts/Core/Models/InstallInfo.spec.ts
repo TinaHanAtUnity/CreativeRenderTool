@@ -6,10 +6,12 @@ import { InstallInfo } from 'Core/Models/InstallInfo';
 
 describe('InstallInfo', () => {
     const validIdentifier = 'ffffffff-ffff-ffff-ffff-ffffffffffff';
-    const getStringNotFoundError = 'COULDNT_GET_VALUE';
-    const getStringOtherError = 'OTHER_ERROR';
     const preferencesIdfiKey = 'unityads-idfi';
-    const errorLog = `InstalledInfo failed due to: \"${getStringOtherError}\"`;
+
+    const COULDNT_GET_VALUE = 'COULDNT_GET_VALUE';
+    const OTHER_ERROR = 'OTHER_ERROR';
+
+    const errorLog = `InstalledInfo failed due to: \"${OTHER_ERROR}\"`;
 
     let core: ICore;
     let installInfo: InstallInfo;
@@ -23,7 +25,7 @@ describe('InstallInfo', () => {
 
         describe('when fetch is called the first time', () => {
             beforeEach(() => {
-                core.Api.Android!.Preferences.getString = jest.fn().mockReturnValue(Promise.reject(getStringNotFoundError));
+                core.Api.Android!.Preferences.getString = jest.fn().mockReturnValue(Promise.reject(COULDNT_GET_VALUE));
                 core.Api.DeviceInfo.getUniqueEventId = jest.fn().mockReturnValue(Promise.resolve(validIdentifier));
                 core.Api.Android!.Preferences.setString = jest.fn().mockImplementation(() => Promise.resolve());
                 installInfo = new InstallInfo(Platform.ANDROID, core.Api);
@@ -66,7 +68,7 @@ describe('InstallInfo', () => {
 
         describe('when getString returns an error other than COULDNT_GET_VALUE', () => {
             beforeEach(() => {
-                core.Api.Android!.Preferences.getString = jest.fn().mockReturnValue(Promise.reject(getStringOtherError));
+                core.Api.Android!.Preferences.getString = jest.fn().mockReturnValue(Promise.reject(OTHER_ERROR));
                 core.Api.Sdk.logError = jest.fn().mockImplementation(() => Promise.resolve());
                 installInfo = new InstallInfo(Platform.ANDROID, core.Api);
             });
@@ -84,7 +86,7 @@ describe('InstallInfo', () => {
 
         describe('when fetch is called the first time', () => {
             beforeEach(() => {
-                core.Api.iOS!.Preferences.getString = jest.fn().mockReturnValue(Promise.reject(getStringNotFoundError));
+                core.Api.iOS!.Preferences.getString = jest.fn().mockReturnValue(Promise.reject(COULDNT_GET_VALUE));
                 core.Api.DeviceInfo.getUniqueEventId = jest.fn().mockReturnValue(Promise.resolve(validIdentifier));
                 core.Api.iOS!.Preferences.setString = jest.fn().mockImplementation(() => Promise.resolve());
                 installInfo = new InstallInfo(Platform.IOS, core.Api);
@@ -127,7 +129,7 @@ describe('InstallInfo', () => {
 
         describe('when getString returns an error other than COULDNT_GET_VALUE', () => {
             beforeEach(() => {
-                core.Api.iOS!.Preferences.getString = jest.fn().mockReturnValue(Promise.reject(getStringOtherError));
+                core.Api.iOS!.Preferences.getString = jest.fn().mockReturnValue(Promise.reject(OTHER_ERROR));
                 core.Api.Sdk.logError = jest.fn().mockImplementation(() => Promise.resolve());
                 installInfo = new InstallInfo(Platform.IOS, core.Api);
             });

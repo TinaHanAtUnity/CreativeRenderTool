@@ -8,7 +8,8 @@ export interface IInstallInfo {
 
 const androidSettingsFile = 'unityads-installinfo';
 const idfiKey = 'unityads-idfi';
-const getStringNotFoundError = 'COULDNT_GET_VALUE';
+
+const COULDNT_GET_VALUE = 'COULDNT_GET_VALUE';
 
 /**
  * InstallInfo contains information about the install.
@@ -73,7 +74,7 @@ export class InstallInfo extends Model<IInstallInfo> {
      * If preferences rejected the promise due to not finding the key, return an empty string and continue.
      */
     private handelPreferenceError(err: unknown): Promise<string> {
-        if (err === getStringNotFoundError) {
+        if (err === COULDNT_GET_VALUE) {
             return Promise.resolve('');
         }
         return Promise.reject(err);
