@@ -38,18 +38,18 @@ interface IExternalEndScreenUrlParameters {
 export class ExternalEndScreen extends View<IEndScreenHandler> implements IPrivacyHandlerView {
     private _combination: {} | undefined;
     private _language: string;
-    private _campaign: PerformanceCampaign;
-    private _core: ICoreApi;
-    private _privacy: AbstractPrivacy;
-    private _adUnitStyle: AdUnitStyle | undefined;
-    private _showGDPRBanner: boolean;
+    protected _campaign: PerformanceCampaign;
+    protected _core: ICoreApi;
+    protected _privacy: AbstractPrivacy;
+    protected _adUnitStyle: AdUnitStyle | undefined;
+    protected _showGDPRBanner: boolean;
     private _campaignId: string | undefined;
-    private _hidePrivacy: boolean;
-    private _iframe: HTMLIFrameElement;
-    private _endScreenUrl: string;
-    private _gdprPopupClicked: boolean;
-    private _messageListener: (event: MessageEvent) => void;
-    private _isIframeReady = false;
+    protected _hidePrivacy: boolean;
+    protected _iframe: HTMLIFrameElement;
+    protected _endScreenUrl: string;
+    protected _gdprPopupClicked: boolean;
+    protected _messageListener: (event: MessageEvent) => void;
+    protected _isIframeReady = false;
     private _country: string;
     private _endScreenParameters: Promise<IExternalEndScreenUrlParameters>;
 
@@ -154,7 +154,7 @@ export class ExternalEndScreen extends View<IEndScreenHandler> implements IPriva
     //
     // External End Screen
     //
-    private initIframe(): void {
+    protected initIframe(): void {
         SDKMetrics.reportMetricEvent(ExternalEndScreenMetric.StartInitIframe);
 
         const iframe = this._iframe = <HTMLIFrameElement> this._container.querySelector('#iframe-end-screen');
@@ -162,7 +162,7 @@ export class ExternalEndScreen extends View<IEndScreenHandler> implements IPriva
         iframe.src = this._endScreenUrl;
     }
 
-    private onDownloadEvent(): void {
+    protected onDownloadEvent(): void {
         this._handlers.forEach(handler => handler.onEndScreenDownload({
             clickAttributionUrl: this._campaign.getClickAttributionUrl(),
             clickAttributionUrlFollowsRedirects: this._campaign.getClickAttributionUrlFollowsRedirects(),
@@ -174,7 +174,7 @@ export class ExternalEndScreen extends View<IEndScreenHandler> implements IPriva
         }));
     }
 
-    private route(url: string): void {
+    protected route(url: string): void {
         const protocol = 'sdk://';
 
         if (url.startsWith(protocol)) {
@@ -264,7 +264,7 @@ export class ExternalEndScreen extends View<IEndScreenHandler> implements IPriva
         });
     }
 
-    private sendParameters(): void {
+    protected sendParameters(): void {
         this._endScreenParameters.then(parameters => {
             if (this._iframe.contentWindow) {
                 this._iframe.contentWindow.postMessage({
@@ -284,7 +284,7 @@ export class ExternalEndScreen extends View<IEndScreenHandler> implements IPriva
         }
     }
 
-    private onPrivacyEvent(): void {
+    protected onPrivacyEvent(): void {
         if (this._showGDPRBanner) {
             this._gdprPopupClicked = true;
         }
