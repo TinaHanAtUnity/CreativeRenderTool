@@ -1,4 +1,4 @@
-# Pending
+# Tue Aug 18 21:54:28 UTC 2020
 
 * [Load] Scale Load/Fill Events to 40% [#17108](https://github.com/Applifier/unity-ads-webview/pull/17108)
 * [Signal Mapping] Add Device Free Space to Config Request [#17110](https://github.com/Applifier/unity-ads-webview/pull/17110)
