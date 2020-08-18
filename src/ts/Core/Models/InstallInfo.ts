@@ -85,6 +85,7 @@ export class InstallInfo extends Model<IInstallInfo> {
     private verifyIdfi(idfi: string): Promise<string> {
         if (idfi === '') {
             return this._api.DeviceInfo.getUniqueEventId().then(newIdfi => {
+                newIdfi = newIdfi.toLowerCase();
                 this.setPreferenceString(IDFI_KEY, newIdfi);
                 return newIdfi;
             });
@@ -97,9 +98,9 @@ export class InstallInfo extends Model<IInstallInfo> {
      */
     private setPreferenceString(key: string, value: string): Promise<void> {
         if (this._platform === Platform.IOS) {
-            return this._api.iOS!.Preferences.setString(value.toLowerCase(), key);
+            return this._api.iOS!.Preferences.setString(value, key);
         } else if (this._platform === Platform.ANDROID) {
-            return this._api.Android!.Preferences.setString(ANDROID_SETTINGS_FILE, key, value.toLowerCase());
+            return this._api.Android!.Preferences.setString(ANDROID_SETTINGS_FILE, key, value);
         }
         return Promise.reject(new Error('Preferences API is not supported on current platform'));
     }
