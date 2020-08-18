@@ -1,3 +1,7 @@
+# Pending
+
+* Add Video + Playable Format Support [#17046](https://github.com/Applifier/unity-ads-webview/pull/17046)
+
 # Mon Aug 17 22:24:28 UTC 2020
 
 * [LoadV5]Indexed encrypted data in request body [#16791](https://github.com/Applifier/unity-ads-webview/pull/16791)
