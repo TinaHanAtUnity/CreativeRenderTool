@@ -9,7 +9,7 @@ describe('InstallInfo', () => {
     const getStringNotFoundError = 'COULDNT_GET_VALUE';
     const getStringOtherError = 'OTHER_ERROR';
     const preferencesIdfiKey = 'unityads-idfi';
-    const errorLog = `InstalledInfo failed due to reason: Error: ${getStringOtherError}`;
+    const errorLog = `InstalledInfo failed due to: \"${getStringOtherError}\"`;
 
     let core: ICore;
     let installInfo: InstallInfo;

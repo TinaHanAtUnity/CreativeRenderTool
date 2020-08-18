@@ -34,6 +34,7 @@ export class InstallInfo extends Model<IInstallInfo> {
     public fetch(): Promise<unknown[]> {
         const promises: Promise<unknown>[] = [];
         promises.push(this.getPreferenceString(idfiKey)
+            .catch(err => this.handelPreferenceError(err))
             .then(idfi => this.verifyIdfi(idfi))
             .then(idfi => this.set('idfi', idfi))
             .catch(err => this.handleInstallInfoError(err)));
@@ -57,6 +58,28 @@ export class InstallInfo extends Model<IInstallInfo> {
     }
 
     /**
+     * Looks the value up from preferences.
+     */
+    private getPreferenceString(key: string): Promise<string> {
+        if (this._platform === Platform.IOS) {
+            return this._api.iOS!.Preferences.getString(key);
+        } else if (this._platform === Platform.ANDROID) {
+            return this._api.Android!.Preferences.getString(androidSettingsFile, key);
+        }
+        return Promise.reject(new Error('Preferences API is not supported on current platform'));
+    }
+
+    /**
+     * If preferences rejected the promise due to not finding the key, return an empty string and continue.
+     */
+    private handelPreferenceError(err: unknown): Promise<string> {
+        if (err === getStringNotFoundError) {
+            return Promise.resolve('');
+        }
+        return Promise.reject(err);
+    }
+
+    /**
      * If the IDFI is empty, generate and save a IDFI, otherwise return.
      */
     private verifyIdfi(idfi: string): Promise<string> {
@@ -67,25 +90,6 @@ export class InstallInfo extends Model<IInstallInfo> {
             });
         }
         return Promise.resolve(idfi);
-    }
-
-    /**
-     * Looks the value up from preferences.  If not found an empty string is returned.
-     */
-    private getPreferenceString(key: string): Promise<string> {
-        const handleNotFound = ((e: string) => {
-            if (e === getStringNotFoundError) {
-                return Promise.resolve('');
-            }
-            return Promise.reject(new Error(e));
-        });
-
-        if (this._platform === Platform.IOS) {
-            return this._api.iOS!.Preferences.getString(key).catch(handleNotFound);
-        } else if (this._platform === Platform.ANDROID) {
-            return this._api.Android!.Preferences.getString(androidSettingsFile, key).catch(handleNotFound);
-        }
-        return Promise.reject(new Error('Preferences API is not supported on current platform'));
     }
 
     /**
@@ -103,8 +107,7 @@ export class InstallInfo extends Model<IInstallInfo> {
     /**
      * Handle errors.
      */
-    private handleInstallInfoError(error: unknown): Promise<unknown> {
-        this._api.Sdk.logError(`InstalledInfo failed due to reason: ${error}`);
-        return Promise.reject(error);
+    private handleInstallInfoError(err: unknown) {
+        this._api.Sdk.logError(`InstalledInfo failed due to: ${JSON.stringify(err)}`);
     }
 }
