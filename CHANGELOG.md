@@ -1,3 +1,7 @@
+# Pending
+
+* [Signal Mapping] Add Device Free Space to Config Request [#17110](https://github.com/Applifier/unity-ads-webview/pull/17110)
+
 # Tue Aug 18 11:52:10 UTC 2020
 
 * Enabled Video + Playable experiment [#16982](https://github.com/Applifier/unity-ads-webview/pull/16982)
