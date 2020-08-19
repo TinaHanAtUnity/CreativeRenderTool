@@ -1,3 +1,7 @@
+# Pending
+
+* [Load] Scale Load/Fill Events to 55% [#17143](https://github.com/Applifier/unity-ads-webview/pull/17143)
+
 # Tue Aug 18 21:54:28 UTC 2020
 
 * [Load] Scale Load/Fill Events to 40% [#17108](https://github.com/Applifier/unity-ads-webview/pull/17108)
