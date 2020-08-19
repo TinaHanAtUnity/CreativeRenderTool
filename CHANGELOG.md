@@ -1,5 +1,6 @@
 # Pending
 
+* Add Identifier for Install (IDFI) via new InstallInfo class. [#16977](https://github.com/Applifier/unity-ads-webview/pull/16977)
 * [Load] Scale Load/Fill Events to 55% [#17143](https://github.com/Applifier/unity-ads-webview/pull/17143)
 
 # Tue Aug 18 21:54:28 UTC 2020
