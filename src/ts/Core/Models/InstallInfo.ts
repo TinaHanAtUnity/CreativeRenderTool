@@ -73,7 +73,8 @@ export class InstallInfo extends Model<IInstallInfo> {
      * If preferences rejected the promise due to not finding the key, return an empty string and continue.
      */
     private handelPreferenceError(err: unknown): Promise<string> {
-        if (err === COULDNT_GET_VALUE) {
+        const errList = <string[]>err;
+        if (err === COULDNT_GET_VALUE || (errList.length > 0 && errList[0] === COULDNT_GET_VALUE)) {
             return Promise.resolve('');
         }
         return Promise.reject(err);
