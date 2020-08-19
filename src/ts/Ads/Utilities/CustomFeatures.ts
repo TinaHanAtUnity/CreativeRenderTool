@@ -9,7 +9,7 @@ import CacheModeAllowedExperimentGames from 'json/custom_features/CacheModeAllow
 export class CustomFeatures {
 
     public static shouldSendLoadFillEvent(): boolean {
-        return this.sampleAtGivenPercent(40);
+        return this.sampleAtGivenPercent(55);
     }
 
     public static isTencentSeat(seatId: number | undefined): boolean {
