@@ -32,13 +32,13 @@ export class InstallInfo extends Model<IInstallInfo> {
      * Fetch and cache all properties.
      */
     public fetch(): Promise<unknown[]> {
-        const PROMISES: Promise<unknown>[] = [];
-        PROMISES.push(this.getPreferenceString(IDFI_KEY)
-            .catch(err => this.handelPreferenceError(err))
+        const promises: Promise<unknown>[] = [];
+        promises.push(this.getPreferenceString(IDFI_KEY)
+            .catch(err => this.handlePreferenceError(err))
             .then(idfi => this.verifyIdfi(idfi))
             .then(idfi => this.set('idfi', idfi))
             .catch(err => this.handleInstallInfoError(err)));
-        return Promise.all(PROMISES);
+        return Promise.all(promises);
     }
 
     /**
@@ -72,10 +72,14 @@ export class InstallInfo extends Model<IInstallInfo> {
     /**
      * If preferences rejected the promise due to not finding the key, return an empty string and continue.
      */
-    private handelPreferenceError(err: unknown): Promise<string> {
-        const errList = <string[]>err;
-        if (err === COULDNT_GET_VALUE || (errList.length > 0 && errList[0] === COULDNT_GET_VALUE)) {
+    private handlePreferenceError(err: unknown): Promise<string> {
+        if (this._platform === Platform.IOS && err === COULDNT_GET_VALUE) {
             return Promise.resolve('');
+        } else if (this._platform === Platform.ANDROID) {
+            const errList = <string[]>err;
+            if (errList.length > 0 && errList[0] === COULDNT_GET_VALUE) {
+                return Promise.resolve('');
+            }
         }
         return Promise.reject(err);
     }

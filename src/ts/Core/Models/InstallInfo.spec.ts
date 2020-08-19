@@ -7,7 +7,8 @@ import { InstallInfo } from 'Core/Models/InstallInfo';
 describe('InstallInfo', () => {
     const VALID_IDENTIFIER = 'ffffffff-ffff-ffff-ffff-ffffffffffff';
     const PREFERENCES_IDFI_KEY = 'unityads-idfi';
-    const COULDNT_GET_VALUE = 'COULDNT_GET_VALUE';
+    const IOS_COULDNT_GET_VALUE = 'COULDNT_GET_VALUE';
+    const ANDROID_COULDNT_GET_VALUE = ['COULDNT_GET_VALUE', 'unityads-installinfo', 'unityads-idfi'];
     const OTHER_ERROR = 'OTHER_ERROR';
     const ERROR_LOG = `InstalledInfo failed due to: \"${OTHER_ERROR}\"`;
 
@@ -23,7 +24,7 @@ describe('InstallInfo', () => {
 
         describe('when fetch is called the first time', () => {
             beforeEach(() => {
-                core.Api.Android!.Preferences.getString = jest.fn().mockReturnValue(Promise.reject(COULDNT_GET_VALUE));
+                core.Api.Android!.Preferences.getString = jest.fn().mockReturnValue(Promise.reject(ANDROID_COULDNT_GET_VALUE));
                 core.Api.DeviceInfo.getUniqueEventId = jest.fn().mockReturnValue(Promise.resolve(VALID_IDENTIFIER));
                 core.Api.Android!.Preferences.setString = jest.fn().mockImplementation(() => Promise.resolve());
                 installInfo = new InstallInfo(Platform.ANDROID, core.Api);
@@ -84,7 +85,7 @@ describe('InstallInfo', () => {
 
         describe('when fetch is called the first time', () => {
             beforeEach(() => {
-                core.Api.iOS!.Preferences.getString = jest.fn().mockReturnValue(Promise.reject(COULDNT_GET_VALUE));
+                core.Api.iOS!.Preferences.getString = jest.fn().mockReturnValue(Promise.reject(IOS_COULDNT_GET_VALUE));
                 core.Api.DeviceInfo.getUniqueEventId = jest.fn().mockReturnValue(Promise.resolve(VALID_IDENTIFIER));
                 core.Api.iOS!.Preferences.setString = jest.fn().mockImplementation(() => Promise.resolve());
                 installInfo = new InstallInfo(Platform.IOS, core.Api);
