@@ -1,0 +1,31 @@
+{
+  "auctionId": "a15a4fb6-f9ce-4b09-a0cc-0672f1de4d20",
+  "correlationId": "0zGg2TfRsBNbqlc7AVdhLAw",
+  "placements": {
+    "mraid": "UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85"
+  },
+  "media": {
+    "UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85": {
+      "cacheTTL": 12345,
+      "adType": "mraid-url-sample-ad-type",
+      "creativeId": "mraid-url-sample-creative-id",
+      "seatId": 901,
+      "contentType": "programmatic/mraid-url",
+      "content": "{\"dynamicMarkup\":\"var markup = 'dynamic';\",\"markup\":\"\",\"inlinedUrl\":\"https://localhost\"}",
+      "trackingUrls": {
+        "impression": [
+          "http://test.impression.com/blah1",
+          "http://test.impression.com/blah2",
+          "http://test.impression.com/%ZONE%/blah?sdkVersion=%SDK_VERSION%"
+        ],
+        "complete": [
+          "http://test.complete.com/complete1"
+        ],
+        "click": [
+          "http://test.complete.com/click1"
+        ]
+      },
+      "useWebViewUserAgentForTracking": true
+    }
+  }
+}

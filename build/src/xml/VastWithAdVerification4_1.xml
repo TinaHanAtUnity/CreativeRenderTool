@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<VAST xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="vast.xsd" version="4.1">
+    <Ad id="402186315">
+        <InLine>
+            <AdSystem>DCM</AdSystem>
+            <AdTitle>In-Stream Video</AdTitle>
+            <Error>
+                <![CDATA[
+https://ade.googlesyndication.com/ddm/activity/dc_oe=ChMI_fCpv9fh4AIVxYRiCh0PFAIcEAAYACDsur8c;met=1;ecn1=1;etm1=0;eid1=200015;
+]]>
+            </Error>
+            <Impression>
+                <![CDATA[
+https://googleads4.g.doubleclick.net/pcs/view?xai=AKAOjsvu_9MwZQgFvR3PctX7HEZm5Zl9hUPDFzpnGQGIZyJ0uziGhM2jxGUr4Uc8b31iVUOVcGrLvCMiHSKykj_yoWw0pnNZl8jKvWCTMKYJ7Vg&sig=Cg0ArKJSzIli-jG0xNo1EAE&urlfix=1&adurl=
+]]>
+            </Impression>
+            <Impression>
+                <![CDATA[
+https://secure-gl.imrworldwide.com/cgi-bin/m?ci=nlsnapi13033&am=46&ep=1&at=view&rt=banner&st=image&ca=DFA20159847&cr=0&pc=DFA202347351&r=1416600658198637950
+]]>
+            </Impression>
+            <AdVerifications>
+                <Verification vendor="doubleverify.com-omid">
+                    <JavaScriptResource apiFramework="omid" browserOptional="true"><![CDATA[https://cdn.doubleverify.com/dvtp_src.js]]></JavaScriptResource>
+                    <TrackingEvents>
+                        <Tracking event="verificationNotExecuted">
+                            <![CDATA[https://tps.doubleverify.com/visit.jpg?ctx=818052&cmp=DV064005&sid=123&plc=verificationRejection&advid=818053&adsrv=118&tagtype=video&dvtagver=6.1.img&verr=[REASON]&dup=1lte9o1553552890042]]>
+                        </Tracking>
+                    </TrackingEvents>
+                    <VerificationParameters><![CDATA[tagtype=video&dvtagver=6.1.src&ctx=10733345&cmp=69189&amp;sid=2928&amp;plc=1229669&amp;adsrv=118&amp;dup=1lte9o1553552890042]]></VerificationParameters>
+                </Verification>
+            </AdVerifications>
+            <Creatives>
+                <Creative id="59759980" sequence="1">
+                    <Linear>
+                        <Duration>00:00:14</Duration>
+                        <TrackingEvents>
+                            <Tracking event="start">
+                                <![CDATA[
+https://ade.googlesyndication.com/ddm/activity/dc_oe=ChMI_fCpv9fh4AIVxYRiCh0PFAIcEAAYACDsur8c;met=1;ecn1=1;etm1=0;eid1=11;
+]]>
+                            </Tracking>
+                            <Tracking event="firstQuartile">
+                                <![CDATA[
+https://ade.googlesyndication.com/ddm/activity/dc_oe=ChMI_fCpv9fh4AIVxYRiCh0PFAIcEAAYACDsur8c;met=1;ecn1=1;etm1=0;eid1=960584;
+]]>
+                            </Tracking>
+                            <Tracking event="midpoint">
+                                <![CDATA[
+https://ade.googlesyndication.com/ddm/activity/dc_oe=ChMI_fCpv9fh4AIVxYRiCh0PFAIcEAAYACDsur8c;met=1;ecn1=1;etm1=0;eid1=18;
+]]>
+                            </Tracking>
+                            <Tracking event="thirdQuartile">
+                                <![CDATA[
+https://ade.googlesyndication.com/ddm/activity/dc_oe=ChMI_fCpv9fh4AIVxYRiCh0PFAIcEAAYACDsur8c;met=1;ecn1=1;etm1=0;eid1=960585;
+]]>
+                            </Tracking>
+                            <Tracking event="complete">
+                                <![CDATA[
+https://ade.googlesyndication.com/ddm/activity/dc_oe=ChMI_fCpv9fh4AIVxYRiCh0PFAIcEAAYACDsur8c;met=1;ecn1=1;etm1=0;eid1=13;
+]]>
+                            </Tracking>
+                            <Tracking event="mute">
+                                <![CDATA[
+https://ade.googlesyndication.com/ddm/activity/dc_oe=ChMI_fCpv9fh4AIVxYRiCh0PFAIcEAAYACDsur8c;met=1;ecn1=1;etm1=0;eid1=16;
+]]>
+                            </Tracking>
+                            <Tracking event="unmute">
+                                <![CDATA[
+https://ade.googlesyndication.com/ddm/activity/dc_oe=ChMI_fCpv9fh4AIVxYRiCh0PFAIcEAAYACDsur8c;met=1;ecn1=1;etm1=0;eid1=149645;
+]]>
+                            </Tracking>
+                            <Tracking event="pause">
+                                <![CDATA[
+https://ade.googlesyndication.com/ddm/activity/dc_oe=ChMI_fCpv9fh4AIVxYRiCh0PFAIcEAAYACDsur8c;met=1;ecn1=1;etm1=0;eid1=15;
+]]>
+                            </Tracking>
+                            <Tracking event="fullscreen">
+                                <![CDATA[
+https://ade.googlesyndication.com/ddm/activity/dc_oe=ChMI_fCpv9fh4AIVxYRiCh0PFAIcEAAYACDsur8c;met=1;ecn1=1;etm1=0;eid1=19;
+]]>
+                            </Tracking>
+                        </TrackingEvents>
+                        <VideoClicks>
+                            <ClickThrough>
+                                <![CDATA[
+https://adclick.g.doubleclick.net/pcs/click?xai=AKAOjsvu_9MwZQgFvR3PctX7HEZm5Zl9hUPDFzpnGQGIZyJ0uziGhM2jxGUr4Uc8b31iVUOVcGrLvCMiHSKykj_yoWw0pnNZl8jKvWCTMKYJ7Vg&sig=Cg0ArKJSzP9qkXS9GO1KEAE&urlfix=1&adurl=http://www.google.com
+]]>
+                            </ClickThrough>
+                        </VideoClicks>
+                        <MediaFiles>
+                            <MediaFile delivery="progressive" width="176" height="144" type="video/3gpp" bitrate="50" scalable="false" maintainAspectRatio="false">
+                                <![CDATA[
+https://gcdn.2mdn.net/videoplayback/id/d4e120df4cbaeda8/itag/17/source/doubleclick_dmm/ratebypass/yes/ip/0.0.0.0/ipbits/0/expire/3557072238/sparams/id,itag,source,ratebypass,ip,ipbits,expire/signature/3142C53FFEC0BFD8DFA169E6DC13D0543D8B0518.4956E372E18E70282348E2B5707C87100AEF9606/key/ck2/file/file.3gpp
+]]>
+                            </MediaFile>
+                            <MediaFile delivery="progressive" width="320" height="180" type="video/3gpp" bitrate="186" scalable="false" maintainAspectRatio="false">
+                                <![CDATA[
+https://gcdn.2mdn.net/videoplayback/id/d4e120df4cbaeda8/itag/36/source/doubleclick_dmm/ratebypass/yes/ip/0.0.0.0/ipbits/0/expire/3557072239/sparams/id,itag,source,ratebypass,ip,ipbits,expire/signature/6AE690BA1C8890EBDA497ACD919543C60201B947.469925FE40E5AA951764D66208FEA7D48CB435C6/key/ck2/file/file.3gpp
+]]>
+                            </MediaFile>
+                            <MediaFile delivery="progressive" width="640" height="360" type="video/mp4" bitrate="563" scalable="false" maintainAspectRatio="false">
+                                <![CDATA[
+https://gcdn.2mdn.net/videoplayback/id/d4e120df4cbaeda8/itag/18/source/doubleclick_dmm/ratebypass/yes/ip/0.0.0.0/ipbits/0/expire/3557072247/sparams/id,itag,source,ratebypass,ip,ipbits,expire/signature/5A1F96748ABF16B432EE376FA714DC1C4A46D6B8.8DFFB78E8980203105600B843B45B1584BD4C399/key/ck2/file/file.mp4
+]]>
+                            </MediaFile>
+                            <MediaFile delivery="progressive" width="1280" height="720" type="video/mp4" bitrate="2016" scalable="false" maintainAspectRatio="false">
+                                <![CDATA[
+https://gcdn.2mdn.net/videoplayback/id/d4e120df4cbaeda8/itag/22/source/doubleclick_dmm/ratebypass/yes/ip/0.0.0.0/ipbits/0/expire/3557072267/sparams/id,itag,source,ratebypass,ip,ipbits,expire/signature/3189E68A58191BFD4A47FFE55424178378ACBACC.996143D40744AEEF2C519CF9CB4933110620A7E8/key/ck2/file/file.mp4
+]]>
+                            </MediaFile>
+                            <MediaFile delivery="progressive" width="640" height="360" type="video/webm" bitrate="498" scalable="false" maintainAspectRatio="false">
+                                <![CDATA[
+https://gcdn.2mdn.net/videoplayback/id/d4e120df4cbaeda8/itag/43/source/doubleclick_dmm/ratebypass/yes/ip/0.0.0.0/ipbits/0/expire/3557072258/sparams/id,itag,source,ratebypass,ip,ipbits,expire/signature/4BFE4E3016A4F7E22064F74DE51ABC642FB6AC9B.B2B7F67BDDF4CE75BEAD4DF3B73758F11F880CC3/key/ck2/file/file.webm
+]]>
+                            </MediaFile>
+                            <MediaFile delivery="progressive" width="854" height="480" type="video/webm" bitrate="693" scalable="false" maintainAspectRatio="false">
+                                <![CDATA[
+https://gcdn.2mdn.net/videoplayback/id/d4e120df4cbaeda8/itag/44/source/doubleclick_dmm/ratebypass/yes/ip/0.0.0.0/ipbits/0/expire/3557072270/sparams/id,itag,source,ratebypass,ip,ipbits,expire/signature/39933464963B4A4B50377045FA23A79F35697C75.5DEDAB7B852AB5452D730117B04B30D417A61B96/key/ck2/file/file.webm
+]]>
+                            </MediaFile>
+                            <MediaFile delivery="progressive" width="1280" height="720" type="video/webm" bitrate="1800" scalable="false" maintainAspectRatio="false">
+                                <![CDATA[
+https://gcdn.2mdn.net/videoplayback/id/d4e120df4cbaeda8/itag/45/source/doubleclick_dmm/ratebypass/yes/ip/0.0.0.0/ipbits/0/expire/3557072317/sparams/id,itag,source,ratebypass,ip,ipbits,expire/signature/8F1C3A2996874AC00EB59C4AC51F11E2E5666A92.9586125467EC6DE55174EC3A2B8D1F3AAE89FB16/key/ck2/file/file.webm
+]]>
+                            </MediaFile>
+                            <MediaFile delivery="progressive" width="256" height="144" type="application/x-mpegURL" bitrate="105" scalable="false" maintainAspectRatio="false">
+                                <![CDATA[
+https://manifest.googlevideo.com/api/manifest/hls_variant/source/doubleclick_dmm/id/d4e120df4cbaeda8/itag/0/playlist_type/LIVE/ip/0.0.0.0/ipbits/0/expire/3557072248/sparams/ip,ipbits,expire,source,id,itag,playlist_type/signature/10681B5DC4F61E02250E79F36D68420341AD868B.B21ED5CBC0625D75F8D9B6843733A7371F299E9A/key/ck2/file/index.m3u8
+]]>
+                            </MediaFile>
+                        </MediaFiles>
+                    </Linear>
+                </Creative>
+            </Creatives>
+            <Extensions>
+                <Extension type="geo">
+                    <Country>US</Country>
+                    <Bandwidth>4</Bandwidth>
+                    <BandwidthKbps>20000</BandwidthKbps>
+                </Extension>
+                <Extension type="dart">
+                    <AdServingData>
+                        <DeliveryData>
+                            <GeoData>
+                                <![CDATA[ ct=US&st=CA&city=13358&dma=197&zp=&bw=4 ]]>
+                            </GeoData>
+                        </DeliveryData>
+                    </AdServingData>
+                </Extension>
+            </Extensions>
+        </InLine>
+    </Ad>
+</VAST>

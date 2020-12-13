@@ -1,0 +1,12 @@
+import { AbstractAdUnitFactory } from 'Ads/AdUnits/AbstractAdUnitFactory';
+import { DisplayInterstitialAdUnit } from 'Display/AdUnits/DisplayInterstitialAdUnit';
+import { DisplayInterstitialEventHandler } from 'Display/EventHandlers/DisplayInterstitialEventHandler';
+export class DisplayInterstitialAdUnitFactory extends AbstractAdUnitFactory {
+    createAdUnit(parameters) {
+        const displayInterstitialAdUnit = new DisplayInterstitialAdUnit(parameters);
+        const displayInterstitialEventHandler = new DisplayInterstitialEventHandler(displayInterstitialAdUnit, parameters);
+        parameters.view.addEventHandler(displayInterstitialEventHandler);
+        return displayInterstitialAdUnit;
+    }
+}
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiRGlzcGxheUludGVyc3RpdGlhbEFkVW5pdEZhY3RvcnkuanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuLi8uLi8uLi8uLi8uLi9zcmMvdHMvRGlzcGxheS9BZFVuaXRzL0Rpc3BsYXlJbnRlcnN0aXRpYWxBZFVuaXRGYWN0b3J5LnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUNBLE9BQU8sRUFBRSxxQkFBcUIsRUFBRSxNQUFNLG1DQUFtQyxDQUFDO0FBRzFFLE9BQU8sRUFDSCx5QkFBeUIsRUFFNUIsTUFBTSwyQ0FBMkMsQ0FBQztBQUNuRCxPQUFPLEVBQUUsK0JBQStCLEVBQUUsTUFBTSx1REFBdUQsQ0FBQztBQUl4RyxNQUFNLE9BQU8sZ0NBQWlDLFNBQVEscUJBQXdGO0lBRW5JLFlBQVksQ0FBQyxVQUFnRDtRQUNoRSxNQUFNLHlCQUF5QixHQUFHLElBQUkseUJBQXlCLENBQUMsVUFBVSxDQUFDLENBQUM7UUFDNUUsTUFBTSwrQkFBK0IsR0FBRyxJQUFJLCtCQUErQixDQUFDLHlCQUF5QixFQUFFLFVBQVUsQ0FBQyxDQUFDO1FBQ25ILFVBQVUsQ0FBQyxJQUFJLENBQUMsZUFBZSxDQUFDLCtCQUErQixDQUFDLENBQUM7UUFDakUsT0FBTyx5QkFBeUIsQ0FBQztJQUNyQyxDQUFDO0NBRUoifQ==

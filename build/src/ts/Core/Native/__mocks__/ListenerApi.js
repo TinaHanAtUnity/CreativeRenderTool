@@ -1,0 +1,6 @@
+export const ListenerApi = jest.fn(() => {
+    return {
+        sendPlacementStateChangedEvent: jest.fn().mockImplementation(() => Promise.resolve())
+    };
+});
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiTGlzdGVuZXJBcGkuanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuLi8uLi8uLi8uLi8uLi8uLi9zcmMvdHMvQ29yZS9OYXRpdmUvX19tb2Nrc19fL0xpc3RlbmVyQXBpLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQU1BLE1BQU0sQ0FBQyxNQUFNLFdBQVcsR0FBRyxJQUFJLENBQUMsRUFBRSxDQUFDLEdBQUcsRUFBRTtJQUNwQyxPQUF3QjtRQUNwQiw4QkFBOEIsRUFBRSxJQUFJLENBQUMsRUFBRSxFQUFFLENBQUMsa0JBQWtCLENBQUMsR0FBRyxFQUFFLENBQUMsT0FBTyxDQUFDLE9BQU8sRUFBRSxDQUFDO0tBQ3hGLENBQUM7QUFDTixDQUFDLENBQUMsQ0FBQyJ9

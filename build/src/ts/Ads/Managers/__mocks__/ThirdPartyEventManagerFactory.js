@@ -1,0 +1,7 @@
+import { ThirdPartyEventManager } from 'Ads/Managers/__mocks__/ThirdPartyEventManager.ts';
+export const ThirdPartyEventManagerFactory = jest.fn(() => {
+    return {
+        create: jest.fn().mockReturnValue(new ThirdPartyEventManager())
+    };
+});
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiVGhpcmRQYXJ0eUV2ZW50TWFuYWdlckZhY3RvcnkuanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuLi8uLi8uLi8uLi8uLi8uLi9zcmMvdHMvQWRzL01hbmFnZXJzL19fbW9ja3NfXy9UaGlyZFBhcnR5RXZlbnRNYW5hZ2VyRmFjdG9yeS50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFDQSxPQUFPLEVBQUUsc0JBQXNCLEVBQUUsTUFBTSxrREFBa0QsQ0FBQztBQU0xRixNQUFNLENBQUMsTUFBTSw2QkFBNkIsR0FBRyxJQUFJLENBQUMsRUFBRSxDQUFDLEdBQUcsRUFBRTtJQUN0RCxPQUEwQztRQUN0QyxNQUFNLEVBQUUsSUFBSSxDQUFDLEVBQUUsRUFBRSxDQUFDLGVBQWUsQ0FBQyxJQUFJLHNCQUFzQixFQUFFLENBQUM7S0FDbEUsQ0FBQztBQUNOLENBQUMsQ0FBQyxDQUFDIn0=

@@ -1,0 +1,6 @@
+export const BannerAdUnitParametersFactory = jest.fn(() => {
+    return {
+        create: jest.fn()
+    };
+});
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiQmFubmVyQWRVbml0UGFyYW1ldGVyc0ZhY3RvcnkuanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuLi8uLi8uLi8uLi8uLi8uLi9zcmMvdHMvQmFubmVycy9BZFVuaXRzL19fbW9ja3NfXy9CYW5uZXJBZFVuaXRQYXJhbWV0ZXJzRmFjdG9yeS50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFNQSxNQUFNLENBQUMsTUFBTSw2QkFBNkIsR0FBRyxJQUFJLENBQUMsRUFBRSxDQUFDLEdBQUcsRUFBRTtJQUN0RCxPQUEwQztRQUN0QyxNQUFNLEVBQUUsSUFBSSxDQUFDLEVBQUUsRUFBRTtLQUNwQixDQUFDO0FBQ04sQ0FBQyxDQUFDLENBQUMifQ==

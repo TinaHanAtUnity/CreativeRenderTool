@@ -1,0 +1,6 @@
+export class Diagnostics {
+    static trigger(type, error) {
+        return Promise.resolve({});
+    }
+}
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiRGlhZ25vc3RpY3MuanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuLi8uLi8uLi8uLi8uLi9zcmMvdHMvQ29yZS9VdGlsaXRpZXMvRGlhZ25vc3RpY3MudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBR0EsTUFBTSxPQUFPLFdBQVc7SUFDYixNQUFNLENBQUMsT0FBTyxDQUFDLElBQVksRUFBRSxLQUFTO1FBQ3pDLE9BQU8sT0FBTyxDQUFDLE9BQU8sQ0FBa0IsRUFBRSxDQUFDLENBQUM7SUFDaEQsQ0FBQztDQUNKIn0=

@@ -1,0 +1,7 @@
+export function asSpy(o) {
+    return o;
+}
+export function asStub(o) {
+    return o;
+}
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiRnVuY3Rpb25zLmpzIiwic291cmNlUm9vdCI6IiIsInNvdXJjZXMiOlsiLi4vLi4vLi4vdGVzdC9UZXN0SGVscGVycy9GdW5jdGlvbnMudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBRUEsTUFBTSxVQUFVLEtBQUssQ0FBQyxDQUFNO0lBQ3hCLE9BQXVCLENBQUMsQ0FBQztBQUM3QixDQUFDO0FBRUQsTUFBTSxVQUFVLE1BQU0sQ0FBQyxDQUFNO0lBQ3pCLE9BQXdCLENBQUMsQ0FBQztBQUM5QixDQUFDIn0=

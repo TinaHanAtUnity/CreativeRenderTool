@@ -1,0 +1,114 @@
+<div ontouchstart="void(0)">
+    <div class="row-item">
+        <div class="what-we-collect row-item-title ripple-square">
+            <span><%= data.t("privacy-what-we-collect-title") %></span>
+            <div class="arrow-icon"><span class="consent-icon-chevron"></span></div>
+        </div>
+        <div class="description">
+            <p>
+                <%= data.t("privacy-what-we-collect-desc-p1") %>
+            </p>
+            <p>
+                <%= data.t("privacy-what-we-collect-desc-p2") %>
+            </p>
+            <p>
+                <span id="phone-type" class="intended-span"></span>
+                <span id="country" class="intended-span"></span>
+                <span id="game-plays-this-week" class="intended-span"></span>
+                <span id="ads-seen-in-game" class="intended-span"></span>
+                <span id="games-installed-from-ads" class="intended-span"></span>
+            </p>
+            <p>
+                <%= data.t("privacy-what-we-collect-desc-p3") %>
+            </p>
+            <p>
+                <%= data.t("privacy-what-we-collect-desc-p4") %>
+            </p>
+            <p class="measurement-paragraph">
+                <span class="heading2"><%= data.t("privacy-what-we-collect-sub-title") %></span>
+            </p>
+            <p>
+                <%= data.t("privacy-what-we-collect-desc-p5") %>
+            </p>
+            <p>
+                <%= data.t("privacy-what-we-collect-desc-p6") %>
+            </p>
+        </div>
+    </div>
+    <div class="row-item">
+        <div class="data-transfer row-item-title ripple-square">
+            <span><%= data.t("privacy-data-transfer-title") %></span>
+            <div class="arrow-icon"><span class="consent-icon-chevron"></span></div>
+        </div>
+        <div class="description">
+            <p>
+                <%= data.t("privacy-data-transfer-desc") %>
+            </p>
+        </div>
+    </div>
+    <div class="row-item">
+        <div class="third-party row-item-title ripple-square">
+            <span><%= data.t("privacy-third-party-title") %></span>
+            <div class="arrow-icon"><span class="consent-icon-chevron"></span></div>
+        </div>
+        <div class="description">
+            <p class="dsp-list">
+                <a href="http://corp.aarki.com/privacy">Aarki</a>,
+                <a href="http://www.ad.net/privacy-policy">Ad.Net</a>,
+                <a href="https://www.adcolony.com/gdpr/">AdColony</a>,
+                <a href="http://www.admaxim.com/admaxim-privacy-policy/">AdMaxim</a>,
+                <a href="https://www.adobe.com/privacy/policy.html">Adobe</a>,
+                <a href="https://appreciate.mobi/page.html#/end-user-privacy-policy">Appreciate</a>,
+                <a href="http://beeswax.com/privacy.html">Beeswax</a>,
+                <a href="http://www.bidmotion.com/privacy-policy">Bidmotion</a>,
+                <a href="https://answers.chartboost.com/en-us/articles/200780269">Charboost</a>,
+                <a href="http://www.crossinstall.com/privacy/">CrossInstall</a>,
+                <a href="http://engagebdr.com/privacy-policy/">EngageBDR</a>,
+                <a href="https://policies.google.com/technologies/partner-sites">Google</a>,
+                <a href="https://gothamads.com/privacy-policy">GothamAds</a>,
+                <a href="https://jampp.com/privacy-policy/">Jampp</a>,
+                <a href="https://www.applift.com/privacy-policy">Kayzen (fka Applift)</a>,
+                <a href="http://lifestreet.com/privacy/">Lifestreet</a>,
+                <a href="https://liftoff.io/privacy-policy/">Liftoff</a>,
+                <a href="https://loopme.com/privacy/">LoopMe</a>,
+                <a href="https://www.manage.com/privacy-policy/">Manage.com</a>,
+                <a href="http://www.molocoads.com/private-policy.html">Moloco</a>,
+                <a href="http://persona.ly/privacy_dsp">Persona.ly</a>,
+                <a href="https://pubnative.net/privacy-policy/">Pubnative</a>,
+                <a href="https://www.verve.com/privacy-policy/">Verv</a>,
+                <a href="https://remerge.io/privacy-policy.html">Remerge</a>,
+                <a href="https://telaria.com/privacy-policy/">Telaria</a>,
+                <a href="https://www.yeahmobi.com/privacy-policy/">YeahMobi</a>,
+                <a href="https://smadex.com/index.html@p=3888.html">Smadex</a>,
+                <a href="https://www.bidease.com/privacy-policy/">Bidease</a>,
+                <a href="https://gdm.services/privacy-policy">GDM Services</a>,
+                <a href="https://cubepile.com/privacy-policy/">CubePile</a>,
+                <a href="https://www.adikteev.com/privacy-policy-eng/">Adikteev</a>
+            </p>
+        </div>
+    </div>
+    <% if(data.showChangingPrivacyChoiceItem) { %>
+    <div class="row-item">
+        <div class="changing-privacy-choice row-item-title ripple-square">
+            <span><%= data.t("privacy-changing-privacy-choice-title") %></span>
+            <div class="arrow-icon"><span class="consent-icon-chevron"></span></div>
+        </div>
+        <div class="description">
+            <p>
+                <%= data.t("privacy-changing-privacy-choice-text") %>
+            </p>
+        </div>
+    </div>
+    <% } %>
+    <div class="row-item">
+        <div class="privacy-policy row-item-title ripple-square">
+            <span><%= data.t("privacy-our-privacy-policy-title") %></span>
+            <div class="arrow-icon"><span class="consent-icon-chevron"></span></div>
+        </div>
+        <div class="description">
+            <p>
+                <%= data.t("privacy-our-privacy-policy-desc") %>
+            </p>
+        </div>
+    </div>
+</div>

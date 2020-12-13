@@ -1,0 +1,9 @@
+import { AutomatedExperimentsCategories, ArAvailableButtonExperiment } from 'MabExperimentation/Models/AutomatedExperimentsList';
+export function arAvailableButtonDecision(automatedExperimentManager, campaign) {
+    let actions = automatedExperimentManager.activateSelectedExperiment(campaign, AutomatedExperimentsCategories.MRAID_AR);
+    if (actions === undefined) {
+        actions = ArAvailableButtonExperiment.getDefaultActions();
+    }
+    return actions;
+}
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiQVJVSUV4cGVyaW1lbnRzLmpzIiwic291cmNlUm9vdCI6IiIsInNvdXJjZXMiOlsiLi4vLi4vLi4vLi4vLi4vc3JjL3RzL0FSL0V4cGVyaW1lbnRzL0FSVUlFeHBlcmltZW50cy50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFFQSxPQUFPLEVBQUUsOEJBQThCLEVBQUUsMkJBQTJCLEVBQUUsTUFBTSxvREFBb0QsQ0FBQztBQUdqSSxNQUFNLFVBQVUseUJBQXlCLENBQUMsMEJBQXNELEVBQUUsUUFBa0I7SUFDaEgsSUFBSSxPQUFPLEdBQXdDLDBCQUEwQixDQUFDLDBCQUEwQixDQUFDLFFBQVEsRUFBRSw4QkFBOEIsQ0FBQyxRQUFRLENBQUMsQ0FBQztJQUU1SixJQUFJLE9BQU8sS0FBSyxTQUFTLEVBQUU7UUFDdkIsT0FBTyxHQUFHLDJCQUEyQixDQUFDLGlCQUFpQixFQUFFLENBQUM7S0FDN0Q7SUFFRCxPQUFPLE9BQU8sQ0FBQztBQUNuQixDQUFDIn0=

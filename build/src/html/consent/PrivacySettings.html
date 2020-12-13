@@ -1,0 +1,109 @@
+<div ontouchstart="void(0)" class="safe-area-content">
+    <div class="close-area">
+        <div class="close-button ripple-square">
+            <span><%= data.t("privacy-settings-close") %></span>
+        </div>
+    </div>
+    <div class="view-container">
+        <div class="back-button ripple-circle">
+            <span class="consent-icon-arrow"></span>
+        </div>
+        <div class="main-view-container page-container">
+            <div class="privacy-logo">
+                <span class="icon-gdpr"></span>
+            </div>
+
+            <div class="title">
+                <span><%= data.t("privacy-settings-title") %></span>
+            </div>
+            <div class="button-container">
+                <div class="personalization-button settings-button ripple-square">
+                    <span class="consent-icon-person2"></span>
+                    <span class="button-text"><%= data.t("privacy-settings-personalization-settings") %></span>
+                </div>
+                <div class="delete-data-button settings-button ripple-square">
+                    <span class="consent-icon-lock"></span>
+                    <span class="button-text"><%= data.t("privacy-settings-manage-your-data") %></span>
+                </div>
+                <div class="button-row-container button-container">
+                    <div class="report-ad-button row-button ripple-square">
+                        <span class="button-text"><%= data.t("privacy-settings-report-ad") %></span>
+                    </div>
+                    <div class="build-info-button row-button ripple-square">
+                        <span class="button-text"><%= data.t("privacy-settings-build-info") %></span>
+                    </div>
+                </div>
+            </div>
+            <div class="info-container">
+
+            </div>
+        </div>
+        <div class="personalization-container page-container">
+            <div class="heading"><span><%= data.t("privacy-settings-personalization-settings") %></span></div>
+            <div class="checkbox-group-container">
+            </div>
+        </div>
+        <div class="view-your-data-container page-container">
+            <div class="heading"><span><%= data.t("privacy-settings-manage-your-data") %></span></div>
+            <div class="text">
+                <p>
+                    <%= data.t("privacy-settings-manage-your-data-desc") %>
+                </p>
+            </div>
+            <div class="delete-data-container text">
+                <span class="delete-data-confirmed-text">
+                    <%= data.t("privacy-settings-manage-your-data-deletion-msg") %>
+
+                </span>
+                <div class="delete-data-confirm">
+                    <div class="heading2">
+                        <p>
+                            <%= data.t("privacy-settings-manage-your-data-are-you-sure") %>
+                        </p>
+                    </div>
+                    <div class="delete-data-confirm-buttons">
+                        <div id="delete-data-yes"><%= data.t("privacy-settings-manage-your-data-yes") %></div>
+                        <div id="delete-data-cancel"><%= data.t("privacy-settings-manage-your-data-no") %></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="report-ad-container page-container">
+            <div class="heading"><span>Report advertisement</span></div>
+            <div class="text">
+                <p>
+                    Are you facing issues with your current advertisement? You can report this ad to Unity and let us
+                    know. Reporting will close this ad, and if the ad has not completed, any rewards will be forfeited.
+                </p>
+            </div>
+            <ul class="radio-group-container">
+                <% for (var k = 0; k < data.reportReasons.length; k++) { %>
+                <div class="radio-item-container">
+                    <input id="<%= data.reportKeys[k] %>" class="report-choice-radio" name="report-reason" type="radio">
+                    <label for="<%= data.reportKeys[k] %>">
+                        <%= (data.reportReasons[k] === null || typeof data.reportReasons[k] === "undefined") ? "N/A" : data.reportReasons[k] %></label>
+                </div>
+                <% } %>
+            </ul>
+            <div class="text-small">
+                <p>
+                    Disclaimer: Reporting will close this ad, and if the ad has not completed, any rewards will be forfeited.
+                </p>
+            </div>
+            <div class="report-container">
+                <div class="report-button ripple-square">Report</div>
+                <span class="report-confirmed-text text"></span>
+            </div>
+        </div>
+        <div class="build-info-container page-container">
+            <div class="heading"><span><%= data.t("privacy-settings-build-info") %></span></div>
+            <p></p>
+            <% for (var k in data.buildInformation) { %>
+            <p class="build-information-item text">
+                <span class="build-information-key"><%= k %>:</span>
+                <span class="build-information-value"><%= (data.buildInformation[k] === null || typeof data.buildInformation[k] === "undefined") ? "N/A" : data.buildInformation[k] %></span>
+            </p>
+            <% } %>
+        </div>
+    </div>
+</div>

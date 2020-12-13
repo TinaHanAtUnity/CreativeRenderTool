@@ -1,0 +1,61 @@
+{
+    "auctionId": "d301fd4c-4a9e-48e4-82aa-ad8b07977ca5",
+    "correlationId": "crdI5dC67WKlqhsI1RrICm",
+    "media": {
+        "5be40c5f602f4510ec583881": {
+            "adType": "VIDEO",
+            "campaignId": "5be40c5f602f4510ec583881",
+            "content": "{\"id\":\"5be40c5f602f4510ec583881\",\"platform\":\"android\",\"store\":\"google\",\"appStoreId\":\"com.nitrogames.howl\",\"endScreen\":\"http://cdn-highwinds.unityads.unity3d.com/assets/4a226c04-df33-4b92-a42b-5d5f40ec8560/HoW_EndCard2_800x800.jpg\",\"endScreenLandscape\":\"http://cdn-highwinds.unityads.unity3d.com/assets/4a226c04-df33-4b92-a42b-5d5f40ec8560/HoW_EndCard2_800x800.jpg\",\"endScreenPortrait\":\"http://cdn-highwinds.unityads.unity3d.com/assets/4a226c04-df33-4b92-a42b-5d5f40ec8560/HoW_EndCard2_800x800.jpg\",\"gameId\":500011586,\"gameName\":\"Heroes of Warland - PvP Shooting Arena\",\"gameIcon\":\"http://cdn-highwinds.unityads.unity3d.com/store-icons/30acb691-0142-4583-9690-9eac6f1a6316.png\",\"rating\":4.666666507720947,\"ratingCount\":21,\"clickUrl\":\"https://impact.applifier.com/events/v2/click/14851/5be40c5f602f4510ec583881\",\"videoEventUrls\":{\"video_start\":\"https://impact.applifier.com/events/v2/video/video_start/14851/5be40c5f602f4510ec583881\",\"first_quartile\":\"https://impact.applifier.com/events/v2/video/first_quartile/14851/5be40c5f602f4510ec583881\",\"midpoint\":\"https://impact.applifier.com/events/v2/video/midpoint/14851/5be40c5f602f4510ec583881\",\"third_quartile\":\"https://impact.applifier.com/events/v2/video/third_quartile/14851/5be40c5f602f4510ec583881\",\"video_end\":\"https://impact.applifier.com/events/v2/video/video_end/14851/5be40c5f602f4510ec583881\"},\"bypassAppSheet\":false,\"meta\":\"n1SHrykLKWcaLOueQGcd7YbSVYz3aRSUXhIGoIxX2g3Oobwkq0LqYXNBiLiw5XcrjC+9NsdkToUV/jy/fLMqk0jrutw2MVC9kyDI0eQhdfvQwCEJtIWyMGJD12pUDJEqVk17jioNqN6nBM4I4pcLfA87lp8iAkoGgiMmKQI8R8pwgs3G578LGIfxGlGmeSS/pU3s/4uiKHOguS5vKB93KxJTbEfqm8T+f4MWhNeGq4qDU/TZWD4ktqkKHb15mtbjbip53b0bR+p8pfN9N4vnG5lUgM/SNHWw+OTDCuXPEDWPJJIis+5GtiP+M4WKuV8btsb+xpSqEf5nDinmFFmd6wqUwxh1jmuO\",\"adUnitStyle\":{\"ctaButtonColor\":\"\"},\"creativeId\":\"5be4057b0e0e290019cb9de9\",\"trailerDownloadable\":\"http://cdn-highwinds.unityads.unity3d.com/assets/5be4057b0e0e290019cb9de9/VP9_medium.webm\",\"trailerDownloadableSize\":2995172,\"trailerStreaming\":\"http://cdn-highwinds.unityads.unity3d.com/assets/5be4057b0e0e290019cb9de9/b30-400.mp4\"}",
+            "contentType": "comet/campaign",
+            "seatId": 9000
+        }
+    },
+    "placements": {
+        "fooId": {
+            "mediaId": "5be40c5f602f4510ec583881",
+            "trackingId": "0"
+        }
+    },
+    "statusCode": 0,
+    "tracking": {
+        "0": {
+            "click": [
+                "https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=click&test=0"
+            ],
+            "complete": [
+                "https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=complete&test=0"
+            ],
+            "error": [
+                "https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=error&test=0"
+            ],
+            "firstQuartile": [
+                "https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=firstQuartile&test=0"
+            ],
+            "loaded": [
+                "https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=loaded&test=0"
+            ],
+            "midpoint": [
+                "https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=midpoint&test=0"
+            ],
+            "show": [
+                "https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=skip&test=0"
+            ],
+            "skip": [
+                "https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=skip&test=0"
+            ],
+            "stalled": [
+                "https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=stalled&test=0"
+            ],
+            "start": [
+                "https://tracking.stg.mz.internal.unity3d.com/impression/%ZONE%?data=randomData&test=0",
+                "https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=start&test=0"
+            ],
+            "thirdQuartile": [
+                "https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=thirdQuartile&test=0"
+            ],
+            "videoEndCardClick": [
+                "https://tracking.stg.mz.internal.unity3d.com/operative/%ZONE%?eventType=videoEndCardClick&test=0"
+            ]
+        }
+    }
+}

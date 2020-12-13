@@ -1,0 +1,744 @@
+[
+  {
+    "key": "adapterName",
+    "type": "string",
+    "description": "Unity adapter between game code and SDK, \"AssetStore\" for Asset Store package and \"Engine\" for Unity engine integration layer",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "adapterVersion",
+    "type": "string",
+    "description": "SDK version name for adapter, should be in sync with SDK version",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "advertisingTrackingId",
+    "type": "string",
+    "description": "Advertising identifier in raw format",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "androidId",
+    "type": "string",
+    "description": "Android ID",
+    "provider": "SDK",
+    "platforms": "android"
+  },
+  {
+    "key": "apiLevel",
+    "type": "number",
+    "description": "Android device API level",
+    "provider": "SDK",
+    "platforms": "android"
+  },
+  {
+    "key": "auctionId",
+    "type": "string",
+    "description": "Unique identifier for joining ad requests and operative events. This identifies one ad unit lifecycle so e.g. ad request, start and end events share same auctionId.",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "bundleId",
+    "type": "string",
+    "description": "Bundle identifier for the app",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "bundleVersion",
+    "type": "string",
+    "description": "Game version",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "cached",
+    "type": "boolean",
+    "description": "If video is cached or streamed",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "campaignId",
+    "type": "string",
+    "description": "Internal campaign identifier",
+    "provider": "Server",
+    "platforms": "all"
+  },
+  {
+    "key": "connectionType",
+    "type": "string",
+    "description": "\"wifi\", \"cellular\" or \"none\"",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "coppa",
+    "type": "boolean",
+    "description": "True for COPPA compliant (games targeted for children)",
+    "provider": "Server",
+    "platforms": "all"
+  },
+  {
+    "key": "deviceMake",
+    "type": "string",
+    "description": "Android device manufacturer",
+    "provider": "SDK",
+    "platforms": "android"
+  },
+  {
+    "key": "deviceModel",
+    "type": "string",
+    "description": "Android or iOS device model, example 'iPhone7,1'",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "encrypted",
+    "type": "boolean",
+    "description": "If true, app is encrypted for app store distribution and game is live",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "eventId",
+    "type": "string",
+    "description": "Unique event identifier",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "deviceFreeSpace",
+    "type": "number",
+    "description": "Free space in kilobytes",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "frameworkName",
+    "type": "string",
+    "description": "Game framework, both Asset Store package and engine integration set this to \"Unity\"",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "frameworkVersion",
+    "type": "string",
+    "description": "Unity engine version",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "forceAbGroup",
+    "type": "number",
+    "description": "Force A/B group for internal testing purposes",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "forceCampaignId",
+    "type": "string",
+    "description": "Force campaign ID for internal testing purposes",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "force_country",
+    "type": "string",
+    "description": "Force country targeting for internal testing purposes",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "gameId",
+    "type": "string",
+    "description": "Source game identifier",
+    "provider": "App",
+    "platforms": "all"
+  },
+  {
+    "key": "gameSessionId",
+    "type": "number",
+    "description": "Unique game session identifier. This identifier is shared with analytics events.",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "language",
+    "type": "string",
+    "description": "Device language code (e.g. en_US or fr_CA)",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "limitAdTracking",
+    "type": "boolean",
+    "description": "boolean if user has limited tracking or not",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "mediationOrdinal",
+    "type": "number",
+    "description": "Ordinal for ad unit in a game with multiple ad networks and mediation, e.g. for fifth ad in a game this is 5",
+    "provider": "Mediation",
+    "platforms": "all"
+  },
+  {
+    "key": "mediationName",
+    "type": "string",
+    "description": "Mediation provider name",
+    "provider": "Mediation",
+    "platforms": "all"
+  },
+  {
+    "key": "mediationVersion",
+    "type": "string",
+    "description": "Mediation SDK version",
+    "provider": "Mediation",
+    "platforms": "all"
+  },
+  {
+    "key": "meta",
+    "type": "string",
+    "description": "Encrypted data passed through the SDK",
+    "provider": "Server",
+    "platforms": "all"
+  },
+  {
+    "key": "networkOperator",
+    "type": "string",
+    "description": "MCC + MNC codes",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "networkOperatorName",
+    "type": "string",
+    "description": "Cell network operator name",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "networkType",
+    "type": "number",
+    "description": "Detailed cellular network type",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "osVersion",
+    "type": "string",
+    "description": "Device operating system version",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "placementId",
+    "type": "string",
+    "description": "Internal placement identifier",
+    "provider": "Admin",
+    "platforms": "all"
+  },
+  {
+    "key": "platform",
+    "type": "string",
+    "description": "\"android\" or \"ios\"",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "redirect",
+    "type": "boolean",
+    "description": "Legacy parameter, always false",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "rooted",
+    "type": "boolean",
+    "description": "Is the device rooted or jailbroken",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "screenDensity",
+    "type": "number",
+    "description": "Screen density in DPI",
+    "provider": "SDK",
+    "platforms": "android"
+  },
+  {
+    "key": "screenHeight",
+    "type": "number",
+    "description": "Screen height in pixels",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "screenScale",
+    "type": "number",
+    "description": "Screen scale factor",
+    "provider": "SDK",
+    "platforms": "ios"
+  },
+  {
+    "key": "screenSize",
+    "type": "number",
+    "description": "Android raw screen layout value",
+    "provider": "SDK",
+    "platforms": "android"
+  },
+  {
+    "key": "screenWidth",
+    "type": "number",
+    "description": "Screen width in pixels",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "sdkVersion",
+    "type": "number",
+    "description": "SDK version in four digits",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "sid",
+    "type": "string",
+    "description": "Server side reward callback id",
+    "provider": "App",
+    "platforms": "all"
+  },
+  {
+    "key": "skippedAt",
+    "type": "number",
+    "description": "Milliseconds from video start to video skip",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+    {
+    "key": "stores",
+    "type": "string",
+    "description": "List of stores on device. ('apple', 'google', 'xiaomi,google', 'none')",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "test",
+    "type": "boolean",
+    "description": "Test mode",
+    "provider": "App",
+    "platforms": "all"
+  },
+  {
+    "key": "timeZone",
+    "type": "string",
+    "description": "Current timezone",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "webviewUa",
+    "type": "string",
+    "description": "WebView user agent string",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "videoOrientation",
+    "type": "string",
+    "description": "Chosen video orientation",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "cachedOrientation",
+    "type": "string",
+    "description": "Cached video orientation",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "cachedCampaigns",
+    "type": "object",
+    "description": "Campaign ID's which are fully cached on the device",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "previousPlacementId",
+    "type": "string",
+    "description": "Previously shown placementId",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "properties",
+    "type": "string",
+    "description": "Gamer specific parameters",
+    "provider": "Server",
+    "platforms": "all"
+  },
+  {
+    "key": "placements",
+    "type": "object",
+    "description": "All placements received in configuration",
+    "provider": "Server",
+    "platforms": "all"
+  },
+  {
+    "key": "wiredHeadset",
+    "type": "boolean",
+    "description": "If wired headset is connected to device",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "volume",
+    "type": "number",
+    "description": "On iOS, this is a float between 0 (silent) and 1 (max volume), on Android, this is integer from 0 (silent) to max volume index",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "versionCode",
+    "type": "number",
+    "description": "Application internal version code for Android apps, available only for SDK 2.1.1 and later",
+    "provider": "SDK",
+    "platforms": "android"
+  },
+  {
+    "key": "simulator",
+    "type": "boolean",
+    "description": "If device is a simulator, not a real device",
+    "provider": "SDK",
+    "platforms": "ios"
+  },
+  {
+    "key": "requestSignal",
+    "type": "string",
+    "description": "Base64 encoded string from AdMob protobuf signals",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "adUnitStyle",
+    "type": "object",
+    "description": "Style of the ad unit",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "sessionDepth",
+    "type": "number",
+    "description": "For a given session, how many ads have been delivered currently using adRequestOrdinal",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "token",
+    "type": "string",
+    "description": "Signed JSON Web Token (JWT) with orthogonal (statistically independent) A/B groups for each Unity Monetization component",
+    "provider": "Server",
+    "platforms": "all"
+  },
+  {
+    "key": "projectId",
+    "type": "string",
+    "description": "Unity project ID",
+    "provider": "Server",
+    "platforms": "all"
+  },
+  {
+    "key": "gameSessionCounters",
+    "type": "object",
+    "description": "Game session based counts of starts, views and ad requests",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "ext",
+    "type": "object",
+    "description": "JSON string for optional signals for admob",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "organizationId",
+    "type": "string",
+    "description": "Organization ID from Genesis'",
+    "provider": "Server",
+    "platforms": "all"
+  },
+  {
+    "key": "developerId",
+    "type": "number",
+    "description": "Developer ID from Configuration",
+    "provider": "Server",
+    "platforms": "all"
+  },
+  {
+    "key": "gdprEnabled",
+    "type": "boolean",
+    "description": "If GDPR is enabled",
+    "provider": "Server",
+    "platforms": "all"
+  },
+  {
+    "key": "optOutRecorded",
+    "type": "boolean",
+    "description": "Whether the user has seen the opt-out banner in current game",
+    "provider": "Server",
+    "platforms": "all"
+  },
+  {
+    "key": "optOutEnabled",
+    "type": "boolean",
+    "description": "Whether the user has opted out from behavioral ads targeting in current game",
+    "provider": "Server",
+    "platforms": "all"
+  },
+  {
+    "key": "abGroup",
+    "type": "number",
+    "description": "AB Group number assigned to this user from configuration",
+    "provider": "Server",
+    "platforms": "all"
+  },
+  {
+    "key": "unityCreativeId",
+    "type": "string",
+    "description": "Creative id of the shown creative",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "analyticsUserId",
+    "type": "string",
+    "description": "Unity Analytics user ID in Unity Engine (does not apply to analytics events Unity Ads SDK is sending)",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "analyticsSessionId",
+    "type": "string",
+    "description": "Unity Analytics session ID in Unity Engine (does not apply to analytics events Unity Ads SDK is sending), note: sent as string to avoid problems with 64 bit integers being over JavaScript safe number limit",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "privacy",
+    "type": "object",
+    "description": "Contains the GDPR consent information, combines data received from configuration-service and data collected from user in SDK",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "isLoadEnabled",
+    "type": "boolean",
+    "description": "Flag describing if the campaign was loaded using Load API or from Precached Initialization",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "omidPartnerName",
+    "type": "string",
+    "description": "Flag describing the omid partner name indicating omid is supported",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "omidJSVersion",
+    "type": "string",
+    "description": "Flag describing the omid js implementation version indicating omid is supported",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "legalFramework",
+    "type": "string",
+    "description": "Current legal framework e.g. \"gdpr\", \"ccpa\" or \"default\"",
+    "provider": "Server",
+    "platforms": "all"
+  },
+  {
+    "key": "nofillRetry",
+    "type": "boolean",
+    "description": "Retrying after no fill",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "agreedOverAgeLimit",
+    "type": "string",
+    "description": "User answer to age gate \"yes\" or \"no\", \"missing\" if no age gate has been presented",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "privacyType",
+    "type": "string",
+    "description": "Privacy method, only sent if it is developer_consent or legitimate_interest",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "preload",
+    "type": "boolean",
+    "description": "Preload Flag for Load V5",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "load",
+    "type": "boolean",
+    "description": "Load Flag for Load V5",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "preloadPlacements",
+    "type": "object",
+    "description": "All placements received in configuration",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "preloadData",
+    "type": "object",
+    "description": "Preload Data for all placements received in configuration",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "loadV5Support",
+    "type": "boolean",
+    "description": "Indicates if client can work with Load V5 or not",
+    "provider": "SDK",
+    "platforms": "all"
+  }, 
+  {
+    "key": "deviceName",
+    "type": "string",
+    "description": "Device name associated with an iOS device",
+    "provider": "SDK",
+    "platforms": "ios"
+  },
+  {
+    "key": "vendorIdentifier",
+    "type": "string",
+    "description": "Vendor Identifier string",
+    "provider": "SDK",
+    "platforms": "ios"
+  },
+  {
+    "key": "localeList",
+    "type": "string",
+    "description": "A list of locale strings (e.g. [\"en_US\"] for English language",
+    "provider": "SDK",
+    "platforms": "ios"
+  },
+  {
+    "key": "currentUiTheme",
+    "type": "number",
+    "description": "Indicates the iOS device current ui color theme",
+    "provider": "SDK",
+    "platforms": "ios"
+  },
+  {
+    "key": "adNetworkPlist",
+    "type": "string",
+    "description": "List of SKAdNetworks included in an iOS game Plist",
+    "provider": "SDK",
+    "platforms": "ios"
+  },
+  {
+    "key": "systemBootTime",
+    "type": "number",
+    "description": "Time that the system booted",
+    "provider": "SDK",
+    "platforms": "ios"
+  },
+  {
+    "key": "trackingAuthStatus",
+    "type": "number",
+    "description": "Tracking Authorization Status",
+    "provider": "SDK",
+    "platforms": "ios"
+  },
+  {
+    "key": "locales",
+    "type": "object",
+    "description": "Array representation of localeList",
+    "provider": "SDK",
+    "platforms": "ios"
+  },
+  {
+    "key": "plist",
+    "type": "object",
+    "description": "Array representation of adNetworkPlist",
+    "provider": "SDK",
+    "platforms": "ios"
+  },
+  {
+    "key": "idfv",
+    "type": "string",
+    "description": "Vendor Identifier string",
+    "provider": "SDK",
+    "platforms": "ios"
+  },
+  {
+    "key": "totalSpace",
+    "type": "number",
+    "description": "Total Internal Device Space in kilobytes",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "totalMemory",
+    "type": "number",
+    "description": "Total Internal Device Memory in kilobytes",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "totalMemory",
+    "type": "number",
+    "description": "Total Internal Device Memory in kilobytes",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "freeMemory",
+    "type": "number",
+    "description": "Free Device Memory in kilobytes",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "batteryStatus",
+    "type": "number",
+    "description": "Current battery status of the device - [Resource](http://developer.android.com/intl/zh-cn/reference/android/os/BatteryManager.html)",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "batteryLevel",
+    "type": "number",
+    "description": "Current battery level of the device (0-1)",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "screenBrightness",
+    "type": "number",
+    "description": "Current screen brightness percentage (0-100)",
+    "provider": "SDK",
+    "platforms": "all"
+  }
+]

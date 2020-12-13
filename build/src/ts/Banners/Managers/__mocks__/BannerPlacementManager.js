@@ -1,0 +1,8 @@
+export const BannerPlacementManager = jest.fn(() => {
+    return {
+        sendBannersReady: jest.fn(),
+        getPlacement: jest.fn(),
+        setPlacementState: jest.fn()
+    };
+});
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiQmFubmVyUGxhY2VtZW50TWFuYWdlci5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4uLy4uLy4uLy4uLy4uLy4uL3NyYy90cy9CYW5uZXJzL01hbmFnZXJzL19fbW9ja3NfXy9CYW5uZXJQbGFjZW1lbnRNYW5hZ2VyLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQVFBLE1BQU0sQ0FBQyxNQUFNLHNCQUFzQixHQUFHLElBQUksQ0FBQyxFQUFFLENBQUMsR0FBRyxFQUFFO0lBQy9DLE9BQW1DO1FBQy9CLGdCQUFnQixFQUFFLElBQUksQ0FBQyxFQUFFLEVBQUU7UUFDM0IsWUFBWSxFQUFFLElBQUksQ0FBQyxFQUFFLEVBQUU7UUFDdkIsaUJBQWlCLEVBQUUsSUFBSSxDQUFDLEVBQUUsRUFBRTtLQUMvQixDQUFDO0FBQ04sQ0FBQyxDQUFDLENBQUMifQ==

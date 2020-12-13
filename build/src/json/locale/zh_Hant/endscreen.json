@@ -1,0 +1,21 @@
+{
+  "Ratings": "評分",
+  "Download For Free": "免費下載",
+  "Downloading": "後台下載中",
+  "Download completed": "下載完成",
+  "Download failed due to insufficient space": "下載失敗 - 存儲空間不足，請清理后重試",
+  "Download failed because file already exists": "下載失敗 - 文件已經存在，請直接安裝或刪除",
+  "Download failed due network error": "下載失敗 - 網絡錯誤，請檢查網絡連接並重試",
+  "Download canceled": "下載被取消，可重新嘗試下載",
+  "Download failed": "下載錯誤，請嘗試重新下載",
+  "Download is queued": "下載任務已加入隊列",
+  "Download paused": "下載被暫停",
+  "Download paused due to network": "下載暫停 - 等待網絡",
+  "Download is retrying": "正在重試下載",
+  "Download already enqueued": "下載任務已加入隊列",
+  "Opening browser to complete download": "打開瀏覽器 - 請在瀏覽器完成下載",
+  "Enqueuing is in progress": "正在將下載任務加入隊列",
+  "Safe to resume game": "可返回游戲",
+  "Install Now": "立即下载",
+  "Free": "免费"
+}

@@ -1,0 +1,49 @@
+{
+  "privacy-legitimate-interest-pop-up-1": "Unity正在当前应用程序中个性化定制您的广告体验。",
+  "privacy-legitimate-interest-pop-up-2": "请点击这里",
+  "privacy-legitimate-interest-pop-up-3": "来了解详情和管理您的隐私设置。",
+
+  "privacy-dialog-title": "Unity发布的有助于保护您隐私的消息",
+
+  "privacy-dialog-text-li-p1": "广告使游戏开发者能够免费提供优秀的应用程序。我们也在尝试根据您正在使用的应用程序、设备和所在的国家/地区，来展示对您来说最有趣的应用程序和产品。",
+  "privacy-dialog-text-li-p2": "我们用来提供个性化体验的信息，大部分来自于您设备的广告ID（如苹果或谷歌的广告ID）以及您的IP地址。",
+  "privacy-dialog-text-li-p3-1": "我们的",
+  "privacy-dialog-text-li-p3-2": "隐私条款",
+  "privacy-dialog-text-li-p3-3": "也解释了我们将如何管理您的数据以及如何与提供广告的第三方合作。这些第三方可能会从Unity以外的其他渠道收集关于您广告ID的信息来进一步个性化推荐您会看到的广告。请查看这些第三方的隐私策略来确认其可能收集的数据。",
+  "privacy-dialog-text-li-p4": "根据您和这款应用程序之间的互动，我们收集到了一些信息。以下是我们使用这些信息预测哪个应用程序可能会吸引您的一个示例：",
+  "privacy-dialog-text-li-p5-header": "请选择",
+  "privacy-dialog-text-li-p5": "您可以继续使用个性化体验，或换成大众化的体验。这将应用于Unity直接推送的和其广告合作商推送的广告。",
+
+  "privacy-using": "使用的设备是{0}",
+  "privacy-located-in": "所在位置是{0}",
+  "privacy-used-this-app": "本周使用了这个应用程序{0}次",
+  "privacy-seen-ads": "在这个应用程序里已经看过{0}个广告",
+  "privacy-installed-based-on": "根据已看过的广告已安装{0}个应用程序",
+
+  "privacy-dialog-text-li-agree-radio-button": "同意, 我愿意继续使用个性化体验。",
+  "privacy-dialog-text-li-disagree-radio-button": "不同意, 我不想要个性化体验。",
+
+  "privacy-dialog-text-li-p6-header": "更改您的隐私选项",
+  "privacy-dialog-text-li-p6": "您可以在广告出现或者结束时，点击Unity Data Privacy（Unity数据隐私）图标随时访问/更改这些选项。",
+  "privacy-dialog-text-li-p7-header": "数据管理",
+  "privacy-dialog-text-li-p7-1": "您可以点击",
+  "privacy-dialog-text-li-p7-2": "这里",
+  "privacy-dialog-text-li-p7-3": "删除Unity获取的任何关于您设备的数据。",
+  "privacy-dialog-text-li-p7-are-you-sure": "您确定吗？",
+  "privacy-dialog-text-li-p7-yes": "是 ",
+  "privacy-dialog-text-li-p7-no": "否",
+  "privacy-dialog-text-li-p7-data-deletion-text": "我们会处理您的请求，并在30天内删除您的个人信息数据、让您立即推出个性化体验。请注意，由于完成支付和防止欺诈的需要，我们可能需要将您的数据保留180天。",
+
+  "privacy-dialog-text-failed-age-gate-p1": "此广告由Unity Ads广告提供。由于您已表明经自己不满18周岁，我们将通过相关数据（如您正在玩的游戏）向您展示广告。",
+  "privacy-dialog-text-failed-age-gate-p2-1": "请查看我们的",
+  "privacy-dialog-text-failed-age-gate-p2-2": "隐私条款",
+  "privacy-dialog-text-failed-age-gate-p2-3": "来了解数据实践的详细介绍。您可以在广告出现或结束时，点击Unity Data Privacy（Unity数据隐私）图标随时查看这些选项。",
+
+  "privacy-dialog-text-coppa-p1": "此广告由Unity Ads广告提供。这个游戏开发者已经启用隐私控制，说明这个应用程序会被13周岁以下的儿童使用。因此，我们仅会通过相关数据（例如您正在玩的游戏）来向您展示广告。",
+  "privacy-dialog-text-coppa-p2-1": "请查看我们的",
+  "privacy-dialog-text-coppa-p2-2": "隐私条款",
+  "privacy-dialog-text-coppa-p2-3": "来了解数据实践的详细介绍。您可以在广告出现或结束时，点击Unity Data Privacy（Unity数据隐私）图标随时查看这些选项。",
+
+  "privacy-dialog-button-confirm": "确认",
+  "privacy-dialog-button-close": "关闭"
+}

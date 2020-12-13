@@ -1,0 +1,78 @@
+{
+  "privacy-legitimate-interest-pop-up-1": "Unity is personalizing your ads experience in this application. ",
+  "privacy-legitimate-interest-pop-up-2": "Tap here ",
+  "privacy-legitimate-interest-pop-up-3": "to learn more about Unity and your privacy choices.",
+
+  "privacy-dialog-title": "A message from Unity about your privacy",
+
+  "privacy-dialog-text-li-p1": "Ads allow developers to offer great apps for free. We try to show the apps and products that will be most interesting to you based on the apps you play, the device you use, and the country you are in.",
+  "privacy-dialog-text-li-p2": "Most of the information we use for this personalization is based on your device’s advertising ID (Apple’s Advertising Identifier or Google Advertising Identifier) and your IP address.",
+  "privacy-dialog-text-li-p3-1": "Our ",
+  "privacy-dialog-text-li-p3-2": "Privacy Policy",
+  "privacy-dialog-text-li-p3-3": " explains how we manage your data and how we work with partners who serve ads. These partners may collect information about your advertising ID from sources other than Unity to further personalize the ads you see. Please visit the privacy policies of these third parties to review the compiled data they may have.",
+  "privacy-dialog-text-li-p4": "From your interaction with this app, here is an example of the information we use to predict which other apps might interest you:",
+  "privacy-dialog-text-li-p5-header": "Selection",
+  "privacy-dialog-text-li-p5-header-ccpa": "Personalization",
+  "privacy-dialog-text-li-p5": "You can choose to continue to have a personalized experience, or to have a generic one. This will apply to both advertising that comes from Unity directly as well as from advertising partners.",
+
+  "privacy-using": "Using {0}",
+  "privacy-located-in": "Located in {0}",
+  "privacy-used-this-app": "Used this app {0} times this week",
+  "privacy-seen-ads": "Seen {0} ads in this app",
+  "privacy-installed-based-on": "Installed {0} apps based on those ads",
+
+  "privacy-dialog-text-li-agree-radio-button": "Yes, I agree to a personalized experience.",
+  "privacy-dialog-text-li-disagree-radio-button": "No, I do not want a personalized experience.",
+  "privacy-dialog-text-li-agree-radio-button-ccpa": "Yes, I agree to a personalized experience. This means you are choosing to Opt In.",
+  "privacy-dialog-text-li-disagree-radio-button-ccpa": "No, I do not want a personalized experience. This means you are choosing to Opt Out.",
+
+  "privacy-dialog-text-li-p6-header": "Changing your privacy choice",
+  "privacy-dialog-text-li-p6": "You can access these options at any time by tapping the Unity Data Privacy icon when or after an ad appears.",
+  "privacy-dialog-text-li-p7-header": "Data Management",
+  "privacy-dialog-text-li-p7-header-ccpa": "Delete Data",
+  "privacy-dialog-text-li-p7-1": "You can delete any data Unity has about your device by clicking ",
+  "privacy-dialog-text-li-p7-2": "here",
+  "privacy-dialog-text-li-p7-3": ".",
+  "privacy-dialog-text-li-p7-1-ccpa": "You can delete any data Unity has about your device by clicking ",
+  "privacy-dialog-text-li-p7-2-ccpa": "here",
+  "privacy-dialog-text-li-p7-3-ccpa": ".",
+  "privacy-dialog-text-li-p7-data-request-info": "*Please note, if you already have a data disclosure request in progress, the data that you are requesting to delete for this game may be not included in that report.",
+  "privacy-dialog-text-li-p7-are-you-sure": "Are you sure? ",
+  "privacy-dialog-text-li-p7-yes": "Yes ",
+  "privacy-dialog-text-li-p7-no": "No",
+  "privacy-dialog-text-li-p7-data-deletion-text": "We will process your request and your data for profile purposes will be deleted in 30 days. We will also opt you out of personalized ads immediately.  Please note we may retain your data for invoicing and fraud prevention purposes for 180 days.",
+  "privacy-dialog-text-li-p7-data-deletion-text-ccpa": "We will process your request and your data will be deleted. Please note, for profile purposes this process will take 30 days to complete. We will also opt you out of personalized ads immediately. We may retain your data for invoicing and fraud prevention purposes for 180 days.",
+
+  "privacy-dialog-text-failed-age-gate-p1": "This advertisement has been served by Unity Ads. As you have indicated that you are under 18 years old we deliver ads to you based on contextual data (e.g., the game you are playing).",
+  "privacy-dialog-text-failed-age-gate-p2-1": "Please review our ",
+  "privacy-dialog-text-failed-age-gate-p2-2": "Privacy Policy",
+  "privacy-dialog-text-failed-age-gate-p2-3": " for a full description of our data practices. You can view your privacy settings at any time by tapping the Unity Data Privacy icon when or after an ad appears.",
+
+  "privacy-dialog-text-failed-age-gate-p1-ccpa": "This advertisement has been served by Unity Ads. In this app we are delivering ads to you based on contextual data, such as the game you are playing.",
+  "privacy-dialog-text-failed-age-gate-p2-1-ccpa": "Please review our ",
+  "privacy-dialog-text-failed-age-gate-p2-2-ccpa": "Privacy Policy",
+  "privacy-dialog-text-failed-age-gate-p2-3-ccpa": " for a full description of our data practices. You can view your privacy settings at any time by tapping the Unity Data Privacy icon when or after an ad appears.",
+
+  "privacy-dialog-text-coppa-p1": "This advertisement has been served by Unity Ads. The developer of this app has enabled privacy controls to create a more privacy-protective experience or to indicate that this app is directed to children under the age of 13.  As a result, we deliver ads to you based only on contextual data (e.g., the game you are playing).",
+  "privacy-dialog-text-coppa-p2-1": "Please review our ",
+  "privacy-dialog-text-coppa-p2-2": "Privacy Policy",
+  "privacy-dialog-text-coppa-p2-3": " for a full description of our data practices. You can view privacy information at any time by tapping the Unity Data Privacy icon when or after an ad appears.",
+
+  "privacy-dialog-button-confirm": "Confirm",
+  "privacy-dialog-button-close": "Close",
+
+  "privacy-data-request-header": "Request your Data",
+  "privacy-data-request-text": "It is your right to request the data that we have collected on you for this game. In order to do so, please provide us with your email address so that we can share a secure and personalized link to the data request page. We will not be using your email address for any other purpose.",
+  "privacy-data-request-submit": "Submit",
+  "privacy-data-request-email-input-placeholder": "Enter Email Id",
+  "privacy-data-request-confirmation-message": "Thank you. You should receive an email with the link to request your data shortly.",
+  "privacy-data-request-fail-message": "You have reached the maximum number of attempts. To request your data, please try again after 24 hours.",
+  "privacy-data-request-error-message": "Error: Please try again later.",
+
+  "privacy-captcha-description": "We need to verify that the user is human. Please review the following 16 images and select the one that does not fit the theme.",
+  "privacy-captcha-success-message": "Confirmed",
+  "privacy-captcha-retry-message": "Incorrect. Please try again.",
+
+  "privacy-settings-report-ad": "Report ad",
+  "privacy-settings-build-info": "Build info"
+}

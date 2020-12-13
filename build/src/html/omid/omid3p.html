@@ -1,0 +1,217 @@
+<html>
+    <head>
+        <script>
+            (function() {
+                var OmidVerification = function() {
+
+                    var ON_EVENT_PROCESSED = 'onEventProcessed',
+                    SESSION_FINISH = 'sessionFinish',
+                    SESSION_START = 'sessionStart',
+                    SESSION_ERROR = 'sessionError',
+                    SESSION_REGISTERED = 'sessionRegistered';
+                    var DEFAULT_VENDOR_KEY = '{{ DEFAULT_KEY_ }}';
+                    var IFRAME_ID = '{{ IFRAME_ID_ }}';
+                    var sessionObservers = [];
+                    var sessionStartData = {};
+                    var sessionStartCalled = false;
+                    var scriptVendor = '';
+
+                    var registeredFunctions = {};
+                    var uuid = 0;
+
+                    /**
+                     * This property is required by MOAT to indicate this omid implementation
+                     * is different from web omid implementation
+                     */
+                    this.customNative = true;
+
+                    /**
+                     * Flattens and runs SessionObserver for each unique key/verification client with the specified eventdata
+                     * @param {Object} eventData structured data to indicate type for observer to fire
+                     */
+                    var triggerSessionObserver = function(eventData) {
+                        for (var i = 0; i < sessionObservers.length; i++) {
+                            if (!eventData.data || Object.keys(eventData.data).length === 0) {
+                                delete eventData.data;
+                            }
+                            sessionObservers[i](eventData);
+                        }
+                    }
+
+                    /**
+                     * Callback to communicate back to TS layer of changed state
+                     * @param {string} event to send to the server
+                     * @param {Object} data of the event
+                     */
+                    var postMessageCallback = function(event, data) {
+                        window.parent.postMessage({
+                            type: 'omid',
+                            event: event,
+                            data: data
+                        }, '*');
+                    };
+
+                    /**
+                     * Calls SessionListener for unique verificationScript observer of specified vendorkey
+                     * @param {function} observer
+                     * @param {string} vendorkey
+                     */
+                    var sendSessionStart = function(observer, vendorkey) {
+                        delete sessionStartData.data.vendorkey;
+                        observer(sessionStartData);
+                        postMessageCallback(ON_EVENT_PROCESSED, {
+                            eventType: SESSION_START,
+                            vendorKey: vendorkey
+                        });
+                    }
+
+                    /**
+                     * Calls SessionListener for specified vendorkey
+                     * @param {string} key
+                     */
+                    var sendSessionStartForKey = function(key) {
+                        for (var i = 0; i < sessionObservers.length; i++) {
+                            sendSessionStart(sessionObservers[i], key);
+                        }
+                    }
+
+                    var handleSessionStart = function(event) {
+                        var data = event.data.data;
+                        if (sessionObservers.length > 0) {
+                            sessionStartData = event.data;
+                            if (!sessionStartCalled && sessionStartData) {
+                                sendSessionStartForKey(data.vendorkey);
+                                sessionStartCalled = true;
+                            }
+                        } else {
+                            // It is possible session start was called before a vendor registers so we must always store the data
+                            sessionStartData = event.data;
+                        }
+                    }
+
+                    /**
+                     * Strips 'omid' from string to be passed to vendor
+                     * @param {string} event to send to the vendor
+                     */
+                    var stripEventString = function(eventType) {
+                        return eventType.slice(4).charAt(0).toLowerCase() + eventType.slice(5);
+                    }
+
+                    var handleSessionEvents = function(event) {
+                        switch(event.data.type) {
+                            case SESSION_START:
+                                handleSessionStart(event);
+                                break;
+                            case SESSION_FINISH:
+                                triggerSessionObserver(event.data);
+                                postMessageCallback(ON_EVENT_PROCESSED, {
+                                    eventType: SESSION_FINISH,
+                                    vendorKey: scriptVendor
+                                });
+                                break;
+                            case SESSION_ERROR:
+                                triggerSessionObserver(event.data);
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+
+                    /**
+                     * LifeCycle Event Listener
+                     */
+                    window.addEventListener('message', function(event) {
+                        /*
+                        * AD AND VIDEO EVENTS:
+                        */
+                        if (event.data.uuid) {
+                            payload = event.data.payload;
+                            var eventData = {
+                                adSessionId: event.data.adSessionId,
+                                timestamp: event.data.timestamp,
+                                type: stripEventString(event.data.type),
+                            }
+                            if (payload) {
+                                eventData.data = payload;
+                            }
+                            var handler = registeredFunctions[event.data.uuid];
+                            handler(eventData);
+                        }
+
+                        /**
+                         * SESSION EVENTS:
+                         */
+                        handleSessionEvents(event);
+                    });
+
+                    /*
+                    * Tells verification script omid3p is supported
+                    */
+                    this.isSupported = function() {
+                        return true;
+                    }
+
+                    /**
+                     * Registers session events for the given vendor key
+                     * @param {function} functionToExecute sessionObserver for given vendor
+                     * @param {function} vendorKey optional param to attribute given vendor key to sessionObserver
+                     */
+                    this.registerSessionObserver = function(functionToExecute, vendorKey) {
+                        sessionObservers.push(functionToExecute);
+
+                        if (!sessionStartCalled) {
+                            scriptVendor = vendorKey;
+
+                            postMessageCallback(ON_EVENT_PROCESSED, {
+                                eventType: SESSION_REGISTERED,
+                                vendorKey: vendorKey
+                            });
+                        }
+                    }
+
+                    this.addEventListener = function(type, listener) {
+                        uuid++;
+                        registeredFunctions[uuid] = listener;
+
+                        var adjustEventTypeString = function(eventType) {
+                            return 'omid' + eventType.charAt(0).toUpperCase()+eventType.slice(1);
+                        };
+
+                        postMessageCallback('onEventRegistered', {
+                            eventName: adjustEventTypeString(type),
+                            vendorKey: scriptVendor,
+                            uuid: '' + uuid,
+                            iframeId: IFRAME_ID
+                        });
+                    }
+
+                    this.sendUrl = function(resourceUrl, successCallback, failureCallback) {}
+                    this.setTimeout = function() {}
+                    this.setClearTimeout = function() {}
+                    this.setInterval = function() {}
+                    this.clearInterval = function() {}
+
+                    var fnwhitelist = ['handleSessionStart', 'handleSessionEvents'];
+                    this.get = function(name) {
+                        return fnwhitelist.indexOf(name) > -1 ? eval(name) : console.log('fn not gettable');
+                    }
+                    this.postback = function(event, data) {
+                        postMessageCallback(event, data);
+                    }
+                }
+
+                /**
+                 * Generic Vast verification scripts attach to this:
+                 */
+                window.omid3p = new OmidVerification();
+                Object.freeze(window.omid3p);
+
+                /**
+                 * Used for IAB test:
+                 * window.OmidVerificationClient = {'omid3p': OmidVerification};
+                 * Object.freeze(window.OmidVerificationClient);
+                 */
+            })();
+        </script>
+    </head>
+</html>

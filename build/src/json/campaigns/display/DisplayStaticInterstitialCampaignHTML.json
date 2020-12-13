@@ -1,0 +1,13 @@
+{
+    "buyerId": "7353",
+    "contentType": "programmatic/static-interstitial-js",
+    "adType": "DISPLAY",
+    "seatId": 9000,
+    "advDomain": "appnexus.com",
+    "trackingUrls": {
+    },
+    "content": "%3Ca%20href=%22https://t.manage.com/22874%3Fbts=1525421833&age=0&pt=app&pi=1&p=com.unity3d.ads.example&pb=&pbi=&bnd=com.unity3d.ads.example&sz=1&zid=&pcat=&lat=58.5492&lon=50.0456&city=San+Francisco&country=USA&gender=%253F&_ip=1296600073&isp=CJSC+Information+Systems&netspd=cellular&model=iPhone&sk=0&os=iOS&osv=10.0.0&region=33&zip=94110&dma=%253F&si=49&_uh=ifa%253Ac8198358-ed3b-43ba-b507-17726eef5dd5&bidid=Vj0Fz1v5XALx4plSWe3TQx0SWFM&atb=1&sub4=&sub6=RUS&sub9=&host=web58-east&sdkv=&lt=13.5&ff=%253F&sl=221&ss=1525421612&l=en&uhgid=124&at=2&dvmo=iPhone&idx=3&agidx=1&ai=1054553&ag=23893&ci=1271&cu=USD&_bid=0.005&pr=0&dealid=&uimp=6&uclk=1&uins=2&useg=2&mid=197759&cm=2&pr1=3&vte=1%22%3E%3Cimg%20src=%22https://cdn.manage.com/1270/m_WIS_300x250_AutoExpert.gif%22%20width=%22300%22%20height=%22250%22%3E%3C/a%3E",
+    "campaignId": "000000000000000000000001",
+    "cacheTTL": 123,
+    "creativeId": "not-defined-in-fab"
+}

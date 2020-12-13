@@ -1,0 +1,4 @@
+export const LifecycleApi = jest.fn(() => {
+    return {};
+});
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiTGlmZWN5Y2xlQXBpLmpzIiwic291cmNlUm9vdCI6IiIsInNvdXJjZXMiOlsiLi4vLi4vLi4vLi4vLi4vLi4vLi4vc3JjL3RzL0NvcmUvTmF0aXZlL0FuZHJvaWQvX19tb2Nrc19fL0xpZmVjeWNsZUFwaS50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFLQSxNQUFNLENBQUMsTUFBTSxZQUFZLEdBQUcsSUFBSSxDQUFDLEVBQUUsQ0FBQyxHQUFHLEVBQUU7SUFDckMsT0FBeUIsRUFDeEIsQ0FBQztBQUNOLENBQUMsQ0FBQyxDQUFDIn0=

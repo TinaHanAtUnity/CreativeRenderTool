@@ -1,0 +1,4 @@
+export const PermissionsApi = jest.fn(() => {
+    return {};
+});
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiUGVybWlzc2lvbnNBcGkuanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuLi8uLi8uLi8uLi8uLi8uLi9zcmMvdHMvQ29yZS9OYXRpdmUvX19tb2Nrc19fL1Blcm1pc3Npb25zQXBpLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUtBLE1BQU0sQ0FBQyxNQUFNLGNBQWMsR0FBRyxJQUFJLENBQUMsRUFBRSxDQUFDLEdBQUcsRUFBRTtJQUN2QyxPQUEyQixFQUMxQixDQUFDO0FBQ04sQ0FBQyxDQUFDLENBQUMifQ==

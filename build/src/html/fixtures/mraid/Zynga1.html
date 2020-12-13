@@ -1,0 +1,25 @@
+<script type="text/javascript" src="mraid.js"></script>
+<script type="text/javascript" src="mraid_ext.js"></script>
+<img id="adTagLoadedPixel_689921" src="https://stats.justad.mobi/tracking/detailed/et.php?eventType=12&adId=689921&%%CACHEBUSTER%%" style="visibility:hidden; display:none;"></img>
+<div id="JA_Creative">
+    <script type="text/javascript">
+        var adConfig = {
+            clickurl : {},
+            platform : null,
+            options : {}
+        };
+        var combinedMediaUrl = 'https://mediajustad-a.akamaihd.net/select/Mraid/689921?%%CACHEBUSTER%%';
+        var justAdTrackingMacros =
+                {OPEN_URL: 'https://bs.serving-sys.com/BurstingPipe/adServer.bs?cn=tf&c=20&mc=click&pli=17413981&PluID=0&ord=%%CACHEBUSTER%%&mb=1&ck=1'}
+                ;
+        function downloadScript(src,adData) {
+            var scp = document.createElement('script');
+            scp.src = src;
+            scp.onload = function()
+            { launchAd(downloadScript,adData);}
+            ;
+            document.getElementsByTagName('head')[0].appendChild(scp);
+        }
+        downloadScript(combinedMediaUrl,adConfig);
+    </script>
+</div>

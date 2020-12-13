@@ -1,0 +1,56 @@
+<script id='debug-js-console-script' type="text/javascript">
+    (function() {
+        function postConsoleLog(functionName, args) {
+            return window.parent.postMessage({
+                type: 'consoleLog',
+                data: {
+                    functionName: functionName,
+                    args: args
+                }
+            }, '*');
+        }
+
+        var origConsoleLog = console.log;
+
+        console.log = function() {
+            var argumentsArray = Array.prototype.slice.call(arguments);
+            postConsoleLog('console.log', argumentsArray.join(" "));
+            return origConsoleLog.apply(this, argumentsArray);
+        };
+
+        var origConsoleWarn = console.warn;
+
+        console.warn = function() {
+            var argumentsArray = Array.prototype.slice.call(arguments);
+            postConsoleLog('console.warn', argumentsArray.join(" "));
+            return origConsoleWarn.apply(this, argumentsArray);
+        };
+
+        var origConsoleError = console.error;
+
+        console.error = function() {
+            var argumentsArray = Array.prototype.slice.call(arguments);
+            postConsoleLog('console.error', argumentsArray.join(" "));
+            return origConsoleError.apply(this, argumentsArray);
+        };
+
+        var origWindowOnError = window.onerror;
+
+        window.onerror = function () {
+            var argumentsArray = Array.prototype.slice.call(arguments);
+            postConsoleLog('window.onerror', argumentsArray.join(" "));
+            if(origWindowOnError) {
+                return origConsoleError.apply(this, argumentsArray);
+            }
+            return false;
+        };
+
+        const origXMLHttpRequestOpen = window.XMLHttpRequest.prototype.open;
+
+        window.XMLHttpRequest.prototype.open = function () {
+            var argumentsArray = Array.prototype.slice.call(arguments);
+            postConsoleLog('XMLHttpRequest.open', argumentsArray.join(" "));
+            return origXMLHttpRequestOpen.apply(this, argumentsArray);
+        };
+    })();
+</script>

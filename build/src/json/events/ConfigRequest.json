@@ -1,0 +1,251 @@
+{
+  "event": "Configuration request",
+  "parameters": [
+    {
+      "parameter": "bundleId",
+      "required": "all",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "encrypted",
+      "required": "all",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "rooted",
+      "required": "all",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "platform",
+      "required": "all",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "sdkVersion",
+      "required": "all",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "osVersion",
+      "required": "all",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "deviceModel",
+      "required": "all",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "language",
+      "required": "all",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "connectionType",
+      "required": "all",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "screenHeight",
+      "required": "all",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "screenWidth",
+      "required": "all",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "test",
+      "required": "all",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "forceAbGroup",
+      "required": "no",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "deviceMake",
+      "required": "android",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "screenDensity",
+      "required": "android",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "screenSize",
+      "required": "android",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "advertisingTrackingId",
+      "required": "no",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "limitAdTracking",
+      "required": "no",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "androidId",
+      "required": "no",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "frameworkName",
+      "required": "no",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "frameworkVersion",
+      "required": "no",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "adapterName",
+      "required": "no",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "adapterVersion",
+      "required": "no",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "analyticsUserId",
+      "required": "no",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "analyticsSessionId",
+      "required": "no",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "networkOperator",
+      "required": "ios",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "totalSpace",
+      "required": "ios",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "totalMemory",
+      "required": "ios",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "freeMemory",
+      "required": "ios",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "batteryStatus",
+      "required": "ios",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "batteryLevel",
+      "required": "ios",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "screenBrightness",
+      "required": "ios",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "volume",
+      "required": "ios",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "deviceFreeSpace",
+      "required": "ios",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "deviceName",
+      "required": "ios",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "vendorIdentifier",
+      "required": "ios",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "localeList",
+      "required": "ios",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "currentUiTheme",
+      "required": "ios",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "adNetworkPlist",
+      "required": "ios",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "systemBootTime",
+      "required": "ios",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "trackingAuthStatus",
+      "required": "ios",
+      "queryString": true,
+      "body": false
+    }
+  ]
+}

@@ -1,0 +1,4 @@
+export const AndroidPreferencesApi = jest.fn(() => {
+    return {};
+});
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiQW5kcm9pZFByZWZlcmVuY2VzQXBpLmpzIiwic291cmNlUm9vdCI6IiIsInNvdXJjZXMiOlsiLi4vLi4vLi4vLi4vLi4vLi4vLi4vc3JjL3RzL0NvcmUvTmF0aXZlL0FuZHJvaWQvX19tb2Nrc19fL0FuZHJvaWRQcmVmZXJlbmNlc0FwaS50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFLQSxNQUFNLENBQUMsTUFBTSxxQkFBcUIsR0FBRyxJQUFJLENBQUMsRUFBRSxDQUFDLEdBQUcsRUFBRTtJQUM5QyxPQUFrQyxFQUNqQyxDQUFDO0FBQ04sQ0FBQyxDQUFDLENBQUMifQ==

@@ -1,0 +1,70 @@
+import { Observable1, Observable2 } from 'Core/Utilities/Observable';
+/**
+ * The WebPlayerContainer wraps the WebPlayerApi in a way that can be used without needing
+ * to pass in the ViewID specifically into each method.
+ */
+export class WebPlayerContainer {
+    constructor(platform, ads, viewId) {
+        this.onPageStarted = new Observable1();
+        this.onPageFinished = new Observable1();
+        this.onWebPlayerEvent = new Observable1();
+        this.onCreateWindow = new Observable1();
+        this.shouldOverrideUrlLoading = new Observable2();
+        this.onCreateWebView = new Observable1();
+        this._platform = platform;
+        this._ads = ads;
+        this._viewId = viewId;
+        this._ads.WebPlayer.onPageStarted.subscribe((view, url) => this.handleOnPageStarted(view, url));
+        this._ads.WebPlayer.onPageFinished.subscribe((view, url) => this.handleOnPageFinished(view, url));
+        this._ads.WebPlayer.onWebPlayerEvent.subscribe((view, event) => this.handleOnWebPlayerEvent(view, event));
+        this._ads.WebPlayer.shouldOverrideUrlLoading.subscribe((view, url, method) => this.handleShouldOverrideUrlLoading(view, url, method));
+        this._ads.WebPlayer.onCreateWebView.subscribe((view, url) => this.handleOnCreateWebView(view, url));
+    }
+    setUrl(url) {
+        return this._ads.WebPlayer.setUrl(url, this._viewId);
+    }
+    setData(data, mimeType, encoding) {
+        return this._ads.WebPlayer.setData(data, mimeType, encoding, this._viewId);
+    }
+    setDataWithUrl(baseUrl, data, mimeType, encoding) {
+        return this._ads.WebPlayer.setDataWithUrl(baseUrl, data, mimeType, encoding, this._viewId);
+    }
+    setSettings(webSettings, webPlayerSettings) {
+        return this._ads.WebPlayer.setSettings(webSettings, webPlayerSettings, this._viewId);
+    }
+    clearSettings() {
+        return this._ads.WebPlayer.clearSettings(this._viewId);
+    }
+    setEventSettings(eventSettings) {
+        return this._ads.WebPlayer.setEventSettings(eventSettings, this._viewId);
+    }
+    sendEvent(args) {
+        return this._ads.WebPlayer.sendEvent(args, this._viewId);
+    }
+    handleOnPageStarted(viewId, url) {
+        if (this._viewId === viewId) {
+            this.onPageStarted.trigger(url);
+        }
+    }
+    handleOnPageFinished(viewId, url) {
+        if (this._viewId === viewId) {
+            this.onPageFinished.trigger(url);
+        }
+    }
+    handleOnWebPlayerEvent(viewId, event) {
+        if (this._viewId === viewId) {
+            this.onWebPlayerEvent.trigger(event);
+        }
+    }
+    handleShouldOverrideUrlLoading(viewId, url, method) {
+        if (this._viewId === viewId) {
+            this.shouldOverrideUrlLoading.trigger(url, method);
+        }
+    }
+    handleOnCreateWebView(viewId, url) {
+        if (this._viewId === viewId) {
+            this.onCreateWebView.trigger(url);
+        }
+    }
+}
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiV2ViUGxheWVyQ29udGFpbmVyLmpzIiwic291cmNlUm9vdCI6IiIsInNvdXJjZXMiOlsiLi4vLi4vLi4vLi4vLi4vLi4vc3JjL3RzL0Fkcy9VdGlsaXRpZXMvV2ViUGxheWVyL1dlYlBsYXllckNvbnRhaW5lci50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFRQSxPQUFPLEVBQUUsV0FBVyxFQUFFLFdBQVcsRUFBRSxNQUFNLDJCQUEyQixDQUFDO0FBRXJFOzs7R0FHRztBQUNILE1BQU0sT0FBZ0Isa0JBQWtCO0lBYXBDLFlBQVksUUFBa0IsRUFBRSxHQUFZLEVBQUUsTUFBYztRQVg1QyxrQkFBYSxHQUFHLElBQUksV0FBVyxFQUFVLENBQUM7UUFDMUMsbUJBQWMsR0FBRyxJQUFJLFdBQVcsRUFBVSxDQUFDO1FBQzNDLHFCQUFnQixHQUFHLElBQUksV0FBVyxFQUFVLENBQUM7UUFDN0MsbUJBQWMsR0FBRyxJQUFJLFdBQVcsRUFBVSxDQUFDO1FBQzNDLDZCQUF3QixHQUFHLElBQUksV0FBVyxFQUFrQixDQUFDO1FBQzdELG9CQUFlLEdBQUcsSUFBSSxXQUFXLEVBQVUsQ0FBQztRQU94RCxJQUFJLENBQUMsU0FBUyxHQUFHLFFBQVEsQ0FBQztRQUMxQixJQUFJLENBQUMsSUFBSSxHQUFHLEdBQUcsQ0FBQztRQUNoQixJQUFJLENBQUMsT0FBTyxHQUFHLE1BQU0sQ0FBQztRQUV0QixJQUFJLENBQUMsSUFBSSxDQUFDLFNBQVMsQ0FBQyxhQUFhLENBQUMsU0FBUyxDQUFDLENBQUMsSUFBSSxFQUFFLEdBQUcsRUFBRSxFQUFFLENBQUMsSUFBSSxDQUFDLG1CQUFtQixDQUFDLElBQUksRUFBRSxHQUFHLENBQUMsQ0FBQyxDQUFDO1FBQ2hHLElBQUksQ0FBQyxJQUFJLENBQUMsU0FBUyxDQUFDLGNBQWMsQ0FBQyxTQUFTLENBQUMsQ0FBQyxJQUFJLEVBQUUsR0FBRyxFQUFFLEVBQUUsQ0FBQyxJQUFJLENBQUMsb0JBQW9CLENBQUMsSUFBSSxFQUFFLEdBQUcsQ0FB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

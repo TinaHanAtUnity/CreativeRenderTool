@@ -1,0 +1,360 @@
+<!-- DO NOT PUT A DOCTYPE HERE! iOS will go crazy -->
+<html lang="en">
+<head>
+    <title>Unity Ads MRAID WebView</title>
+
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+    <meta name="format-detection" content="telephone=no"/>
+    <script>
+        (function(global) {
+            var EventTarget = function() {
+                this.listeners = {};
+            };
+
+            EventTarget.prototype.listeners = null;
+            EventTarget.prototype.addEventListener = function(type, callback) {
+                if (!(type in this.listeners)) {
+                    this.listeners[type] = [];
+                }
+                this.listeners[type].push(callback);
+            };
+
+            EventTarget.prototype.removeEventListener = function(type, callback) {
+                if (!(type in this.listeners)) {
+                    return;
+                }
+                var stack = this.listeners[type];
+                for (var i = 0, l = stack.length; i < l; i++) {
+                    if (stack[i] === callback){
+                        stack.splice(i, 1);
+                        return;
+                    }
+                }
+            };
+
+            EventTarget.prototype.dispatchEvent = function(event) {
+                if (!(event.type in this.listeners)) {
+                    return true;
+                }
+                var stack = this.listeners[event.type];
+
+                for (var i = 0, l = stack.length; i < l; i++) {
+                    stack[i].call(this, event);
+                }
+                return !event.defaultPrevented;
+            };
+
+            var UIWebViewBridge = function() {
+                this.handleEvent = function(event, parameters) {
+                    var iframe = document.createElement('iframe');
+                    iframe.setAttribute('src', 'umsg:' + JSON.stringify([event, parameters]));
+                    document.documentElement.appendChild(iframe);
+                    iframe.parentNode.removeChild(iframe);
+                };
+            };
+
+            var WKWebViewBridge = function() {
+                this.handleEvent = function(event, parameters) {
+                    window.webkit.messageHandlers.sendEvent.postMessage(JSON.stringify([event, parameters]));
+                }
+            };
+
+            var WebViewBridge = function() {
+                this.handleEvent = function(event, parameters) {
+                    window.webplayerbridge.handleEvent(JSON.stringify([event, parameters]));
+                }
+            };
+
+            var NativeBridge = function() {
+                var _this = this;
+                var bridge;
+                if (window.webplayerbridge) {
+                    bridge = new WebViewBridge();
+                } else if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.sendEvent) {
+                    bridge = new WKWebViewBridge();
+                } else {
+                    bridge = new UIWebViewBridge();
+                }
+                this._bridge = bridge;
+
+                this.receiveEvent = function(args) {
+                    console.log('unity', 'Received event: ', args);
+                    var event = args.shift();
+                    var parameters = args.shift();
+                    _this.dispatchEvent(new CustomEvent(event, { detail: parameters }));
+                };
+
+                this.sendEvent = function(event, parameters) {
+                    _this._bridge.handleEvent(event, parameters);
+                };
+
+                this.trigger = function(event, parameters) {
+                    if (event in _this.eventHandlers) {
+                        var listeners = _this.eventHandlers[event];
+                        for (var i = listeners.length - 1; i >= 0; i--) {
+                            var listener = listeners[i];
+                            listener.apply(global, parameters);
+                        }
+                    }
+                };
+            };
+            NativeBridge.prototype = new EventTarget();
+
+            global.nativebridge = new NativeBridge();
+        })(window);
+    </script>
+    <script>
+        (function() {
+
+            var nativebridge = window.nativebridge;
+
+            var MRAID = function() {
+                var state = 'loading';
+
+                var listeners = {
+                    ready: [],
+                    error: [],
+                    stateChange: [],
+                    viewableChange: [],
+                    sizeChange: []
+                };
+
+                var viewable = false;
+
+                var orientationProperties = {
+                    allowOrientationChange: true,
+                    forceOrientation: 'none'
+                };
+
+                var trigger = function(event, parameters) {
+                    if(!parameters) {
+                        parameters = [];
+                    }
+                    if(event in listeners) {
+                        for (var len = listeners[event].length, i = len - 1; i >= 0; i--) {
+                            var listener = listeners[event][i];
+                            try {
+                                listener.apply(window, parameters);
+                            } catch (e) {
+                                console.log('Got error ', e);
+                                window.nativebridge.sendEvent('diagnosticError', [e]);
+                            }
+                        }
+                    }
+                };
+
+                var width = window.innerWidth;
+                var height = window.innerHeight;
+
+                var playableConfiguration = {};
+
+                var setState = function(newState) {
+                    state = newState;
+                    trigger('stateChange', [newState]);
+                };
+
+                window.nativebridge.addEventListener('viewable', function(e) {
+                    viewable = e.detail;
+                    trigger('viewableChange', [viewable]);
+                });
+
+                window.nativebridge.addEventListener('resize', function(e) {
+                    width = window.innerWidth;
+                    height = window.innerHeight;
+                    if (e) {
+                        width = e.detail.width;
+                        height = e.detail.height;
+                    }
+                    trigger('sizeChange', [width, height]);
+                });
+
+                var animationFrame = window.requestAnimationFrame || window.webkitRequestAnimationFrame;
+                var runningResizeEvent = false;
+
+                var changeOrientation = function() {
+                    let orientation = window.innerWidth / window.innerHeight >= 1 ? 'landscape' : 'portrait';
+                    window.nativebridge.sendEvent('resizeWebview');
+                    runningResizeEvent = false;
+                };
+
+                var resizeHandler = function() {
+                    if (runningResizeEvent) {
+                        return;
+                    }
+                    runningResizeEvent = true;
+                    if (typeof animationFrame === 'function') {
+                        animationFrame(changeOrientation);
+                    } else {
+                        setTimeout(changeOrientation, 100);
+                    }
+                };
+
+                resizeHandler();
+                window.addEventListener('resize', resizeHandler, false);
+
+                window.addEventListener('DOMContentLoaded', function() {
+                    window.nativebridge.sendEvent('loaded');
+                    setState('default');
+                    trigger('ready');
+                }, false);
+
+                this.addEventListener = function(event, listener) {
+                    if(event in listeners) {
+                        listeners[event].push(listener);
+                    }
+                };
+
+                this.createCalendarEvent = function() {
+                    trigger('error', ['not implemented', 'createCalendarEvent']);
+                };
+
+                this.close = function() {
+                    setState('hidden');
+                    window.nativebridge.sendEvent('close');
+                };
+
+                this.expand = function() {
+                    trigger('error', ['not implemented', 'expand']);
+                };
+
+                this.getCurrentPosition = this.getDefaultPosition = function() {
+                    return {
+                        x: 0,
+                        y: 0,
+                        width: width,
+                        height: height
+                    };
+                };
+
+                this.getExpandProperties = function() {
+                    trigger('error', ['not implemented', 'getExpandProperties']);
+                };
+
+                this.getMaxSize = this.getScreenSize = function() {
+                    return {
+                        width: width,
+                        height: height
+                    };
+                };
+
+                this.getOrientationProperties = function() {
+                    return orientationProperties;
+                };
+
+                this.getPlacementType = function() {
+                    return 'interstitial';
+                };
+
+                this.getResizeProperties = function() {
+                    trigger('error', ['not implemented', 'getResizeProperties']);
+                };
+
+                this.getState = function() {
+                    return state;
+                };
+
+                this.getVersion = function() {
+                    return '2.0';
+                };
+
+                this.isViewable = function() {
+                    return viewable;
+                };
+
+                this.open = function(url) {
+                    window.nativebridge.sendEvent('open', [url]);
+                };
+
+                this.playVideo = function() {
+                    trigger('error', ['not implemented', 'playVideo']);
+                };
+
+                this.removeEventListener = function(event, listener) {
+                    if(event in listeners) {
+                        var index = listeners[event].indexOf(listener);
+                        if(index !== -1) {
+                            listeners[event].splice(index, 1);
+                        }
+                    }
+                };
+
+                this.resize = function() {
+                    trigger('error', ['not implemented', 'resize']);
+                };
+
+                this.setExpandProperties = function() {
+                    trigger('error', ['not implemented', 'setExpandProperties']);
+                };
+
+                this.setOrientationProperties = function(properties) {
+                    orientationProperties = properties;
+                    window.nativebridge.sendEvent('orientation', [properties]);
+                };
+
+                this.setResizeProperties = function() {
+                    trigger('error', ['not implemented', 'setResizeProperties']);
+                };
+
+                this.storePicture = function() {
+                    trigger('error', ['not implemented', 'storePicture']);
+                };
+
+                this.useCustomClose = function() {
+                    trigger('error', ['not implemented', 'useCustomClose']);
+                };
+
+                this.sendAnalyticsEvent = function(event, eventData) {
+                    window.nativebridge.sendEvent('analyticsEvent', [event, eventData]);
+                };
+
+                this.setCustomMraidState = function(state) {
+                    window.nativebridge.sendEvent('customMraidState', [state]);
+                };
+
+                this.getConfiguration = function() {
+                    return playableConfiguration;
+                }
+
+                var frameCount = 0;
+                var playableStartTime = undefined;
+                var playableTime = 0;
+
+                var lastFrameTime = 0;
+                var originalRequestAnimationFrame = window.requestAnimationFrame || window.webkitRequestAnimationFrame;
+
+                if (typeof originalRequestAnimationFrame === 'function') {
+                    var sendStats = function() {
+                        if (playableStartTime !== undefined) {
+                            var playTime = playableTime / 1000;
+                            var totalTime =  (Date.now() - playableStartTime) / 1000;
+                            window.nativebridge.sendEvent('sendStats', [totalTime, playTime, frameCount]);
+                        }
+                    };
+                    window.requestAnimationFrame = window.webkitRequestAnimationFrame = function (callback) {
+                        if (playableStartTime === undefined) {
+                            playableStartTime = Date.now();
+                        }
+                        return originalRequestAnimationFrame((time) => {
+                            if (time - lastFrameTime > 16) {
+                                frameCount++;
+                                if (lastFrameTime !== 0) {
+                                    playableTime += (time - lastFrameTime);
+                                }
+                            }
+                            lastFrameTime = time;
+                            callback(time);
+                        });
+                    };
+                    setInterval(sendStats, 500);
+                }
+            };
+            window.mraid = new MRAID();
+        })();
+    </script>
+    <script id="deviceorientation-support"></script>
+</head>
+<body></body>
+</html>

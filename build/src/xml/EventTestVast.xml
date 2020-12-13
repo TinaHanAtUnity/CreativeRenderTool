@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<VAST version="2.0">
+    <Ad id="preroll-1">
+        <InLine>
+            <AdSystem>2.0</AdSystem>
+            <AdTitle>5748406</AdTitle>
+            <Impression id="blah"><![CDATA[http://b.scorecardresearch.com/b?C1=1&C2=6000003&C3=0000000200500000197000000&C4=us&C7=http://www.scanscout.com&C8=scanscout.com&C9=http://www.scanscout.com&C10=xn&rn=-103217130]]></Impression>
+            <Creatives>
+                <Creative>
+                    <Linear>
+                        <Duration>00:00:30</Duration>
+                        <TrackingEvents>
+                            <Tracking event="complete"><![CDATA[http://localhost:3500/brands/14851/start?advertisingTrackingId=123456&androidId=aae7974a89efbcfd&creativeId=CrEaTiVeId1&demandSource=tremor&gameId=14851&ip=192.168.69.69&token=9690f425-294c-51e1-7e92-c23eea942b47&ts=2016-04-21T20%3A46%3A36Z&value=13.1]]></Tracking>
+                            <Tracking event="firstQuartile"><![CDATA[http://localhost:3500/brands/14851/firstQuartile?advertisingTrackingId=123456&androidId=aae7974a89efbcfd&creativeId=CrEaTiVeId1&demandSource=tremor&gameId=14851&ip=192.168.69.69&token=9690f425-294c-51e1-7e92-c23eea942b47&ts=2016-04-21T20%3A46%3A36Z&value=13.1]]></Tracking>
+                            <Tracking event="midpoint"><![CDATA[http://localhost:3500/brands/14851/midpoint?advertisingTrackingId=123456&androidId=aae7974a89efbcfd&creativeId=CrEaTiVeId1&demandSource=tremor&gameId=14851&ip=192.168.69.69&token=9690f425-294c-51e1-7e92-c23eea942b47&ts=2016-04-21T20%3A46%3A36Z&value=13.1]]></Tracking>
+                            <Tracking event="start"><![CDATA[http://localhost:3500/brands/14851/start?advertisingTrackingId=123456&androidId=aae7974a89efbcfd&creativeId=CrEaTiVeId1&demandSource=tremor&gameId=14851&ip=192.168.69.69&token=9690f425-294c-51e1-7e92-c23eea942b47&ts=2016-04-21T20%3A46%3A36Z&value=13.1]]></Tracking>
+                            <Tracking event="thirdQuartile"><![CDATA[http://localhost:3500/brands/14851/thirdQuartile?advertisingTrackingId=123456&androidId=aae7974a89efbcfd&creativeId=CrEaTiVeId1&demandSource=tremor&gameId=14851&ip=192.168.69.69&token=9690f425-294c-51e1-7e92-c23eea942b47&ts=2016-04-21T20%3A46%3A36Z&value=13.1]]></Tracking>
+                            <Tracking event="creativeView"><![CDATA[http://localhost:3500/brands/14851/creativeView?advertisingTrackingId=123456&androidId=aae7974a89efbcfd&creativeId=CrEaTiVeId1&demandSource=tremor&gameId=14851&ip=192.168.69.69&token=9690f425-294c-51e1-7e92-c23eea942b47&ts=2016-04-21T20%3A46%3A36Z&value=13.1]]></Tracking>
+                            <Tracking event="mute"><![CDATA[http://localhost:3500/brands/14851/mute?advertisingTrackingId=123456&androidId=aae7974a89efbcfd&creativeId=CrEaTiVeId1&demandSource=tremor&gameId=14851&ip=192.168.69.69&token=9690f425-294c-51e1-7e92-c23eea942b47&ts=2016-04-21T20%3A46%3A36Z&value=13.1]]></Tracking>
+                            <Tracking event="unmute"><![CDATA[http://localhost:3500/brands/14851/unmute?advertisingTrackingId=123456&androidId=aae7974a89efbcfd&creativeId=CrEaTiVeId1&demandSource=tremor&gameId=14851&ip=192.168.69.69&token=9690f425-294c-51e1-7e92-c23eea942b47&ts=2016-04-21T20%3A46%3A36Z&value=13.1]]></Tracking>
+                        </TrackingEvents>
+                        <VideoClicks>
+                            <ClickThrough id="scanscout"><![CDATA[http://www.target.com]]></ClickThrough>
+                            <ClickTracking>http://myTrackingURL.com/click</ClickTracking>
+                        </VideoClicks>
+                        <MediaFiles>
+                            <MediaFile height="396" width="600" bitrate="496" type="video/mp4" delivery="progressive"><![CDATA[http://static.applifier.com/impact/videos/104090/e97394713b8efa50/1602-30s-v22r3-seven-knights-character-select/m31-1000.mp4]]></MediaFile>
+                        </MediaFiles>
+                    </Linear>
+                </Creative>
+                <Creative>
+                    <CompanionAds>
+                        <Companion id="unity_brand_endcard_portrait" width="2500" height="3500">
+                            <StaticResource creativeType="image/png"><![CDATA[http://unity.com/portrait.jpg]]></StaticResource>
+                            <TrackingEvents>
+                                <Tracking event="creativeView"><![CDATA[https://test.com/clicktracking]]></Tracking>
+                            </TrackingEvents>
+                            <CompanionClickThrough><![CDATA[https://test.com/companionClickThrough]]></CompanionClickThrough>
+                        </Companion>
+                    </CompanionAds>
+                </Creative>
+            </Creatives>
+        </InLine>
+    </Ad>
+</VAST>

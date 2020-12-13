@@ -1,0 +1,455 @@
+{
+  "event": "Ad request",
+  "parameters": [
+    {
+      "parameter": "advertisingTrackingId",
+      "required": "no",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "limitAdTracking",
+      "required": "no",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "androidId",
+      "required": "no",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "deviceMake",
+      "required": "android",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "deviceModel",
+      "required": "all",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "platform",
+      "required": "all",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "screenDensity",
+      "required": "android",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "screenScale",
+      "required": "ios",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "screenWidth",
+      "required": "all",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "screenHeight",
+      "required": "all",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "sdkVersion",
+      "required": "all",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "screenSize",
+      "required": "android",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "osVersion",
+      "required": "ios",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "apiLevel",
+      "required": "android",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "test",
+      "required": "no",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "connectionType",
+      "required": "all",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "networkType",
+      "required": "no",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "stores",
+      "required": "all",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "bundleVersion",
+      "required": "all",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "nofillRetry",
+      "required": "no",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "bundleId",
+      "required": "all",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "language",
+      "required": "all",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "timeZone",
+      "required": "all",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "webviewUa",
+      "required": "no",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "deviceFreeSpace",
+      "required": "all",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "networkOperator",
+      "required": "no",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "coppa",
+      "required": "all",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "networkOperatorName",
+      "required": "no",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "gameSessionId",
+      "required": "all",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "mediationName",
+      "required": "no",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "mediationVersion",
+      "required": "no",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "mediationOrdinal",
+      "required": "no",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "frameworkName",
+      "required": "no",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "frameworkVersion",
+      "required": "no",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "forceAbGroup",
+      "required": "no",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "forceCampaignId",
+      "required": "no",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "force_country",
+      "required": "no",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "cachedCampaigns",
+      "required": "no",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "previousPlacementId",
+      "required": "no",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "properties",
+      "required": "all",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "placements",
+      "required": "all",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "wiredHeadset",
+      "required": "all",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "volume",
+      "required": "all",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "versionCode",
+      "required": "no",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "simulator",
+      "required": "ios",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "requestSignal",
+      "required": "all",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "sessionDepth",
+      "required": "all",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "token",
+      "required": "all",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "projectId",
+      "required": "all",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "gameSessionCounters",
+      "required": "all",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "ext",
+      "required": "all",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "organizationId",
+      "required": "no",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "developerId",
+      "required": "all",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "gdprEnabled",
+      "required": "all",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "optOutRecorded",
+      "required": "all",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "optOutEnabled",
+      "required": "all",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "abGroup",
+      "required": "no",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "privacy",
+      "required": "all",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "isLoadEnabled",
+      "required": "all",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "omidPartnerName",
+      "required": "all",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "omidJSVersion",
+      "required": "all",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "legalFramework",
+      "required": "all",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "agreedOverAgeLimit",
+      "required": "all",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "preload",
+      "required": "no",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "load",
+      "required": "no",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "preloadPlacements",
+      "required": "no",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "preloadData",
+      "required": "no",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "loadV5Support",
+      "required": "no",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "plist",
+      "required": "ios",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "idfv",
+      "required": "ios",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "deviceName",
+      "required": "ios",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "locales",
+      "required": "ios",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "currentUiTheme",
+      "required": "ios",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "systemBootTime",
+      "required": "ios",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "trackingAuthStatus",
+      "required": "ios",
+      "queryString": false,
+      "body": true
+    }
+  ]
+}

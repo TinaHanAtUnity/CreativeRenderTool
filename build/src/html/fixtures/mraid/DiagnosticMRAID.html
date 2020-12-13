@@ -1,0 +1,667 @@
+<script src="mraid.js"></script>
+
+<style type="text/css">
+    body
+    {
+        background-color:#ADACAC;
+    }
+
+    table
+    {
+        font-size:6px;
+        width:100%;
+        border:1px solid black;
+    }
+
+    th
+    {
+        border:1px solid black;
+        text-align:center;
+        vertical-align:middle;
+    }
+
+    td
+    {
+        border:1px solid black;
+        text-align:center;
+        vertical-align:middle;
+    }
+
+    button
+    {
+        font-size:6px;
+    }
+
+    textarea
+    {
+        font-size:6px;
+    }
+
+    input
+    {
+        font-size:6px;
+    }
+
+    select
+    {
+        font-size:6px;
+    }
+</style>
+
+<table>
+    <tr>
+        <th>State</th>
+        <th>Orientation</th>
+        <th>Viewable</th>
+        <th>Version</th>
+        <th>PlacementType</th>
+    </tr>
+    <tr>
+        <td id="State"></td>
+        <td id="Orientation"></td>
+        <td id="Viewable"></td>
+        <td id="Version"></td>
+        <td id="PlacementType"></td>
+    </tr>
+</table>
+
+<table>
+    <tr>
+        <th>DefaultPos</th>
+        <th>CurrentPos</th>
+        <th>MaxSize</th>
+        <th>ScreenSize</th>
+    </tr>
+    <tr>
+        <td id="DefaultPos"></td>
+        <td id="CurrentPos"></td>
+        <td id="MaxSize"></td>
+        <td id="ScreenSize"></td>
+    </tr>
+</table>
+
+<table>
+    <tr>
+        <td>Supports</td>
+        <td id="Supports"></td>
+    </tr>
+    <tr>
+        <td>ExpandProperties</td>
+        <td id="ExpandProperties"></td>
+    </tr>
+    <tr>
+        <td>ResizeProperties</td>
+        <td id="ResizeProperties"></td>
+    </tr>
+    <tr>
+        <td>OrientationProperties</td>
+        <td id="OrientationProperties"></td>
+    </tr>
+</table>
+
+<table>
+    <tr>
+        <td>
+            <button onclick="expand()">Expand</button>
+            <input type="checkbox" id="ExpandUseCustomClose">useCustomClose</input>
+        </td>
+        <td>
+            <button onclick="collapse()">Close</button>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <button onclick="expandTwoPart()">Two Part Expand</button>
+            <input type="checkbox" id="TwoPartExpandUseCustomClose">useCustomClose</input>
+        </td>
+        <td>
+            <textarea id="TwoPartExpandURL" rows="1" cols="50">http://admarvel.s3.amazonaws.com/demo/mraid/MRAID_v2_twopart.html</textarea>
+        </td>
+    </tr>
+</table>
+
+<table>
+    <tr>
+        <td>
+            <button onclick="resize()">Resize</button>
+        </td>
+        <td>
+            Width: <textarea id="ResizeWidth" rows="1" cols="4">320</textarea>
+        </td>
+        <td>
+            Height: <textarea id="ResizeHeight" rows="1" cols="4">460</textarea>
+        </td>
+        <td>
+            OffsetX: <textarea id="ResizeOffsetX" rows="1" cols="4">0</textarea>
+        </td>
+        <td>
+            OffsetY: <textarea id="ResizeOffsetY" rows="1" cols="4">0</textarea>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="3">
+            customClosePosition:
+            <select id="customClosePosition">
+                <option value="">--Select--</option>
+                <option value="top-left">top-left</option>
+                <option value="top-right">top-right</option>
+                <option value="center">center</option>
+                <option value="bottom-left">bottom-left</option>
+                <option value="bottom-right">bottom-right</option>
+                <option value="top-center">top-center</option>
+                <option value="bottom-center">bottom-center</option>
+            </select>
+        </td>
+        <td colspan="2">
+            <input type="checkbox" id="ResizeAllowOffscreen" checked>allowOffscreen</input>
+        </td>
+    </tr>
+</table>
+
+<table>
+    <tr>
+        <td>
+            <button onclick="setOrientationProperties()">Set Orientation Properties</button>
+        </td>
+        <td>
+            forceOrientation:
+            <select id="ForceOrientation">
+                <option value="none">none</option>
+                <option value="portrait">portrait</option>
+                <option value="landscape">landscape</option>
+            </select>
+        </td>
+        <td>
+            <input type="checkbox" id="AllowOrientationChange" checked>allowOrientationChange</input>
+        </td>
+    </tr>
+</table>
+
+<table>
+    <tr>
+        <td>
+            <button onclick="openSite()">Open</button>
+        </td>
+        <td>
+            <textarea id="OpenURL" rows="1" cols="50">http://operamediaworks.com/</textarea>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <button onclick="playVideo()">Play Video</button>
+        </td>
+        <td>
+            <textarea id="PlayVideoURL" rows="1" cols="50">http://admarvel.s3.amazonaws.com/demo/mraid/OMW_SOUND_VIDEO_RENEW.iPhoneSmall.mp4</textarea>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <button onclick="storePicture()">Store Picture</button>
+        </td>
+        <td>
+            <textarea id="StorePictureURL" rows="1" cols="50">http://admarvel.s3.amazonaws.com/demo/mraid/320x50.png</textarea>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <button onclick="createCalendarEvent()">Create Calendar Event</button>
+        </td>
+        <td>
+            <input type="checkbox" id="UseCustomClose" onChange="updateUseCustomClose(this.checked)">useCustomClose</input>
+        </td>
+    </tr>
+</table>
+
+<table>
+    <tr>
+        <th>Error</th>
+    </tr>
+    <tr>
+        <td id="Error"></td>
+    </tr>
+</table>
+
+<script language="javascript" type="text/javascript">
+    function printObject(o)
+    {
+        var out = '{';
+        for (var p in o)
+        {
+            if (out != '{') out += ',';
+            out += p + ':' + o[p];
+        }
+        out += '}';
+        return out;
+    }
+
+    function updateElementInnerHTML(id, newValue)
+    {
+        logMRAIDMessage("updateElementInnerHTML for id = " + id + ", newValue = " + newValue + ", oldValue = " + document.getElementById(id).innerHTML);
+
+        if (newValue !== document.getElementById(id).innerHTML)
+        {
+            document.getElementById(id).innerHTML = newValue;
+
+            setUpdated(id);
+        }
+    }
+
+    function updateStateDiagnostic(state)
+    {
+        updateElementInnerHTML("State", state);
+    }
+
+    function updateOrientationDiagnostic()
+    {
+        updateElementInnerHTML("Orientation", window.orientation);
+    }
+
+    function updateViewableDiagnostic()
+    {
+        updateElementInnerHTML("Viewable", mraid.isViewable());
+    }
+
+    function updateVersionDiagnostic()
+    {
+        updateElementInnerHTML("Version", mraid.getVersion());
+    }
+
+    function updatePlacementTypeDiagnostic()
+    {
+        updateElementInnerHTML("PlacementType", mraid.getPlacementType());
+    }
+
+    function updateErrorDiagnostic(message, action)
+    {
+        var displayString = "Action: " + action + " caused error: " + message;
+
+        updateElementInnerHTML("Error", displayString);
+    }
+
+    function updateDefaultPositionDiagnostic()
+    {
+        var frame = mraid.getDefaultPosition();
+        var displayString = frame.x + "," + frame.y + "," + frame.width + "," + frame.height;
+
+        updateElementInnerHTML("DefaultPos", displayString);
+    }
+
+    function updateCurrentPositionDiagnostic()
+    {
+        var frame = mraid.getCurrentPosition();
+        var displayString = frame.x + "," + frame.y + "," + frame.width + "," + frame.height;
+
+        updateElementInnerHTML("CurrentPos", displayString);
+    }
+
+    function updateMaxSizeDiagnostic()
+    {
+        var size = mraid.getMaxSize();
+        var displayString = size.width + "x" + size.height;
+
+        updateElementInnerHTML("MaxSize", displayString);
+    }
+
+    function updateScreenSizeDiagnostic()
+    {
+        var size = mraid.getScreenSize();
+        var displayString = size.width + "x" + size.height;
+
+        updateElementInnerHTML("ScreenSize", displayString);
+    }
+
+    function updateExpandPropertiesDiagnostic()
+    {
+        var props = mraid.getExpandProperties();
+        var displayString = printObject(props);
+
+        updateElementInnerHTML("ExpandProperties", displayString);
+    }
+
+    function updateResizePropertiesDiagnostic()
+    {
+        var props = mraid.getResizeProperties();
+        var displayString = printObject(props);
+
+        updateElementInnerHTML("ResizeProperties", displayString);
+    }
+
+    function updateOrientationPropertiesDiagnostic()
+    {
+        var props = mraid.getOrientationProperties();
+        var displayString = printObject(props);
+
+        updateElementInnerHTML("OrientationProperties", displayString);
+    }
+
+    function updateSupportsDiagnostic()
+    {
+        var supportsObject = {sms:false,tel:false,calendar:false,storePicture:false,inlineVideo:false};
+        if (mraid.supports("sms"))
+        {
+            supportsObject["sms"] = true;
+        }
+        if (mraid.supports("tel"))
+        {
+            supportsObject["tel"] = true;
+        }
+        if (mraid.supports("calendar"))
+        {
+            supportsObject["calendar"] = true;
+        }
+        if (mraid.supports("storePicture"))
+        {
+            supportsObject["storePicture"] = true;
+        }
+        if (mraid.supports("inlineVideo"))
+        {
+            supportsObject["inlineVideo"] = true;
+        }
+
+        var displayString = printObject(supportsObject);
+
+        updateElementInnerHTML("Supports", displayString);
+    }
+
+    function updateAllDiagnostics()
+    {
+        updateStateDiagnostic(mraid.getState());
+        updateOrientationDiagnostic();
+        updateViewableDiagnostic();
+        updateVersionDiagnostic();
+        updatePlacementTypeDiagnostic();
+
+        updateSupportsDiagnostic();
+        updateExpandPropertiesDiagnostic();
+        updateResizePropertiesDiagnostic();
+        updateOrientationPropertiesDiagnostic();
+
+        updateDefaultPositionDiagnostic();
+        updateCurrentPositionDiagnostic();
+        updateMaxSizeDiagnostic();
+        updateScreenSizeDiagnostic();
+    }
+
+    function setUpdated(id)
+    {
+        var element = document.getElementById(id);
+        element.style.backgroundColor = "#008A32";
+
+        setTimeout("clearUpdated('" + id + "')", 1000);
+    }
+
+    function clearUpdated(id)
+    {
+        var element = document.getElementById(id);
+        element.style.backgroundColor = "rgb(255,255,255)";
+
+    }
+</script>
+
+<script language="javascript" type="text/javascript">
+    function expand()
+    {
+        var useCustomClose = document.getElementById("ExpandUseCustomClose").checked;
+        if (useCustomClose)
+        {
+            mraid.setExpandProperties({"useCustomClose":true});
+
+            logMRAIDMessage("expand with useCustomClose = true");
+        }
+        else
+        {
+            mraid.setExpandProperties({"useCustomClose":false});
+
+            logMRAIDMessage("expand with useCustomClose = false");
+        }
+
+        updateExpandPropertiesDiagnostic();
+
+        mraid.expand();
+    }
+
+    function expandTwoPart()
+    {
+        var useCustomClose = document.getElementById("TwoPartExpandUseCustomClose").checked;
+        if (useCustomClose)
+        {
+            mraid.setExpandProperties({"useCustomClose":true});
+
+            logMRAIDMessage("expandTwoPart with useCustomClose = true");
+        }
+        else
+        {
+            mraid.setExpandProperties({"useCustomClose":false});
+
+            logMRAIDMessage("expandTwoPart with useCustomClose = false");
+        }
+
+        updateExpandPropertiesDiagnostic();
+
+        var url = document.getElementById("TwoPartExpandURL").value;
+
+        logMRAIDMessage("doing two part expand to url: " + url);
+
+        mraid.expand(url);
+    }
+
+    function resize()
+    {
+        var width = document.getElementById("ResizeWidth").value;
+        var height = document.getElementById("ResizeHeight").value;
+        var offsetX = document.getElementById("ResizeOffsetX").value;
+        var offsetY = document.getElementById("ResizeOffsetY").value;
+
+        var resizePropertiesObj = {"width":width,"height":height,"offsetX":offsetX,"offsetY":offsetY};
+
+        var customClosePosition = document.getElementById("customClosePosition").value;
+        if (customClosePosition != "")
+        {
+            resizePropertiesObj["customClosePosition"] = customClosePosition;
+        }
+        var allowOffscreen = document.getElementById("ResizeAllowOffscreen").checked;
+        if (!allowOffscreen)
+        {
+            resizePropertiesObj["allowOffscreen"] = false;
+        }
+        else
+        {
+            resizePropertiesObj["allowOffscreen"] = true;
+        }
+
+        logMRAIDMessage("Calling resize with properties: " + printObject(resizePropertiesObj));
+
+        mraid.setResizeProperties(resizePropertiesObj);
+
+        updateResizePropertiesDiagnostic();
+
+        mraid.resize();
+    }
+
+    function collapse()
+    {
+        mraid.close();
+    }
+
+    function setOrientationProperties()
+    {
+        var allowOrientationChange = document.getElementById("AllowOrientationChange").checked;
+        var forceOrientation = document.getElementById("ForceOrientation").value;
+
+        var orientationPropertiesObj = {"allowOrientationChange":allowOrientationChange,"forceOrientation":forceOrientation};
+
+        logMRAIDMessage("Setting orientation properties: " + printObject(orientationPropertiesObj));
+
+        mraid.setOrientationProperties(orientationPropertiesObj);
+
+        updateOrientationPropertiesDiagnostic();
+    }
+
+    function openSite()
+    {
+        var url = document.getElementById("OpenURL").value;
+
+        mraid.open(url);
+    }
+
+    function playVideo()
+    {
+        var url = document.getElementById("PlayVideoURL").value;
+
+        mraid.playVideo(url);
+    }
+
+    function storePicture()
+    {
+        var url = document.getElementById("StorePictureURL").value;
+
+        mraid.storePicture(url);
+    }
+
+    function createCalendarEvent()
+    {
+        var calendarObject = {description:"Mayan Apocalypse/End of World", location:"everywhere", start:"2013-12-21T00:00-05:00", end:"2013-12-22T00:00-05:00"};
+
+        logMRAIDMessage("Creating calendar object with params = " + printObject(calendarObject));
+
+        mraid.createCalendarEvent(calendarObject);
+    }
+
+    function updateUseCustomClose(checked)
+    {
+        logMRAIDMessage("Calling useCustomClose with = " + checked);
+
+        mraid.useCustomClose(checked);
+    }
+
+    window.addEventListener("orientationchange", function ()
+    {
+        handleOrientationChange();
+    });
+
+    function logMRAIDMessage(message)
+    {
+        // Replace this method with whatever logging best works for your test environment
+        console.log("MRAID: " + message);
+    }
+
+    function handleOrientationChange()
+    {
+        updateOrientationDiagnostic();
+
+        updateDefaultPositionDiagnostic();
+        updateCurrentPositionDiagnostic();
+        updateMaxSizeDiagnostic();
+        updateScreenSizeDiagnostic();
+
+        logMRAIDMessage("Orientation change! window.orientation = " + window.orientation);
+    }
+
+    function stateChangeHandler(state)
+    {
+        updateStateDiagnostic(mraid.getState());
+
+        updateDefaultPositionDiagnostic();
+        updateCurrentPositionDiagnostic();
+        updateMaxSizeDiagnostic();
+        updateScreenSizeDiagnostic();
+
+        logMRAIDMessage("stateChange event fired!: state = " + state);
+    }
+
+    function sizeChangeHandler(width, height)
+    {
+        updateDefaultPositionDiagnostic();
+        updateCurrentPositionDiagnostic();
+        updateMaxSizeDiagnostic();
+        updateScreenSizeDiagnostic();
+
+        logMRAIDMessage("sizeChange event fired!: width = " + width + ", height = " + height);
+    }
+
+    function viewableChangeHandler(visible)
+    {
+        updateViewableDiagnostic();
+        logMRAIDMessage("viewableChange event fired!: visible = " + visible);
+    }
+
+    function errorHandler(message, action)
+    {
+        updateErrorDiagnostic(message, action);
+
+        logMRAIDMessage("error event fired!: message = " + message + ", action = " + action);
+    }
+
+    function mraidIsReady()
+    {
+        mraid.removeEventListener("ready", mraidIsReady);
+
+        showMyAd();
+    }
+
+    function showMyAd()
+    {
+        updateAllDiagnostics();
+
+        // Add all listeners
+        mraid.addEventListener("stateChange", stateChangeHandler);
+        mraid.addEventListener("sizeChange", sizeChangeHandler);
+        mraid.addEventListener("viewableChange", viewableChangeHandler);
+        mraid.addEventListener("error", errorHandler);
+
+        logMRAIDMessage("MRAID version = " + mraid.getVersion());
+
+        // First call to getExpandProperties should return screen width/height.
+        var expandProperties = mraid.getExpandProperties();
+        if ( (window.orientation == 0) || (window.orientation == 180) )
+        {
+            screenWidth = expandProperties.width;
+            screenHeight = expandProperties.height;
+        }
+        else
+        {
+            screenWidth = expandProperties.height;
+            screenHeight = expandProperties.width;
+        }
+
+        logMRAIDMessage("width = " + screenWidth + ", height = " + screenHeight);
+
+        // Setup resize width/height based on max resize size available on this device
+        var resizeMaxSize = mraid.getMaxSize();
+        document.getElementById("ResizeWidth").value = resizeMaxSize.width;
+        document.getElementById("ResizeHeight").value = resizeMaxSize.height;
+    }
+
+    function setupViewport(width)
+    {
+        var element = document.querySelector("meta[name=viewport]");
+        if (!element)
+        {
+            element = document.createElement("meta");
+            element.name = "viewport";
+            element.content = "width=" + width + ", user-scalable=no";
+            document.getElementsByTagName('head')[0].appendChild(element);
+        }
+        else
+        {
+            element.content = "width=" + width + ", user-scalable=no";
+        }
+    }
+    setupViewport(320);
+
+    function doReadyCheck()
+    {
+        if (mraid.getState() == 'loading')
+        {
+            updateElementInnerHTML("State", 'loading');
+
+            mraid.addEventListener("ready", mraidIsReady);
+        }
+        else
+        {
+            showMyAd();
+        }
+    }
+
+    doReadyCheck();
+</script>

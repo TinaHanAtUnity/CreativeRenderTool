@@ -1,0 +1,7 @@
+import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
+export class BannerWebPlayerContainer extends WebPlayerContainer {
+    constructor(platform, ads, viewId) {
+        super(platform, ads, viewId);
+    }
+}
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiQmFubmVyV2ViUGxheWVyQ29udGFpbmVyLmpzIiwic291cmNlUm9vdCI6IiIsInNvdXJjZXMiOlsiLi4vLi4vLi4vLi4vLi4vLi4vc3JjL3RzL0Fkcy9VdGlsaXRpZXMvV2ViUGxheWVyL0Jhbm5lcldlYlBsYXllckNvbnRhaW5lci50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFDQSxPQUFPLEVBQUUsa0JBQWtCLEVBQUUsTUFBTSw0Q0FBNEMsQ0FBQztBQUdoRixNQUFNLE9BQU8sd0JBQXlCLFNBQVEsa0JBQWtCO0lBQzVELFlBQVksUUFBa0IsRUFBRSxHQUFZLEVBQUUsTUFBYztRQUN4RCxLQUFLLENBQUMsUUFBUSxFQUFFLEdBQUcsRUFBRSxNQUFNLENBQUMsQ0FBQztJQUNqQyxDQUFDO0NBQ0oifQ==

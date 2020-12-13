@@ -1,0 +1,13 @@
+import { IOSPerformanceAdUnit } from 'Performance/AdUnits/IOSPerformanceAdUnit';
+import { AutomatedExperimentsCategories } from 'MabExperimentation/Models/AutomatedExperimentsList';
+export class IOSPerformanceAdUnitWithAutomatedExperiment extends IOSPerformanceAdUnit {
+    constructor(parameters) {
+        super(parameters);
+        this._automatedExperimentManager = parameters.automatedExperimentManager;
+    }
+    hide() {
+        this._automatedExperimentManager.endSelectedExperiment(this.getCampaign(), AutomatedExperimentsCategories.PERFORMANCE_ENDCARD);
+        return super.hide();
+    }
+}
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiSU9TUGVyZm9ybWFuY2VBZFVuaXRXaXRoQXV0b21hdGVkRXhwZXJpbWVudC5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4uLy4uLy4uLy4uLy4uL3NyYy90cy9NYWJFeHBlcmltZW50YXRpb24vUGVyZm9ybWFuY2UvSU9TUGVyZm9ybWFuY2VBZFVuaXRXaXRoQXV0b21hdGVkRXhwZXJpbWVudC50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFDQSxPQUFPLEVBQUUsb0JBQW9CLEVBQUUsTUFBTSwwQ0FBMEMsQ0FBQztBQUVoRixPQUFPLEVBQUUsOEJBQThCLEVBQUUsTUFBTSxvREFBb0QsQ0FBQztBQUNwRyxNQUFNLE9BQU8sMkNBQTRDLFNBQVEsb0JBQW9CO0lBSWpGLFlBQVksVUFBK0Q7UUFDdkUsS0FBSyxDQUFDLFVBQVUsQ0FBQyxDQUFDO1FBQ2xCLElBQUksQ0FBQywyQkFBMkIsR0FBRyxVQUFVLENBQUMsMEJBQTBCLENBQUM7SUFDN0UsQ0FBQztJQUVNLElBQUk7UUFDUCxJQUFJLENBQUMsMkJBQTJCLENBQUMscUJBQXFCLENBQUMsSUFBSSxDQUFDLFdBQVcsRUFBRSxFQUFFLDhCQUE4QixDQUFDLG1CQUFtQixDQUFDLENBQUM7UUFFL0gsT0FBTyxLQUFLLENBQUMsSUFBSSxFQUFFLENBQUM7SUFDeEIsQ0FBQztDQUNKIn0=

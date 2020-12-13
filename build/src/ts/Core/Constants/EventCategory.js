@@ -1,0 +1,30 @@
+export var EventCategory;
+(function (EventCategory) {
+    EventCategory[EventCategory["APPSHEET"] = 0] = "APPSHEET";
+    EventCategory[EventCategory["ADUNIT"] = 1] = "ADUNIT";
+    EventCategory[EventCategory["VIDEOPLAYER"] = 2] = "VIDEOPLAYER";
+    EventCategory[EventCategory["CACHE"] = 3] = "CACHE";
+    EventCategory[EventCategory["CONNECTIVITY"] = 4] = "CONNECTIVITY";
+    EventCategory[EventCategory["STORAGE"] = 5] = "STORAGE";
+    EventCategory[EventCategory["REQUEST"] = 6] = "REQUEST";
+    EventCategory[EventCategory["RESOLVE"] = 7] = "RESOLVE";
+    EventCategory[EventCategory["BROADCAST"] = 8] = "BROADCAST";
+    EventCategory[EventCategory["NOTIFICATION"] = 9] = "NOTIFICATION";
+    EventCategory[EventCategory["LIFECYCLE"] = 10] = "LIFECYCLE";
+    EventCategory[EventCategory["DEVICEINFO"] = 11] = "DEVICEINFO";
+    EventCategory[EventCategory["WEBPLAYER"] = 12] = "WEBPLAYER";
+    EventCategory[EventCategory["DECISION"] = 13] = "DECISION";
+    EventCategory[EventCategory["PLACEMENT_CONTENT"] = 14] = "PLACEMENT_CONTENT";
+    EventCategory[EventCategory["BANNER"] = 15] = "BANNER";
+    EventCategory[EventCategory["AR"] = 16] = "AR";
+    EventCategory[EventCategory["ANALYTICS"] = 17] = "ANALYTICS";
+    EventCategory[EventCategory["PERMISSIONS"] = 18] = "PERMISSIONS";
+    EventCategory[EventCategory["DOWNLOAD"] = 19] = "DOWNLOAD";
+    EventCategory[EventCategory["INSTALL"] = 20] = "INSTALL";
+    EventCategory[EventCategory["STORE"] = 21] = "STORE";
+    EventCategory[EventCategory["WEB_AUTH_SESSION"] = 22] = "WEB_AUTH_SESSION";
+    EventCategory[EventCategory["NATIVE_ERROR"] = 23] = "NATIVE_ERROR";
+    EventCategory[EventCategory["LOAD_API"] = 24] = "LOAD_API";
+    EventCategory[EventCategory["TRACKING_MANAGER"] = 25] = "TRACKING_MANAGER";
+})(EventCategory || (EventCategory = {}));
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiRXZlbnRDYXRlZ29yeS5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4uLy4uLy4uLy4uLy4uL3NyYy90cy9Db3JlL0NvbnN0YW50cy9FdmVudENhdGVnb3J5LnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBLE1BQU0sQ0FBTixJQUFZLGFBMkJYO0FBM0JELFdBQVksYUFBYTtJQUNyQix5REFBUSxDQUFBO0lBQ1IscURBQU0sQ0FBQTtJQUNOLCtEQUFXLENBQUE7SUFDWCxtREFBSyxDQUFBO0lBQ0wsaUVBQVksQ0FBQTtJQUNaLHVEQUFPLENBQUE7SUFDUCx1REFBTyxDQUFBO0lBQ1AsdURBQU8sQ0FBQTtJQUNQLDJEQUFTLENBQUE7SUFDVCxpRUFBWSxDQUFBO0lBQ1osNERBQVMsQ0FBQTtJQUNULDhEQUFVLENBQUE7SUFDViw0REFBUyxDQUFBO0lBQ1QsMERBQVEsQ0FBQTtJQUNSLDRFQUFpQixDQUFBO0lBQ2pCLHNEQUFNLENBQUE7SUFDTiw4Q0FBRSxDQUFBO0lBQ0YsNERBQVMsQ0FBQTtJQUNULGdFQUFXLENBQUE7SUFDWCwwREFBUSxDQUFBO0lBQ1Isd0RBQU8sQ0FBQTtJQUNQLG9EQUFLLENBQUE7SUFDTCwwRUFBZ0IsQ0FBQTtJQUNoQixrRUFBWSxDQUFBO0lBQ1osMERBQVEsQ0FBQTtJQUNSLDBFQUFnQixDQUFBO0FBQ3BCLENBQUMsRUEzQlcsYUFBYSxLQUFiLGFBQWEsUUEyQnhCIn0=

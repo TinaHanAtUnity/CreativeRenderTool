@@ -1,0 +1,6 @@
+export class SessionDiagnostics {
+    static trigger(type, error, session) {
+        return Promise.resolve({});
+    }
+}
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiU2Vzc2lvbkRpYWdub3N0aWNzLmpzIiwic291cmNlUm9vdCI6IiIsInNvdXJjZXMiOlsiLi4vLi4vLi4vLi4vLi4vc3JjL3RzL0Fkcy9VdGlsaXRpZXMvU2Vzc2lvbkRpYWdub3N0aWNzLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQVlBLE1BQU0sT0FBTyxrQkFBa0I7SUFDcEIsTUFBTSxDQUFDLE9BQU8sQ0FBQyxJQUFZLEVBQUUsS0FBYyxFQUFFLE9BQWdCO1FBQ2hFLE9BQU8sT0FBTyxDQUFDLE9BQU8sQ0FBa0IsRUFBRSxDQUFDLENBQUM7SUFDaEQsQ0FBQztDQUNKIn0=

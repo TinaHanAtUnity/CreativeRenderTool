@@ -1,0 +1,4 @@
+export const MissedImpressionManager = jest.fn(() => {
+    return {};
+});
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiTWlzc2VkSW1wcmVzc2lvbk1hbmFnZXIuanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuLi8uLi8uLi8uLi8uLi8uLi9zcmMvdHMvQWRzL01hbmFnZXJzL19fbW9ja3NfXy9NaXNzZWRJbXByZXNzaW9uTWFuYWdlci50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFLQSxNQUFNLENBQUMsTUFBTSx1QkFBdUIsR0FBRyxJQUFJLENBQUMsRUFBRSxDQUFDLEdBQUcsRUFBRTtJQUNoRCxPQUFvQyxFQUNuQyxDQUFDO0FBQ04sQ0FBQyxDQUFDLENBQUMifQ==

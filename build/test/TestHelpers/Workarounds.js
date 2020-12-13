@@ -1,0 +1,6 @@
+import 'mocha';
+import * as sinon from 'sinon';
+afterEach(() => {
+    sinon.restore();
+});
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiV29ya2Fyb3VuZHMuanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuLi8uLi8uLi90ZXN0L1Rlc3RIZWxwZXJzL1dvcmthcm91bmRzLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBLE9BQU8sT0FBTyxDQUFDO0FBQ2YsT0FBTyxLQUFLLEtBQUssTUFBTSxPQUFPLENBQUM7QUFFL0IsU0FBUyxDQUFDLEdBQUcsRUFBRTtJQUNMLEtBQU0sQ0FBQyxPQUFPLEVBQUUsQ0FBQztBQUMzQixDQUFDLENBQUMsQ0FBQyJ9

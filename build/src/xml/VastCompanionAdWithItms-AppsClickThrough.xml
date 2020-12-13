@@ -1,0 +1,42 @@
+<VAST xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="vast.xsd" version="2.0">
+    <Ad id="1870">
+        <InLine>
+            <AdSystem>Persona.ly RTB</AdSystem>
+            <AdTitle>Monopoly Slots</AdTitle>
+            <Error><![CDATA[https://us-event.app-install.bid/rtb/error?id=YnRyAgIAAAFpU9ZIlgAAB04AAAAk9r7_nSRvT9-svATAz6x1EAACdXM&code=[ERRORCODE]]]></Error>
+            <Impression><![CDATA[https://us-event.app-install.bid/rtb/impr?id=YnRyAgIAAAFpU9ZIlgAAB04AAAAk9r7_nSRvT9-svATAz6x1EAACdXM&price=3EEADF781A04942A]]></Impression>
+            <Creatives>
+                <Creative>
+                    <Linear>
+                        <Duration>00:00:21</Duration>
+                        <TrackingEvents>
+                            <Tracking event="start"><![CDATA[https://us-event.app-install.bid/rtb/event/start?id=YnRyAgIAAAFpU9ZIlgAAB04AAAAk9r7_nSRvT9-svATAz6x1EAACdXM&price=3EEADF781A04942A]]></Tracking>
+                            <Tracking event="firstQuartile"><![CDATA[https://us-event.app-install.bid/rtb/event/firstQuartile?id=YnRyAgIAAAFpU9ZIlgAAB04AAAAk9r7_nSRvT9-svATAz6x1EAACdXM]]></Tracking>
+                            <Tracking event="midpoint"><![CDATA[https://us-event.app-install.bid/rtb/event/midpoint?id=YnRyAgIAAAFpU9ZIlgAAB04AAAAk9r7_nSRvT9-svATAz6x1EAACdXM]]></Tracking>
+                            <Tracking event="thirdQuartile"><![CDATA[https://us-event.app-install.bid/rtb/event/thirdQuartile?id=YnRyAgIAAAFpU9ZIlgAAB04AAAAk9r7_nSRvT9-svATAz6x1EAACdXM]]></Tracking>
+                            <Tracking event="complete"><![CDATA[https://us-event.app-install.bid/rtb/event/complete?id=YnRyAgIAAAFpU9ZIlgAAB04AAAAk9r7_nSRvT9-svATAz6x1EAACdXM]]></Tracking>
+                        </TrackingEvents>
+                        <VideoClicks>
+                            <ClickThrough><![CDATA[https://us-event.app-install.bid/rtb/click?id=YnRyAgIAAAFpU9ZIlgAAB04AAAAk9r7_nSRvT9-svATAz6x1EAACdXM]]></ClickThrough>
+                        </VideoClicks>
+                        <MediaFiles>
+                            <MediaFile delivery="progressive" type="video/mp4" width="320" height="480"><![CDATA[https://d8kbfjpasyqym.cloudfront.net/jackpot_party/videos/mullah_land_21s.mp4]]></MediaFile>
+                        </MediaFiles>
+                    </Linear>
+                </Creative>
+                <Creative>
+                    <CompanionAds>
+                        <Companion id="endCard" width="320" height="480">
+                            <StaticResource creativeType="image/jpeg"><![CDATA[https://d8kbfjpasyqym.cloudfront.net/jackpot_party/ec/static_land_ec.png]]></StaticResource>
+                            <TrackingEvents>
+                                <Tracking event="creativeView"><![CDATA[https://us-event.app-install.bid/rtb/event/companion?id=YnRyAgIAAAFpU9ZIlgAAB04AAAAk9r7_nSRvT9-svATAz6x1EAACdXM]]></Tracking>
+                            </TrackingEvents>
+			    <CompanionClickThrough><![CDATA[itms-apps://itunes.apple.com/us/app/jackpot-party-casino-slots/id575980917]]></CompanionClickThrough>
+                            <CompanionClickTracking><![CDATA[https://us-event.app-install.bid/rtb/click?id=YnRyAgIAAAFpU9ZIlgAAB04AAAAk9r7_nSRvT9-svATAz6x1EAACdXM&companion=true]]></CompanionClickTracking>
+                        </Companion>
+                    </CompanionAds>
+                </Creative>
+            </Creatives>
+        </InLine>
+    </Ad>
+</VAST>
