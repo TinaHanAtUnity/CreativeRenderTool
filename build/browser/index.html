@@ -36,29 +36,17 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.5/js/bootstrap.min.js" integrity="sha384-BLiI7JTZm+JWlgKa0M0kGRpJbF2J8q+qreVrKBC47e3K6BW78kGLrCkeRX6I9RoK" crossorigin="anonymous"></script>
 </head>
 <body>
-    <div class="container" id="hello">
+    <div class="container">
+        <div class="row">
+            <div class="col-xs">
+                <div class="jumbotron">
+                    <button id="video" class="btn btn-secondary btn-block" disabled="disabled">Show Creative</button>
+                </form>
+            </div>
+        </div>
     </div>
     <video id="videoView"></video>
     <iframe name="webview-frame" id="webView" src="iframe.html?enableLogs=1"></iframe>
-    <script>
-        var getHeadless = function() {
-            if(typeof location !== 'undefined' && location.search.indexOf('headless=1') !== -1) {
-                return true;
-            }
-            return false;
-        };
-        var getHeadlessLoad = function() {
-             if(typeof location !== 'undefined' && location.search.indexOf('headlessload=1') !== -1) {
-                 return true;
-             }
-             return false;
-         };
-         var getHeadlessLoadAdapter = function() {
-             if(typeof location !== 'undefined' && location.search.indexOf('headlessloadadapter=1') !== -1) {
-                 return true;
-             }
-             return false;
-         }
-    </script>
+    </div>
 </body>
 </html>
