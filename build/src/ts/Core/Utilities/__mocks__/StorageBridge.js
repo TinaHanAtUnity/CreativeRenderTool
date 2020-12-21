@@ -1,6 +1,0 @@
-export const StorageBridge = jest.fn(() => {
-    return {
-        queue: jest.fn()
-    };
-});
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiU3RvcmFnZUJyaWRnZS5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4uLy4uLy4uLy4uLy4uLy4uL3NyYy90cy9Db3JlL1V0aWxpdGllcy9fX21vY2tzX18vU3RvcmFnZUJyaWRnZS50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFNQSxNQUFNLENBQUMsTUFBTSxhQUFhLEdBQUcsSUFBSSxDQUFDLEVBQUUsQ0FBQyxHQUFHLEVBQUU7SUFDdEMsT0FBMEI7UUFDdEIsS0FBSyxFQUFFLElBQUksQ0FBQyxFQUFFLEVBQUU7S0FDbkIsQ0FBQztBQUNOLENBQUMsQ0FBQyxDQUFDIn0=

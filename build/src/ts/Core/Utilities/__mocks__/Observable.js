@@ -1,8 +1,0 @@
-export const Observable = jest.fn(() => {
-    return {
-        subscribe: jest.fn(),
-        unsubscribe: jest.fn(),
-        trigger: jest.fn()
-    };
-});
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiT2JzZXJ2YWJsZS5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4uLy4uLy4uLy4uLy4uLy4uL3NyYy90cy9Db3JlL1V0aWxpdGllcy9fX21vY2tzX18vT2JzZXJ2YWJsZS50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFRQSxNQUFNLENBQUMsTUFBTSxVQUFVLEdBQUcsSUFBSSxDQUFDLEVBQUUsQ0FBQyxHQUFHLEVBQUU7SUFDbkMsT0FBdUI7UUFDbkIsU0FBUyxFQUFFLElBQUksQ0FBQyxFQUFFLEVBQUU7UUFDcEIsV0FBVyxFQUFFLElBQUksQ0FBQyxFQUFFLEVBQUU7UUFDdEIsT0FBTyxFQUFFLElBQUksQ0FBQyxFQUFFLEVBQUU7S0FDckIsQ0FBQztBQUNOLENBQUMsQ0FBQyxDQUFDIn0=

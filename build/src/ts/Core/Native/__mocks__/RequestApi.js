@@ -1,4 +1,0 @@
-export const RequestApi = jest.fn(() => {
-    return {};
-});
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiUmVxdWVzdEFwaS5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4uLy4uLy4uLy4uLy4uLy4uL3NyYy90cy9Db3JlL05hdGl2ZS9fX21vY2tzX18vUmVxdWVzdEFwaS50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFLQSxNQUFNLENBQUMsTUFBTSxVQUFVLEdBQUcsSUFBSSxDQUFDLEVBQUUsQ0FBQyxHQUFHLEVBQUU7SUFDbkMsT0FBdUIsRUFDdEIsQ0FBQztBQUNOLENBQUMsQ0FBQyxDQUFDIn0=

@@ -1,7 +1,0 @@
-import { BackendApi } from 'Backend/BackendApi';
-export class Connectivity extends BackendApi {
-    setConnectionMonitoring(value) {
-        return;
-    }
-}
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiQ29ubmVjdGl2aXR5LmpzIiwic291cmNlUm9vdCI6IiIsInNvdXJjZXMiOlsiLi4vLi4vLi4vLi4vLi4vc3JjL3RzL0JhY2tlbmQvQXBpL0Nvbm5lY3Rpdml0eS50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQSxPQUFPLEVBQUUsVUFBVSxFQUFFLE1BQU0sb0JBQW9CLENBQUM7QUFFaEQsTUFBTSxPQUFPLFlBQWEsU0FBUSxVQUFVO0lBRWpDLHVCQUF1QixDQUFDLEtBQWM7UUFDekMsT0FBTztJQUNYLENBQUM7Q0FFSiJ9

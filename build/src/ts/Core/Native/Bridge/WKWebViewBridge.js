@@ -1,9 +1,0 @@
-export class WKWebViewBridge {
-    handleInvocation(invocations) {
-        window.webkit.messageHandlers.handleInvocation.postMessage(invocations);
-    }
-    handleCallback(id, status, parameters) {
-        window.webkit.messageHandlers.handleCallback.postMessage({ id: id, status: status, parameters: parameters });
-    }
-}
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiV0tXZWJWaWV3QnJpZGdlLmpzIiwic291cmNlUm9vdCI6IiIsInNvdXJjZXMiOlsiLi4vLi4vLi4vLi4vLi4vLi4vc3JjL3RzL0NvcmUvTmF0aXZlL0JyaWRnZS9XS1dlYlZpZXdCcmlkZ2UudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUEsTUFBTSxPQUFPLGVBQWU7SUFFakIsZ0JBQWdCLENBQUMsV0FBbUI7UUFDdkMsTUFBTSxDQUFDLE1BQU0sQ0FBQyxlQUFlLENBQUMsZ0JBQWdCLENBQUMsV0FBVyxDQUFDLFdBQVcsQ0FBQyxDQUFDO0lBQzVFLENBQUM7SUFFTSxjQUFjLENBQUMsRUFBVSxFQUFFLE1BQWMsRUFBRSxVQUFtQjtRQUNqRSxNQUFNLENBQUMsTUFBTSxDQUFDLGVBQWUsQ0FBQyxjQUFjLENBQUMsV0FBVyxDQUFDLEVBQUUsRUFBRSxFQUFFLEVBQUUsRUFBRSxNQUFNLEVBQUUsTUFBTSxFQUFFLFVBQVUsRUFBRSxVQUFVLEVBQUUsQ0FBQyxDQUFDO0lBQ2pILENBQUM7Q0FFSiJ9

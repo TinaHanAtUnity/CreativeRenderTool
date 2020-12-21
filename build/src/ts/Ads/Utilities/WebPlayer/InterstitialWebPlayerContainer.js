@@ -1,8 +1,0 @@
-import { WebPlayerViewId } from 'Ads/Native/WebPlayer';
-import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
-export class InterstitialWebPlayerContainer extends WebPlayerContainer {
-    constructor(platform, ads) {
-        super(platform, ads, WebPlayerViewId.WebPlayer);
-    }
-}
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiSW50ZXJzdGl0aWFsV2ViUGxheWVyQ29udGFpbmVyLmpzIiwic291cmNlUm9vdCI6IiIsInNvdXJjZXMiOlsiLi4vLi4vLi4vLi4vLi4vLi4vc3JjL3RzL0Fkcy9VdGlsaXRpZXMvV2ViUGxheWVyL0ludGVyc3RpdGlhbFdlYlBsYXllckNvbnRhaW5lci50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFDQSxPQUFPLEVBQUUsZUFBZSxFQUFFLE1BQU0sc0JBQXNCLENBQUM7QUFDdkQsT0FBTyxFQUFFLGtCQUFrQixFQUFFLE1BQU0sNENBQTRDLENBQUM7QUFHaEYsTUFBTSxPQUFPLDhCQUErQixTQUFRLGtCQUFrQjtJQUNsRSxZQUFZLFFBQWtCLEVBQUUsR0FBWTtRQUN4QyxLQUFLLENBQUMsUUFBUSxFQUFFLEdBQUcsRUFBRSxlQUFlLENBQUMsU0FBUyxDQUFDLENBQUM7SUFDcEQsQ0FBQztDQUNKIn0=

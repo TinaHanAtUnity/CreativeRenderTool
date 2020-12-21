@@ -1,4 +1,0 @@
-export const Analytics = jest.fn(() => {
-    return {};
-});
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiQW5hbHl0aWNzLmpzIiwic291cmNlUm9vdCI6IiIsInNvdXJjZXMiOlsiLi4vLi4vLi4vLi4vLi4vc3JjL3RzL0FuYWx5dGljcy9fX21vY2tzX18vQW5hbHl0aWNzLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUlBLE1BQU0sQ0FBQyxNQUFNLFNBQVMsR0FBRyxJQUFJLENBQUMsRUFBRSxDQUFDLEdBQUcsRUFBRTtJQUNsQyxPQUFzQixFQUFFLENBQUM7QUFDN0IsQ0FBQyxDQUFDLENBQUMifQ==

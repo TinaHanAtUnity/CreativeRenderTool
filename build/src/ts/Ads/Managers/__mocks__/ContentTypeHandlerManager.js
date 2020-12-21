@@ -1,8 +1,0 @@
-export const ContentTypeHandlerManager = jest.fn(() => {
-    return {
-        addHandler: jest.fn(),
-        getParser: jest.fn(),
-        getFactory: jest.fn()
-    };
-});
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiQ29udGVudFR5cGVIYW5kbGVyTWFuYWdlci5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4uLy4uLy4uLy4uLy4uLy4uL3NyYy90cy9BZHMvTWFuYWdlcnMvX19tb2Nrc19fL0NvbnRlbnRUeXBlSGFuZGxlck1hbmFnZXIudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBUUEsTUFBTSxDQUFDLE1BQU0seUJBQXlCLEdBQUcsSUFBSSxDQUFDLEVBQUUsQ0FBQyxHQUFHLEVBQUU7SUFDbEQsT0FBc0M7UUFDbEMsVUFBVSxFQUFFLElBQUksQ0FBQyxFQUFFLEVBQUU7UUFDckIsU0FBUyxFQUFFLElBQUksQ0FBQyxFQUFFLEVBQUU7UUFDcEIsVUFBVSxFQUFFLElBQUksQ0FBQyxFQUFFLEVBQUU7S0FDeEIsQ0FBQztBQUNOLENBQUMsQ0FBQyxDQUFDIn0=

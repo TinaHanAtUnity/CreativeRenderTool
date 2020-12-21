@@ -1,3 +1,0 @@
-// see http://developer.android.com/reference/android/view/View.html#SYSTEM_UI_FLAG_VISIBLE for detailed specs
-// note: most of the flags have API level restrictions
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiU3lzdGVtVWlWaXNpYmlsaXR5LmpzIiwic291cmNlUm9vdCI6IiIsInNvdXJjZXMiOlsiLi4vLi4vLi4vLi4vLi4vLi4vc3JjL3RzL0NvcmUvQ29uc3RhbnRzL0FuZHJvaWQvU3lzdGVtVWlWaXNpYmlsaXR5LnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBLDhHQUE4RztBQUM5RyxzREFBc0QifQ==

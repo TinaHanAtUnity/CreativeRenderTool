@@ -1,4 +1,0 @@
-export const Video = jest.fn(() => {
-    return {};
-});
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiVmlkZW8uanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuLi8uLi8uLi8uLi8uLi8uLi8uLi9zcmMvdHMvQWRzL01vZGVscy9Bc3NldHMvX19tb2Nrc19fL1ZpZGVvLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUtBLE1BQU0sQ0FBQyxNQUFNLEtBQUssR0FBRyxJQUFJLENBQUMsRUFBRSxDQUFDLEdBQUcsRUFBRTtJQUM5QixPQUFrQixFQUNqQixDQUFDO0FBQ04sQ0FBQyxDQUFDLENBQUMifQ==

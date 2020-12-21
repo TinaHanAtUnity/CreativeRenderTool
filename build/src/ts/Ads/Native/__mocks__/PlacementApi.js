@@ -1,6 +1,0 @@
-export const PlacementApi = jest.fn(() => {
-    return {
-        setPlacementState: jest.fn()
-    };
-});
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiUGxhY2VtZW50QXBpLmpzIiwic291cmNlUm9vdCI6IiIsInNvdXJjZXMiOlsiLi4vLi4vLi4vLi4vLi4vLi4vc3JjL3RzL0Fkcy9OYXRpdmUvX19tb2Nrc19fL1BsYWNlbWVudEFwaS50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFNQSxNQUFNLENBQUMsTUFBTSxZQUFZLEdBQUcsSUFBSSxDQUFDLEVBQUUsQ0FBQyxHQUFHLEVBQUU7SUFDckMsT0FBeUI7UUFDckIsaUJBQWlCLEVBQUUsSUFBSSxDQUFDLEVBQUUsRUFBRTtLQUMvQixDQUFDO0FBQ04sQ0FBQyxDQUFDLENBQUMifQ==

@@ -1,7 +1,0 @@
-export const LoadAndFillEventManager = jest.fn(() => {
-    return {
-        sendLoadTrackingEvents: jest.fn().mockImplementation(() => Promise.resolve()),
-        sendFillTrackingEvents: jest.fn().mockImplementation(() => Promise.resolve())
-    };
-});
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiTG9hZEFuZEZpbGxFdmVudE1hbmFnZXIuanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuLi8uLi8uLi8uLi8uLi8uLi9zcmMvdHMvQWRzL01hbmFnZXJzL19fbW9ja3NfXy9Mb2FkQW5kRmlsbEV2ZW50TWFuYWdlci50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFPQSxNQUFNLENBQUMsTUFBTSx1QkFBdUIsR0FBRyxJQUFJLENBQUMsRUFBRSxDQUFDLEdBQUcsRUFBRTtJQUNoRCxPQUFvQztRQUNoQyxzQkFBc0IsRUFBRSxJQUFJLENBQUMsRUFBRSxFQUFFLENBQUMsa0JBQWtCLENBQUMsR0FBRyxFQUFFLENBQUMsT0FBTyxDQUFDLE9BQU8sRUFBRSxDQUFDO1FBQzdFLHNCQUFzQixFQUFFLElBQUksQ0FBQyxFQUFFLEVBQUUsQ0FBQyxrQkFBa0IsQ0FBQyxHQUFHLEVBQUUsQ0FBQyxPQUFPLENBQUMsT0FBTyxFQUFFLENBQUM7S0FDaEYsQ0FBQztBQUNOLENBQUMsQ0FBQyxDQUFDIn0=

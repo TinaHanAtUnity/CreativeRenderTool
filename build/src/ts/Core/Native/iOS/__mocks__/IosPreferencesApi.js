@@ -1,4 +1,0 @@
-export const IosPreferencesApi = jest.fn(() => {
-    return {};
-});
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiSW9zUHJlZmVyZW5jZXNBcGkuanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuLi8uLi8uLi8uLi8uLi8uLi8uLi9zcmMvdHMvQ29yZS9OYXRpdmUvaU9TL19fbW9ja3NfXy9Jb3NQcmVmZXJlbmNlc0FwaS50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFLQSxNQUFNLENBQUMsTUFBTSxpQkFBaUIsR0FBRyxJQUFJLENBQUMsRUFBRSxDQUFDLEdBQUcsRUFBRTtJQUMxQyxPQUE4QixFQUM3QixDQUFDO0FBQ04sQ0FBQyxDQUFDLENBQUMifQ==

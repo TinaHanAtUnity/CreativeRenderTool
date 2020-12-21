@@ -1,9 +1,0 @@
-import { TrackingAuthorizationStatus } from 'Core/Native/iOS/TrackingManager';
-export const TrackingManagerApi = jest.fn(() => {
-    return {
-        available: jest.fn().mockResolvedValue(true),
-        requestTrackingAuthorization: jest.fn().mockResolvedValue(undefined),
-        getTrackingAuthorizationStatus: jest.fn().mockResolvedValue(TrackingAuthorizationStatus.NotDetermined)
-    };
-});
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiVHJhY2tpbmdNYW5hZ2VyQXBpLmpzIiwic291cmNlUm9vdCI6IiIsInNvdXJjZXMiOlsiLi4vLi4vLi4vLi4vLi4vLi4vLi4vc3JjL3RzL0NvcmUvTmF0aXZlL2lPUy9fX21vY2tzX18vVHJhY2tpbmdNYW5hZ2VyQXBpLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBLE9BQU8sRUFBOEIsMkJBQTJCLEVBQUUsTUFBTSxpQ0FBaUMsQ0FBQztBQVExRyxNQUFNLENBQUMsTUFBTSxrQkFBa0IsR0FBRyxJQUFJLENBQUMsRUFBRSxDQUFDLEdBQUcsRUFBRTtJQUMzQyxPQUErQjtRQUMzQixTQUFTLEVBQUUsSUFBSSxDQUFDLEVBQUUsRUFBRSxDQUFDLGlCQUFpQixDQUFDLElBQUksQ0FBQztRQUM1Qyw0QkFBNEIsRUFBRSxJQUFJLENBQUMsRUFBRSxFQUFFLENBQUMsaUJBQWlCLENBQUMsU0FBUyxDQUFDO1FBQ3BFLDhCQUE4QixFQUFFLElBQUksQ0FBQyxFQUFFLEVBQUUsQ0FBQyxpQkFBaUIsQ0FBQywyQkFBMkIsQ0FBQyxhQUFhLENBQUM7S0FDekcsQ0FBQztBQUNOLENBQUMsQ0FBQyxDQUFDIn0=
